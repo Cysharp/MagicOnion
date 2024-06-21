@@ -182,7 +182,7 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         public List<(EventType EventType, object HubInstance, string MethodName, object? Request, object? Response, Exception? Exception)> Events { get; } = new ();
 
-        public async Task<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse> invokeMethod)
+        public async ValueTask<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse> invokeMethod)
         {
             Events.Add((EventType.OnRequestBegin, hubInstance!, methodName, request, default, default));
             try

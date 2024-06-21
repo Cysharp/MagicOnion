@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Buffers;
-using System.Collections.Concurrent;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Grpc.Core;
-using MagicOnion.Client.Internal.Threading;
-using MagicOnion.Client.Internal.Threading.Tasks;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
@@ -84,7 +80,7 @@ namespace MagicOnion.Client
         readonly IMagicOnionSerializer messageSerializer;
         readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
-        readonly Dictionary<int, ITaskCompletion> responseFutures = new();
+        readonly Dictionary<int, IStreamingHubResponseTaskSource> responseFutures = new();
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -171,15 +167,15 @@ namespace MagicOnion.Client
         }
 
         // Helper methods to make building clients easy.
-        protected void SetResultForResponse<TResponse>(object taskCompletionSource, ReadOnlyMemory<byte> data)
-            => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
+        protected void SetResultForResponse<TResponse>(object taskSource, ReadOnlyMemory<byte> data)
+            => ((StreamingHubResponseTaskSource<TResponse>)taskSource).SetResult(Deserialize<TResponse>(data));
         protected void Serialize<T>(IBufferWriter<byte> writer, in T value)
             => messageSerializer.Serialize<T>(writer, value);
         protected T Deserialize<T>(ReadOnlyMemory<byte> data)
             => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(data));
 
         protected abstract void OnClientResultEvent(int methodId, Guid messageId, ReadOnlyMemory<byte> data);
-        protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
+        protected abstract void OnResponseEvent(int methodId, object taskSource, ReadOnlyMemory<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data);
 
         static Method<StreamingHubPayload, StreamingHubPayload> CreateConnectMethod(string serviceName)
@@ -320,7 +316,7 @@ namespace MagicOnion.Client
         {
             var message = messageReader.ReadResponseMessage();
 
-            ITaskCompletion? future;
+            IStreamingHubResponseTaskSource? future;
             lock (responseFutures)
             {
                 if (!responseFutures.Remove(message.MessageId, out future))
@@ -347,7 +343,7 @@ namespace MagicOnion.Client
         {
             var message = messageReader.ReadResponseWithErrorMessage();
 
-            ITaskCompletion? future;
+            IStreamingHubResponseTaskSource? future;
             lock (responseFutures)
             {
                 if (!responseFutures.Remove(message.MessageId, out future))
@@ -453,39 +449,62 @@ namespace MagicOnion.Client
             lastHeartbeatSentAt = DateTimeOffset.UtcNow;
         }
 
-        protected Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
+        protected Task<TResponse> WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+            => WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message).AsTask();
+
+        protected ValueTask<TResponse> WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
 
             var v = BuildRequestMessage(methodId, message);
             _ = writerQueue.Writer.TryWrite(v);
 
-            return Task.FromResult<TResponse>(default!);
+            return default;
         }
 
-        protected Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
+        protected ValueTask WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+        {
+            WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+            return default;
+        }
+
+        protected Task<TResponse> WriteMessageWithResponseTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+            => WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message).AsTask();
+
+        protected ValueTask<TResponse> WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
 
             var mid = Interlocked.Increment(ref messageIdSequence);
-            // NOTE: The continuations (user code) should be executed asynchronously. (Except: Unity WebGL)
-            //       This is because the continuation may block the thread, for example, Console.ReadLine().
-            //       If the thread is blocked, it will no longer return to the message consuming loop.
-            var tcs = new TaskCompletionSourceEx<TResponse>(
-#if !UNITY_WEBGL
-                TaskCreationOptions.RunContinuationsAsynchronously
-#endif
-            );
+
+            var taskSource = StreamingHubResponseTaskSourcePool<TResponse>.Shared.RentOrCreate();
             lock (responseFutures)
             {
-                responseFutures[mid] = tcs;
+                responseFutures[mid] = taskSource;
             }
 
             var v = BuildRequestMessage(methodId, mid, message);
             _ = writerQueue.Writer.TryWrite(v);
 
-            return tcs.Task; // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
+            return new ValueTask<TResponse>(taskSource, taskSource.Version); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
+        }
 
+        protected ValueTask WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+        {
+            ThrowIfDisposed();
+
+            var mid = Interlocked.Increment(ref messageIdSequence);
+
+            var taskSource = StreamingHubResponseTaskSourcePool<TResponse>.Shared.RentOrCreate();
+            lock (responseFutures)
+            {
+                responseFutures[mid] = taskSource;
+            }
+
+            var v = BuildRequestMessage(methodId, mid, message);
+            _ = writerQueue.Writer.TryWrite(v);
+
+            return new ValueTask(taskSource, taskSource.Version); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }
 
         protected void AwaitAndWriteClientResultResponseMessage(int methodId, Guid clientResultMessageId, Task task)
@@ -602,7 +621,7 @@ namespace MagicOnion.Client
                     {
                         try
                         {
-                            (item.Value as ITaskCompletion).TrySetCanceled();
+                            (item.Value as IStreamingHubResponseTaskSource).TrySetCanceled();
                         }
                         catch (Exception ex)
                         {

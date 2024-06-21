@@ -21,15 +21,15 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task B(global::TempProject.MyObject a)
-                    => this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
+                    => this.WriteMessageWithResponseTaskAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
                 public global::System.Threading.Tasks.Task C(global::TempProject.MyObject a, global::System.String b)
-                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
+                    => this.WriteMessageWithResponseTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
                 public global::System.Threading.Tasks.Task D(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                    => this.WriteMessageWithResponseTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
                 public global::System.Threading.Tasks.Task<global::System.Int32> E(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                    => this.WriteMessageWithResponseTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -47,15 +47,15 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task A()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task B(global::TempProject.MyObject a)
-                        => parent.WriteMessageFireAndForgetAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
                     public global::System.Threading.Tasks.Task C(global::TempProject.MyObject a, global::System.String b)
-                        => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
                     public global::System.Threading.Tasks.Task D(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                        => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
                     public global::System.Threading.Tasks.Task<global::System.Int32> E(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                        => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
 
                 }
 

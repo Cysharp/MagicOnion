@@ -23,38 +23,80 @@ namespace TempProject
                     this.diagnosticHandler = diagnosticHandler;
                 }
 
-                global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
                     if (diagnosticHandler is null)
                     {
-                        return base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message);
+                        return base.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(methodId, message);
                     }
 
-                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseAsync<TRequest, TResponse>);
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                 }
 
-                global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
                     if (diagnosticHandler is null)
                     {
-                        return base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message);
+                        await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message);
+                        return;
                     }
 
-                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetAsync<TRequest, TResponse>);
+                    await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
+                }
+
+                global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageWithResponseDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                {
+                    if (diagnosticHandler is null)
+                    {
+                        return base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                    }
+
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
+                }
+
+                global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                {
+                    if (diagnosticHandler is null)
+                    {
+                        return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                    }
+
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>).AsTask();
+                }
+
+                async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                {
+                    if (diagnosticHandler is null)
+                    {
+                        await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                        return;
+                    }
+
+                    await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
+                }
+
+                global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                {
+                    if (diagnosticHandler is null)
+                    {
+                        return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                    }
+                
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                 }
 
                 public global::System.Threading.Tasks.Task MethodA()
-                    => this.WriteMessageWithResponseDiagnosticAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1497325507, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseDiagnosticTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1497325507, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Int32> MethodB()
-                    => this.WriteMessageWithResponseDiagnosticAsync<global::MessagePack.Nil, global::System.Int32>(1514103126, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseDiagnosticTaskAsync<global::MessagePack.Nil, global::System.Int32>(1514103126, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.ValueTask MethodC()
-                    => new global::System.Threading.Tasks.ValueTask(this.WriteMessageWithResponseDiagnosticAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1530880745, global::MessagePack.Nil.Default));
+                    => this.WriteMessageWithResponseDiagnosticValueTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1530880745, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.ValueTask<global::System.Int32> MethodD()
-                    => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(this.WriteMessageWithResponseDiagnosticAsync<global::MessagePack.Nil, global::System.Int32>(1547658364, global::MessagePack.Nil.Default));
+                    => this.WriteMessageWithResponseDiagnosticValueTaskOfTAsync<global::MessagePack.Nil, global::System.Int32>(1547658364, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task MethodE(global::System.Int32 arg0, global::System.String arg1)
-                    => this.WriteMessageWithResponseDiagnosticAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::MessagePack.Nil>(1564435983, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
+                    => this.WriteMessageWithResponseDiagnosticTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::MessagePack.Nil>(1564435983, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
                 public global::System.Threading.Tasks.Task<global::System.String> MethodF(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
-                    => this.WriteMessageWithResponseDiagnosticAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.String>(1581213602, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2));
+                    => this.WriteMessageWithResponseDiagnosticTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.String>(1581213602, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -72,17 +114,17 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task MethodA()
-                        => parent.WriteMessageFireAndForgetDiagnosticAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1497325507, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetDiagnosticTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1497325507, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task<global::System.Int32> MethodB()
-                        => parent.WriteMessageFireAndForgetDiagnosticAsync<global::MessagePack.Nil, global::System.Int32>(1514103126, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetDiagnosticTaskAsync<global::MessagePack.Nil, global::System.Int32>(1514103126, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.ValueTask MethodC()
-                        => new global::System.Threading.Tasks.ValueTask(parent.WriteMessageFireAndForgetDiagnosticAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1530880745, global::MessagePack.Nil.Default));
+                        => parent.WriteMessageFireAndForgetDiagnosticValueTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1530880745, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.ValueTask<global::System.Int32> MethodD()
-                        => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(parent.WriteMessageFireAndForgetDiagnosticAsync<global::MessagePack.Nil, global::System.Int32>(1547658364, global::MessagePack.Nil.Default));
+                        => parent.WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<global::MessagePack.Nil, global::System.Int32>(1547658364, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task MethodE(global::System.Int32 arg0, global::System.String arg1)
-                        => parent.WriteMessageFireAndForgetDiagnosticAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::MessagePack.Nil>(1564435983, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
+                        => parent.WriteMessageFireAndForgetDiagnosticTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::MessagePack.Nil>(1564435983, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
                     public global::System.Threading.Tasks.Task<global::System.String> MethodF(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
-                        => parent.WriteMessageFireAndForgetDiagnosticAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.String>(1581213602, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2));
+                        => parent.WriteMessageFireAndForgetDiagnosticTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.String>(1581213602, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2));
 
                 }
 

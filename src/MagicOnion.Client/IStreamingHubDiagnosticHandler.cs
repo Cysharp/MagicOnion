@@ -8,7 +8,7 @@ namespace MagicOnion.Client
     /// </summary>
     public interface IStreamingHubDiagnosticHandler
     {
-        public delegate Task<TResponse> InvokeMethodDelegate<TRequest, TResponse>(int methodId, TRequest value);
+        public delegate ValueTask<TResponse> InvokeMethodDelegate<TRequest, TResponse>(int methodId, TRequest value);
 
         /// <summary>
         /// The callback method at the beginning of a Hub method request. This API may change in the future.
@@ -22,7 +22,7 @@ namespace MagicOnion.Client
         /// <param name="request"></param>
         /// <param name="isFireAndForget"></param>
         /// <param name="invokeMethod"></param>
-        Task<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, InvokeMethodDelegate<TRequest, TResponse> invokeMethod);
+        ValueTask<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, InvokeMethodDelegate<TRequest, TResponse> invokeMethod);
 
         /// <summary>
         /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.

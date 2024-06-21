@@ -240,7 +240,7 @@ namespace MagicOnion.Client.DynamicClient
 
             // receiver types borrow from DynamicBroadcastBuilder
             {
-                // protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
+                // protected abstract void OnResponseEvent(int methodId, object taskSource, ReadOnlyMemory<byte> data);
                 {
                     var method = typeBuilder.DefineMethod("OnResponseEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
                         null, new[] { typeof(int), typeof(object), typeof(ReadOnlyMemory<byte>) });
@@ -263,7 +263,7 @@ namespace MagicOnion.Client.DynamicClient
 
                     foreach (var item in labels)
                     {
-                        // SetResultForResponse<T>(taskCompletionSource, data);
+                        // SetResultForResponse<T>(taskSource, data);
                         Type responseType;
 
                         if (item.def.MethodInfo.ReturnType == typeof(Task) || item.def.MethodInfo.ReturnType == typeof(ValueTask))
@@ -278,9 +278,9 @@ namespace MagicOnion.Client.DynamicClient
 
                         il.MarkLabel(item.label);
 
-                        // this.SetResultForResponse<T>(taskCompletionSource, data);
+                        // this.SetResultForResponse<T>(taskSource, data);
                         il.Emit(OpCodes.Ldarg_0); // this
-                        il.Emit(OpCodes.Ldarg_2); // taskCompletionSource
+                        il.Emit(OpCodes.Ldarg_2); // taskSource
                         il.Emit(OpCodes.Ldarg_3); // data
                         il.Emit(OpCodes.Call, baseType.GetMethod("SetResultForResponse", BindingFlags.Instance | BindingFlags.NonPublic)!.MakeGenericMethod(responseType));
 
@@ -568,32 +568,26 @@ namespace MagicOnion.Client.DynamicClient
                     il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
                 }
 
-                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
+                if (def.MethodInfo.ReturnType == typeof(Task))
                 {
-                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseAsync.MakeGenericMethod(callType, typeof(Nil)));
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseTaskAsync.MakeGenericMethod(callType, typeof(Nil)));
+                }
+                else if (def.MethodInfo.ReturnType == typeof(ValueTask))
+                {
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseValueTaskAsync.MakeGenericMethod(callType, typeof(Nil)));
                 }
                 else if (def.MethodInfo.ReturnType == typeof(void))
                 {
-                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetAsync.MakeGenericMethod(callType, typeof(Nil)));
-                }
-                else
-                {
-                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseAsync.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
-                }
-
-                // If the return type is `ValueTask`, the task must be wrapped as ValueTask.
-                if (def.MethodInfo.ReturnType == typeof(ValueTask))
-                {
-                    il.Emit(OpCodes.Newobj, typeof(ValueTask).GetConstructor(new [] { typeof(Task) })!);
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetValueTaskOfTAsync.MakeGenericMethod(callType, typeof(Nil)));
+                    il.Emit(OpCodes.Pop);
                 }
                 else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
                 {
-                    var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
-                    il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseValueTaskOfTAsync.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
                 }
-                else if (def.MethodInfo.ReturnType == typeof(void))
+                else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
-                    il.Emit(OpCodes.Pop);
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseTaskAsync.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -686,24 +680,31 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     responseType = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                 }
-                var mInfo = parentNestedType.BaseType!
-                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Single(x => x.Name == "WriteMessageFireAndForgetAsync"); // WriteMessageAsyncFireAndForget<TRequest, TResponse>
-                il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(requestType, responseType));
 
-                // If the return type is `ValueTask`, the task must be wrapped as ValueTask.
-                if (def.MethodInfo.ReturnType == typeof(ValueTask))
+                if (def.MethodInfo.ReturnType == typeof(Task))
                 {
-                    il.Emit(OpCodes.Newobj, typeof(ValueTask).GetConstructor(new [] { typeof(Task) })!);
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync.MakeGenericMethod(requestType, responseType));
                 }
-                else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                else if (def.MethodInfo.ReturnType == typeof(ValueTask))
                 {
-                    var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
-                    il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetValueTaskAsync.MakeGenericMethod(requestType, responseType));
                 }
                 else if (def.MethodInfo.ReturnType == typeof(void))
                 {
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetValueTaskOfTAsync.MakeGenericMethod(requestType, responseType));
                     il.Emit(OpCodes.Pop);
+                }
+                else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                {
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetValueTaskOfTAsync.MakeGenericMethod(requestType, responseType));
+                }
+                else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync.MakeGenericMethod(requestType, responseType));
+                }
+                else
+                {
+                    throw new NotSupportedException($"Unsupported Return Type: {def.MethodInfo.ReturnType}");
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -732,10 +733,18 @@ namespace MagicOnion.Client.DynamicClient
 
             public static readonly MethodInfo StreamingHubClientBase_WriteClientResultResponseMessageForError
                 = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteClientResultResponseMessageForError", BindingFlags.NonPublic | BindingFlags.Instance)!;
-            public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseAsync
-                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
-            public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetAsync
-                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseValueTaskOfTAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseValueTaskOfTAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseTaskAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseValueTaskAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetValueTaskOfTAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetValueTaskOfTAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetValueTaskAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
             // ReSharper restore StaticMemberInGenericType
             // ReSharper restore InconsistentNaming
 #pragma warning restore IDE1006 // Naming Styles

@@ -21,9 +21,9 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetStringValuesAsync(global::System.Collections.Generic.List<global::System.String> arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(1774317884, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(1774317884, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetIntValuesAsync(global::System.Collections.Generic.List<global::System.Int32> arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(-400881550, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(-400881550, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -41,9 +41,9 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetStringValuesAsync(global::System.Collections.Generic.List<global::System.String> arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(1774317884, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(1774317884, arg0);
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetIntValuesAsync(global::System.Collections.Generic.List<global::System.Int32> arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(-400881550, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(-400881550, arg0);
 
                 }
 

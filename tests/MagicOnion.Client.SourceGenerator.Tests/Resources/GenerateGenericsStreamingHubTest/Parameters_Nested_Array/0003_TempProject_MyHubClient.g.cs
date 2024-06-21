@@ -21,7 +21,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetValuesAsync(global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]> arg0)
-                    => this.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]>, global::MessagePack.Nil>(-209315513, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]>, global::MessagePack.Nil>(-209315513, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -39,7 +39,7 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetValuesAsync(global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]> arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]>, global::MessagePack.Nil>(-209315513, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::TempProject.MyGenericObject<global::TempProject.MyNestedGenericObject[]>, global::MessagePack.Nil>(-209315513, arg0);
 
                 }
 

@@ -21,9 +21,9 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::System.Int32>> A()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::System.Int32>>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::System.Int32>>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyObject>> B()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyObject>>(-955516027, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyObject>>(-955516027, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -41,9 +41,9 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::System.Int32>> A()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::System.Int32>>(-1005848884, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::System.Int32>>(-1005848884, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyObject>> B()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyObject>>(-955516027, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyObject>>(-955516027, global::MessagePack.Nil.Default);
 
                 }
 

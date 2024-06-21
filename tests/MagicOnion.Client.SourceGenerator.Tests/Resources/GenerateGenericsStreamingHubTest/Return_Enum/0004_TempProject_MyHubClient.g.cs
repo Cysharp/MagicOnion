@@ -21,7 +21,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> GetEnumAsync()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyEnum>>(-1221306238, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyEnum>>(-1221306238, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -39,7 +39,7 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> GetEnumAsync()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyEnum>>(-1221306238, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyEnum>>(-1221306238, global::MessagePack.Nil.Default);
 
                 }
 

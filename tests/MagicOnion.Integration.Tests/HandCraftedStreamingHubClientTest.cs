@@ -118,53 +118,53 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
 
             public Task MethodReturnWithoutValue()
             {
-                return parent.WriteMessageFireAndForgetAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
+                return parent.WriteMessageFireAndForgetTaskAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
             }
 
             public Task<int> MethodParameterless()
             {
-                return parent.WriteMessageFireAndForgetAsync<MessagePack.Nil, int>(FNV1A32.GetHashCode(nameof(MethodParameterless)), MessagePack.Nil.Default);
+                return parent.WriteMessageFireAndForgetTaskAsync<MessagePack.Nil, int>(FNV1A32.GetHashCode(nameof(MethodParameterless)), MessagePack.Nil.Default);
             }
 
             public Task<int> MethodParameter_One(int arg0)
             {
-                return parent.WriteMessageFireAndForgetAsync<int, int>(FNV1A32.GetHashCode(nameof(MethodParameter_One)), arg0);
+                return parent.WriteMessageFireAndForgetTaskAsync<int, int>(FNV1A32.GetHashCode(nameof(MethodParameter_One)), arg0);
             }
 
             public Task<int> MethodParameter_Many(int arg0, string arg1)
             {
-                return parent.WriteMessageFireAndForgetAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(MethodParameter_Many)), new DynamicArgumentTuple<int, string>(arg0, arg1));
+                return parent.WriteMessageFireAndForgetTaskAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(MethodParameter_Many)), new DynamicArgumentTuple<int, string>(arg0, arg1));
             }
 
             public Task<int> Callback(int arg0, string arg1)
             {
-                return parent.WriteMessageFireAndForgetAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(Callback)), new DynamicArgumentTuple<int, string>(arg0, arg1));
+                return parent.WriteMessageFireAndForgetTaskAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(Callback)), new DynamicArgumentTuple<int, string>(arg0, arg1));
             }
         }
 
         public Task MethodReturnWithoutValue()
         {
-            return base.WriteMessageWithResponseAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
+            return base.WriteMessageWithResponseTaskAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
         }
 
         public Task<int> MethodParameterless()
         {
-            return WriteMessageWithResponseAsync<MessagePack.Nil, int>(FNV1A32.GetHashCode(nameof(MethodParameterless)), MessagePack.Nil.Default);
+            return WriteMessageWithResponseTaskAsync<MessagePack.Nil, int>(FNV1A32.GetHashCode(nameof(MethodParameterless)), MessagePack.Nil.Default);
         }
 
         public Task<int> MethodParameter_One(int arg0)
         {
-            return WriteMessageWithResponseAsync<int, int>(FNV1A32.GetHashCode(nameof(MethodParameter_One)), arg0);
+            return WriteMessageWithResponseTaskAsync<int, int>(FNV1A32.GetHashCode(nameof(MethodParameter_One)), arg0);
         }
 
         public Task<int> MethodParameter_Many(int arg0, string arg1)
         {
-            return WriteMessageWithResponseAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(MethodParameter_Many)), new DynamicArgumentTuple<int, string>(arg0, arg1));
+            return WriteMessageWithResponseTaskAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(MethodParameter_Many)), new DynamicArgumentTuple<int, string>(arg0, arg1));
         }
 
         public Task<int> Callback(int arg0, string arg1)
         {
-            return WriteMessageWithResponseAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(Callback)), new DynamicArgumentTuple<int, string>(arg0, arg1));
+            return WriteMessageWithResponseTaskAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(Callback)), new DynamicArgumentTuple<int, string>(arg0, arg1));
         }
     }
 }
