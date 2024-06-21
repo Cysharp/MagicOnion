@@ -273,9 +273,9 @@ public class StaticStreamingHubClientGenerator
             """);
 
             if (isFireAndForget) ctx.Writer.Append("    ");
-            if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
+            if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask || isReturnTypeVoid)
             {
-                // ValueTask
+                // ValueTask, void
                 ctx.Writer.AppendLineWithFormat($"""
                                 => {writeMessageAsyncPrefix}ValueTaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
