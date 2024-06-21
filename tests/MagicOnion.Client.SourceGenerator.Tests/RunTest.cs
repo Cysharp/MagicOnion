@@ -126,6 +126,8 @@ public class RunTest
                 {
                     Task<string> HelloAsync(string name, int age);
                     Task<string?> HelloNullableAsync(string? name, int? age);
+                    ValueTask<string> HelloValueTaskAsync(string name, int age);
+                    void Hello(string name, int age);
                 }
 
                 public interface IMyStreamingHubReceiver
@@ -221,6 +223,48 @@ public class RunTest
             
             [moc::MagicOnionClientGenerationAttribute]
             partial class FullName_AliasQualified {}
+            """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+
+        Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+    }
+
+
+    [Fact]
+    public void RunAndGenerate_StreamingHub_EnableStreamingHubDiagnosticHandler()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+            #nullable enable
+            using System;
+            using System.Threading.Tasks;
+            using MagicOnion;
+            using MagicOnion.Client;
+
+            namespace TempProject;
+
+            public interface IMyStreamingHub : IStreamingHub<IMyStreamingHub, IMyStreamingHubReceiver>
+            {
+                Task<string> HelloAsync(string name, int age);
+                Task<string?> HelloNullableAsync(string? name, int? age);
+                void Hello(string name, int age);
+            }
+
+            public interface IMyStreamingHubReceiver
+            {
+            }
+
+            [MagicOnionClientGeneration(typeof(IMyStreamingHub), EnableStreamingHubDiagnosticHandler = true)]
+            partial class MagicOnionInitializer {}
             """);
         var sourceGenerator = new MagicOnionClientSourceGenerator();
 

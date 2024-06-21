@@ -273,11 +273,18 @@ public class StaticStreamingHubClientGenerator
             """);
 
             if (isFireAndForget) ctx.Writer.Append("    ");
-            if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask || isReturnTypeVoid)
+            if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
             {
-                // ValueTask, void
+                // ValueTask
                 ctx.Writer.AppendLineWithFormat($"""
                                 => {writeMessageAsyncPrefix}ValueTaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+            """);
+            }
+            else if (isReturnTypeVoid)
+            {
+                // void
+                ctx.Writer.AppendLineWithFormat($"""
+                                => _ = {writeMessageAsyncPrefix}ValueTaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
             else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
