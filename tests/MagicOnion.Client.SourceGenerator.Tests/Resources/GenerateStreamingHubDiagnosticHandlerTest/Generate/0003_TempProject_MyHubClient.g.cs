@@ -130,6 +130,7 @@ namespace TempProject
 
                 protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
+                    diagnosticHandler?.OnBroadcastEventRaw(this, methodId, data);
                     switch (methodId)
                     {
                         case -1005848884: // Void A()
@@ -149,27 +150,33 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case 1497325507: // Task MethodA()
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::MessagePack.Nil>(this, "MethodA", data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 1514103126: // Task<Int32> MethodB()
-                            base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::System.Int32>(this, "MethodB", data);
+                            base.SetResultForResponse<global::System.Int32>(taskSource, data);
                             break;
                         case 1530880745: // ValueTask MethodC()
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::MessagePack.Nil>(this, "MethodC", data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 1547658364: // ValueTask<Int32> MethodD()
-                            base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::System.Int32>(this, "MethodD", data);
+                            base.SetResultForResponse<global::System.Int32>(taskSource, data);
                             break;
                         case 1564435983: // Task MethodE(global::System.Int32 arg0, global::System.String arg1)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::MessagePack.Nil>(this, "MethodE", data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 1581213602: // Task<String> MethodF(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
-                            base.SetResultForResponse<global::System.String>(taskCompletionSource, data);
+                            diagnosticHandler?.OnResponseEvent<TempProject_MyHubClient, global::System.String>(this, "MethodF", data);
+                            base.SetResultForResponse<global::System.String>(taskSource, data);
                             break;
                     }
                 }

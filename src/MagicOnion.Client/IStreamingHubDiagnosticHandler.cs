@@ -28,10 +28,29 @@ namespace MagicOnion.Client
         /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
         /// </summary>
         /// <typeparam name="THub"></typeparam>
+        /// <param name="hubInstance"></param>
+        /// <param name="methodId"></param>
+        /// <param name="data"></param>
+        void OnBroadcastEventRaw<THub>(THub hubInstance, int methodId, ReadOnlyMemory<byte> data);
+
+        /// <summary>
+        /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
+        /// </summary>
+        /// <typeparam name="THub"></typeparam>
         /// <typeparam name="T"></typeparam>
         /// <param name="hubInstance"></param>
         /// <param name="methodName"></param>
         /// <param name="value"></param>
         void OnBroadcastEvent<THub, T>(THub hubInstance, string methodName, T value);
+
+        /// <summary>
+        /// [Preview] The callback method when the return value of a hub method call is received. This API may change in the future.
+        /// </summary>
+        /// <typeparam name="THub"></typeparam>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hubInstance"></param>
+        /// <param name="methodName"></param>
+        /// <param name="data"></param>
+        void OnResponseEvent<THub, T>(THub hubInstance, string methodName, ReadOnlyMemory<byte> data);
     }
 }

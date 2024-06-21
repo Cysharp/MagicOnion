@@ -83,24 +83,24 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case -1005848884: // Task A()
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case -955516027: // Task B(global::TempProject.MyObject a)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case -972293646: // Task C(global::TempProject.MyObject a, global::System.String b)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case -1056181741: // Task D(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case -1072959360: // Task<Int32> E(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                            base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Int32>(taskSource, data);
                             break;
                     }
                 }

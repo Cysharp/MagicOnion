@@ -50,12 +50,12 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case -1005848884: // Task<MyObject> A(global::TempProject.MyObject a)
-                            base.SetResultForResponse<global::TempProject.MyObject>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::TempProject.MyObject>(taskSource, data);
                             break;
                     }
                 }

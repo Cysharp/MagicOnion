@@ -66,24 +66,24 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case 1774317884: // Task<Nil> GetStringValuesAsync(global::System.String[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case -400881550: // Task<Nil> GetIntValuesAsync(global::System.Int32[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 309063297: // Task<Nil> GetInt32ValuesAsync(global::System.Int32[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 702446639: // Task<Nil> GetSingleValuesAsync(global::System.Single[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                         case 2082077357: // Task<Nil> GetBooleanValuesAsync(global::System.Boolean[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::MessagePack.Nil>(taskSource, data);
                             break;
                     }
                 }

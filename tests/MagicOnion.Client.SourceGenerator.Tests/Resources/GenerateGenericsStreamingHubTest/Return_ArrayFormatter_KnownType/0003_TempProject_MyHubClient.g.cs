@@ -66,24 +66,24 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case 1774317884: // Task<String[]> GetStringValuesAsync()
-                            base.SetResultForResponse<global::System.String[]>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.String[]>(taskSource, data);
                             break;
                         case -400881550: // Task<Int32[]> GetIntValuesAsync()
-                            base.SetResultForResponse<global::System.Int32[]>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Int32[]>(taskSource, data);
                             break;
                         case 309063297: // Task<Int32[]> GetInt32ValuesAsync()
-                            base.SetResultForResponse<global::System.Int32[]>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Int32[]>(taskSource, data);
                             break;
                         case 702446639: // Task<Single[]> GetSingleValuesAsync()
-                            base.SetResultForResponse<global::System.Single[]>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Single[]>(taskSource, data);
                             break;
                         case 2082077357: // Task<Boolean[]> GetBooleanValuesAsync()
-                            base.SetResultForResponse<global::System.Boolean[]>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Boolean[]>(taskSource, data);
                             break;
                     }
                 }
