@@ -829,6 +829,22 @@ references:
   fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEvent(Of THub, T)(THub, System.String, T)
   nameWithType: IStreamingHubDiagnosticHandler.OnBroadcastEvent<THub, T>(THub, String, T)
   nameWithType.vb: IStreamingHubDiagnosticHandler.OnBroadcastEvent(Of THub, T)(THub, String, T)
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw*
+  name: OnBroadcastEventRaw
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEventRaw_
+  commentId: Overload:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw
+  isSpec: "True"
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw
+  nameWithType: IStreamingHubDiagnosticHandler.OnBroadcastEventRaw
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw``1(``0,System.Int32,ReadOnlyMemory{System.Byte})
+  name: OnBroadcastEventRaw<THub>(THub, Int32, ReadOnlyMemory<Byte>)
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEventRaw__1___0_System_Int32_ReadOnlyMemory_System_Byte__
+  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw``1(``0,System.Int32,ReadOnlyMemory{System.Byte})
+  name.vb: OnBroadcastEventRaw(Of THub)(THub, Int32, ReadOnlyMemory(Of Byte))
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw<THub>(THub, System.Int32, ReadOnlyMemory<System.Byte>)
+  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw(Of THub)(THub, System.Int32, ReadOnlyMemory(Of System.Byte))
+  nameWithType: IStreamingHubDiagnosticHandler.OnBroadcastEventRaw<THub>(THub, Int32, ReadOnlyMemory<Byte>)
+  nameWithType.vb: IStreamingHubDiagnosticHandler.OnBroadcastEventRaw(Of THub)(THub, Int32, ReadOnlyMemory(Of Byte))
 - uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke*
   name: OnMethodInvoke
   href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke_
@@ -845,6 +861,22 @@ references:
   fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke(Of THub, TRequest, TResponse)(THub, System.Int32, System.String, TRequest, System.Boolean, MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse))
   nameWithType: IStreamingHubDiagnosticHandler.OnMethodInvoke<THub, TRequest, TResponse>(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>)
   nameWithType.vb: IStreamingHubDiagnosticHandler.OnMethodInvoke(Of THub, TRequest, TResponse)(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse))
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent*
+  name: OnResponseEvent
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnResponseEvent_
+  commentId: Overload:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent
+  isSpec: "True"
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent
+  nameWithType: IStreamingHubDiagnosticHandler.OnResponseEvent
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent``2(``0,System.String,ReadOnlyMemory{System.Byte})
+  name: OnResponseEvent<THub, T>(THub, String, ReadOnlyMemory<Byte>)
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnResponseEvent__2___0_System_String_ReadOnlyMemory_System_Byte__
+  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent``2(``0,System.String,ReadOnlyMemory{System.Byte})
+  name.vb: OnResponseEvent(Of THub, T)(THub, String, ReadOnlyMemory(Of Byte))
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent<THub, T>(THub, System.String, ReadOnlyMemory<System.Byte>)
+  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent(Of THub, T)(THub, System.String, ReadOnlyMemory(Of System.Byte))
+  nameWithType: IStreamingHubDiagnosticHandler.OnResponseEvent<THub, T>(THub, String, ReadOnlyMemory<Byte>)
+  nameWithType.vb: IStreamingHubDiagnosticHandler.OnResponseEvent(Of THub, T)(THub, String, ReadOnlyMemory(Of Byte))
 - uid: MagicOnion.Client.MagicOnionClient
   name: MagicOnionClient
   href: api/MagicOnion.Client.MagicOnionClient.html

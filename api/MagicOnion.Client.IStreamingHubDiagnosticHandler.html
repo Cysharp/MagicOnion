@@ -113,9 +113,23 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEventRaw__1___0_System_Int32_ReadOnlyMemory_System_Byte__">OnBroadcastEventRaw&lt;THub&gt;(THub, Int32, ReadOnlyMemory&lt;Byte&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"><p>[Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke__3___0_System_Int32_System_String___1_System_Boolean_MagicOnion_Client_IStreamingHubDiagnosticHandler_InvokeMethodDelegate___1___2__">OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt;)</a>
         </td>
         <td class="markdown level1 summary"><p>The callback method at the beginning of a Hub method request. This API may change in the future.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnResponseEvent__2___0_System_String_ReadOnlyMemory_System_Byte__">OnResponseEvent&lt;THub, T&gt;(THub, String, ReadOnlyMemory&lt;Byte&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"><p>[Preview] The callback method when the return value of a hub method call is received. This API may change in the future.</p>
 </td>
       </tr>
     </tbody>
@@ -153,6 +167,48 @@
     <dt><span class="parametername"><code>THub</code></span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEventRaw_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw*"></a>
+  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEventRaw__1___0_System_Int32_ReadOnlyMemory_System_Byte__" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw``1(``0,System.Int32,ReadOnlyMemory{System.Byte})">OnBroadcastEventRaw&lt;THub&gt;(THub, Int32, ReadOnlyMemory&lt;Byte&gt;)</h4>
+  <div class="markdown level1 summary"><p>[Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void OnBroadcastEventRaw&lt;THub&gt;(THub hubInstance, int methodId, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>hubInstance</code></span> <span class="xref">THub</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>data</code></span> <span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>THub</code></span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -212,6 +268,50 @@
     <dt><span class="parametername"><code>TRequest</code></span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnResponseEvent_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent*"></a>
+  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnResponseEvent__2___0_System_String_ReadOnlyMemory_System_Byte__" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent``2(``0,System.String,ReadOnlyMemory{System.Byte})">OnResponseEvent&lt;THub, T&gt;(THub, String, ReadOnlyMemory&lt;Byte&gt;)</h4>
+  <div class="markdown level1 summary"><p>[Preview] The callback method when the return value of a hub method call is received. This API may change in the future.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void OnResponseEvent&lt;THub, T&gt;(THub hubInstance, string methodName, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>hubInstance</code></span> <span class="xref">THub</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>methodName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>data</code></span> <span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>THub</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>T</code></span></dt>
     <dd></dd>
   </dl>
   </section>
