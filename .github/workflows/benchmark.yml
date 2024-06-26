@@ -3,36 +3,72 @@ name: Benchmark
 on:
   push:
     branches:
-      - feature/perf
+      - benchmark
 
 env:
   BUILD_CONFIG: Release
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  build:
+  benchmark:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      # build
-      - name: Build Client
-        run: dotnet publish -c ${{ env.BUILD_CONFIG }} -p:PublishSingleFile=true --runtime linux-x64 --self-contained true ./perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj -o ./perf/artifacts/PerformanceTest.Client
-      - name: Build Server
-        run: dotnet publish -c ${{ env.BUILD_CONFIG }} -p:PublishSingleFile=true --runtime linux-x64 --self-contained true ./perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj -o ./perf/artifacts/PerformanceTest.Server
-      # upload
-      - uses: Cysharp/Actions/.github/actions/upload-artifact@main
+      - name: Load secret
+        id: op-load-secret
+        uses: 1password/load-secrets-action@v2
         with:
-          name: artifacts
-          path: ./perf/artifacts
-          if-no-files-found: error
-          retention-days: 1
-
-#   run:
-#     needs: [build]
-#     runs-on: ubuntu-latest
-#     timeout-minutes: 10
-#     steps:
-#       - uses: actions/checkout@v4
-#       # run
-#       # get result
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
+          SSH_KEY: "op://GitHubActionsPublic/BENCHMARK_VM_SSH/private key"
+          AZURE_OIDC_CLIENTID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/clientId"
+          AZURE_OIDC_TENANTID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/tenantId"
+          AZURE_OIDC_SUBSCRIPTIONID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/subscriptionId"
+      - name: Output SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ steps.op-load-secret.outputs.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_CLIENTID }}
+          tenant-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_TENANTID }}
+          subscription-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_SUBSCRIPTIONID }}
+      - name: Start Benchmark VM
+        run: |
+          for vm in $(az vm list -d -g BenchmarkTest --query "[?powerState!='VM running'].name" -o tsv); do
+            az vm start --name $vm  --resource-group BenchmarkTest
+          done
+      - name: Setup .NET on Benchmark VM
+        run: |
+          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running'].publicIps" -o tsv); do
+            echo "::group::Install on $ip"
+              ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --dotnet-version 8.0' < ./scripts/dotnet_install.sh
+            echo "::endgroup::"
+          done
+        working-directory: ./.github
+      - name: Run Benchmark Server
+        run: |
+          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='benchmark-server-vm'].publicIps" -o tsv); do
+            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj" --env-settings "Kestrel__EndpointDefaults__Protocols=Http2;Kestrel__Endpoints__Grpc__Url=http://+:5000;" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh &
+          done
+          # wait until server started
+          sleep 120s
+        working-directory: ./.github
+      - name: Run Benchmark Client
+        run: |
+          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='benchmark-client-vm'].publicIps" -o tsv); do
+            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --args "-u http://benchmark-server-vm:5000 -s streaminghub --channels 1 --streams 1" --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh
+          done
+        working-directory: ./.github
+      - name: Stop (Deallocate) Benchmark VM
+        if: always()
+        run: |
+          for vm in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running'].name" -o tsv); do
+            az vm deallocate --name $vm  --resource-group BenchmarkTest --no-wait
+          done
