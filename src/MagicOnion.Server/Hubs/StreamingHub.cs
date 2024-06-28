@@ -242,11 +242,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             // Create a context for each call to the hub method.
             var context = StreamingHubContextPool.Shared.Get();
             context.Initialize(
-                serviceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
+                handler: handler,
+                streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
                 hubInstance: this,
                 request: body,
-                path: handler.ToString(),
-                methodId: methodId,
                 messageId: messageId,
                 timestamp: DateTime.UtcNow
             );

@@ -35,6 +35,7 @@ public class StreamingHubContext
 {
     IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> streamingServiceContext = default!;
     ConcurrentDictionary<string, object>? items;
+    StreamingHubHandler handler = default!;
 
     /// <summary>Object storage per invoke.</summary>
     public ConcurrentDictionary<string, object> Items
@@ -49,10 +50,12 @@ public class StreamingHubContext
         }
     }
 
+    public string Path => handler.ToString();
+    public ILookup<Type, Attribute> AttributeLookup => handler.AttributeLookup;
+
     public object HubInstance { get; private set; } = default!;
 
     public ReadOnlyMemory<byte> Request { get; private set; }
-    public string Path { get; private set; } = default!;
     public DateTime Timestamp { get; private set; }
 
     public Guid ConnectionId => streamingServiceContext.ContextId;
@@ -60,31 +63,29 @@ public class StreamingHubContext
     public IServiceContext ServiceContext => streamingServiceContext;
 
     internal int MessageId { get; private set; }
-    internal int MethodId { get; private set; }
+    internal int MethodId => handler.MethodId;
 
     internal int ResponseSize { get; private set; } = -1;
     internal Type? ResponseType { get; private set; }
 
-    internal void Initialize(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, object hubInstance, ReadOnlyMemory<byte> request, string path, DateTime timestamp, int messageId, int methodId)
+    internal void Initialize(StreamingHubHandler handler, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> streamingServiceContext, object hubInstance, ReadOnlyMemory<byte> request, DateTime timestamp, int messageId)
     {
-        streamingServiceContext = serviceContext;
+        this.handler = handler;
+        this.streamingServiceContext = streamingServiceContext;
         HubInstance = hubInstance;
         Request = request;
-        Path = path;
         Timestamp = timestamp;
         MessageId = messageId;
-        MethodId = methodId;
     }
 
     internal void Uninitialize()
     {
+        handler = default!;
         streamingServiceContext = default!;
         HubInstance = default!;
         Request = default!;
-        Path = default!;
         Timestamp = default!;
         MessageId = default!;
-        MethodId = default!;
         ResponseSize = -1;
         items?.Clear();
     }
