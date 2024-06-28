@@ -125,7 +125,6 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                 writer.Write(Nil);
             }
 
-            var payload = StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan);
 
             MagicOnionServerLog.SendHeartbeat(this.logger, method);
             try
@@ -133,7 +132,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                 foreach (var (contextId, handle) in contexts)
                 {
                     handle.RestartTimeoutTimer();
-                    handle.ServiceContext.QueueResponseStreamWrite(payload);
+                    handle.ServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan));
                 }
             }
             catch { /* Ignore */ }

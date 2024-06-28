@@ -15,21 +15,21 @@ internal class StreamingHubPayloadPool
     public StreamingHubPayload RentOrCreate(ReadOnlySequence<byte> data)
     {
         var payload = pool.Get();
-        ((IStreamingHubPayload)payload).Initialize(data);
+        payload.Initialize(data);
         return payload;
     }
 
     public StreamingHubPayload RentOrCreate(ReadOnlySpan<byte> data)
     {
         var payload = pool.Get();
-        ((IStreamingHubPayload)payload).Initialize(data);
+        payload.Initialize(data);
         return payload;
     }
 
     public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data)
     {
         var payload = pool.Get();
-        ((IStreamingHubPayload)payload).Initialize(data);
+        payload.Initialize(data);
         return payload;
     }
 
@@ -47,7 +47,7 @@ internal class StreamingHubPayloadPool
 
         public bool Return(StreamingHubPayload obj)
         {
-            ((IStreamingHubPayload)obj).Uninitialize();
+            obj.Uninitialize();
             return true;
         }
     }
