@@ -1,20 +1,52 @@
 #nullable enable
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace MagicOnion.Internal
 {
-    internal class StreamingHubPayload : IStreamingHubPayload
+    internal class StreamingHubPayload
     {
         byte[]? buffer;
         ReadOnlyMemory<byte>? memory;
 
+#if DEBUG
+        public int Length
+        {
+            get
+            {
+                ThrowIfUninitialized();
+                return memory!.Value.Length;
+            }
+        }
+
+        public ReadOnlySpan<byte> Span
+        {
+            get
+            {
+                ThrowIfUninitialized();
+                return memory!.Value.Span;
+            }
+        }
+
+        public ReadOnlyMemory<byte> Memory
+        {
+            get
+            {
+                ThrowIfUninitialized();
+                return memory!.Value;
+            }
+        }
+
+#else
         public int Length => memory!.Value.Length;
         public ReadOnlySpan<byte> Span => memory!.Value.Span;
         public ReadOnlyMemory<byte> Memory => memory!.Value;
+#endif
 
-        void IStreamingHubPayload.Initialize(ReadOnlySpan<byte> data)
+        public void Initialize(ReadOnlySpan<byte> data)
         {
             ThrowIfUsing();
 
@@ -23,7 +55,7 @@ namespace MagicOnion.Internal
             memory = buffer.AsMemory(0, (int)data.Length);
         }
 
-        void IStreamingHubPayload.Initialize(ReadOnlySequence<byte> data)
+        public void Initialize(ReadOnlySequence<byte> data)
         {
             ThrowIfUsing();
             if (data.Length > int.MaxValue) throw new InvalidOperationException("A body size of StreamingHubPayload must be less than int.MaxValue");
@@ -33,7 +65,7 @@ namespace MagicOnion.Internal
             memory = buffer.AsMemory(0, (int)data.Length);
         }
 
-        void IStreamingHubPayload.Initialize(ReadOnlyMemory<byte> data)
+        public void Initialize(ReadOnlyMemory<byte> data)
         {
             ThrowIfUsing();
 
@@ -41,9 +73,9 @@ namespace MagicOnion.Internal
             memory = data;
         }
 
-        void IStreamingHubPayload.Uninitialize()
+        public void Uninitialize()
         {
-            ThrowIfDisposed();
+            ThrowIfUninitialized();
 
             if (buffer != null)
             {
@@ -60,22 +92,22 @@ namespace MagicOnion.Internal
 #if NON_UNITY && !NETSTANDARD2_0 && !NETSTANDARD2_1
         [MemberNotNull(nameof(memory))]
 #endif
-        void ThrowIfDisposed()
+        void ThrowIfUninitialized()
         {
-            if (memory is null) throw new ObjectDisposedException(nameof(StreamingHubPayload));
+            //Debug.Assert(memory is not null);
+            if (memory is null)
+            {
+                throw new InvalidOperationException("A StreamingHubPayload has been already uninitialized.");
+            }
         }
 
         void ThrowIfUsing()
         {
-            if (memory is not null) throw new InvalidOperationException(nameof(StreamingHubPayload));
+            //Debug.Assert(memory is null);
+            if (memory is not null)
+            {
+                throw new InvalidOperationException("A StreamingHubPayload is currently used by other caller.");
+            }
         }
-    }
-
-    internal interface IStreamingHubPayload
-    {
-        void Initialize(ReadOnlySpan<byte> data);
-        void Initialize(ReadOnlySequence<byte> data);
-        void Initialize(ReadOnlyMemory<byte> data);
-        void Uninitialize();
     }
 }

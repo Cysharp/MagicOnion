@@ -61,28 +61,28 @@ namespace MagicOnion.Internal
 
         public void Return(StreamingHubPayload payload)
         {
-            ((IStreamingHubPayload)payload).Uninitialize();
+            payload.Uninitialize();
             ReturnCore(payload);
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlySequence<byte> data)
         {
             var payload = RentOrCreateCore(static () => new StreamingHubPayload());
-            ((IStreamingHubPayload)payload).Initialize(data);
+            payload.Initialize(data);
             return payload;
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlySpan<byte> data)
         {
             var payload = RentOrCreateCore(static () => new StreamingHubPayload());
-            ((IStreamingHubPayload)payload).Initialize(data);
+            payload.Initialize(data);
             return payload;
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data)
         {
             var payload = RentOrCreateCore(static () => new StreamingHubPayload());
-            ((IStreamingHubPayload)payload).Initialize(data);
+            payload.Initialize(data);
             return payload;
         }
     }
