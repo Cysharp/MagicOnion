@@ -11830,6 +11830,19 @@ references:
   commentId: T:MagicOnion.Server.Hubs.StreamingHubContext
   fullName: MagicOnion.Server.Hubs.StreamingHubContext
   nameWithType: StreamingHubContext
+- uid: MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup
+  name: AttributeLookup
+  href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_AttributeLookup
+  commentId: P:MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup
+  fullName: MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup
+  nameWithType: StreamingHubContext.AttributeLookup
+- uid: MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup*
+  name: AttributeLookup
+  href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_AttributeLookup_
+  commentId: Overload:MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup
+  isSpec: "True"
+  fullName: MagicOnion.Server.Hubs.StreamingHubContext.AttributeLookup
+  nameWithType: StreamingHubContext.AttributeLookup
 - uid: MagicOnion.Server.Hubs.StreamingHubContext.ConnectionId
   name: ConnectionId
   href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_ConnectionId
