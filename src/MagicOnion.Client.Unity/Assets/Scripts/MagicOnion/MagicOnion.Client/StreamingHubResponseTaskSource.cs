@@ -8,9 +8,14 @@ namespace MagicOnion.Client
     internal class StreamingHubResponseTaskSourcePool<T> : ObjectPool<StreamingHubResponseTaskSource<T>>
     {
         public static StreamingHubResponseTaskSourcePool<T> Shared { get; } = new();
+
+        public StreamingHubResponseTaskSourcePool()
+            : base(static () => new StreamingHubResponseTaskSource<T>())
+        {}
+
         public StreamingHubResponseTaskSource<T> RentOrCreate()
         {
-            var item = RentOrCreateCore(static () => new StreamingHubResponseTaskSource<T>());
+            var item = RentOrCreateCore();
             item.Reset();
             return item;
         }
