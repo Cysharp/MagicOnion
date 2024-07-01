@@ -463,6 +463,24 @@ public class StreamingHubHandlerTest
         fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
     }
 
+    [Fact]
+    public async Task MethodAttributeLookup()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var hubType = typeof(StreamingHubHandlerTestHub);
+        var hubMethod = hubType.GetMethod(nameof(StreamingHubHandlerTestHub.Method_Attribute))!;
+
+        // Act
+        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+
+        // Assert
+        Assert.NotEmpty(handler.AttributeLookup);
+        Assert.NotEmpty(handler.AttributeLookup[typeof(CustomMethodAttribute)]);
+        Assert.NotEmpty(handler.AttributeLookup[typeof(CustomHubAttribute)]);
+    }
+
     interface IStreamingHubHandlerTestHubReceiver
     {
     }
@@ -482,8 +500,16 @@ public class StreamingHubHandlerTest
         void Method_Parameterless_Void();
         void Method_Parameter_Single_Void(int arg0);
         void Method_Parameter_Multiple_Void(int arg0, string arg1, bool arg2);
+
+        Task Method_Attribute();
     }
 
+    [AttributeUsage(AttributeTargets.Class)]
+    class CustomHubAttribute : Attribute;
+    [AttributeUsage(AttributeTargets.Method)]
+    class CustomMethodAttribute : Attribute;
+
+    [CustomHub]
     class StreamingHubHandlerTestHub : IStreamingHubHandlerTestHub
     {
         public List<string> Results { get; } = new List<string>();
@@ -548,5 +574,8 @@ public class StreamingHubHandlerTest
         {
             Results.Add(nameof(Method_Parameter_Multiple_Void) + $"({arg0},{arg1},{arg2}) called.");
         }
+
+        [CustomMethod]
+        public Task Method_Attribute() => Task.CompletedTask;
     }
 }
