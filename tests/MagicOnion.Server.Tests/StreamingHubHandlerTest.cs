@@ -286,7 +286,7 @@ public class StreamingHubHandlerTest
             var writer = new MessagePackWriter(buffer);
             writer.WriteArrayHeader(3);
             writer.Write(messageId);
-            writer.Write(0 /* MethodId - Fixed */);
+            writer.Write(FNV1A32.GetHashCode(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32)) /* MethodId */);
             MessagePackSerializer.Serialize(ref writer, retVal);
             writer.Flush();
             return buffer.WrittenMemory.ToArray();
