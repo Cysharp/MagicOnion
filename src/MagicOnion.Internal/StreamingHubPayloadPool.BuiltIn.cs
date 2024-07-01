@@ -10,12 +10,19 @@ namespace MagicOnion.Internal
 {
     internal class ObjectPool<T> where T : class
     {
+        readonly Func<T> factory;
+
         T? item1;
         T? item2;
         T? item3;
         T? item4;
 
-        protected T RentOrCreateCore(Func<T> factory)
+        public ObjectPool(Func<T> factory)
+        {
+            this.factory = factory;
+        }
+
+        public T RentOrCreateCore()
         {
             T? tmpItem;
             if (!(TryGet(ref item1, out tmpItem) ||
@@ -29,7 +36,7 @@ namespace MagicOnion.Internal
             return tmpItem;
         }
 
-        protected void ReturnCore(T item)
+        public void ReturnCore(T item)
         {
             var pooled = TryReturn(ref item1, item) ||
                          TryReturn(ref item2, item) ||
@@ -55,35 +62,58 @@ namespace MagicOnion.Internal
         }
     }
 
-    internal class StreamingHubPayloadPool : ObjectPool<StreamingHubPayload>
+    internal class StreamingHubPayloadPool
     {
+#if DEBUG
+        readonly ObjectPool<StreamingHubPayloadCore> pool = new(static () => new StreamingHubPayloadCore());
+#else
+        readonly ObjectPool<StreamingHubPayloadCore> pool = new(static () => new StreamingHubPayload());
+#endif
+
         public static StreamingHubPayloadPool Shared { get; } = new();
 
         public void Return(StreamingHubPayload payload)
         {
+#if DEBUG
+            payload.Core.Uninitialize();
+            pool.ReturnCore(payload.Core);
+#else
             payload.Uninitialize();
-            ReturnCore(payload);
+            pool.ReturnCore(payload);
+#endif
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlySequence<byte> data)
         {
-            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            var payload = pool.RentOrCreateCore();
             payload.Initialize(data);
-            return payload;
+#if DEBUG
+            return new StreamingHubPayload(payload);
+#else
+            return (StreamingHubPayload)payload;
+#endif
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlySpan<byte> data)
         {
-            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            var payload = pool.RentOrCreateCore();
             payload.Initialize(data);
-            return payload;
+#if DEBUG
+            return new StreamingHubPayload(payload);
+#else
+            return (StreamingHubPayload)payload;
+#endif
         }
 
         public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data)
         {
-            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            var payload = pool.RentOrCreateCore();
             payload.Initialize(data);
-            return payload;
+#if DEBUG
+            return new StreamingHubPayload(payload);
+#else
+            return (StreamingHubPayload)payload;
+#endif
         }
     }
 }

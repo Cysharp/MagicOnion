@@ -7,27 +7,24 @@ using System.Threading;
 
 namespace MagicOnion.Internal
 {
+#if DEBUG
     internal class StreamingHubPayload
     {
-        byte[]? buffer;
-        ReadOnlyMemory<byte>? memory;
+        readonly short version;
 
-#if DEBUG
+#if STREAMINGHUBPAYLOAD_TRACK_LOCATION
+        string? payloadCreatedLocation;
+        string? payloadReturnLocation;
+#endif
+
+        internal StreamingHubPayloadCore Core { get; }
+
         public int Length
         {
             get
             {
-                ThrowIfUninitialized();
-                return memory!.Value.Length;
-            }
-        }
-
-        public ReadOnlySpan<byte> Span
-        {
-            get
-            {
-                ThrowIfUninitialized();
-                return memory!.Value.Span;
+                ThrowIfVersionHasChanged();
+                return Core.Length;
             }
         }
 
@@ -35,16 +32,58 @@ namespace MagicOnion.Internal
         {
             get
             {
-                ThrowIfUninitialized();
-                return memory!.Value;
+                ThrowIfVersionHasChanged();
+                return Core.Memory;
             }
         }
 
+        public ReadOnlySpan<byte> Span
+        {
+            get
+            {
+                ThrowIfVersionHasChanged();
+                return Core.Span;
+            }
+        }
+
+        public StreamingHubPayload(StreamingHubPayloadCore core)
+        {
+            this.Core = core;
+            this.version = core.Version;
+#if STREAMINGHUBPAYLOAD_TRACK_LOCATION
+            this.payloadCreatedLocation = Environment.StackTrace;
+#endif
+        }
+
+        void ThrowIfVersionHasChanged()
+        {
+            if (Core.Version != version) throw new InvalidOperationException("StreamingHubPayload version is mismatched.");
+        }
+
+        public void MarkAsReturned()
+        {
+#if STREAMINGHUBPAYLOAD_TRACK_LOCATION
+            payloadReturnLocation = Environment.StackTrace;
+#endif
+        }
+    }
 #else
+    internal class StreamingHubPayload : StreamingHubPayloadCore
+    {}
+#endif
+
+    internal class StreamingHubPayloadCore
+    {
+        byte[]? buffer;
+        ReadOnlyMemory<byte>? memory;
+
+#if DEBUG
+        public short Version { get; private set; }
+#endif
+
         public int Length => memory!.Value.Length;
         public ReadOnlySpan<byte> Span => memory!.Value.Span;
         public ReadOnlyMemory<byte> Memory => memory!.Value;
-#endif
 
         public void Initialize(ReadOnlySpan<byte> data)
         {
@@ -87,6 +126,10 @@ namespace MagicOnion.Internal
 
             memory = null;
             buffer = null;
+
+#if DEBUG
+            Version++;
+#endif
         }
 
 #if NON_UNITY && !NETSTANDARD2_0 && !NETSTANDARD2_1
