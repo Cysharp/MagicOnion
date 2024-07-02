@@ -1,12 +1,15 @@
 name: Benchmark
 
 on:
-  push:
-    branches:
-      - benchmark
+  workflow_dispatch:
+#   push:
+#     branches:
+#       - benchmark
 
 env:
   BUILD_CONFIG: Release
+  BENCHMARK_SERVER_NAME: benchmark-server-vm
+  BENCHMARK_CLIENT_NAME: benchmark-client-vm
 
 permissions:
   contents: read
@@ -14,6 +17,7 @@ permissions:
 
 jobs:
   benchmark:
+    environment: benchmark # required for Azure login
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -54,7 +58,7 @@ jobs:
         working-directory: ./.github
       - name: Run Benchmark Server
         run: |
-          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='benchmark-server-vm'].publicIps" -o tsv); do
+          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='${{ env.BENCHMARK_SERVER_NAME }}'].publicIps" -o tsv); do
             ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj" --env-settings "Kestrel__EndpointDefaults__Protocols=Http2;Kestrel__Endpoints__Grpc__Url=http://+:5000;" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh &
           done
           # wait until server started
@@ -62,8 +66,8 @@ jobs:
         working-directory: ./.github
       - name: Run Benchmark Client
         run: |
-          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='benchmark-client-vm'].publicIps" -o tsv); do
-            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --args "-u http://benchmark-server-vm:5000 -s streaminghub --channels 1 --streams 1" --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh
+          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='${{ env.BENCHMARK_CLIENT_NAME }}'].publicIps" -o tsv); do
+            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --args "-u http://${{ env.BENCHMARK_SERVER_NAME }}:5000 -s streaminghub --channels 1 --streams 1" --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh
           done
         working-directory: ./.github
       - name: Stop (Deallocate) Benchmark VM
