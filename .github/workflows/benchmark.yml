@@ -1,78 +1,42 @@
 name: Benchmark
 
 on:
+  issue_comment:
+    types: [created]
   workflow_dispatch:
-#   push:
-#     branches:
-#       - benchmark
-
-env:
-  BUILD_CONFIG: Release
-  BENCHMARK_SERVER_NAME: benchmark-server-vm
-  BENCHMARK_CLIENT_NAME: benchmark-client-vm
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  benchmark:
-    environment: benchmark # required for Azure login
+  prepare:
+    outputs:
+      branch: ${{ steps.get-branch.outputs.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Load secret
-        id: op-load-secret
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
-          SSH_KEY: "op://GitHubActionsPublic/BENCHMARK_VM_SSH/private key"
-          AZURE_OIDC_CLIENTID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/clientId"
-          AZURE_OIDC_TENANTID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/tenantId"
-          AZURE_OIDC_SUBSCRIPTIONID: "op://GitHubActionsPublic/BENCHMARK_AZURE_OIDC/subscriptionId"
-      - name: Output SSH Key
+      - name: Get branch name
+        id: get-branch
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ steps.op-load-secret.outputs.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-      - uses: azure/login@v2
-        with:
-          client-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_CLIENTID }}
-          tenant-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_TENANTID }}
-          subscription-id: ${{ steps.op-load-secret.outputs.AZURE_OIDC_SUBSCRIPTIONID }}
-      - name: Start Benchmark VM
-        run: |
-          for vm in $(az vm list -d -g BenchmarkTest --query "[?powerState!='VM running'].name" -o tsv); do
-            az vm start --name $vm  --resource-group BenchmarkTest
-          done
-      - name: Setup .NET on Benchmark VM
-        run: |
-          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running'].publicIps" -o tsv); do
-            echo "::group::Install on $ip"
-              ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --dotnet-version 8.0' < ./scripts/dotnet_install.sh
-            echo "::endgroup::"
-          done
-        working-directory: ./.github
-      - name: Run Benchmark Server
-        run: |
-          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='${{ env.BENCHMARK_SERVER_NAME }}'].publicIps" -o tsv); do
-            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj" --env-settings "Kestrel__EndpointDefaults__Protocols=Http2;Kestrel__Endpoints__Grpc__Url=http://+:5000;" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh &
-          done
-          # wait until server started
-          sleep 120s
-        working-directory: ./.github
-      - name: Run Benchmark Client
-        run: |
-          for ip in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running' && name=='${{ env.BENCHMARK_CLIENT_NAME }}'].publicIps" -o tsv); do
-            ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@$ip 'bash -s -- --args "-u http://${{ env.BENCHMARK_SERVER_NAME }}:5000 -s streaminghub --channels 1 --streams 1" --branch main --build-csproj "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" --owner Cysharp --repo MagicOnion' < ./scripts/run_benchmark.sh
-          done
-        working-directory: ./.github
-      - name: Stop (Deallocate) Benchmark VM
-        if: always()
-        run: |
-          for vm in $(az vm list -d -g BenchmarkTest --query "[?powerState=='VM running'].name" -o tsv); do
-            az vm deallocate --name $vm  --resource-group BenchmarkTest --no-wait
-          done
+          if [[ "${{ github.event_name}}" == "issue_comment" && "${{ github.event.issue.pull_request.html_url }}" != "" ]]; then
+            # issue_comment (pull_request)
+            branch=$(gh pr view "${{ github.event.issue.pull_request.html_url }}"  --json headRefName | jq -r ".headRefName")
+            echo "name=${branch}" | tee -a "$GITHUB_OUTPUT"
+          else
+            # workflow_dispatch or issue comment (issue)
+            echo "name=${{ github.ref_name }}" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+  # run benchmark
+  benchmark:
+    needs: [prepare]
+    uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main
+    with:
+      branch: ${{ needs.prepare.outputs.branch }}
+      dotnet-version: 8.0
+      environment: benchmark
+      client-args-format: "-u http://{0}:5000 -s streaminghub --channels 1 --streams 1" # {0} will be replaced with server address
+      client-csproj: "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
+      server-csproj: "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
