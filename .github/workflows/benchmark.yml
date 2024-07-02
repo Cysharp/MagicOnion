@@ -43,3 +43,4 @@ jobs:
       client-args-format: "-u http://{0}:5000 -s streaminghub --channels 1 --streams 1" # {0} will be replaced with server address
       client-csproj: "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
       server-csproj: "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
+    secrets: inherit
