@@ -81,7 +81,6 @@ namespace MagicOnion.Client
         {
             while (!shutdownTokenSource.IsCancellationRequested)
             {
-                Debug.WriteLine("Wait until sending time...");
                 await Task.Delay(heartbeatInterval
 #if NET8_0_OR_GREATER
                     , timeProvider
@@ -92,7 +91,6 @@ namespace MagicOnion.Client
 
                 // Writes a ClientHeartbeat to the writer queue.
                 _ = writer.TryWrite(BuildClientHeartbeatMessage());
-                Debug.WriteLine("Wrote ClientHeartbeat message.");
 
                 // Start/Restart the timeout cancellation timer. 
                 timeoutTokenSource.CancelAfter(timeoutPeriod);
