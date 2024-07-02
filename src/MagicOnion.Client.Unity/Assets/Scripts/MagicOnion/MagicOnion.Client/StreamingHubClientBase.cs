@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Buffers;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Channels;
 using Grpc.Core;
@@ -19,51 +20,139 @@ namespace MagicOnion.Client
         public IMagicOnionSerializerProvider SerializerProvider { get; }
         public IMagicOnionClientLogger Logger { get; }
 
-        public TimeSpan? HeartbeatInterval { get; }
-        public Action<ReadOnlyMemory<byte>>? HeartbeatReceivedFromServer { get; }
+        public TimeSpan? ClientHeartbeatInterval { get; }
+        public TimeSpan? ClientHeartbeatTimeout { get; }
+        public Action<ReadOnlyMemory<byte>>? OnServerHeartbeatReceived { get; }
+        public Action<ClientHeartbeatEvent>? OnClientHeartbeatResponseReceived { get; }
+#if NET8_0_OR_GREATER
+        public TimeProvider? TimeProvider { get; }
+#endif
 
         public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
-            : this(host, callOptions, serializerProvider, logger, default, default)
+#if NET8_0_OR_GREATER
+            : this(host, callOptions, serializerProvider, logger, default, default, default, default, default)
+#else
+            : this(host, callOptions, serializerProvider, logger, default, default, default, default)
+#endif
         {
         }
 
-        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? heartbeatInterval, Action<ReadOnlyMemory<byte>>? heartbeatReceivedFromServer)
+#if NET8_0_OR_GREATER
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
+#else
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
+#endif
         {
             Host = host;
             CallOptions = callOptions;
             SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            HeartbeatInterval = heartbeatInterval;
-            HeartbeatReceivedFromServer = heartbeatReceivedFromServer;
+            ClientHeartbeatInterval = clientHeartbeatInterval;
+            ClientHeartbeatTimeout = clientHeartbeatTimeout;
+            OnServerHeartbeatReceived = onServerHeartbeatReceived;
+            OnClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
+#if NET8_0_OR_GREATER
+            TimeProvider = timeProvider;
+#endif
         }
 
         public static StreamingHubClientOptions CreateWithDefault(string? host = default, CallOptions callOptions = default, IMagicOnionSerializerProvider? serializerProvider = default, IMagicOnionClientLogger? logger = default)
             => new(host, callOptions, serializerProvider ?? MagicOnionSerializerProvider.Default, logger ?? NullMagicOnionClientLogger.Instance);
 
         public StreamingHubClientOptions WithHost(string? host)
-            => new(host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
+            => new(host, CallOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
         public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
-            => new(Host, callOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
+            => new(Host, callOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
         public StreamingHubClientOptions WithSerializerProvider(IMagicOnionSerializerProvider serializerProvider)
-            => new(Host, CallOptions, serializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
+            => new(
+                Host, CallOptions, serializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
         public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
-            => new(Host, CallOptions, SerializerProvider, logger, HeartbeatInterval, HeartbeatReceivedFromServer);
+            => new(Host, CallOptions, SerializerProvider, logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
 
         /// <summary>
         /// Sets a heartbeat interval. If a value is <see keyword="null"/>, the heartbeat from the client is disabled.
         /// </summary>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public StreamingHubClientOptions WithHeartbeatInterval(TimeSpan? interval)
-            => new(Host, CallOptions, SerializerProvider, Logger, interval, HeartbeatReceivedFromServer);
+        public StreamingHubClientOptions WithClientHeartbeatInterval(TimeSpan? interval)
+            => new(Host, CallOptions, SerializerProvider, Logger
+                , interval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
+
+        /// <summary>
+        /// Sets a heartbeat timeout period. If a value is <see keyword="null"/>, the client does not time out.
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public StreamingHubClientOptions WithClientHeartbeatTimeout(TimeSpan? timeout)
+            => new(Host, CallOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, timeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
 
         /// <summary>
         /// Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.
         /// </summary>
-        /// <param name="onHeartbeatReceived"></param>
+        /// <param name="onServerHeartbeatReceived"></param>
         /// <returns></returns>
-        public StreamingHubClientOptions WithHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onHeartbeatReceived)
-            => new(Host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, onHeartbeatReceived);
+        public StreamingHubClientOptions WithServerHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived)
+            => new(Host, CallOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, onServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
+
+        /// <summary>
+        /// Sets a client heartbeat response callback.
+        /// </summary>
+        /// <param name="onClientHeartbeatResponseReceived"></param>
+        /// <returns></returns>
+        public StreamingHubClientOptions WithClientHeartbeatResponseReceived(Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
+            => new(Host, CallOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, onClientHeartbeatResponseReceived
+#if NET8_0_OR_GREATER
+                , TimeProvider
+#endif
+            );
+
+#if NET8_0_OR_GREATER
+        /// <summary>
+        /// Sets a <see cref="TimeProvider"/>
+        /// </summary>
+        /// <param name="timeProvider"></param>
+        /// <returns></returns>
+        public StreamingHubClientOptions WithTimeProvider(TimeProvider timeProvider)
+            => new(Host, CallOptions, SerializerProvider, Logger
+                , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+                , timeProvider
+            );
+#endif
     }
 
     public abstract class StreamingHubClientBase<TStreamingHub, TReceiver>
@@ -83,21 +172,18 @@ namespace MagicOnion.Client
         readonly Dictionary<int, IStreamingHubResponseTaskSource> responseFutures = new();
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
-
         readonly Dictionary<int, SendOrPostCallback> postCallbackCache = new();
-        SendOrPostCallback? heartbeatCallbackCache;
+
 
         int messageIdSequence = 0;
         bool disposed;
-
-        Task? heartbeatTask;
-        DateTimeOffset lastHeartbeatSentAt;
 
         readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = false });
         Task? writerTask;
         IClientStreamWriter<StreamingHubPayload> writer = default!;
         IAsyncStreamReader<StreamingHubPayload> reader = default!;
 
+        StreamingHubClientHeartbeatManager heartbeatManager = default!;
         Task subscription = default!;
 
         protected readonly TReceiver receiver;
@@ -183,12 +269,29 @@ namespace MagicOnion.Client
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
         {
-            if (options.HeartbeatInterval is { } heartbeatInterval)
+            var cancellationToken = cancellationTokenSource.Token;
+
+            heartbeatManager = new StreamingHubClientHeartbeatManager(
+                writerQueue.Writer,
+                options.ClientHeartbeatInterval ?? TimeSpan.Zero /* Disable */,
+                options.ClientHeartbeatTimeout ?? Timeout.InfiniteTimeSpan,
+                options.OnServerHeartbeatReceived,
+                options.OnClientHeartbeatResponseReceived,
+                syncContext,
+                cancellationTokenSource.Token
+#if NET8_0_OR_GREATER
+                , options.TimeProvider ?? TimeProvider.System
+#endif
+            );
+
+            // Activate the Heartbeat Manager if enabled in the options.
+            if (options.ClientHeartbeatInterval is {} heartbeatInterval && heartbeatInterval > TimeSpan.Zero)
             {
-                heartbeatTask = RunHeartbeatLoopAsync(heartbeatInterval, cancellationTokenSource.Token);
+                heartbeatManager.StartClientHeartbeatLoop();
+                cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(heartbeatManager.TimeoutToken, cancellationTokenSource.Token).Token;
             }
 
-            writerTask = RunWriterLoopAsync(cancellationTokenSource.Token);
+            writerTask = RunWriterLoopAsync(cancellationToken);
 
             var reader = this.reader;
             try
@@ -214,7 +317,7 @@ namespace MagicOnion.Client
                         }
                     }
 
-                    moveNext = reader.MoveNext(cancellationTokenSource.Token);
+                    moveNext = reader.MoveNext(cancellationToken);
                 }
             }
             catch (Exception ex)
@@ -236,6 +339,8 @@ namespace MagicOnion.Client
             }
             finally
             {
+                heartbeatManager.Dispose();
+
                 try
                 {
 #if !UNITY_WEBGL
@@ -255,10 +360,6 @@ namespace MagicOnion.Client
             }
         }
 
-        // MessageFormat:
-        // broadcast: [methodId, [argument]]
-        // response:  [messageId, methodId, response]
-        // error-response: [messageId, statusCode, detail, StringMessage]
         void ConsumeData(SynchronizationContext? syncContext, StreamingHubPayload payload)
         {
             var messageReader = new StreamingHubClientMessageReader(payload.Memory);
@@ -276,8 +377,11 @@ namespace MagicOnion.Client
                 case StreamingHubMessageType.ClientResultRequest:
                     ProcessClientResultRequest(syncContext, payload, ref messageReader);
                     break;
-                case StreamingHubMessageType.Heartbeat:
-                    ProcessHeartbeat(syncContext, payload, ref messageReader);
+                case StreamingHubMessageType.ServerHeartbeat:
+                    heartbeatManager.ProcessServerHeartbeat(payload);
+                    break;
+                case StreamingHubMessageType.ClientHeartbeatResponse:
+                    heartbeatManager.ProcessClientHeartbeatResponse(payload);
                     break;
             }
         }
@@ -386,46 +490,6 @@ namespace MagicOnion.Client
             }
         }
 
-        void ProcessHeartbeat(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
-        {
-            var metadata = messageReader.ReadHeartbeat();
-            if (this.options.HeartbeatReceivedFromServer is { } heartbeatReceived)
-            {
-                if (syncContext is null)
-                {
-                    heartbeatReceived(metadata);
-                    StreamingHubPayloadPool.Shared.Return(payload);
-                }
-                else
-                {
-                    heartbeatCallbackCache ??= CreateHeartbeatCallback(heartbeatReceived);
-                    syncContext.Post(heartbeatCallbackCache, payload);
-                }
-            }
-            WriteHeartbeat();
-        }
-
-        SendOrPostCallback CreateHeartbeatCallback(Action<ReadOnlyMemory<byte>> heartbeatReceivedAction) => (state) =>
-        {
-            var p = (StreamingHubPayload)state!;
-            heartbeatReceivedAction(p.Memory.Slice(5));
-            StreamingHubPayloadPool.Shared.Return(p);
-        };
-
-        async Task RunHeartbeatLoopAsync(TimeSpan heartbeatInterval, CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                await Task.Delay(heartbeatInterval, cancellationToken).ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if ((DateTimeOffset.UtcNow - lastHeartbeatSentAt) > heartbeatInterval)
-                {
-                    WriteHeartbeat();
-                }
-            }
-        }
-
         async Task RunWriterLoopAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -438,15 +502,6 @@ namespace MagicOnion.Client
                     }
                 }
             }
-        }
-
-        void WriteHeartbeat()
-        {
-            if (disposed) return;
-            var v = BuildHeartbeatMessage();
-            _ = writerQueue.Writer.TryWrite(v);
-
-            lastHeartbeatSentAt = DateTimeOffset.UtcNow;
         }
 
         protected Task<TResponse> WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
@@ -672,13 +727,6 @@ namespace MagicOnion.Client
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
             StreamingHubMessageWriter.WriteClientResultResponseMessageForError(buffer, methodId, messageId, statusCode, detail, ex, messageSerializer);
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-        }
-
-        StreamingHubPayload BuildHeartbeatMessage()
-        {
-            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-            StreamingHubMessageWriter.WriteHeartbeatMessageForClientToServer(buffer);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
     }

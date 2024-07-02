@@ -104,12 +104,21 @@ namespace MagicOnion.Internal
             memory = buffer.AsMemory(0, (int)data.Length);
         }
 
-        public void Initialize(ReadOnlyMemory<byte> data)
+        public void Initialize(ReadOnlyMemory<byte> data, bool holdReference)
         {
             ThrowIfUsing();
 
-            buffer = null;
-            memory = data;
+            if (holdReference)
+            {
+                buffer = null;
+                memory = data;
+            }
+            else
+            {
+                buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+                data.CopyTo(buffer);
+                memory = buffer.AsMemory(0, (int)data.Length);
+            }
         }
 
         public void Uninitialize()

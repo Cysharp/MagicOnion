@@ -1,4 +1,6 @@
 using MagicOnion.Client.DynamicClient;
+using Microsoft.Extensions.Time.Testing;
+using System.Buffers;
 
 namespace MagicOnion.Client.Tests;
 
@@ -436,14 +438,22 @@ public class StreamingHubTest
     public async Task Heartbeat_Interval()
     {
         // Arrange
+        var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
+        var timeProvider = new FakeTimeProvider(origin);
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
-        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(TimeSpan.FromMilliseconds(100));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithClientHeartbeatInterval(TimeSpan.FromMilliseconds(100)).WithTimeProvider(timeProvider);
         var client = await helper.ConnectAsync(options, timeout.Token);
+        byte[] sentAt = [0xcf, 0x00, 0x00, 0x01, 0x90, 0x6b, 0x97, 0x5c, 0x00]; // MessagePackWriter.Write(timeProvider.GetUtcNow().ToUnixTimeMilliseconds());
 
         // Act
         var t = client.Parameter_One(1234);
-        await Task.Delay(300);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(100); // Wait for processing queue.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(100); // Wait for processing queue.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(100); // Wait for processing queue.
 
         // Assert
         var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
@@ -452,9 +462,20 @@ public class StreamingHubTest
         var request1 = await helper.ReadRequestRawAsync();
         var request2 = await helper.ReadRequestRawAsync();
         var request3 = await helper.ReadRequestRawAsync();
-        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray());
-        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request2.ToArray());
-        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request3.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(100)))], request1.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(200)))], request2.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(300)))], request3.ToArray());
+
+        static byte[] ToMessagePackBytes(DateTimeOffset dt)
+        {
+            var ms = dt.ToUnixTimeMilliseconds();
+
+            var arrayBufferWriter = new ArrayBufferWriter<byte>();
+            var writer = new MessagePackWriter(arrayBufferWriter);
+            writer.Write(ms);
+            writer.Flush();
+            return arrayBufferWriter.WrittenMemory.ToArray();
+        }
     }
 
     [Fact]
@@ -463,7 +484,7 @@ public class StreamingHubTest
         // Arrange
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
-        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
+        var options = StreamingHubClientOptions.CreateWithDefault().WithClientHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
         var client = await helper.ConnectAsync(options, timeout.Token);
 
         // Act
@@ -487,8 +508,8 @@ public class StreamingHubTest
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
         var options = StreamingHubClientOptions.CreateWithDefault()
-            .WithHeartbeatReceived(x => received = x.ToArray())
-            .WithHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
+            .WithServerHeartbeatReceived(x => received = x.ToArray())
+            .WithClientHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
         var client = await helper.ConnectAsync(options, timeout.Token);
 
         // Act

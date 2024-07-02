@@ -25,7 +25,8 @@ namespace MagicOnion.Internal
                 {
                     0x00 => StreamingHubMessageType.ClientResultResponse,
                     0x01 => StreamingHubMessageType.ClientResultResponseWithError,
-                    0x7f => StreamingHubMessageType.HeartbeatResponse,
+                    0x7e => StreamingHubMessageType.ClientHeartbeat,
+                    0x7f => StreamingHubMessageType.ServerHeartbeatResponse,
                     var subType => throw new InvalidOperationException($"Unknown client response message: {subType}"),
                 },
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
@@ -74,6 +75,15 @@ namespace MagicOnion.Internal
             var message = reader.ReadString() ?? string.Empty;
 
             return (clientResultMessageId, clientMethodId, statusCode, detail, message);
+        }
+
+        public ReadOnlyMemory<byte> ReadClientHeartbeat()
+        {
+            // [Nil, Nil, [SentAt(long)]]
+            reader.Skip(); // Dummy
+            reader.Skip(); // Dummy
+
+            return data.Slice((int)reader.Consumed);
         }
     }
 }

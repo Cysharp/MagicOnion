@@ -24,8 +24,9 @@ namespace MagicOnion.Internal
                 4 => StreamingHubMessageType.ResponseWithError,
                 5 => reader.ReadByte() switch
                 {
-                    0x00 /* 0:ClientResultRequest */ => StreamingHubMessageType.ClientResultRequest,
-                    0x7f /* 127:Heartbeat */ => StreamingHubMessageType.Heartbeat,
+                    0x00 /*   0:ClientResultRequest */ => StreamingHubMessageType.ClientResultRequest,
+                    0x7e /* 126:ClientHeartbeatResponse */ => StreamingHubMessageType.ClientHeartbeatResponse,
+                    0x7f /* 127:ServerHeartbeat */ => StreamingHubMessageType.ServerHeartbeat,
                     var x => throw new InvalidOperationException($"Unknown Type: {x}"),
                 },
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
@@ -73,7 +74,7 @@ namespace MagicOnion.Internal
             return (clientRequestMessageId, methodId, data.Slice(offset));
         }
 
-        public ReadOnlyMemory<byte> ReadHeartbeat()
+        public ReadOnlyMemory<byte> ReadServerHeartbeat()
         {
             //var type = reader.ReadByte(); // Type is already read by ReadMessageType
             reader.Skip(); // Dummy (1)
@@ -81,6 +82,21 @@ namespace MagicOnion.Internal
             reader.Skip(); // Dummy (3)
 
             return data.Slice((int)reader.Consumed);
+        }
+
+        public long ReadClientHeartbeatResponse()
+        {
+            //var type = reader.ReadByte(); // Type is already read by ReadMessageType
+            reader.Skip(); // Dummy (1)
+            reader.Skip(); // Dummy (2)
+            reader.Skip(); // Dummy (3)
+
+            // Extra: [SentAt(long)]
+            var arrayLen = reader.ReadArrayHeader();
+            if (arrayLen == 0) throw new InvalidOperationException("Invalid client heartbeat response. An extra data is empty.");
+            var sentAt = reader.ReadInt64();
+
+            return sentAt;
         }
     }
 }
