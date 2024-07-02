@@ -38,7 +38,7 @@ jobs:
     uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main
     with:
       branch: ${{ needs.prepare.outputs.branch }}
-      dotnet-version: 8.0
+      dotnet-version: "8.0"
       environment: benchmark
       client-args-format: "-u http://{0}:5000 -s streaminghub --channels 1 --streams 1" # {0} will be replaced with server address
       client-csproj: "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
