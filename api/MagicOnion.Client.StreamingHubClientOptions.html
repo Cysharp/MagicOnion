@@ -116,7 +116,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_Action_ReadOnlyMemory_System_Byte____">StreamingHubClientOptions(Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable&lt;TimeSpan&gt;, Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_ReadOnlyMemory_System_Byte____System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___">StreamingHubClientOptions(Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable&lt;TimeSpan&gt;, Nullable&lt;TimeSpan&gt;, Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;, Nullable&lt;Action&lt;ClientHeartbeatEvent&gt;&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -140,13 +140,13 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_HeartbeatInterval">HeartbeatInterval</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatInterval">ClientHeartbeatInterval</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_HeartbeatReceivedFromServer">HeartbeatReceivedFromServer</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatTimeout">ClientHeartbeatTimeout</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -159,6 +159,18 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_Logger">Logger</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_OnClientHeartbeatResponseReceived">OnClientHeartbeatResponseReceived</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_OnServerHeartbeatReceived">OnServerHeartbeatReceived</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -194,16 +206,23 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatInterval_System_Nullable_TimeSpan__">WithHeartbeatInterval(Nullable&lt;TimeSpan&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatInterval_System_Nullable_TimeSpan__">WithClientHeartbeatInterval(Nullable&lt;TimeSpan&gt;)</a>
         </td>
         <td class="markdown level1 summary"><p>Sets a heartbeat interval. If a value is <see keyword="null"></see>, the heartbeat from the client is disabled.</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatReceived_System_Nullable_Action_ReadOnlyMemory_System_Byte____">WithHeartbeatReceived(Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatResponseReceived_System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___">WithClientHeartbeatResponseReceived(Nullable&lt;Action&lt;ClientHeartbeatEvent&gt;&gt;)</a>
         </td>
-        <td class="markdown level1 summary"><p>Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.</p>
+        <td class="markdown level1 summary"><p>Sets a client heartbeat response callback.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatTimeout_System_Nullable_TimeSpan__">WithClientHeartbeatTimeout(Nullable&lt;TimeSpan&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"><p>Sets a heartbeat timeout period. If a value is <see keyword="null"></see>, the client does not time out.</p>
 </td>
       </tr>
       <tr>
@@ -223,6 +242,13 @@
           <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithSerializerProvider_MagicOnion_Serialization_IMagicOnionSerializerProvider_">WithSerializerProvider(IMagicOnionSerializerProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_System_Nullable_Action_ReadOnlyMemory_System_Byte____">WithServerHeartbeatReceived(Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"><p>Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -267,12 +293,12 @@
   </section>
   <section>
   <a id="MagicOnion_Client_StreamingHubClientOptions__ctor_" data-uid="MagicOnion.Client.StreamingHubClientOptions.#ctor*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_Action_ReadOnlyMemory_System_Byte____" data-uid="MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{Action{ReadOnlyMemory{System.Byte}}})">StreamingHubClientOptions(Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable&lt;TimeSpan&gt;, Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</h4>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_ReadOnlyMemory_System_Byte____System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___" data-uid="MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{ReadOnlyMemory{System.Byte}}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})">StreamingHubClientOptions(Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable&lt;TimeSpan&gt;, Nullable&lt;TimeSpan&gt;, Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;, Nullable&lt;Action&lt;ClientHeartbeatEvent&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? heartbeatInterval, Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? heartbeatReceivedFromServer)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? onServerHeartbeatReceived, Action&lt;ClientHeartbeatEvent&gt;? onClientHeartbeatResponseReceived)</code></pre>
   </div>
 
   <section>
@@ -286,9 +312,13 @@
     <dd></dd>
     <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>heartbeatInterval</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
+    <dt><span class="parametername"><code>clientHeartbeatInterval</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
     <dd></dd>
-    <dt><span class="parametername"><code>heartbeatReceivedFromServer</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
+    <dt><span class="parametername"><code>clientHeartbeatTimeout</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>onServerHeartbeatReceived</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>onClientHeartbeatResponseReceived</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<a class="xref" href="MagicOnion.Client.ClientHeartbeatEvent.html">ClientHeartbeatEvent</a>&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -338,13 +368,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientOptions_HeartbeatInterval_" data-uid="MagicOnion.Client.StreamingHubClientOptions.HeartbeatInterval*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientOptions_HeartbeatInterval" data-uid="MagicOnion.Client.StreamingHubClientOptions.HeartbeatInterval">HeartbeatInterval</h4>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatInterval_" data-uid="MagicOnion.Client.StreamingHubClientOptions.ClientHeartbeatInterval*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatInterval" data-uid="MagicOnion.Client.StreamingHubClientOptions.ClientHeartbeatInterval">ClientHeartbeatInterval</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeSpan? HeartbeatInterval { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeSpan? ClientHeartbeatInterval { get; }</code></pre>
   </div>
 
   
@@ -368,13 +398,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientOptions_HeartbeatReceivedFromServer_" data-uid="MagicOnion.Client.StreamingHubClientOptions.HeartbeatReceivedFromServer*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientOptions_HeartbeatReceivedFromServer" data-uid="MagicOnion.Client.StreamingHubClientOptions.HeartbeatReceivedFromServer">HeartbeatReceivedFromServer</h4>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatTimeout_" data-uid="MagicOnion.Client.StreamingHubClientOptions.ClientHeartbeatTimeout*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_ClientHeartbeatTimeout" data-uid="MagicOnion.Client.StreamingHubClientOptions.ClientHeartbeatTimeout">ClientHeartbeatTimeout</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? HeartbeatReceivedFromServer { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeSpan? ClientHeartbeatTimeout { get; }</code></pre>
   </div>
 
   
@@ -384,7 +414,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -445,6 +475,66 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_OnClientHeartbeatResponseReceived_" data-uid="MagicOnion.Client.StreamingHubClientOptions.OnClientHeartbeatResponseReceived*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_OnClientHeartbeatResponseReceived" data-uid="MagicOnion.Client.StreamingHubClientOptions.OnClientHeartbeatResponseReceived">OnClientHeartbeatResponseReceived</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;ClientHeartbeatEvent&gt;? OnClientHeartbeatResponseReceived { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<a class="xref" href="MagicOnion.Client.ClientHeartbeatEvent.html">ClientHeartbeatEvent</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_OnServerHeartbeatReceived_" data-uid="MagicOnion.Client.StreamingHubClientOptions.OnServerHeartbeatReceived*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_OnServerHeartbeatReceived" data-uid="MagicOnion.Client.StreamingHubClientOptions.OnServerHeartbeatReceived">OnServerHeartbeatReceived</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? OnServerHeartbeatReceived { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -570,14 +660,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatInterval_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithHeartbeatInterval*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatInterval_System_Nullable_TimeSpan__" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithHeartbeatInterval(System.Nullable{TimeSpan})">WithHeartbeatInterval(Nullable&lt;TimeSpan&gt;)</h4>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatInterval_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatInterval*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatInterval_System_Nullable_TimeSpan__" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatInterval(System.Nullable{TimeSpan})">WithClientHeartbeatInterval(Nullable&lt;TimeSpan&gt;)</h4>
   <div class="markdown level1 summary"><p>Sets a heartbeat interval. If a value is <see keyword="null"></see>, the heartbeat from the client is disabled.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithHeartbeatInterval(TimeSpan? interval)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithClientHeartbeatInterval(TimeSpan? interval)</code></pre>
   </div>
 
   <section>
@@ -608,20 +698,58 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatReceived_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithHeartbeatReceived*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithHeartbeatReceived_System_Nullable_Action_ReadOnlyMemory_System_Byte____" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithHeartbeatReceived(System.Nullable{Action{ReadOnlyMemory{System.Byte}}})">WithHeartbeatReceived(Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</h4>
-  <div class="markdown level1 summary"><p>Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.</p>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatResponseReceived_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatResponseReceived*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatResponseReceived_System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatResponseReceived(System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})">WithClientHeartbeatResponseReceived(Nullable&lt;Action&lt;ClientHeartbeatEvent&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Sets a client heartbeat response callback.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithHeartbeatReceived(Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? onHeartbeatReceived)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithClientHeartbeatResponseReceived(Action&lt;ClientHeartbeatEvent&gt;? onClientHeartbeatResponseReceived)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>onHeartbeatReceived</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
+    <dt><span class="parametername"><code>onClientHeartbeatResponseReceived</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<a class="xref" href="MagicOnion.Client.ClientHeartbeatEvent.html">ClientHeartbeatEvent</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html">StreamingHubClientOptions</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatTimeout_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatTimeout*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithClientHeartbeatTimeout_System_Nullable_TimeSpan__" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatTimeout(System.Nullable{TimeSpan})">WithClientHeartbeatTimeout(Nullable&lt;TimeSpan&gt;)</h4>
+  <div class="markdown level1 summary"><p>Sets a heartbeat timeout period. If a value is <see keyword="null"></see>, the client does not time out.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithClientHeartbeatTimeout(TimeSpan? timeout)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>timeout</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -733,6 +861,44 @@
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html">StreamingHubClientOptions</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_System_Nullable_Action_ReadOnlyMemory_System_Byte____" data-uid="MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable{Action{ReadOnlyMemory{System.Byte}}})">WithServerHeartbeatReceived(Nullable&lt;Action&lt;ReadOnlyMemory&lt;Byte&gt;&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StreamingHubClientOptions WithServerHeartbeatReceived(Action&lt;ReadOnlyMemory&lt;byte&gt;&gt;? onServerHeartbeatReceived)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>onServerHeartbeatReceived</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Action</span>&lt;<span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
