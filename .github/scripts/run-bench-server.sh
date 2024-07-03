@@ -95,7 +95,7 @@ pushd "$output_dir"
   cat "${stdoutfile}"
 
   # output stderr
-  if [[ "$(stat -c%s "$stdoutFile")" -ne "0" ]]; then
+  if [[ "$(stat -c%s "$stderrfile")" -ne "0" ]]; then
     echo "Error found when running the server."
     cat "${stderrfile}"
     exit 1
