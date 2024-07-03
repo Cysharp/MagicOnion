@@ -86,7 +86,7 @@ ps -eo pid,cmd | while read -r pid cmd; do
 done
 
 # run dotnet app
-print "# Run $full_process_path"
+print "# Run $full_process_path $args"
 pushd "$output_dir"
   # run foreground
   "./$binary_name" $args
