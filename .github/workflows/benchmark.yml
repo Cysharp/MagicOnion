@@ -37,7 +37,8 @@ jobs:
       branch: ${{ needs.prepare.outputs.branch }}
       dotnet-version: "8.0"
       environment: benchmark
-      client-args-format: "-u http://{0}:5000 -s streaminghub --channels 1 --streams 1" # {0} will be replaced with server address
-      client-csproj: "perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
-      server-csproj: "perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
+      client-benchmark-script-path: ".github/scripts/run-bench-client.sh"
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 1\""
+      server-benchmark-script-path: ".github/scripts/run-bench-server.sh"
+      server-benchmark-script-args: ""
     secrets: inherit
