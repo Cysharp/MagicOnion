@@ -4,9 +4,6 @@ on:
   issue_comment:
     types: [created]
   workflow_dispatch:
-  push:
-    branches:
-      - benchmark
 
 permissions:
   contents: read
@@ -28,7 +25,7 @@ jobs:
             branch=$(gh pr view "${{ github.event.issue.pull_request.html_url }}"  --json headRefName | jq -r ".headRefName")
             echo "name=${branch}" | tee -a "$GITHUB_OUTPUT"
           else
-            # workflow_dispatch or issue comment (issue)
+            # workflow_dispatch or issue_comment (issue)
             echo "name=${{ github.ref_name }}" | tee -a "$GITHUB_OUTPUT"
           fi
 
