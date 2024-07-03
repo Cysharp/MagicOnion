@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -5,6 +6,7 @@ using Cysharp.Runtime.Multicast;
 using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
 using MagicOnion.Internal;
+using MagicOnion.Internal.Buffers;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
@@ -224,9 +226,20 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     }
                     return default;
                 }
-            case StreamingHubMessageType.HeartbeatResponse:
+            case StreamingHubMessageType.ServerHeartbeatResponse:
                 {
                     heartbeatHandle.Ack();
+                    return default;
+                }
+            case StreamingHubMessageType.ClientHeartbeat:
+                {
+                    var heartbeatBody = reader.ReadClientHeartbeat();
+
+                    using var bufferWriter = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                    StreamingHubMessageWriter.WriteClientHeartbeatMessageResponseHeader(bufferWriter);
+                    bufferWriter.Write(heartbeatBody.Span);
+
+                    StreamingServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan));
                     return default;
                 }
             default:

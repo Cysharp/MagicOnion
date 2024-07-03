@@ -26,8 +26,12 @@ namespace MagicOnion.Internal
     ///             <description>Array(5): [Type=0x00, Nil, ClientResultMessageId(Guid), MethodId(int), SerializedArguments]</description>
     ///         </item>
     ///         <item>
-    ///             <term>Heartbeat:</term>
+    ///             <term>ServerHeartbeat/Request:</term>
     ///             <description>Array(5): [Type=0x7f, Nil, Nil, Nil, Extras]</description>
+    ///         </item>
+    ///         <item>
+    ///             <term>ClientHeartbeat/Response:</term>
+    ///             <description>Array(5): [Type=0x7e, Nil, Nil, Nil, [ClientTime(long)]]</description>
     ///         </item>
     ///     </list>
     ///     <para>StreamingHub message formats (from Client to Server):</para>
@@ -49,8 +53,12 @@ namespace MagicOnion.Internal
     ///             <description>Array(4): [Type=0x01, ClientResultMessageId(Guid), MethodId(int), [StatusCode(int), Detail(string), Message(string)]]</description>
     ///         </item>
     ///         <item>
-    ///             <term>Heartbeat/Response:</term>
+    ///             <term>ServerHeartbeat/Response:</term>
     ///             <description>Array(4): [Type=0x7f, Nil, Nil, Nil]</description>
+    ///         </item>
+    ///         <item>
+    ///             <term>ClientHeartbeat/Request:</term>
+    ///             <description>Array(4): [Type=0x7e, Nil, Nil, [ClientTime(long)]]</description>
     ///         </item>
     ///     </list>
     /// </remarks>
@@ -193,34 +201,35 @@ namespace MagicOnion.Internal
 
 
         // Array(5)[127, Nil, Nil, Nil, <Extra>]
-        static ReadOnlySpan<byte> HeartbeatMessageForServerToClientHeader => new byte[] { 0x95, 0x7f, 0xc0, 0xc0, 0xc0 };
+        static ReadOnlySpan<byte> ServerHeartbeatMessageForServerToClientHeader => new byte[] { 0x95, 0x7f, 0xc0, 0xc0, 0xc0 };
 
         /// <summary>
-        /// Writes a heartbeat message for sending from the server.
+        /// Writes a server heartbeat message for sending from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteHeartbeatMessageForServerToClientHeader(IBufferWriter<byte> bufferWriter)
+        public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter)
         {
-            bufferWriter.Write(HeartbeatMessageForServerToClientHeader);
+            bufferWriter.Write(ServerHeartbeatMessageForServerToClientHeader);
             //var writer = new MessagePackWriter(bufferWriter);
             //writer.WriteArrayHeader(5);
             //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
+            //writer.WriteNil();  // Dummy
+            //writer.WriteNil();  // Dummy
+            //writer.WriteNil();  // Dummy
             //writer.Flush();
+            //                    // <Metadata>
         }
 
         // Array(4)[127, Nil, Nil, Nil]
-        static ReadOnlySpan<byte> HeartbeatMessageForClientToServer => new byte[] { 0x94, 0x7f, 0xc0, 0xc0, 0xc0 };
+        static ReadOnlySpan<byte> ServerHeartbeatMessageForClientToServer => new byte[] { 0x94, 0x7f, 0xc0, 0xc0, 0xc0 };
 
         /// <summary>
-        /// Writes a heartbeat message for sending from the client.
+        /// Writes a server heartbeat message for sending response from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteHeartbeatMessageForClientToServer(IBufferWriter<byte> bufferWriter)
+        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter)
         {
-            bufferWriter.Write(HeartbeatMessageForClientToServer);
+            bufferWriter.Write(ServerHeartbeatMessageForClientToServer);
             //var writer = new MessagePackWriter(bufferWriter);
             //writer.WriteArrayHeader(4);
             //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
@@ -229,22 +238,101 @@ namespace MagicOnion.Internal
             //writer.WriteNil(); // Dummy
             //writer.Flush();
         }
+
+        // Array(4)[0x7e(126), Nil, Nil, <Extra>]
+        static ReadOnlySpan<byte> ClientHeartbeatMessageHeader => new byte[] { 0x94, 0x7e, 0xc0, 0xc0 };
+
+        /// <summary>
+        /// Writes a client heartbeat message for sending from the client.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteClientHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter)
+        {
+            bufferWriter.Write(ClientHeartbeatMessageHeader);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(4);
+            //writer.Write(0x7f); // Type = 0x7e / 126 (ClientHeartbeat)
+            //writer.WriteNil();  // Dummy
+            //writer.WriteNil();  // Dummy
+            //writer.Flush();
+            //                    // <Extra>
+        }
+
+        // Array(5)[0x7e(126), Nil, Nil, Nil, <Extra>]
+        static ReadOnlySpan<byte> ClientHeartbeatMessageResponseHeader => new byte[] { 0x95, 0x7e, 0xc0, 0xc0, 0xc0 };
+
+        /// <summary>
+        /// Writes a client heartbeat message for sending response from the server.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteClientHeartbeatMessageResponseHeader(IBufferWriter<byte> bufferWriter)
+        {
+            bufferWriter.Write(ClientHeartbeatMessageResponseHeader);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(5);
+            //writer.Write(0x7f); // Type = 0x7e / 126 (Heartbeat)
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.Flush();
+            //                    // <Extra>
+        }
     }
 
     internal enum StreamingHubMessageType
     {
-        // Client to Server
+        /// <summary>
+        /// Request: Client -> Server
+        /// </summary>
         Request,
+        /// <summary>
+        /// Request: Client -> Server / Fire-and-Forget
+        /// </summary>
         RequestFireAndForget,
+        /// <summary>
+        /// Request: Client -> Server -> Client
+        /// </summary>
         Response,
+        /// <summary>
+        /// Request: Client -> Server -(Error)-> Client
+        /// </summary>
         ResponseWithError,
-        HeartbeatResponse,
 
-        // Server to Client
+        /// <summary>
+        /// Broadcast: Server -> Client
+        /// </summary>
         Broadcast,
+
+        /// <summary>
+        /// ClientResult: Server -> Client
+        /// </summary>
         ClientResultRequest,
+        /// <summary>
+        /// ClientResult: Server -> Client -> Server
+        /// </summary>
         ClientResultResponse,
+        /// <summary>
+        /// ClientResult: Server -> Client -(Error)-> Server
+        /// </summary>
         ClientResultResponseWithError,
-        Heartbeat,
+
+
+        /// <summary>
+        /// Heartbeat: Server -> Client -> Server
+        /// </summary>
+        ServerHeartbeatResponse,
+        /// <summary>
+        /// Heartbeat: Server -> Client
+        /// </summary>
+        ServerHeartbeat,
+
+        /// <summary>
+        /// Heartbeat: Client -> Server
+        /// </summary>
+        ClientHeartbeat,
+        /// <summary>
+        /// Heartbeat: Client -> Server -> Client
+        /// </summary>
+        ClientHeartbeatResponse,
     }
 }

@@ -254,6 +254,7 @@ public static class MagicOnionEngine
                             heartbeatInterval.Value,
                             heartbeatTimeout ?? Timeout.InfiniteTimeSpan,
                             heartbeatMetadataProvider ?? serviceProvider.GetService<IStreamingHubHeartbeatMetadataProvider>(),
+                            TimeProvider.System,
                             serviceProvider.GetRequiredService<ILogger<StreamingHubHeartbeatManager>>()
                         );
                     }

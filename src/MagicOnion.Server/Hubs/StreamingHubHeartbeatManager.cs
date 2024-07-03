@@ -23,12 +23,16 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     public IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; }
     public CancellationToken TimeoutToken => timeoutToken.Token;
 
-    public StreamingHubHeartbeatHandle(IStreamingHubHeartbeatManager manager, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, TimeSpan timeoutDuration)
+    public StreamingHubHeartbeatHandle(IStreamingHubHeartbeatManager manager, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, TimeSpan timeoutDuration, TimeProvider timeProvider)
     {
         this.manager = manager;
         this.ServiceContext = serviceContext;
         this.timeoutDuration = timeoutDuration;
-        this.timeoutToken = new CancellationTokenSource();
+        this.timeoutToken = new CancellationTokenSource(Timeout.InfiniteTimeSpan
+#if NET8_0_OR_GREATER
+            , timeProvider
+#endif
+        );
     }
 
     public void RestartTimeoutTimer()
@@ -59,7 +63,7 @@ internal class NopStreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     NopStreamingHubHeartbeatManager() {}
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
-        => new(this, serviceContext, Timeout.InfiniteTimeSpan);
+        => new(this, serviceContext, Timeout.InfiniteTimeSpan, TimeProvider.System);
     public void Unregister(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext) { }
     public void Dispose() { }
 }
@@ -72,23 +76,25 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     readonly IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider;
     readonly TimeSpan heartbeatInterval;
     readonly TimeSpan timeoutDuration;
+    readonly TimeProvider timeProvider;
     readonly ILogger logger;
 
     PeriodicTimer? timer;
     int registeredCount;
     ConcurrentDictionary<Guid, StreamingHubHeartbeatHandle> contexts = new();
 
-    public StreamingHubHeartbeatManager(TimeSpan heartbeatInterval, TimeSpan timeoutDuration, IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider, ILogger<StreamingHubHeartbeatManager> logger)
+    public StreamingHubHeartbeatManager(TimeSpan heartbeatInterval, TimeSpan timeoutDuration, IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider, TimeProvider timeProvider, ILogger<StreamingHubHeartbeatManager> logger)
     {
         this.heartbeatInterval = heartbeatInterval;
         this.timeoutDuration = timeoutDuration;
         this.heartbeatMetadataProvider = heartbeatMetadataProvider;
+        this.timeProvider = timeProvider;
         this.logger = logger;
     }
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
     {
-        var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration);
+        var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration, timeProvider);
         if (contexts.TryAdd(serviceContext.ContextId, handle))
         {
             if (Interlocked.Increment(ref registeredCount) == 1)
@@ -97,7 +103,11 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                 {
                     if (timer is null)
                     {
-                        timer = new PeriodicTimer(heartbeatInterval);
+                        timer = new PeriodicTimer(heartbeatInterval
+#if NET8_0_OR_GREATER
+                            , timeProvider
+#endif
+                        );
                         MagicOnionServerLog.BeginHeartbeatTimer(this.logger, serviceContext.CallContext.Method, heartbeatInterval, timeoutDuration);
                         _ = StartHeartbeatAsync(timer, serviceContext.CallContext.Method);
                     }
@@ -119,7 +129,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         var writer = new ArrayBufferWriter<byte>();
         while (await runningTimer.WaitForNextTickAsync())
         {
-            StreamingHubMessageWriter.WriteHeartbeatMessageForServerToClientHeader(writer);
+            StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(writer);
             if (!(heartbeatMetadataProvider?.TryWriteMetadata(writer) ?? false))
             {
                 writer.Write(Nil);

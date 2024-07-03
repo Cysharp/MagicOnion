@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using Grpc.Core;
 using MagicOnion.Internal;
@@ -5,6 +6,7 @@ using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.Time.Testing;
 
 namespace MagicOnion.Server.Tests.StreamingHubHeartbeat;
 
@@ -18,7 +20,8 @@ public class StreamingHubHeartbeatManagerTest
     {
         // Arrange
         var logger = new FakeLogger<StreamingHubHeartbeatManager>();
-        var manager = new StreamingHubHeartbeatManager(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan, null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan, null, timeProvider, logger);
         var context = CreateFakeStreamingServiceContext();
 
         // Act
@@ -35,7 +38,8 @@ public class StreamingHubHeartbeatManagerTest
     {
         // Arrange
         var logger = new FakeLogger<StreamingHubHeartbeatManager>();
-        var manager = new StreamingHubHeartbeatManager(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan, null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan, null, timeProvider, logger);
         var context = CreateFakeStreamingServiceContext();
         var handle = manager.Register(context);
 
@@ -48,7 +52,8 @@ public class StreamingHubHeartbeatManagerTest
     {
         // Arrange
         var logger = new FakeLogger<StreamingHubHeartbeatManager>();
-        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, null, timeProvider, logger);
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
@@ -57,7 +62,12 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
-        await Task.Delay(310);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
@@ -80,7 +90,8 @@ public class StreamingHubHeartbeatManagerTest
         // Arrange
         var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
         var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
-        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
@@ -89,7 +100,8 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
-        await Task.Delay(350);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(350));
+        await Task.Delay(50);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
         var isCanceled2 = handle2.TimeoutToken.IsCancellationRequested;
         var isCanceled3 = handle3.TimeoutToken.IsCancellationRequested;
@@ -97,7 +109,8 @@ public class StreamingHubHeartbeatManagerTest
         handle1.Ack();
         handle2.Ack();
         handle3.Ack();
-        await Task.Delay(250);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(250));
+        await Task.Delay(50);
 
         // Assert
         Assert.False(isCanceled1);
@@ -114,7 +127,8 @@ public class StreamingHubHeartbeatManagerTest
         // Arrange
         var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
         var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
-        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
@@ -123,11 +137,13 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
-        await Task.Delay(350);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(350));
+        await Task.Delay(50);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
         var isCanceled2 = handle2.TimeoutToken.IsCancellationRequested;
         var isCanceled3 = handle3.TimeoutToken.IsCancellationRequested;
-        await Task.Delay(250); // No responses from clients and timeouts are reached.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(250)); // No responses from clients and timeouts are reached.
+        await Task.Delay(50);
 
         // Assert
         Assert.False(isCanceled1);
@@ -143,7 +159,8 @@ public class StreamingHubHeartbeatManagerTest
     {
         // Arrange
         var logger = new FakeLogger<StreamingHubHeartbeatManager>();
-        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, null, logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, null, timeProvider, logger);
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
@@ -152,11 +169,21 @@ public class StreamingHubHeartbeatManagerTest
         var handle1 = manager.Register(context1);
         var handle2 = manager.Register(context2);
         var handle3 = manager.Register(context3);
-        await Task.Delay(310);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
         handle1.Dispose();
         handle2.Dispose();
         handle3.Dispose();
-        await Task.Delay(300);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
@@ -178,7 +205,8 @@ public class StreamingHubHeartbeatManagerTest
     {
         // Arrange
         var logger = new FakeLogger<StreamingHubHeartbeatManager>();
-        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, new CustomHeartbeatMetadataProvider(), logger);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan, new CustomHeartbeatMetadataProvider(), timeProvider, logger);
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
@@ -188,7 +216,12 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
-        await Task.Delay(310);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100));
+        await Task.Delay(50);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
