@@ -42,6 +42,7 @@ namespace Assets.Scripts
         public Button ExceptionButton;
         public Button UnaryExceptionButton;
 
+        public Text LabelRtt;
 
         async void Start()
         {
@@ -71,7 +72,11 @@ namespace Assets.Scripts
                 try
                 {
                     Debug.Log($"Connecting to the server...");
-                    this.streamingClient = await StreamingHubClient.ConnectAsync<IChatHub, IChatHubReceiver>(this.channel, this, cancellationToken: shutdownCancellation.Token);
+                    var options = StreamingHubClientOptions.CreateWithDefault()
+                        .WithClientHeartbeatResponseReceived(x => LabelRtt.text = $"RTT: {x.RoundTripTime.TotalMilliseconds:#,0}ms")
+                        .WithClientHeartbeatInterval(TimeSpan.FromSeconds(10))
+                        .WithClientHeartbeatTimeout(TimeSpan.FromSeconds(5));
+                    this.streamingClient = await StreamingHubClient.ConnectAsync<IChatHub, IChatHubReceiver>(this.channel, this, options, cancellationToken: shutdownCancellation.Token);
                     this.RegisterDisconnectEvent(streamingClient);
                     Debug.Log($"Connection is established.");
                     break;
