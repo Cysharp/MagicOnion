@@ -37,6 +37,9 @@ clone_path="$HOME/github/$repo"
 output_dir="$clone_path/$publish_dir"
 full_process_path="$output_dir/$binary_name"
 
+stdoutfile="stdout.log"
+stderrfile="stderr.log"
+
 # show machine name
 print "MACHINE_NAME: $(hostname)"
 
@@ -82,6 +85,19 @@ popd
 # run dotnet app
 print "# Run $full_process_path"
 pushd "$output_dir"
-  # run background
-  "./$binary_name" &
+  # run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
+  nohup "./$binary_name" > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
+
+  # wait 10s will be enough to start the server or not
+  sleep 10s
+
+  # output stdout
+  cat "${stdoutfile}"
+
+  # output stderr
+  if [[ "$(stat -c%s "$stdoutFile")" -ne "0" ]]; then
+    echo "Error found when running the server."
+    cat "${stderrfile}"
+    exit 1
+  fi
 popd

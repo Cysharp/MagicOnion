@@ -32,6 +32,7 @@ function print() {
 
 # parameter setup
 repo="MagicOnion"
+build_config="Release"
 args="${_ARGS:=""}"
 build_csproj="perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
 env_settings=""
