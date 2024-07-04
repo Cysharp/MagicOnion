@@ -462,9 +462,9 @@ public class StreamingHubTest
         var request1 = await helper.ReadRequestRawAsync();
         var request2 = await helper.ReadRequestRawAsync();
         var request3 = await helper.ReadRequestRawAsync();
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(100)))], request1.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(200)))], request2.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0xc0 /* Nil */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(300)))], request3.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x00 /* Sequence(0) */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(100)))], request1.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x01 /* Sequence(1) */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(200)))], request2.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x02 /* Sequence(2) */, 0xc0 /* Nil */, 0x91 /* Array(1) */, .. (ToMessagePackBytes(origin.AddMilliseconds(300)))], request3.ToArray());
 
         static byte[] ToMessagePackBytes(DateTimeOffset dt)
         {
@@ -489,7 +489,7 @@ public class StreamingHubTest
 
         // Act
         var t = client.Parameter_One(1234);
-        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0xc0, 0xc0, 0xc0, 0xc0 /* Extra */]); // Simulate heartbeat from the server.
+        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, 0xc0, 0xc0, 0xc0 /* Extra */]); // Simulate heartbeat from the server.
         await Task.Delay(100);
 
         // Assert
@@ -497,7 +497,7 @@ public class StreamingHubTest
         Assert.Equal(1234, requestBody);
 
         var request1 = await helper.ReadRequestRawAsync();
-        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
+        Assert.Equal([0x94, 0x7f, 0x00 /* Sequence(0) */, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
     }
 
     [Fact]
@@ -513,13 +513,13 @@ public class StreamingHubTest
         var client = await helper.ConnectAsync(options, timeout.Token);
 
         // Act
-        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0xc0, 0xc0, 0xc0, .."Hello World"u8 /* Extra */]); // Simulate heartbeat from the server.
+        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, 0xc0, 0xc0, .."Hello World"u8 /* Extra */]); // Simulate heartbeat from the server.
         await Task.Delay(100);
 
         // Assert
         Assert.Equal([.. "Hello World"u8], received); // Respond to the heartbeat from the server.
         var request1 = await helper.ReadRequestRawAsync();
-        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
+        Assert.Equal([0x94, 0x7f, 0x00 /* Sequence(0) */, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
     }
 }
 

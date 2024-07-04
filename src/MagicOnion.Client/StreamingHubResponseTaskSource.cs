@@ -1,5 +1,6 @@
 using MagicOnion.Internal;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
@@ -63,6 +64,7 @@ namespace MagicOnion.Client
         public short Version
             => core.Version;
 
+        [DebuggerNonUserCode]
         public T GetResult(short token)
         {
             try

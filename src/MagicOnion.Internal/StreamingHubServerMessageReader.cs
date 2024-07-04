@@ -77,13 +77,24 @@ namespace MagicOnion.Internal
             return (clientResultMessageId, clientMethodId, statusCode, detail, message);
         }
 
-        public ReadOnlyMemory<byte> ReadClientHeartbeat()
+        public (short Sequence, ReadOnlyMemory<byte> Extra) ReadClientHeartbeat()
         {
-            // [Nil, Nil, [SentAt(long)]]
+            // [Sequence(int8), Nil, [SentAt(long)]]
+            var sequence = reader.ReadInt16(); // Sequence
+            reader.Skip(); // Dummy
+            var extra = data.Slice((int)reader.Consumed);
+
+            return (sequence, data.Slice((int)reader.Consumed));
+        }
+
+        public short ReadServerHeartbeatResponse()
+        {
+            // [Sequence(int8), Nil, Nil]
+            var sequence = reader.ReadInt16(); // Sequence
             reader.Skip(); // Dummy
             reader.Skip(); // Dummy
 
-            return data.Slice((int)reader.Consumed);
+            return sequence;
         }
     }
 }
