@@ -1770,6 +1770,54 @@ references:
   fullName.vb: MagicOnion.Client.ResponseContext(Of T).WithNewResult
   nameWithType: ResponseContext<T>.WithNewResult
   nameWithType.vb: ResponseContext(Of T).WithNewResult
+- uid: MagicOnion.Client.ServerHeartbeatEvent
+  name: ServerHeartbeatEvent
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html
+  commentId: T:MagicOnion.Client.ServerHeartbeatEvent
+  fullName: MagicOnion.Client.ServerHeartbeatEvent
+  nameWithType: ServerHeartbeatEvent
+- uid: MagicOnion.Client.ServerHeartbeatEvent.#ctor(System.Int64,ReadOnlyMemory{System.Byte})
+  name: ServerHeartbeatEvent(Int64, ReadOnlyMemory<Byte>)
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent__ctor_System_Int64_ReadOnlyMemory_System_Byte__
+  commentId: M:MagicOnion.Client.ServerHeartbeatEvent.#ctor(System.Int64,ReadOnlyMemory{System.Byte})
+  name.vb: ServerHeartbeatEvent(Int64, ReadOnlyMemory(Of Byte))
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.ServerHeartbeatEvent(System.Int64, ReadOnlyMemory<System.Byte>)
+  fullName.vb: MagicOnion.Client.ServerHeartbeatEvent.ServerHeartbeatEvent(System.Int64, ReadOnlyMemory(Of System.Byte))
+  nameWithType: ServerHeartbeatEvent.ServerHeartbeatEvent(Int64, ReadOnlyMemory<Byte>)
+  nameWithType.vb: ServerHeartbeatEvent.ServerHeartbeatEvent(Int64, ReadOnlyMemory(Of Byte))
+- uid: MagicOnion.Client.ServerHeartbeatEvent.#ctor*
+  name: ServerHeartbeatEvent
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent__ctor_
+  commentId: Overload:MagicOnion.Client.ServerHeartbeatEvent.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.ServerHeartbeatEvent
+  nameWithType: ServerHeartbeatEvent.ServerHeartbeatEvent
+- uid: MagicOnion.Client.ServerHeartbeatEvent.Metadata
+  name: Metadata
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent_Metadata
+  commentId: P:MagicOnion.Client.ServerHeartbeatEvent.Metadata
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.Metadata
+  nameWithType: ServerHeartbeatEvent.Metadata
+- uid: MagicOnion.Client.ServerHeartbeatEvent.Metadata*
+  name: Metadata
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent_Metadata_
+  commentId: Overload:MagicOnion.Client.ServerHeartbeatEvent.Metadata
+  isSpec: "True"
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.Metadata
+  nameWithType: ServerHeartbeatEvent.Metadata
+- uid: MagicOnion.Client.ServerHeartbeatEvent.ServerTime
+  name: ServerTime
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent_ServerTime
+  commentId: P:MagicOnion.Client.ServerHeartbeatEvent.ServerTime
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.ServerTime
+  nameWithType: ServerHeartbeatEvent.ServerTime
+- uid: MagicOnion.Client.ServerHeartbeatEvent.ServerTime*
+  name: ServerTime
+  href: api/MagicOnion.Client.ServerHeartbeatEvent.html#MagicOnion_Client_ServerHeartbeatEvent_ServerTime_
+  commentId: Overload:MagicOnion.Client.ServerHeartbeatEvent.ServerTime
+  isSpec: "True"
+  fullName: MagicOnion.Client.ServerHeartbeatEvent.ServerTime
+  nameWithType: ServerHeartbeatEvent.ServerTime
 - uid: MagicOnion.Client.SourceGenerator
   name: MagicOnion.Client.SourceGenerator
   href: api/MagicOnion.Client.SourceGenerator.html
@@ -4586,15 +4634,15 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
   nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
   nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
-- uid: MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{ReadOnlyMemory{System.Byte}}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
-  name: StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ReadOnlyMemory<Byte>>>, Nullable<Action<ClientHeartbeatEvent>>)
-  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_ReadOnlyMemory_System_Byte____System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___
-  commentId: M:MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{ReadOnlyMemory{System.Byte}}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
-  name.vb: StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ReadOnlyMemory(Of Byte))), Nullable(Of Action(Of ClientHeartbeatEvent)))
-  fullName: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable<TimeSpan>, System.Nullable<TimeSpan>, System.Nullable<Action<ReadOnlyMemory<System.Byte>>>, System.Nullable<Action<MagicOnion.Client.ClientHeartbeatEvent>>)
-  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable(Of TimeSpan), System.Nullable(Of TimeSpan), System.Nullable(Of Action(Of ReadOnlyMemory(Of System.Byte))), System.Nullable(Of Action(Of MagicOnion.Client.ClientHeartbeatEvent)))
-  nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ReadOnlyMemory<Byte>>>, Nullable<Action<ClientHeartbeatEvent>>)
-  nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ReadOnlyMemory(Of Byte))), Nullable(Of Action(Of ClientHeartbeatEvent)))
+- uid: MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
+  name: StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>)
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_MagicOnion_Client_ServerHeartbeatEvent___System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___
+  commentId: M:MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
+  name.vb: StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)))
+  fullName: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable<TimeSpan>, System.Nullable<TimeSpan>, System.Nullable<Action<MagicOnion.Client.ServerHeartbeatEvent>>, System.Nullable<Action<MagicOnion.Client.ClientHeartbeatEvent>>)
+  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable(Of TimeSpan), System.Nullable(Of TimeSpan), System.Nullable(Of Action(Of MagicOnion.Client.ServerHeartbeatEvent)), System.Nullable(Of Action(Of MagicOnion.Client.ClientHeartbeatEvent)))
+  nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>)
+  nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)))
 - uid: MagicOnion.Client.StreamingHubClientOptions.#ctor*
   name: StreamingHubClientOptions
   href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_
@@ -4825,15 +4873,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.StreamingHubClientOptions.WithSerializerProvider
   nameWithType: StreamingHubClientOptions.WithSerializerProvider
-- uid: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable{Action{ReadOnlyMemory{System.Byte}}})
-  name: WithServerHeartbeatReceived(Nullable<Action<ReadOnlyMemory<Byte>>>)
-  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_System_Nullable_Action_ReadOnlyMemory_System_Byte____
-  commentId: M:MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable{Action{ReadOnlyMemory{System.Byte}}})
-  name.vb: WithServerHeartbeatReceived(Nullable(Of Action(Of ReadOnlyMemory(Of Byte))))
-  fullName: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable<Action<ReadOnlyMemory<System.Byte>>>)
-  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable(Of Action(Of ReadOnlyMemory(Of System.Byte))))
-  nameWithType: StreamingHubClientOptions.WithServerHeartbeatReceived(Nullable<Action<ReadOnlyMemory<Byte>>>)
-  nameWithType.vb: StreamingHubClientOptions.WithServerHeartbeatReceived(Nullable(Of Action(Of ReadOnlyMemory(Of Byte))))
+- uid: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}})
+  name: WithServerHeartbeatReceived(Nullable<Action<ServerHeartbeatEvent>>)
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_System_Nullable_Action_MagicOnion_Client_ServerHeartbeatEvent___
+  commentId: M:MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}})
+  name.vb: WithServerHeartbeatReceived(Nullable(Of Action(Of ServerHeartbeatEvent)))
+  fullName: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable<Action<MagicOnion.Client.ServerHeartbeatEvent>>)
+  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Nullable(Of Action(Of MagicOnion.Client.ServerHeartbeatEvent)))
+  nameWithType: StreamingHubClientOptions.WithServerHeartbeatReceived(Nullable<Action<ServerHeartbeatEvent>>)
+  nameWithType.vb: StreamingHubClientOptions.WithServerHeartbeatReceived(Nullable(Of Action(Of ServerHeartbeatEvent)))
 - uid: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived*
   name: WithServerHeartbeatReceived
   href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithServerHeartbeatReceived_
