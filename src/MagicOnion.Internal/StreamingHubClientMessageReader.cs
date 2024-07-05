@@ -74,20 +74,20 @@ namespace MagicOnion.Internal
             return (clientRequestMessageId, methodId, data.Slice(offset));
         }
 
-        public (byte Sequence, long ServerSentAt, ReadOnlyMemory<byte> Metadata) ReadServerHeartbeat()
+        public (short Sequence, long ServerSentAt, ReadOnlyMemory<byte> Metadata) ReadServerHeartbeat()
         {
             //var type = reader.ReadByte(); // Type is already read by ReadMessageType
-            var sequence = reader.ReadByte(); // Sequence
+            var sequence = reader.ReadInt16(); // Sequence
             var serverSentAt = reader.ReadInt64(); // ServerSentAt (2)
             reader.Skip(); // Dummy (3)
 
             return (sequence, serverSentAt, data.Slice((int)reader.Consumed));
         }
 
-        public (byte Sequence, long ClientSentAt) ReadClientHeartbeatResponse()
+        public (short Sequence, long ClientSentAt) ReadClientHeartbeatResponse()
         {
             //var type = reader.ReadByte(); // Type is already read by ReadMessageType
-            var sequence = reader.ReadByte(); // Sequence
+            var sequence = reader.ReadInt16(); // Sequence
             var clientSentAt = reader.ReadInt64(); // ClientSentAt (2)
             reader.Skip(); // Reserved (3)
 
