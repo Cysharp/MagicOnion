@@ -199,83 +199,70 @@ namespace MagicOnion.Internal
             writer.Flush();
         }
 
-
-        // Array(5)[127, Nil, Nil, Nil, <Extra>]
-        static ReadOnlySpan<byte> ServerHeartbeatMessageForServerToClientHeader => new byte[] { 0x95, 0x7f, 0xc0, 0xc0, 0xc0 };
-
         /// <summary>
         /// Writes a server heartbeat message for sending from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter)
+        public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence)
         {
-            bufferWriter.Write(ServerHeartbeatMessageForServerToClientHeader);
-            //var writer = new MessagePackWriter(bufferWriter);
-            //writer.WriteArrayHeader(5);
-            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
-            //writer.WriteNil();  // Dummy
-            //writer.WriteNil();  // Dummy
-            //writer.WriteNil();  // Dummy
-            //writer.Flush();
-            //                    // <Metadata>
+            // Array(5)[127, Sequence(int8), Nil, Nil, <Metadata>]
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(5);
+            writer.Write(0x7f);     // Type = 0x7f / 127 (Heartbeat)
+            writer.Write(sequence); // Sequence
+            writer.WriteNil();      // Dummy
+            writer.WriteNil();      // Dummy
+            writer.Flush();
+            //                      // <Metadata>
         }
-
-        // Array(4)[127, Nil, Nil, Nil]
-        static ReadOnlySpan<byte> ServerHeartbeatMessageForClientToServer => new byte[] { 0x94, 0x7f, 0xc0, 0xc0, 0xc0 };
 
         /// <summary>
         /// Writes a server heartbeat message for sending response from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter)
+        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence)
         {
-            bufferWriter.Write(ServerHeartbeatMessageForClientToServer);
-            //var writer = new MessagePackWriter(bufferWriter);
-            //writer.WriteArrayHeader(4);
-            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
-            //writer.Flush();
+            // Array(4)[127, Sequence(int8), Nil, Nil]
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(4);
+            writer.Write(0x7f);     // Type = 0x7f / 127 (Heartbeat)
+            writer.Write(sequence); // Sequence
+            writer.WriteNil();      // Dummy
+            writer.WriteNil();      // Dummy
+            writer.Flush();
         }
-
-        // Array(4)[0x7e(126), Nil, Nil, <Extra>]
-        static ReadOnlySpan<byte> ClientHeartbeatMessageHeader => new byte[] { 0x94, 0x7e, 0xc0, 0xc0 };
 
         /// <summary>
         /// Writes a client heartbeat message for sending from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter)
+        public static void WriteClientHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence)
         {
-            bufferWriter.Write(ClientHeartbeatMessageHeader);
-            //var writer = new MessagePackWriter(bufferWriter);
-            //writer.WriteArrayHeader(4);
-            //writer.Write(0x7f); // Type = 0x7e / 126 (ClientHeartbeat)
-            //writer.WriteNil();  // Dummy
-            //writer.WriteNil();  // Dummy
-            //writer.Flush();
-            //                    // <Extra>
+            // Array(4)[0x7e(126), Sequence(int8), Nil, <Extra>]
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(4);
+            writer.Write(0x7e);     // Type = 0x7e / 126 (ClientHeartbeat)
+            writer.Write(sequence); // Sequence
+            writer.WriteNil();      // Dummy
+            writer.Flush();
+            //                      // <Extra>
         }
-
-        // Array(5)[0x7e(126), Nil, Nil, Nil, <Extra>]
-        static ReadOnlySpan<byte> ClientHeartbeatMessageResponseHeader => new byte[] { 0x95, 0x7e, 0xc0, 0xc0, 0xc0 };
 
         /// <summary>
         /// Writes a client heartbeat message for sending response from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessageResponseHeader(IBufferWriter<byte> bufferWriter)
+        public static void WriteClientHeartbeatMessageResponseHeader(IBufferWriter<byte> bufferWriter, short sequence)
         {
-            bufferWriter.Write(ClientHeartbeatMessageResponseHeader);
-            //var writer = new MessagePackWriter(bufferWriter);
-            //writer.WriteArrayHeader(5);
-            //writer.Write(0x7f); // Type = 0x7e / 126 (Heartbeat)
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
-            //writer.WriteNil(); // Dummy
-            //writer.Flush();
-            //                    // <Extra>
+            // Array(5)[0x7e(126), Sequence(int8), Nil, Nil, <Extra>]
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(5);
+            writer.Write(0x7e);     // Type = 0x7e / 126 (Heartbeat)
+            writer.Write(sequence); // Sequence
+            writer.WriteNil();      // Dummy
+            writer.WriteNil();      // Dummy
+            writer.Flush();
+            //                      // <Extra>
         }
     }
 

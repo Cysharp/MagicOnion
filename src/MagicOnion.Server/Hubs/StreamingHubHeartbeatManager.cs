@@ -19,6 +19,8 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     readonly CancellationTokenSource timeoutToken;
     readonly TimeSpan timeoutDuration;
     bool disposed;
+    short waitingSequence;
+    bool timeoutTimerIsRunning;
 
     public IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; }
     public CancellationToken TimeoutToken => timeoutToken.Token;
@@ -35,16 +37,25 @@ internal class StreamingHubHeartbeatHandle : IDisposable
         );
     }
 
-    public void RestartTimeoutTimer()
+    public void RestartTimeoutTimer(short sequence)
     {
         if (disposed || timeoutDuration == Timeout.InfiniteTimeSpan) return;
-        timeoutToken.CancelAfter(timeoutDuration);
+        waitingSequence = sequence;
+
+        if (!timeoutTimerIsRunning)
+        {
+            timeoutToken.CancelAfter(timeoutDuration);
+            timeoutTimerIsRunning = true;
+        }
     }
 
-    public void Ack()
+    public void Ack(short sequence)
     {
         if (disposed || timeoutDuration == Timeout.InfiniteTimeSpan) return;
+
+        if (waitingSequence != sequence) return;
         timeoutToken.CancelAfter(Timeout.InfiniteTimeSpan);
+        timeoutTimerIsRunning = false;
     }
 
     public void Dispose()
@@ -82,6 +93,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     PeriodicTimer? timer;
     int registeredCount;
     ConcurrentDictionary<Guid, StreamingHubHeartbeatHandle> contexts = new();
+    short sequence;
 
     public StreamingHubHeartbeatManager(TimeSpan heartbeatInterval, TimeSpan timeoutDuration, IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider, TimeProvider timeProvider, ILogger<StreamingHubHeartbeatManager> logger)
     {
@@ -94,6 +106,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
     {
+        var method = serviceContext.CallContext.Method;
         var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration, timeProvider);
         if (contexts.TryAdd(serviceContext.ContextId, handle))
         {
@@ -108,13 +121,13 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                             , timeProvider
 #endif
                         );
-                        MagicOnionServerLog.BeginHeartbeatTimer(this.logger, serviceContext.CallContext.Method, heartbeatInterval, timeoutDuration);
-                        _ = StartHeartbeatAsync(timer, serviceContext.CallContext.Method);
+                        MagicOnionServerLog.BeginHeartbeatTimer(this.logger, method, heartbeatInterval, timeoutDuration);
+                        _ = StartHeartbeatAsync(timer, method);
                     }
                 }
             }
 
-            handle.TimeoutToken.UnsafeRegister(_ => MagicOnionServerLog.HeartbeatTimedOut(logger, serviceContext.CallContext.Method, serviceContext.ContextId), null);
+            handle.TimeoutToken.UnsafeRegister(_ => MagicOnionServerLog.HeartbeatTimedOut(logger, method, serviceContext.ContextId), null);
 
             return handle;
         }
@@ -129,25 +142,25 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         var writer = new ArrayBufferWriter<byte>();
         while (await runningTimer.WaitForNextTickAsync())
         {
-            StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(writer);
+            StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(writer, sequence);
             if (!(heartbeatMetadataProvider?.TryWriteMetadata(writer) ?? false))
             {
                 writer.Write(Nil);
             }
-
 
             MagicOnionServerLog.SendHeartbeat(this.logger, method);
             try
             {
                 foreach (var (contextId, handle) in contexts)
                 {
-                    handle.RestartTimeoutTimer();
+                    handle.RestartTimeoutTimer(sequence);
                     handle.ServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan));
                 }
             }
             catch { /* Ignore */ }
 
             writer.Clear();
+            sequence++;
         }
     }
 

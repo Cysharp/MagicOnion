@@ -72,7 +72,7 @@ public interface IStreamingHubStressTestHubReceiver
     void OnMessage();
 }
 
-[Heartbeat(Enable = true, Interval = 100, Timeout = 1000)]
+[Heartbeat(Enable = true, Interval = 1000, Timeout = 1000)]
 public class StreamingHubStressTestHub : StreamingHubBase<IStreamingHubStressTestHub, IStreamingHubStressTestHubReceiver>, IStreamingHubStressTestHub
 {
     IGroup<IStreamingHubStressTestHubReceiver> defaultGroup = default!;

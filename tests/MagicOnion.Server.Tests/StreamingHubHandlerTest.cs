@@ -464,7 +464,7 @@ public class StreamingHubHandlerTest
     }
 
     [Fact]
-    public async Task MethodAttributeLookup()
+    public void MethodAttributeLookup()
     {
         // Arrange
         var services = new ServiceCollection();

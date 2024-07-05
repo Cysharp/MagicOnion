@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 
 namespace MagicOnion.Server;
 
