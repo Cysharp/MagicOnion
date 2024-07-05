@@ -74,29 +74,24 @@ namespace MagicOnion.Internal
             return (clientRequestMessageId, methodId, data.Slice(offset));
         }
 
-        public (byte Sequence, ReadOnlyMemory<byte> Metadata) ReadServerHeartbeat()
+        public (byte Sequence, long ServerSentAt, ReadOnlyMemory<byte> Metadata) ReadServerHeartbeat()
         {
             //var type = reader.ReadByte(); // Type is already read by ReadMessageType
             var sequence = reader.ReadByte(); // Sequence
-            reader.Skip(); // Dummy (2)
+            var serverSentAt = reader.ReadInt64(); // ServerSentAt (2)
             reader.Skip(); // Dummy (3)
 
-            return (sequence, data.Slice((int)reader.Consumed));
+            return (sequence, serverSentAt, data.Slice((int)reader.Consumed));
         }
 
-        public (byte Sequence, long SentAt) ReadClientHeartbeatResponse()
+        public (byte Sequence, long ClientSentAt) ReadClientHeartbeatResponse()
         {
             //var type = reader.ReadByte(); // Type is already read by ReadMessageType
             var sequence = reader.ReadByte(); // Sequence
-            reader.Skip(); // Dummy (2)
-            reader.Skip(); // Dummy (3)
+            var clientSentAt = reader.ReadInt64(); // ClientSentAt (2)
+            reader.Skip(); // Reserved (3)
 
-            // Extra: [SentAt(long)]
-            var arrayLen = reader.ReadArrayHeader();
-            if (arrayLen == 0) throw new InvalidOperationException("Invalid client heartbeat response. An extra data is empty.");
-            var sentAt = reader.ReadInt64();
-
-            return (sequence, sentAt);
+            return (sequence, clientSentAt);
         }
     }
 }

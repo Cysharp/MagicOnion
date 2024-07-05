@@ -9,6 +9,8 @@ namespace MagicOnion.Server.Hubs;
 
 internal interface IStreamingHubHeartbeatManager : IDisposable
 {
+    TimeProvider TimeProvider { get; }
+
     StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext);
     void Unregister(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext);
 }
@@ -21,26 +23,41 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     bool disposed;
     short waitingSequence;
     bool timeoutTimerIsRunning;
+    DateTimeOffset lastSentAt;
+    DateTimeOffset lastReceivedAt;
+
+    /// <summary>
+    /// Gets the last received time.
+    /// </summary>
+    public DateTimeOffset LastReceivedAt => lastReceivedAt;
+
+    /// <summary>
+    /// Gets the latency between client and server. Returns <see cref="TimeSpan.Zero"/> if not sent or received.
+    /// </summary>
+    public TimeSpan Latency => (lastSentAt == default || lastReceivedAt == default)
+        ? TimeSpan.Zero
+        : lastReceivedAt - lastSentAt;
 
     public IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; }
     public CancellationToken TimeoutToken => timeoutToken.Token;
 
-    public StreamingHubHeartbeatHandle(IStreamingHubHeartbeatManager manager, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, TimeSpan timeoutDuration, TimeProvider timeProvider)
+    public StreamingHubHeartbeatHandle(IStreamingHubHeartbeatManager manager, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, TimeSpan timeoutDuration)
     {
         this.manager = manager;
         this.ServiceContext = serviceContext;
         this.timeoutDuration = timeoutDuration;
         this.timeoutToken = new CancellationTokenSource(Timeout.InfiniteTimeSpan
 #if NET8_0_OR_GREATER
-            , timeProvider
+            , this.manager.TimeProvider
 #endif
         );
     }
 
-    public void RestartTimeoutTimer(short sequence)
+    public void RestartTimeoutTimer(short sequence, DateTimeOffset sentAt)
     {
         if (disposed || timeoutDuration == Timeout.InfiniteTimeSpan) return;
         waitingSequence = sequence;
+        lastSentAt = sentAt;
 
         if (!timeoutTimerIsRunning)
         {
@@ -54,6 +71,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
         if (disposed || timeoutDuration == Timeout.InfiniteTimeSpan) return;
 
         if (waitingSequence != sequence) return;
+        lastReceivedAt = manager.TimeProvider.GetUtcNow();
         timeoutToken.CancelAfter(Timeout.InfiniteTimeSpan);
         timeoutTimerIsRunning = false;
     }
@@ -71,10 +89,12 @@ internal class NopStreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
 {
     public static IStreamingHubHeartbeatManager Instance { get; } = new NopStreamingHubHeartbeatManager();
 
+    public TimeProvider TimeProvider => TimeProvider.System;
+
     NopStreamingHubHeartbeatManager() {}
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
-        => new(this, serviceContext, Timeout.InfiniteTimeSpan, TimeProvider.System);
+        => new(this, serviceContext, Timeout.InfiniteTimeSpan);
     public void Unregister(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext) { }
     public void Dispose() { }
 }
@@ -87,7 +107,6 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     readonly IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider;
     readonly TimeSpan heartbeatInterval;
     readonly TimeSpan timeoutDuration;
-    readonly TimeProvider timeProvider;
     readonly ILogger logger;
 
     PeriodicTimer? timer;
@@ -95,19 +114,22 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     ConcurrentDictionary<Guid, StreamingHubHeartbeatHandle> contexts = new();
     short sequence;
 
+    public TimeProvider TimeProvider { get; }
+
     public StreamingHubHeartbeatManager(TimeSpan heartbeatInterval, TimeSpan timeoutDuration, IStreamingHubHeartbeatMetadataProvider? heartbeatMetadataProvider, TimeProvider timeProvider, ILogger<StreamingHubHeartbeatManager> logger)
     {
         this.heartbeatInterval = heartbeatInterval;
         this.timeoutDuration = timeoutDuration;
         this.heartbeatMetadataProvider = heartbeatMetadataProvider;
-        this.timeProvider = timeProvider;
         this.logger = logger;
+
+        TimeProvider = timeProvider;
     }
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
     {
         var method = serviceContext.CallContext.Method;
-        var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration, timeProvider);
+        var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration);
         if (contexts.TryAdd(serviceContext.ContextId, handle))
         {
             if (Interlocked.Increment(ref registeredCount) == 1)
@@ -118,7 +140,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                     {
                         timer = new PeriodicTimer(heartbeatInterval
 #if NET8_0_OR_GREATER
-                            , timeProvider
+                            , TimeProvider
 #endif
                         );
                         MagicOnionServerLog.BeginHeartbeatTimer(this.logger, method, heartbeatInterval, timeoutDuration);
@@ -142,7 +164,8 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         var writer = new ArrayBufferWriter<byte>();
         while (await runningTimer.WaitForNextTickAsync())
         {
-            StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(writer, sequence);
+            var now = TimeProvider.GetUtcNow();
+            StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(writer, sequence, now);
             if (!(heartbeatMetadataProvider?.TryWriteMetadata(writer) ?? false))
             {
                 writer.Write(Nil);
@@ -153,7 +176,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
             {
                 foreach (var (contextId, handle) in contexts)
                 {
-                    handle.RestartTimeoutTimer(sequence);
+                    handle.RestartTimeoutTimer(sequence, now);
                     handle.ServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan));
                 }
             }
