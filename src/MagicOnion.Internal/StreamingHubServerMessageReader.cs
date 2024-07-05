@@ -79,7 +79,7 @@ namespace MagicOnion.Internal
 
         public (short Sequence, long ClientSentAt, ReadOnlyMemory<byte> Extra) ReadClientHeartbeat()
         {
-            // [Sequence(int8), ClientSentAt(long), <Extra>]
+            // [Sequence(int16), ClientSentAt(long), <Extra>]
             var sequence = reader.ReadInt16(); // Sequence
             var clientSentAt = reader.ReadInt64(); // ClientSentAt
             var extra = data.Slice((int)reader.Consumed);
@@ -89,7 +89,7 @@ namespace MagicOnion.Internal
 
         public short ReadServerHeartbeatResponse()
         {
-            // [Sequence(int8), Nil, Nil]
+            // [Sequence(int16), Nil, Nil]
             var sequence = reader.ReadInt16(); // Sequence
             reader.Skip(); // Dummy
             reader.Skip(); // Dummy
