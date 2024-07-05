@@ -234,10 +234,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 }
             case StreamingHubMessageType.ClientHeartbeat:
                 {
-                    var (seq, heartbeatBody) = reader.ReadClientHeartbeat();
+                    var (seq, clientSentAt, heartbeatBody) = reader.ReadClientHeartbeat();
 
                     using var bufferWriter = ArrayPoolBufferWriter.RentThreadStaticWriter();
-                    StreamingHubMessageWriter.WriteClientHeartbeatMessageResponseHeader(bufferWriter, seq);
+                    StreamingHubMessageWriter.WriteClientHeartbeatMessageResponse(bufferWriter, seq, clientSentAt);
                     bufferWriter.Write(heartbeatBody.Span); // Copy an extra body to the response message.
 
                     StreamingServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan));

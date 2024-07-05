@@ -9,6 +9,9 @@ using MessagePack;
 
 namespace MagicOnion.Client
 {
+    /// <summary>
+    /// Represents a client heartbeat received event.
+    /// </summary>
     public readonly struct ClientHeartbeatEvent
     {
         /// <summary>
@@ -22,13 +25,35 @@ namespace MagicOnion.Client
         }
     }
 
+    /// <summary>
+    /// Represents a server heartbeat received event.
+    /// </summary>
+    public readonly struct ServerHeartbeatEvent
+    {
+        /// <summary>
+        /// Gets the server time at when the heartbeat was sent.
+        /// </summary>
+        public DateTimeOffset ServerTime { get; }
+
+        /// <summary>
+        /// Gets the metadata data. The data is only available during event processing.
+        /// </summary>
+        public ReadOnlyMemory<byte> Metadata { get; }
+
+        public ServerHeartbeatEvent(long serverTimeUnixMs, ReadOnlyMemory<byte> metadata)
+        {
+            ServerTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeUnixMs);
+            Metadata = metadata;
+        }
+    }
+
     internal class StreamingHubClientHeartbeatManager : IDisposable
     {
         readonly CancellationTokenSource timeoutTokenSource;
         readonly CancellationTokenSource shutdownTokenSource;
         readonly TimeSpan heartbeatInterval;
         readonly TimeSpan timeoutPeriod;
-        readonly Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived;
+        readonly Action<ServerHeartbeatEvent>? onServerHeartbeatReceived;
         readonly Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived;
         readonly SynchronizationContext? synchronizationContext;
         readonly ChannelWriter<StreamingHubPayload> writer;
@@ -48,7 +73,7 @@ namespace MagicOnion.Client
             ChannelWriter<StreamingHubPayload> writer,
             TimeSpan heartbeatInterval,
             TimeSpan timeoutPeriod,
-            Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived,
+            Action<ServerHeartbeatEvent>? onServerHeartbeatReceived,
             Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,
             SynchronizationContext? synchronizationContext,
             CancellationToken shutdownToken
@@ -142,7 +167,7 @@ namespace MagicOnion.Client
             var payload = (StreamingHubPayload)state!;
             var reader = new StreamingHubClientMessageReader(payload.Memory);
             _ = reader.ReadMessageType();
-            var (sentSequence, sentAt) = reader.ReadClientHeartbeatResponse();
+            var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
 
             if (sentSequence == (sequence - 1)/* NOTE: Sequence already 1 advanced.*/)
             {
@@ -157,38 +182,37 @@ namespace MagicOnion.Client
 #else
                 DateTimeOffset.UtcNow;
 #endif
-            var elapsed = now.ToUnixTimeMilliseconds() - sentAt;
+            var elapsed = now.ToUnixTimeMilliseconds() - clientSentAt;
 
             clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
             StreamingHubPayloadPool.Shared.Return(payload);
         };
 
-        SendOrPostCallback ProcessServerHeartbeatCore(Action<ReadOnlyMemory<byte>>? serverHeartbeatReceivedAction) => (state) =>
+        SendOrPostCallback ProcessServerHeartbeatCore(Action<ServerHeartbeatEvent>? serverHeartbeatReceivedAction) => (state) =>
         {
             var payload = (StreamingHubPayload)state!;
             var reader = new StreamingHubClientMessageReader(payload.Memory);
             _ = reader.ReadMessageType();
-            var (serverSentSequence, metadata) = reader.ReadServerHeartbeat();
+            var (serverSentSequence, serverSentAt, metadata) = reader.ReadServerHeartbeat();
 
-            serverHeartbeatReceivedAction?.Invoke(metadata);
+            serverHeartbeatReceivedAction?.Invoke(new ServerHeartbeatEvent(serverSentAt, metadata));
 
             // Writes a ServerHeartbeatResponse to the writer queue.
-            _ = writer.TryWrite(BuildServerHeartbeatMessage(serverSentSequence));
+            _ = writer.TryWrite(BuildServerHeartbeatMessage(serverSentSequence, serverSentAt));
 
             StreamingHubPayloadPool.Shared.Return(payload);
         };
 
-        StreamingHubPayload BuildServerHeartbeatMessage(short serverSequence)
+        StreamingHubPayload BuildServerHeartbeatMessage(short serverSequence, long serverSentAt)
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-            StreamingHubMessageWriter.WriteServerHeartbeatMessageResponse(buffer, serverSequence);
+            StreamingHubMessageWriter.WriteServerHeartbeatMessageResponse(buffer, serverSequence, serverSentAt);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
 
         StreamingHubPayload BuildClientHeartbeatMessage(short clientSequence)
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-            StreamingHubMessageWriter.WriteClientHeartbeatMessageHeader(buffer, clientSequence);
 
             var now =
 #if NET8_0_OR_GREATER
@@ -197,11 +221,7 @@ namespace MagicOnion.Client
                 DateTimeOffset.UtcNow;
 #endif
 
-            // Extra: [SentAt(long)]
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(1);
-            writer.Write(now.ToUnixTimeMilliseconds());
-            writer.Flush();
+            StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, now);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
 

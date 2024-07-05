@@ -21,7 +21,7 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Arrange
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new List<byte[]>();
-        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.ToArray()));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray()));
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_EnableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
@@ -38,7 +38,7 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Arrange
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new List<byte[]>();
-        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.ToArray()));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray()));
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_DisableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
@@ -55,7 +55,7 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Arrange
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new List<byte[]>();
-        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.ToArray()));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray()));
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
@@ -127,7 +127,7 @@ public class StreamingHubServerHeartbeatTest_DisabledByDefault : StreamingHubSer
         // Arrange
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new List<byte[]>();
-        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.ToArray()));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray()));
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
@@ -169,7 +169,7 @@ public class StreamingHubServerHeartbeatTest_EnabledByDefault : StreamingHubServ
         // Arrange
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new List<byte[]>();
-        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.ToArray()));
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray()));
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);

@@ -46,6 +46,66 @@ public class StreamingHubHeartbeatManagerTest
     }
 
     [Fact]
+    public async Task Latency()
+    {
+        // Arrange
+        var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
+        var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
+        var context = CreateFakeStreamingServiceContext();
+
+        // Act
+        using var handle = manager.Register(context);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(350));
+        await Task.Delay(1);
+
+        // Simulate to send heartbeat responses from clients.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(50));
+        handle.Ack(0);
+        await Task.Delay(1);
+
+        // Assert
+        Assert.Equal(TimeSpan.FromMilliseconds(50), handle.Latency);
+    }
+
+    [Fact]
+    public void Latency_Before_Send()
+    {
+        // Arrange
+        var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
+        var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
+        var context = CreateFakeStreamingServiceContext();
+
+        // Act
+        using var handle = manager.Register(context);
+
+        // Assert
+        Assert.Equal(TimeSpan.Zero, handle.Latency);
+    }
+
+    [Fact]
+    public async Task Latency_Before_Ack()
+    {
+        // Arrange
+        var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
+        var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
+        var context = CreateFakeStreamingServiceContext();
+
+        // Act
+        using var handle = manager.Register(context);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(350));
+        await Task.Delay(1);
+
+        // Assert
+        Assert.Equal(TimeSpan.Zero, handle.Latency);
+    }
+
+    [Fact]
     public async Task Interval_Disable_Timeout()
     {
         // Arrange
@@ -55,9 +115,9 @@ public class StreamingHubHeartbeatManagerTest
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
-        byte[] expectedHeartbeatMessageNoExtra1 = BuildMessage(0);
-        byte[] expectedHeartbeatMessageNoExtra2 = BuildMessage(1);
-        byte[] expectedHeartbeatMessageNoExtra3 = BuildMessage(2);
+        byte[] expectedHeartbeatMessageNoExtra1 = BuildMessage(0, timeProvider.GetUtcNow().AddMilliseconds(100));
+        byte[] expectedHeartbeatMessageNoExtra2 = BuildMessage(1, timeProvider.GetUtcNow().AddMilliseconds(200));
+        byte[] expectedHeartbeatMessageNoExtra3 = BuildMessage(2, timeProvider.GetUtcNow().AddMilliseconds(300));
 
         // Act
         using var handle1 = manager.Register(context1);
@@ -165,9 +225,9 @@ public class StreamingHubHeartbeatManagerTest
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
-        byte[] expectedHeartbeatMessageNoExtra1 = BuildMessage(0);
-        byte[] expectedHeartbeatMessageNoExtra2 = BuildMessage(1);
-        byte[] expectedHeartbeatMessageNoExtra3 = BuildMessage(2);
+        byte[] expectedHeartbeatMessageNoExtra1 = BuildMessage(0, timeProvider.GetUtcNow().AddMilliseconds(100));
+        byte[] expectedHeartbeatMessageNoExtra2 = BuildMessage(1, timeProvider.GetUtcNow().AddMilliseconds(200));
+        byte[] expectedHeartbeatMessageNoExtra3 = BuildMessage(2, timeProvider.GetUtcNow().AddMilliseconds(300));
 
         // Act
         var handle1 = manager.Register(context1);
@@ -214,9 +274,9 @@ public class StreamingHubHeartbeatManagerTest
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
-        byte[] expectedHeartbeatMessage1 = [.. BuildMessageHeader(0), .. "Hello"u8];
-        byte[] expectedHeartbeatMessage2 = [.. BuildMessageHeader(1), .. "Hello"u8];
-        byte[] expectedHeartbeatMessage3 = [.. BuildMessageHeader(2), .. "Hello"u8];
+        byte[] expectedHeartbeatMessage1 = [.. BuildMessageHeader(0, timeProvider.GetUtcNow().AddMilliseconds(100)), .. "Hello"u8];
+        byte[] expectedHeartbeatMessage2 = [.. BuildMessageHeader(1, timeProvider.GetUtcNow().AddMilliseconds(200)), .. "Hello"u8];
+        byte[] expectedHeartbeatMessage3 = [.. BuildMessageHeader(2, timeProvider.GetUtcNow().AddMilliseconds(300)), .. "Hello"u8];
 
         // Act
         using var handle1 = manager.Register(context1);
@@ -348,8 +408,8 @@ public class StreamingHubHeartbeatManagerTest
         handle1.Ack(1);
 
         // Assert
-        Assert.Equal(BuildMessage(0), context1.Responses[0].Memory.ToArray());
-        Assert.Equal(BuildMessage(1), context1.Responses[1].Memory.ToArray());
+        Assert.Equal(BuildMessage(0, origin.AddMilliseconds(350)), context1.Responses[0].Memory.ToArray());
+        Assert.Equal(BuildMessage(1, origin.AddMilliseconds(700)), context1.Responses[1].Memory.ToArray());
     }
 
     [Fact]
@@ -360,47 +420,31 @@ public class StreamingHubHeartbeatManagerTest
         var bufferWriter2 = new ArrayBufferWriter<byte>();
 
         // Act
-        StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(bufferWriter1, 0);
-        StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(bufferWriter2, 1);
+        StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(bufferWriter1, 0, DateTimeOffset.FromUnixTimeMilliseconds(123456));
+        StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(bufferWriter2, 1, DateTimeOffset.FromUnixTimeMilliseconds(456789));
 
         // Assert
-        Assert.Equal(BuildMessageHeader(0), bufferWriter1.WrittenSpan.ToArray());
-        Assert.Equal(BuildMessageHeader(1), bufferWriter2.WrittenSpan.ToArray());
+        Assert.Equal(BuildMessageHeader(0, DateTimeOffset.FromUnixTimeMilliseconds(123456)), bufferWriter1.WrittenSpan.ToArray());
+        Assert.Equal(BuildMessageHeader(1, DateTimeOffset.FromUnixTimeMilliseconds(456789)), bufferWriter2.WrittenSpan.ToArray());
     }
 
-    static byte[] BuildMessageHeader(byte sequence)
+    static byte[] BuildMessageHeader(byte sequence, DateTimeOffset serverSentAt)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
         var messagePackWriter = new MessagePackWriter(bufferWriter);
         messagePackWriter.WriteArrayHeader(5);
         {
-            messagePackWriter.Write(127);      // 0: 0x7f / 127: ServerHeartbeat
-            messagePackWriter.Write(sequence); // 1: Sequence
-            messagePackWriter.WriteNil();      // 2: Dummy
-            messagePackWriter.WriteNil();      // 3: Dummy
-        }
-        messagePackWriter.Flush();
-
-        return bufferWriter.WrittenSpan.ToArray();
-    }
-    static byte[] BuildMessage(byte sequence)
-    {
-        var bufferWriter = new ArrayBufferWriter<byte>();
-        var messagePackWriter = new MessagePackWriter(bufferWriter);
-        messagePackWriter.WriteArrayHeader(5);
-        {
-            messagePackWriter.Write(127);      // 0: 0x7f / 127: ServerHeartbeat
-            messagePackWriter.Write(sequence); // 1: Sequence
-            messagePackWriter.WriteNil();      // 2: Dummy
-            messagePackWriter.WriteNil();      // 3: Dummy
-            messagePackWriter.WriteNil();      // 4: Dummy
+            messagePackWriter.Write(127);                                   // 0: 0x7f / 127: ServerHeartbeat
+            messagePackWriter.Write(sequence);                              // 1: Sequence
+            messagePackWriter.Write(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
+            messagePackWriter.WriteNil();                                   // 3: Dummy
         }
         messagePackWriter.Flush();
 
         return bufferWriter.WrittenSpan.ToArray();
     }
 
-    static byte[] BuildMessage(byte sequence, DateTimeOffset dt)
+    static byte[] BuildMessage(byte sequence, long serverSentAt)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
         var messagePackWriter = new MessagePackWriter(bufferWriter);
@@ -408,12 +452,27 @@ public class StreamingHubHeartbeatManagerTest
         {
             messagePackWriter.Write(127);          // 0: 0x7f / 127: ServerHeartbeat
             messagePackWriter.Write(sequence);     // 1: Sequence
-            messagePackWriter.WriteNil();          // 2: Dummy
+            messagePackWriter.Write(serverSentAt); // 2: ServerSentAt
             messagePackWriter.WriteNil();          // 3: Dummy
-            messagePackWriter.WriteArrayHeader(1); // 4: Array(1)
-            {
-                messagePackWriter.Write(dt.ToUnixTimeMilliseconds());
-            }
+            messagePackWriter.WriteNil();          // 4: Dummy
+        }
+        messagePackWriter.Flush();
+
+        return bufferWriter.WrittenSpan.ToArray();
+    }
+
+    static byte[] BuildMessage(byte sequence, DateTimeOffset serverSentAt)
+    {
+        var bufferWriter = new ArrayBufferWriter<byte>();
+        var messagePackWriter = new MessagePackWriter(bufferWriter);
+        messagePackWriter.WriteArrayHeader(5);
+        {
+            messagePackWriter.Write(127);                                   // 0: 0x7f / 127: ServerHeartbeat
+            messagePackWriter.Write(sequence);                              // 1: Sequence
+            messagePackWriter.Write(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
+            messagePackWriter.WriteNil();                                   // 3: Dummy
+            messagePackWriter.WriteNil();                                   // 4: Dummy
+
         }
         messagePackWriter.Flush();
 

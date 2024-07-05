@@ -203,32 +203,32 @@ namespace MagicOnion.Internal
         /// Writes a server heartbeat message for sending from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence)
+        public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence, DateTimeOffset serverSentAt)
         {
-            // Array(5)[127, Sequence(int8), Nil, Nil, <Metadata>]
+            // Array(5)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil, <Metadata>]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(5);
-            writer.Write(0x7f);     // Type = 0x7f / 127 (Heartbeat)
-            writer.Write(sequence); // Sequence
-            writer.WriteNil();      // Dummy
-            writer.WriteNil();      // Dummy
+            writer.Write(0x7f);                                  // Type = 0x7f / 127 (Heartbeat)
+            writer.Write(sequence);                              // Sequence
+            writer.Write(serverSentAt.ToUnixTimeMilliseconds()); // ServerSentAt
+            writer.WriteNil();                                   // Dummy
             writer.Flush();
-            //                      // <Metadata>
+            //                                                   // <Metadata>
         }
 
         /// <summary>
         /// Writes a server heartbeat message for sending response from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence)
+        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence, long serverSentAt)
         {
-            // Array(4)[127, Sequence(int8), Nil, Nil]
+            // Array(4)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(4);
-            writer.Write(0x7f);     // Type = 0x7f / 127 (Heartbeat)
-            writer.Write(sequence); // Sequence
-            writer.WriteNil();      // Dummy
-            writer.WriteNil();      // Dummy
+            writer.Write(0x7f);         // Type = 0x7f / 127 (Heartbeat)
+            writer.Write(sequence);     // Sequence
+            writer.Write(serverSentAt); // ServerSentAt
+            writer.WriteNil();          // Dummy
             writer.Flush();
         }
 
@@ -236,33 +236,33 @@ namespace MagicOnion.Internal
         /// Writes a client heartbeat message for sending from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence)
+        public static void WriteClientHeartbeatMessage(IBufferWriter<byte> bufferWriter, short sequence, DateTimeOffset clientSentAt)
         {
-            // Array(4)[0x7e(126), Sequence(int8), Nil, <Extra>]
+            // Array(4)[0x7e(126), Sequence(int8), ClientSentAt(long; UnixTimeMs), <Extra>]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(4);
-            writer.Write(0x7e);     // Type = 0x7e / 126 (ClientHeartbeat)
-            writer.Write(sequence); // Sequence
-            writer.WriteNil();      // Dummy
+            writer.Write(0x7e);                                  // 0:Type = 0x7e / 126 (ClientHeartbeat)
+            writer.Write(sequence);                              // 1:Sequence
+            writer.Write(clientSentAt.ToUnixTimeMilliseconds()); // 2:ClientSentAt
+            writer.WriteNil();                                   // 3:Reserved
             writer.Flush();
-            //                      // <Extra>
         }
 
         /// <summary>
         /// Writes a client heartbeat message for sending response from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessageResponseHeader(IBufferWriter<byte> bufferWriter, short sequence)
+        public static void WriteClientHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence, long clientSentAt)
         {
-            // Array(5)[0x7e(126), Sequence(int8), Nil, Nil, <Extra>]
+            // Array(5)[0x7e(126), Sequence(int8), ClientSentAt(long; UnixTimeMs), Nil, <Extra>]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(5);
-            writer.Write(0x7e);     // Type = 0x7e / 126 (Heartbeat)
-            writer.Write(sequence); // Sequence
-            writer.WriteNil();      // Dummy
-            writer.WriteNil();      // Dummy
+            writer.Write(0x7e);         // 0:Type = 0x7e / 126 (Heartbeat)
+            writer.Write(sequence);     // 1:Sequence
+            writer.Write(clientSentAt); // 2:ClientSentAt
+            writer.WriteNil();          // 3:Reserved
+            writer.WriteNil();          // 4:Reserved
             writer.Flush();
-            //                      // <Extra>
         }
     }
 

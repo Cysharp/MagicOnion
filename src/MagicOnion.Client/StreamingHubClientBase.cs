@@ -22,7 +22,7 @@ namespace MagicOnion.Client
 
         public TimeSpan? ClientHeartbeatInterval { get; }
         public TimeSpan? ClientHeartbeatTimeout { get; }
-        public Action<ReadOnlyMemory<byte>>? OnServerHeartbeatReceived { get; }
+        public Action<ServerHeartbeatEvent>? OnServerHeartbeatReceived { get; }
         public Action<ClientHeartbeatEvent>? OnClientHeartbeatResponseReceived { get; }
 #if NET8_0_OR_GREATER
         public TimeProvider? TimeProvider { get; }
@@ -38,9 +38,9 @@ namespace MagicOnion.Client
         }
 
 #if NET8_0_OR_GREATER
-        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
 #else
-        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
 #endif
         {
             Host = host;
@@ -120,7 +120,7 @@ namespace MagicOnion.Client
         /// </summary>
         /// <param name="onServerHeartbeatReceived"></param>
         /// <returns></returns>
-        public StreamingHubClientOptions WithServerHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onServerHeartbeatReceived)
+        public StreamingHubClientOptions WithServerHeartbeatReceived(Action<ServerHeartbeatEvent>? onServerHeartbeatReceived)
             => new(Host, CallOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, onServerHeartbeatReceived, OnClientHeartbeatResponseReceived
 #if NET8_0_OR_GREATER
