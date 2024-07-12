@@ -53,6 +53,11 @@ public class MagicOnionOptions
     public TimeSpan? StreamingHubHeartbeatTimeout { get; set; }
 
     /// <summary>
+    /// Gets or sets a <see cref="System.TimeProvider"/> used internally by MagicOnion.
+    /// </summary>
+    public TimeProvider? TimeProvider { get; set; }
+
+    /// <summary>
     /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer.
     /// </summary>
     public MagicOnionOptions()
@@ -68,5 +73,6 @@ public class MagicOnionOptions
         this.EnableStreamingHubHeartbeat = false;
         this.StreamingHubHeartbeatInterval = null;
         this.StreamingHubHeartbeatTimeout = null;
+        this.TimeProvider = null;
     }
 }

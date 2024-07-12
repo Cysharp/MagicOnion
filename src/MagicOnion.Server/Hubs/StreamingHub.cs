@@ -83,14 +83,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     {
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
-        var features = this.Context.CallContext.GetHttpContext().Features;
-
         var streamingContext = GetDuplexStreamingContext<StreamingHubPayload, StreamingHubPayload>();
         var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
+        var features = this.Context.CallContext.GetHttpContext().Features;
+        var magicOnionOptions = serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value;
+
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
-        this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value.ClientResultsDefaultTimeout);
+        this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(magicOnionOptions.ClientResultsDefaultTimeout, magicOnionOptions.TimeProvider ?? TimeProvider.System);
         this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
         var handlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();

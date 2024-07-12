@@ -5,15 +5,38 @@ using MagicOnion.Server.Features;
 using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
 
 namespace MagicOnion.Server.Tests.StreamingHubHeartbeat;
 
 public abstract class StreamingHubServerHeartbeatTestBase
 {
-    protected ServerFixture Fixture { get; }
+    protected StreamingHubHeartbeatTestServerFixtureBase Fixture { get; }
 
-    public StreamingHubServerHeartbeatTestBase(ServerFixture fixture)
+    public abstract class StreamingHubHeartbeatTestServerFixtureBase : ServerFixture<
+        StreamingHubServerHeartbeatTestHub,
+        StreamingHubServerHeartbeatTestHub_EnableByAttribute,
+        StreamingHubServerHeartbeatTestHub_DisableByAttribute,
+        StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
+        StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
+        StreamingHubServerHeartbeatTestHub_Conditional
+    >
+    {
+        public FakeTimeProvider FakeTimeProvider { get; } = new();
+
+        protected sealed override void ConfigureMagicOnion(MagicOnionOptions options)
+        {
+            options.TimeProvider = FakeTimeProvider;
+            options.StreamingHubHeartbeatInterval = TimeSpan.FromMilliseconds(300);
+            options.StreamingHubHeartbeatTimeout = TimeSpan.FromMilliseconds(200);
+            ConfigureMagicOnionCore(options);
+        }
+
+        protected virtual void ConfigureMagicOnionCore(MagicOnionOptions options){}
+    }
+
+    public StreamingHubServerHeartbeatTestBase(StreamingHubHeartbeatTestServerFixtureBase fixture)
     {
         this.Fixture = fixture;
     }
@@ -28,7 +51,10 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_EnableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
@@ -45,7 +71,10 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_DisableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
@@ -62,7 +91,10 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
@@ -78,7 +110,7 @@ public abstract class StreamingHubServerHeartbeatTestBase
         var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x =>
         {
             heartbeatReceived.SetResult();
-            Thread.Sleep(200); // Block consuming message loop.
+            Thread.Sleep(100); // Block consuming message loop.
         });
 
         // We need to consume message inline. Avoid post continuations to the synchronization context.
@@ -87,12 +119,18 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_TimeoutBehavior, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
 
+        // Send a heartbeat to the client.
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+
         // Wait for receiving a heartbeat from the server.
         // The client must receive a heartbeat every 200ms from the server.
         await heartbeatReceived.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
-        // Timeout at 100 ms after receiving a heartbeat.
-        await Task.Delay(500);
+        // Timeout at 200 ms after receiving a heartbeat.
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(200));
+
+        await Task.Delay(150); // Wait for unblocking and disconnection.
 
         // Assert
         Assert.True((bool)Fixture.Items.GetValueOrDefault("Disconnected"));
@@ -114,7 +152,10 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
@@ -130,19 +171,10 @@ public class StreamingHubServerHeartbeatTest_DisabledByDefault : StreamingHubSer
     {
     }
 
-    public class StreamingHubHeartbeatTestServerFixture : ServerFixture<
-        StreamingHubServerHeartbeatTestHub,
-        StreamingHubServerHeartbeatTestHub_EnableByAttribute,
-        StreamingHubServerHeartbeatTestHub_DisableByAttribute,
-        StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
-        StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
-        StreamingHubServerHeartbeatTestHub_Conditional
-    >
+    public class StreamingHubHeartbeatTestServerFixture : StreamingHubHeartbeatTestServerFixtureBase
     {
-        protected override void ConfigureMagicOnion(MagicOnionOptions options)
+        protected override void ConfigureMagicOnionCore(MagicOnionOptions options)
         {
-            options.StreamingHubHeartbeatInterval = TimeSpan.FromMilliseconds(300);
-            options.StreamingHubHeartbeatTimeout = TimeSpan.FromMilliseconds(200);
             options.EnableStreamingHubHeartbeat = false; // Disabled by default.
         }
     }
@@ -157,7 +189,10 @@ public class StreamingHubServerHeartbeatTest_DisabledByDefault : StreamingHubSer
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
@@ -173,19 +208,10 @@ public class StreamingHubServerHeartbeatTest_EnabledByDefault : StreamingHubServ
     {
     }
 
-    public class StreamingHubHeartbeatTestServerFixture : ServerFixture<
-        StreamingHubServerHeartbeatTestHub,
-        StreamingHubServerHeartbeatTestHub_EnableByAttribute,
-        StreamingHubServerHeartbeatTestHub_DisableByAttribute,
-        StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
-        StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
-        StreamingHubServerHeartbeatTestHub_Conditional
-    >
+    public class StreamingHubHeartbeatTestServerFixture : StreamingHubHeartbeatTestServerFixtureBase
     {
-        protected override void ConfigureMagicOnion(MagicOnionOptions options)
+        protected override void ConfigureMagicOnionCore(MagicOnionOptions options)
         {
-            options.StreamingHubHeartbeatInterval = TimeSpan.FromMilliseconds(300);
-            options.StreamingHubHeartbeatTimeout = TimeSpan.FromMilliseconds(200);
             options.EnableStreamingHubHeartbeat = true; // Enabled by default.
         }
     }
@@ -200,7 +226,10 @@ public class StreamingHubServerHeartbeatTest_EnabledByDefault : StreamingHubServ
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
-        await Task.Delay(650);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15);
         await client.DisposeAsync();
 
         // Assert
