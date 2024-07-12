@@ -9963,6 +9963,70 @@ references:
   fullName.vb: MagicOnion.Server.DuplexStreamingContext(Of TRequest, TResponse).WriteOptions
   nameWithType: DuplexStreamingContext<TRequest, TResponse>.WriteOptions
   nameWithType.vb: DuplexStreamingContext(Of TRequest, TResponse).WriteOptions
+- uid: MagicOnion.Server.Features
+  name: MagicOnion.Server.Features
+  href: api/MagicOnion.Server.Features.html
+  commentId: N:MagicOnion.Server.Features
+  fullName: MagicOnion.Server.Features
+  nameWithType: MagicOnion.Server.Features
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature
+  name: IMagicOnionHeartbeatFeature
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html
+  commentId: T:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature
+  nameWithType: IMagicOnionHeartbeatFeature
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt
+  name: LastReceivedAt
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_LastReceivedAt
+  commentId: P:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt
+  nameWithType: IMagicOnionHeartbeatFeature.LastReceivedAt
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt*
+  name: LastReceivedAt
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_LastReceivedAt_
+  commentId: Overload:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt
+  isSpec: "True"
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.LastReceivedAt
+  nameWithType: IMagicOnionHeartbeatFeature.LastReceivedAt
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
+  name: Latency
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_Latency
+  commentId: P:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
+  nameWithType: IMagicOnionHeartbeatFeature.Latency
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency*
+  name: Latency
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_Latency_
+  commentId: Overload:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
+  isSpec: "True"
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
+  nameWithType: IMagicOnionHeartbeatFeature.Latency
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
+  name: TimeoutToken
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_TimeoutToken
+  commentId: P:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
+  nameWithType: IMagicOnionHeartbeatFeature.TimeoutToken
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken*
+  name: TimeoutToken
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_TimeoutToken_
+  commentId: Overload:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
+  isSpec: "True"
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
+  nameWithType: IMagicOnionHeartbeatFeature.TimeoutToken
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister
+  name: Unregister()
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_Unregister
+  commentId: M:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister()
+  nameWithType: IMagicOnionHeartbeatFeature.Unregister()
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister*
+  name: Unregister
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_Unregister_
+  commentId: Overload:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister
+  isSpec: "True"
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Unregister
+  nameWithType: IMagicOnionHeartbeatFeature.Unregister
 - uid: MagicOnion.Server.Filters
   name: MagicOnion.Server.Filters
   href: api/MagicOnion.Server.Filters.html
@@ -13290,6 +13354,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.MagicOnionOptions.StreamingHubHeartbeatTimeout
   nameWithType: MagicOnionOptions.StreamingHubHeartbeatTimeout
+- uid: MagicOnion.Server.MagicOnionOptions.TimeProvider
+  name: TimeProvider
+  href: api/MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_TimeProvider
+  commentId: P:MagicOnion.Server.MagicOnionOptions.TimeProvider
+  fullName: MagicOnion.Server.MagicOnionOptions.TimeProvider
+  nameWithType: MagicOnionOptions.TimeProvider
+- uid: MagicOnion.Server.MagicOnionOptions.TimeProvider*
+  name: TimeProvider
+  href: api/MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_TimeProvider_
+  commentId: Overload:MagicOnion.Server.MagicOnionOptions.TimeProvider
+  isSpec: "True"
+  fullName: MagicOnion.Server.MagicOnionOptions.TimeProvider
+  nameWithType: MagicOnionOptions.TimeProvider
 - uid: MagicOnion.Server.MagicOnionServiceDefinition
   name: MagicOnionServiceDefinition
   href: api/MagicOnion.Server.MagicOnionServiceDefinition.html
