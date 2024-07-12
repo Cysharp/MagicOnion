@@ -174,41 +174,77 @@ public abstract class ServerFixture : IDisposable
 }
 
 public class ServerFixture<TServiceOrHub> : ServerFixture
+    where TServiceOrHub : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
+    where TServiceOrHub4 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
+    where TServiceOrHub4 : IServiceMarker
+    where TServiceOrHub5 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
+    where TServiceOrHub4 : IServiceMarker
+    where TServiceOrHub5 : IServiceMarker
+    where TServiceOrHub6 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6, TServiceOrHub7> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
+    where TServiceOrHub4 : IServiceMarker
+    where TServiceOrHub5 : IServiceMarker
+    where TServiceOrHub6 : IServiceMarker
+    where TServiceOrHub7 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6), typeof(TServiceOrHub7)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6, TServiceOrHub7, TServiceOrHub8> : ServerFixture
+    where TServiceOrHub1 : IServiceMarker
+    where TServiceOrHub2 : IServiceMarker
+    where TServiceOrHub3 : IServiceMarker
+    where TServiceOrHub4 : IServiceMarker
+    where TServiceOrHub5 : IServiceMarker
+    where TServiceOrHub6 : IServiceMarker
+    where TServiceOrHub7 : IServiceMarker
+    where TServiceOrHub8 : IServiceMarker
 {
     protected override IEnumerable<Type> GetServiceTypes()
         => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6), typeof(TServiceOrHub7), typeof(TServiceOrHub8)];

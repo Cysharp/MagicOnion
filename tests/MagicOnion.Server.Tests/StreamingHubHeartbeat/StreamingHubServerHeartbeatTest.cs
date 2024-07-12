@@ -1,6 +1,9 @@
 using System.Collections.Concurrent;
+using Grpc.Core;
 using MagicOnion.Client;
+using MagicOnion.Server.Features;
 using MagicOnion.Server.Hubs;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
@@ -95,6 +98,28 @@ public abstract class StreamingHubServerHeartbeatTestBase
         Assert.True((bool)Fixture.Items.GetValueOrDefault("Disconnected"));
         Assert.True(client.WaitForDisconnect().IsCompleted);
     }
+
+
+    [Fact]
+    public async Task Disabled_Unregister_Manually()
+    {
+        // Arrange
+        var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
+        var receivedHeartbeatMetadata = new List<byte[]>();
+        var metadata = new Metadata()
+        {
+            {"x-mo-test-disable-heartbeat", "true"},
+        };
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray())).WithCallOptions(new CallOptions(metadata));
+
+        // Act
+        var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
+        await Task.Delay(650);
+        await client.DisposeAsync();
+
+        // Assert
+        Assert.Empty(receivedHeartbeatMetadata);
+    }
 }
 
 
@@ -110,7 +135,8 @@ public class StreamingHubServerHeartbeatTest_DisabledByDefault : StreamingHubSer
         StreamingHubServerHeartbeatTestHub_EnableByAttribute,
         StreamingHubServerHeartbeatTestHub_DisableByAttribute,
         StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
-        StreamingHubServerHeartbeatTestHub_TimeoutBehavior
+        StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
+        StreamingHubServerHeartbeatTestHub_Conditional
     >
     {
         protected override void ConfigureMagicOnion(MagicOnionOptions options)
@@ -152,7 +178,8 @@ public class StreamingHubServerHeartbeatTest_EnabledByDefault : StreamingHubServ
         StreamingHubServerHeartbeatTestHub_EnableByAttribute,
         StreamingHubServerHeartbeatTestHub_DisableByAttribute,
         StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
-        StreamingHubServerHeartbeatTestHub_TimeoutBehavior
+        StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
+        StreamingHubServerHeartbeatTestHub_Conditional
     >
     {
         protected override void ConfigureMagicOnion(MagicOnionOptions options)
@@ -186,6 +213,7 @@ public interface IStreamingHubServerHeartbeatTestHub_EnableByAttribute : IStream
 public interface IStreamingHubServerHeartbeatTestHub_DisableByAttribute : IStreamingHub<IStreamingHubServerHeartbeatTestHub_DisableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout : IStreamingHub<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_TimeoutBehavior : IStreamingHub<IStreamingHubServerHeartbeatTestHub_TimeoutBehavior, IStreamingHubServerHeartbeatTestHubReceiver>;
+public interface IStreamingHubServerHeartbeatTestHub_Conditional : IStreamingHub<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHubReceiver;
 
 // Implementations
@@ -216,3 +244,23 @@ public class StreamingHubServerHeartbeatTestHub_TimeoutBehavior([FromKeyedServic
         return base.OnDisconnected();
     }
 }
+
+[Heartbeat(Enable = true, Interval = 200, Timeout = 100)]
+public class StreamingHubServerHeartbeatTestHub_Conditional
+    : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_Conditional
+{
+    protected override ValueTask OnConnected()
+    {
+        var httpContext = Context.CallContext.GetHttpContext();
+        if (httpContext.Request.Headers.TryGetValue("x-mo-test-disable-heartbeat", out var disableHeartbeatHeader))
+        {
+            if (disableHeartbeatHeader == "true")
+            {
+                httpContext.Features.GetRequiredFeature<IMagicOnionHeartbeatFeature>().Unregister();
+            }
+        }
+
+        return base.OnConnected();
+    }
+}
+

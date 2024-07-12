@@ -8,6 +8,7 @@ using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Features;
 using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
@@ -82,6 +83,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     {
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
+        var features = this.Context.CallContext.GetHttpContext().Features;
+
         var streamingContext = GetDuplexStreamingContext<StreamingHubPayload, StreamingHubPayload>();
         var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
@@ -96,6 +99,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var heartbeatManager = handlerRepository.GetHeartbeatManager(Context.MethodHandler);
         heartbeatHandle = heartbeatManager.Register(StreamingServiceContext);
+        features.Set<IMagicOnionHeartbeatFeature>(new MagicOnionHeartbeatFeature(heartbeatHandle));
+
         try
         {
             await OnConnecting();
@@ -113,7 +118,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException)
         {
-            var httpRequestLifetimeFeature = this.Context.CallContext.GetHttpContext()?.Features.Get<IHttpRequestLifetimeFeature>();
+            var httpRequestLifetimeFeature = features.Get<IHttpRequestLifetimeFeature>();
 
             // NOTE: If the connection is completed when a message is written, PipeWriter throws an InvalidOperationException.
             // NOTE: If the connection is closed with STREAM_RST, PipeReader throws an IOException.

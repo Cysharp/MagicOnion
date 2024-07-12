@@ -76,6 +76,13 @@ internal class StreamingHubHeartbeatHandle : IDisposable
         timeoutTimerIsRunning = false;
     }
 
+    public void Unregister()
+    {
+        manager.Unregister(ServiceContext);
+        timeoutToken.CancelAfter(Timeout.InfiniteTimeSpan);
+        timeoutTimerIsRunning = false;
+    }
+
     public void Dispose()
     {
         if (disposed) return;
