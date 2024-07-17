@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - vNext
+      - release/**
     tags:
       - "!*" # not a tag push
     paths-ignore:

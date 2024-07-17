@@ -29,7 +29,6 @@
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
     <ProjectReference Include="..\samples\AuthSample\AuthSample.csproj" />
-    <ProjectReference Include="..\samples\BasicServerSample\BasicServerSample.csproj" />
     <ProjectReference Include="..\samples\MagicOnionEngineTest\MagicOnionEngineTest.csproj" />
     <ProjectReference Include="..\samples\MagicOnionTestServer\MagicOnionTestServer.csproj" />
   </ItemGroup>
