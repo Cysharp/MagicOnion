@@ -22,6 +22,7 @@ jobs:
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
       push-tag: false
+      ref: ${{ github.ref }}
 
   build-dotnet:
     needs: [update-packagejson]
