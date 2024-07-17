@@ -250,7 +250,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         {
             isErrorOrInterrupted = true;
             context.Status = ex.ToStatus();
-            response = default;
+            response = default(TResponse?);
 
             // WORKAROUND: Grpc.AspNetCore.Server throws a `Cancelled` status exception when it receives `null` response.
             //             To return the status code correctly, we needs to rethrow the exception here.
@@ -292,7 +292,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
                 context.Status = new Status(StatusCode.Unknown, str);
                 MagicOnionServerLog.Error(Logger, ex, context);
-                response = default;
+                response = default(TResponse?);
             }
             else
             {
