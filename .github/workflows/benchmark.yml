@@ -12,37 +12,16 @@ permissions:
   pull-requests: write
 
 jobs:
-  prepare:
-    outputs:
-      branch: ${{ steps.get-branch.outputs.name }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Get branch name
-        id: get-branch
-        run: |
-          if [[ "${{ github.event_name}}" == "issue_comment" && "${{ github.event.issue.pull_request.html_url }}" != "" ]]; then
-            # issue_comment (pull_request)
-            branch=$(gh pr view "${{ github.event.issue.pull_request.html_url }}"  --json headRefName | jq -r ".headRefName")
-            echo "name=${branch}" | tee -a "$GITHUB_OUTPUT"
-          else
-            # workflow_dispatch or issue_comment (issue)
-            echo "name=${{ github.ref_name }}" | tee -a "$GITHUB_OUTPUT"
-          fi
-
   # run benchmark
   benchmark:
-    needs: [prepare]
     uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main
     with:
-      branch: ${{ needs.prepare.outputs.branch }}
       dotnet-version: "8.0"
       environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || github.run_number }}"
       benchmark-timeout: 18 # 10min (env prepare) + 8min (clone & benchmark)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
-      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 1\""
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 2\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
       server-benchmark-script-args: ""
     secrets: inherit
