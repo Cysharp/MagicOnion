@@ -19,9 +19,9 @@ jobs:
       dotnet-version: "8.0"
       environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || github.run_number }}"
-      benchmark-timeout: 18 # 10min (env prepare) + 8min (clone & benchmark)
+      benchmark-timeout: 20 # 10min (env prepare) + 5min (clone & benchmark) + 5min (spare)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
-      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 2\""
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 1\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
       server-benchmark-script-args: ""
     secrets: inherit
