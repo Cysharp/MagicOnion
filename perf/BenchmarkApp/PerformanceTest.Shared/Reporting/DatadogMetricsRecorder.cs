@@ -79,7 +79,7 @@ public class DatadogMetricsRecorder
     /// <param name="type"></param>
     /// <param name="tags"></param>
     /// <returns></returns>
-    public async Task SendAsync(string metricsName, double value, DatadogMetricsType type, string[] tags)
+    public async Task SendAsync(string metricsName, double value, DatadogMetricsType type, string[] tags, string? unit = null)
     {
         var now = timeProvider.GetUtcNow().ToUnixTimeSeconds();
         var data = new DatadogMetricsRecord
@@ -97,6 +97,7 @@ public class DatadogMetricsRecorder
                         }
                     ],
                     Tags = tags,
+                    Unit = unit,
                 }
             ],
         };
@@ -114,6 +115,9 @@ public class DatadogMetricsRecorder
     }
 }
 
+/// <summary>
+/// see: https://docs.datadoghq.com/api/latest/metrics/?code-lang=go#submit-metrics
+/// </summary>
 public static class DatadogMetricsRecorderExtensions
 {
     /// <summary>
@@ -131,9 +135,9 @@ public static class DatadogMetricsRecorderExtensions
         var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.client.rps", requestsPerSecond, DatadogMetricsType.Rate, tags)); // rate?
-        recorder.Record(recorder.SendAsync("benchmark.client.duration", requestsPerSecond, DatadogMetricsType.Gauge, tags)); // gauge?
-        recorder.Record(recorder.SendAsync("benchmark.client.total_requests", totalRequests, DatadogMetricsType.Gauge, tags));
+        recorder.Record(recorder.SendAsync("benchmark.client.rps", requestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.client.duration", duration.TotalSeconds, DatadogMetricsType.Gauge, tags, "second"));
+        recorder.Record(recorder.SendAsync("benchmark.client.total_requests", totalRequests, DatadogMetricsType.Gauge, tags, "request"));
     }
 }
 
