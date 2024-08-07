@@ -7,6 +7,7 @@ using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Serialization.MessagePack;
 using PerformanceTest.Shared;
+using PerformanceTest.Shared.Reporting;
 
 var app = ConsoleApp.Create(args);
 app.AddRootCommand(Main);
@@ -26,6 +27,7 @@ async Task Main(
 )
 {
     var config = new ScenarioConfiguration(url, warmup, duration, streams, channels, verbose);
+    var datadog = DatadogMetricsRecorder.Create();
 
     PrintStartupInformation();
 
@@ -75,7 +77,9 @@ async Task Main(
                 results = new List<PerformanceResult>();
                 resultsByScenario[scenario2] = results;
             }
-            results.Add(await RunScenarioAsync(scenario2, config, controlServiceClient));
+            var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
+            results.Add(result);
+            datadog.PutClientBenchmarkMetrics(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result.RequestsPerSecond, result.Duration, result.TotalRequests);
         }
     }
 
@@ -127,6 +131,8 @@ async Task Main(
             writer.WriteLine($"{s}\t{string.Join("\t", results.Select(x => x.RequestsPerSecond.ToString("0.000")))}\t{results.Average(x => x.RequestsPerSecond):0.000}");
         }
     }
+
+    await datadog.WaitSaveAsync();
 }
 
 async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IPerfTestControlService controlService)
