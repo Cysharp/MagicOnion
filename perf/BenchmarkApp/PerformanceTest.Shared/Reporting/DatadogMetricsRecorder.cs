@@ -78,6 +78,7 @@ public class DatadogMetricsRecorder
     /// <param name="value"></param>
     /// <param name="type"></param>
     /// <param name="tags"></param>
+    /// <param name="unit"></param>
     /// <returns></returns>
     public async Task SendAsync(string metricsName, double value, DatadogMetricsType type, string[] tags, string? unit = null)
     {

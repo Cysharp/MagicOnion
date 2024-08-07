@@ -159,6 +159,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload16K => () => new StreamingHubLargePayload16KScenario(),
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
+        ScenarioType.PingpongStreamingHub => () => new PingpongStreamingHubScenario(),
+        ScenarioType.PingpongCachedStreamingHub => () => new PingpongCachedStreamingHubScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 

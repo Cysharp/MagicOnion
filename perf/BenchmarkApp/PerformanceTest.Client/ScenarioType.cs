@@ -22,4 +22,7 @@ public enum ScenarioType
     StreamingHubLargePayload16K,
     StreamingHubLargePayload32K,
     StreamingHubLargePayload64K,
+
+    PingpongStreamingHub,
+    PingpongCachedStreamingHub,
 }
