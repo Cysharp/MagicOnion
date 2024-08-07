@@ -128,7 +128,7 @@ public static class DatadogMetricsRecorderExtensions
     /// <param name="totalRequests"></param>
     public static void PutClientBenchmarkMetrics(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, double requestsPerSecond, TimeSpan duration, int totalRequests)
     {
-        var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:${x.serialization}"]);
+        var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
         recorder.Record(recorder.SendAsync("benchmark.client.rps", requestsPerSecond, DatadogMetricsType.Rate, tags)); // rate?
