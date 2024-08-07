@@ -201,7 +201,7 @@ public class DatadogMetricsRecord
         /// <summary>
         /// A list of tags associated with the metric.
         /// </summary>
-        /// [JsonPropertyName("tags")]
+        [JsonPropertyName("tags")]
         public required string[] Tags { get; set; }
 
         /// <summary>
