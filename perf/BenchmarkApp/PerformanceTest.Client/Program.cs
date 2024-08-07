@@ -66,7 +66,7 @@ async Task Main(
     }
 
     var resultsByScenario = new Dictionary<ScenarioType, List<PerformanceResult>>();
-    var runScenarios = Enum.GetValues<ScenarioType>().Where(x => (scenario == ScenarioType.All) ? x != ScenarioType.All : x == scenario);
+    var runScenarios = GetRunScenarios(scenario);
     for (var i = 1; i <= rounds; i++)
     {
         WriteLog($"Round: {i}");
@@ -231,6 +231,15 @@ void PrintStartupInformation(TextWriter? writer = null)
 void WriteLog(string value)
 {
     Console.WriteLine($"[{DateTime.Now:s}] {value}");
+}
+
+IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
+{
+    return scenario switch
+    {
+        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All),
+        _ => [scenario],
+    };
 }
 
 public record ScenarioConfiguration(string Url, int Warmup, int Duration, int Streams, int Channels, bool Verbose);

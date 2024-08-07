@@ -1,6 +1,8 @@
 public enum ScenarioType
 {
     All,
+    // TODO: add CI scenario
+
     Unary,
     UnaryComplex,
     UnaryLargePayload1K,
