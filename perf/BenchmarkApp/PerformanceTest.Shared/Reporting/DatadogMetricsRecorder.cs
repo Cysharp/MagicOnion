@@ -14,13 +14,15 @@ namespace PerformanceTest.Shared.Reporting;
 // * The full payload is approximately 100 bytes.
 public class DatadogMetricsRecorder
 {
+    public IReadOnlyList<string> DefaultTags { get; }
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider = TimeProvider.System;
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
 
-    private DatadogMetricsRecorder(string apiKey)
+    private DatadogMetricsRecorder(IReadOnlyList<string> tags, string apiKey)
     {
+        DefaultTags = tags;
         jsonSerializerOptions = new JsonSerializerOptions()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -35,14 +37,25 @@ public class DatadogMetricsRecorder
         backgroundQueue = new ConcurrentQueue<Task>();
     }
 
-    public static DatadogMetricsRecorder Create(bool validate = false)
+    public static DatadogMetricsRecorder Create(string? tagString, bool validate = false)
     {
+        List<string> tags = [];
+        if (!string.IsNullOrEmpty(tagString))
+        {
+            foreach (var item in tagString.Split(","))
+            {
+                if (item.Contains(":"))
+                {
+                    tags.Add(item);
+                }
+            }
+        }
         var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
         if (validate)
         {
             ArgumentException.ThrowIfNullOrEmpty(apiKey);
         }
-        return new DatadogMetricsRecorder(apiKey!);
+        return new DatadogMetricsRecorder(tags, apiKey!);
     }
 
     /// <summary>
