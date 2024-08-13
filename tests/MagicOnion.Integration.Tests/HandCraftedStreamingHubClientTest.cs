@@ -24,10 +24,10 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
+        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance);
 
         // Act
-        await client.ConnectAsync();
+        var client = await clientConnectTask;
         var retVal = await client.MethodParameterless();
 
         // Assert
@@ -40,10 +40,10 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
+        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance);
 
         // Act
-        await client.ConnectAsync();
+        var client = await clientConnectTask;
         var retVal = await client.Callback(1234, "FooBarBaz");
         await Task.Delay(500); // Wait for the broadcast queue to be consumed.
 
@@ -61,17 +61,24 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         }
     }
 
+    class HandCraftedClientFactoryProvider : IStreamingHubClientFactoryProvider
+    {
+        public static IStreamingHubClientFactoryProvider Instance { get; } = new HandCraftedClientFactoryProvider();
+
+        public bool TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            factory = (receiver, invoker, options) => (TStreamingHub)(object)new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub((IHandCraftedStreamingHubClientTestHubReceiver)(object)receiver!, invoker, options);
+            return true;
+        }
+    }
+
     class __HandCraftedClient__IHandCraftedStreamingHubClientTestHub : StreamingHubClientBase<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>, IHandCraftedStreamingHubClientTestHub
     {
-        public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
-            : base(nameof(IHandCraftedStreamingHubClientTestHub), receiver, callInvoker, new StreamingHubClientOptions(host, option, messageSerializer, logger))
+        public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
+            : base(nameof(IHandCraftedStreamingHubClientTestHub), receiver, callInvoker, options)
         {
         }
 
-        public Task ConnectAsync()
-        {
-            return __ConnectAndSubscribeAsync(CancellationToken.None);
-        }
 
         protected override void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data)
         {
