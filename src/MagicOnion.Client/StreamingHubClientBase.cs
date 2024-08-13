@@ -199,7 +199,7 @@ namespace MagicOnion.Client
         }
 
         // call immediately after create.
-        public async Task __ConnectAndSubscribeAsync(CancellationToken cancellationToken)
+        internal async Task __ConnectAndSubscribeAsync(CancellationToken cancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, options.CallOptions);
