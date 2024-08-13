@@ -26,19 +26,19 @@ jobs:
       matrix:
         include:
           # 1
-          - tags: "streams:1"
+          - tags: "legend:h2c-linux,streams:1"
             channels: 28
             streams: 1
           # 1x1
-          - tags: "streams:1x1"
+          - tags: "legend:h2c-linux,streams:1x1"
             channels: 1
             streams: 1
           # 70
-          - tags: "streams:70"
+          - tags: "legend:h2c-linux,streams:70"
             channels: 28
             streams: 70
           # 70x1
-          - tags: "streams:70x1"
+          - tags: "legend:h2c-linux,streams:70x1"
             channels: 1
             streams: 70
     uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main

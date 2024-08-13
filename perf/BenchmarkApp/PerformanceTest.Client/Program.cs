@@ -14,15 +14,15 @@ app.AddRootCommand(Main);
 app.Run();
 
 async Task Main(
-    [Option("s")]ScenarioType scenario,
-    [Option("u")]string url,
-    [Option("w")]int warmup = 10,
-    [Option("d")]int duration = 10,
-    [Option("t")]int streams = 10,
-    [Option("c")]int channels = 10,
-    [Option("r")]string? report = null,
+    [Option("s")] ScenarioType scenario,
+    [Option("u")] string url,
+    [Option("w")] int warmup = 10,
+    [Option("d")] int duration = 10,
+    [Option("t")] int streams = 10,
+    [Option("c")] int channels = 10,
+    [Option("r")] string? report = null,
     uint rounds = 1,
-    [Option("v")]bool verbose = false,
+    [Option("v")] bool verbose = false,
     SerializationType serialization = SerializationType.MessagePack,
     string? tags = null
 )
@@ -267,7 +267,18 @@ public static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((recorder.DefaultTags, scenario, applicationInfo, serialization), static x => [$"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
+        var tags = MetricsTagCache.Get((recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
+            $"legend:{x.scenario.ToLower()}-{x.TagLegend}{x.TagStreams}",
+            $"streams:{x.TagStreams}",
+            $"magiconion_version:{x.applicationInfo.MagicOnionVersion}",
+            $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}",
+            $"messagepack_version:{x.applicationInfo.MessagePackVersion}",
+            $"memorypack_version:{x.applicationInfo.MemoryPackVersion}",
+            $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+            $"process_count:{x.applicationInfo.ProcessorCount}",
+            $"scenario:{x.scenario}",
+            $"serialization:{x.serialization}"
+        ]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));

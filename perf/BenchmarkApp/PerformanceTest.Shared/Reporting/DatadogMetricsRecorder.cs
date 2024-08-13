@@ -14,15 +14,17 @@ namespace PerformanceTest.Shared.Reporting;
 // * The full payload is approximately 100 bytes.
 public class DatadogMetricsRecorder
 {
-    public IReadOnlyList<string> DefaultTags { get; }
+    public string TagLegend { get; }
+    public string TagStreams { get; }
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider = TimeProvider.System;
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
 
-    private DatadogMetricsRecorder(IReadOnlyList<string> tags, string apiKey)
+    private DatadogMetricsRecorder(string tagLegend, string tagStreams, string apiKey)
     {
-        DefaultTags = tags;
+        TagLegend = tagLegend;
+        TagStreams = tagStreams;
         jsonSerializerOptions = new JsonSerializerOptions()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -39,14 +41,19 @@ public class DatadogMetricsRecorder
 
     public static DatadogMetricsRecorder Create(string? tagString, bool validate = false)
     {
-        List<string> tags = [];
+        string tagLegend = "";
+        string tagStreams = "";
         if (!string.IsNullOrEmpty(tagString))
         {
             foreach (var item in tagString.Split(","))
             {
-                if (item.Contains(":"))
+                if (item.StartsWith("legend:"))
                 {
-                    tags.Add(item);
+                    tagLegend = item;
+                }
+                else if (item.StartsWith("streams:"))
+                {
+                    tagStreams = item;
                 }
             }
         }
@@ -55,7 +62,7 @@ public class DatadogMetricsRecorder
         {
             ArgumentException.ThrowIfNullOrEmpty(apiKey);
         }
-        return new DatadogMetricsRecorder(tags, apiKey!);
+        return new DatadogMetricsRecorder(tagLegend, tagStreams, apiKey!);
     }
 
     /// <summary>
