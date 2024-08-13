@@ -1,1 +1,6 @@
 src/MagicOnion.HttpGateway/Swagger/SwaggerUI/* linguist-vendored
+*.csproj	text
+*.props		text
+*.targets	text
+*.cs		text
+*.xml		text
