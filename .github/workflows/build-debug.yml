@@ -14,7 +14,7 @@ on:
   pull_request:
     branches:
       - main
-      - vNext
+      - release/**
     paths-ignore:
       - '**.md'
       - .github/**
