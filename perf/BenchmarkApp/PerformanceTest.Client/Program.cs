@@ -79,7 +79,7 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
             results.Add(result);
-            datadog.PutClientBenchmarkMetrics(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result);
+            await datadog.PutClientBenchmarkMetricsAsync(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result);
         }
     }
 
@@ -136,8 +136,6 @@ async Task Main(
             writer.WriteLine($"{s}\t{string.Join("\t", results.Select(x => x.RequestsPerSecond.ToString("0.000")))}\t{results.Average(x => x.RequestsPerSecond):0.000}");
         }
     }
-
-    await datadog.WaitSaveAsync();
 }
 
 async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IPerfTestControlService controlService)
@@ -265,7 +263,7 @@ public static class DatadogMetricsRecorderExtensions
     /// <param name="applicationInfo"></param>
     /// <param name="serialization"></param>
     /// <param name="result"></param>
-    public static void PutClientBenchmarkMetrics(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
+    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
     {
         var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
 
@@ -279,6 +277,9 @@ public static class DatadogMetricsRecorderExtensions
         recorder.Record(recorder.SendAsync("benchmark.client.latency_p75", result.Latency.P75, DatadogMetricsType.Gauge, tags, "millisecond"));
         recorder.Record(recorder.SendAsync("benchmark.client.latency_p90", result.Latency.P90, DatadogMetricsType.Gauge, tags, "millisecond"));
         recorder.Record(recorder.SendAsync("benchmark.client.latency_p99", result.Latency.P99, DatadogMetricsType.Gauge, tags, "millisecond"));
+
+        // wait until send complete
+        await recorder.WaitSaveAsync();
     }
 }
 

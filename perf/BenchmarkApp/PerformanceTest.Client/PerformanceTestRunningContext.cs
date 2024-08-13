@@ -5,12 +5,14 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
-    List<List<double>> latencyPerConnection = [];
-    List<object> locks = [];
+    List<List<double>> latencyPerConnection;
+    List<object> locks;
 
     public PerformanceTestRunningContext(int connectionCount)
     {
         stopwatch = new Stopwatch();
+        latencyPerConnection = new (connectionCount);
+        locks = new (connectionCount);
         for (var i = 0; i < connectionCount; i++)
         {
             latencyPerConnection.Add([]);
@@ -49,6 +51,8 @@ public class PerformanceTestRunningContext
     public PerformanceResult GetResult()
     {
         var latency = MeasureLatency();
+        latencyPerConnection.Clear();
+        locks.Clear();
         return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency);
 
         Latency MeasureLatency()
@@ -66,7 +70,7 @@ public class PerformanceTestRunningContext
                 latencyPerConnection[i].Sort();
             }
             var latencyMean = (totalCount != 0) ? totalSum / totalCount : totalSum;
-            var latencyAllConnection = new List<double>();
+            var latencyAllConnection = new List<double>(totalCount);
             foreach (var connections in latencyPerConnection) latencyAllConnection.AddRange(connections);
             var latency50p = GetPercentile(50, latencyAllConnection);
             var latency75p = GetPercentile(75, latencyAllConnection);

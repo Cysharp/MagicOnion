@@ -6,21 +6,20 @@ public class StreamingHubScenario : IScenario, IPerfTestHubReceiver
 {
     IPerfTestHub client = default!;
     readonly TimeProvider timeProvider = TimeProvider.System;
-    long beginTimeStamp = default;
 
     public async ValueTask PrepareAsync(GrpcChannel channel)
     {
         this.client = await StreamingHubClient.ConnectAsync<IPerfTestHub, IPerfTestHubReceiver>(channel, this);
-        this.beginTimeStamp = timeProvider.GetTimestamp();
     }
 
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            var begin = timeProvider.GetTimestamp();
             await client.CallMethodAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011);
             ctx.Increment();
-            ctx.Latency(connectionId, timeProvider.GetElapsedTime(this.beginTimeStamp));
+            ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
 }
