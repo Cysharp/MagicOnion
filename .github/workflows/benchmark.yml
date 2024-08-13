@@ -20,16 +20,20 @@ jobs:
       matrix:
         include:
           # 1
-          - channels: 28
+          - tags: "streams:1"
+            channels: 28
             streams: 1
           # 1x1
-          - channels: 1
+          - tags: "streams:1x1"
+            channels: 1
             streams: 1
           # 70
-          - channels: 28
+          - tags: "streams:70"
+            channels: 28
             streams: 70
           # 70x1
-          - channels: 1
+          - tags: "streams:70x1"
+            channels: 1
             streams: 70
     uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main
     with:
@@ -38,7 +42,7 @@ jobs:
       benchmark-name: "magiconion-${{ github.event.issue.number || github.run_number }}"
       benchmark-timeout: 20 # 10min (env prepare) + 5min (clone & benchmark) + 5min (spare)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
-      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }}\""
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }}\" --tags \"${{ matrix.tags }}\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
       server-benchmark-script-args: ""
     secrets: inherit

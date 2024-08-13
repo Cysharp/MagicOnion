@@ -23,11 +23,12 @@ async Task Main(
     [Option("r")]string? report = null,
     uint rounds = 1,
     [Option("v")]bool verbose = false,
-    SerializationType serialization = SerializationType.MessagePack
+    SerializationType serialization = SerializationType.MessagePack,
+    string? tags = null
 )
 {
     var config = new ScenarioConfiguration(url, warmup, duration, streams, channels, verbose);
-    var datadog = DatadogMetricsRecorder.Create();
+    var datadog = DatadogMetricsRecorder.Create(tags);
 
     PrintStartupInformation();
 
@@ -39,6 +40,7 @@ async Task Main(
     WriteLog($"Channels: {config.Channels}");
     WriteLog($"Rounds: {rounds}");
     WriteLog($"Serialization: {serialization}");
+    WriteLog($"Tags: {tags}");
 
     // Setup serializer
     switch (serialization)
@@ -265,17 +267,12 @@ public static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
+        var tags = MetricsTagCache.Get((recorder.DefaultTags, scenario, applicationInfo, serialization), static x => [$"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_max", result.Latency.Max, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_p50", result.Latency.P50, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_p75", result.Latency.P75, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_p90", result.Latency.P90, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.client.latency_p99", result.Latency.P99, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
 
         // wait until send complete
         await recorder.WaitSaveAsync();
