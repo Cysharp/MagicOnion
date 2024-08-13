@@ -269,7 +269,6 @@ public static class DatadogMetricsRecorderExtensions
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
         recorder.Record(recorder.SendAsync("benchmark.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.client.duration", result.Duration.TotalSeconds, DatadogMetricsType.Gauge, tags, "second"));
         recorder.Record(recorder.SendAsync("benchmark.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
         recorder.Record(recorder.SendAsync("benchmark.client.latency_max", result.Latency.Max, DatadogMetricsType.Gauge, tags, "millisecond"));
