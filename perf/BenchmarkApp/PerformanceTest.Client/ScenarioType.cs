@@ -1,7 +1,7 @@
 public enum ScenarioType
 {
     All,
-    // TODO: add CI scenario
+    CI, // Run Unary, StreamingHub, PingpongStreamingHub
 
     Unary,
     UnaryComplex,
