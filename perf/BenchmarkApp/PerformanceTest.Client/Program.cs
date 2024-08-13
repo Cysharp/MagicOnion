@@ -79,7 +79,7 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
             results.Add(result);
-            datadog.PutClientBenchmarkMetrics(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result.RequestsPerSecond, result.Duration, result.TotalRequests);
+            datadog.PutClientBenchmarkMetrics(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result);
         }
     }
 
@@ -121,6 +121,11 @@ async Task Main(
                 writer.WriteLine($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
                 writer.WriteLine($"Duration           : {result.Duration.TotalSeconds} s");
                 writer.WriteLine($"Total Requests     : {result.TotalRequests} requests");
+                writer.WriteLine($"Mean latency       : {result.Latency.Mean:0.###} ms");
+                writer.WriteLine($"Max latency        : {result.Latency.Max:0.###} ms");
+                writer.WriteLine($"p50 latency        : {result.Latency.P50:0.###} ms");
+                writer.WriteLine($"p90 latency        : {result.Latency.P90:0.###} ms");
+                writer.WriteLine($"p99 latency        : {result.Latency.P99:0.###} ms");
                 writer.WriteLine($"========================================");
             }
         }
@@ -164,7 +169,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
-    var ctx = new PerformanceTestRunningContext();
+    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
     var cts = new CancellationTokenSource();
 
     WriteLog($"Starting scenario '{scenario}'...");
@@ -175,11 +180,12 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         for (var j = 0; j < config.Streams; j++)
         {
             if (config.Verbose) WriteLog($"Channel[{i}] - Stream[{j}]: Run");
+            var connectionId = i;
             tasks.Add(Task.Run(async () =>
             {
                 var scenarioRunner = scenarioFactory();
                 await scenarioRunner.PrepareAsync(channel);
-                await scenarioRunner.RunAsync(ctx, cts.Token);
+                await scenarioRunner.RunAsync(connectionId, ctx, cts.Token);
             }));
         }
     }
@@ -202,6 +208,12 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
     WriteLog($"Duration: {result.Duration.TotalSeconds} s");
     WriteLog($"Total Requests: {result.TotalRequests} requests");
+    WriteLog($"Mean latency: {result.Latency.Mean:0.###} ms");
+    WriteLog($"Max latency: {result.Latency.Max:0.###} ms");
+    WriteLog($"p50 latency: {result.Latency.P50:0.###} ms");
+    WriteLog($"p75 latency: {result.Latency.P75:0.###} ms");
+    WriteLog($"p90 latency: {result.Latency.P90:0.###} ms");
+    WriteLog($"p99 latency: {result.Latency.P99:0.###} ms");
 
     return result;
 }
@@ -240,6 +252,33 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
         ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All),
         _ => [scenario],
     };
+}
+
+public static class DatadogMetricsRecorderExtensions
+{
+    /// <summary>
+    /// Put Client Benchmark metrics to background. 
+    /// </summary>
+    /// <param name="recorder"></param>
+    /// <param name="scenario"></param>
+    /// <param name="applicationInfo"></param>
+    /// <param name="serialization"></param>
+    /// <param name="result"></param>
+    public static void PutClientBenchmarkMetrics(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
+    {
+        var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
+
+        // Don't want to await each put. Let's send it to queue and await when benchmark ends.
+        recorder.Record(recorder.SendAsync("benchmark.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.client.duration", result.Duration.TotalSeconds, DatadogMetricsType.Gauge, tags, "second"));
+        recorder.Record(recorder.SendAsync("benchmark.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_max", result.Latency.Max, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_p50", result.Latency.P50, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_p75", result.Latency.P75, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_p90", result.Latency.P90, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.client.latency_p99", result.Latency.P99, DatadogMetricsType.Gauge, tags, "millisecond"));
+    }
 }
 
 public record ScenarioConfiguration(string Url, int Warmup, int Duration, int Streams, int Channels, bool Verbose);

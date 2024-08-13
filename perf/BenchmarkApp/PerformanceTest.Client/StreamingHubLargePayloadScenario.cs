@@ -6,6 +6,7 @@ public abstract class StreamingHubLargePayloadScenarioBase : IScenario, IPerfTes
 {
     IPerfTestHub client = default!;
     readonly int payloadSize;
+    readonly TimeProvider timeProvider = TimeProvider.System;
 
     public StreamingHubLargePayloadScenarioBase(int payloadSize)
     {
@@ -17,14 +18,16 @@ public abstract class StreamingHubLargePayloadScenarioBase : IScenario, IPerfTes
         this.client = await StreamingHubClient.ConnectAsync<IPerfTestHub, IPerfTestHubReceiver>(channel, this);
     }
 
-    public async ValueTask RunAsync(PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
+    public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
         var data = new byte[payloadSize];
 
         while (!cancellationToken.IsCancellationRequested)
         {
+            var begin = timeProvider.GetTimestamp();
             _ = await client.CallMethodLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
             ctx.Increment();
+            ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
 }

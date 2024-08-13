@@ -17,7 +17,7 @@ public class DatadogMetricsRecorder
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider = TimeProvider.System;
     private readonly HttpClient client;
-    private readonly ConcurrentQueue<Task> reservations;
+    private readonly ConcurrentQueue<Task> backgroundQueue;
 
     private DatadogMetricsRecorder(string apiKey)
     {
@@ -32,7 +32,7 @@ public class DatadogMetricsRecorder
         client.DefaultRequestHeaders.Add("Accept", "application/json");
         client.DefaultRequestHeaders.Add("DD-API-KEY", apiKey);
 
-        reservations = new ConcurrentQueue<Task>();
+        backgroundQueue = new ConcurrentQueue<Task>();
     }
 
     public static DatadogMetricsRecorder Create(bool validate = false)
@@ -46,12 +46,12 @@ public class DatadogMetricsRecorder
     }
 
     /// <summary>
-    /// Pass to background
+    /// Pass task to background
     /// </summary>
-    /// <param name="reserve"></param>
-    public void Record(Task reserve)
+    /// <param name="task"></param>
+    public void Record(Task task)
     {
-        reservations.Enqueue(reserve);
+        backgroundQueue.Enqueue(task);
     }
 
     /// <summary>
@@ -61,10 +61,10 @@ public class DatadogMetricsRecorder
     public async Task WaitSaveAsync()
     {
         // sequential handling to avoid Datadog API quota
-        while (reservations.TryDequeue(out var task))
+        while (backgroundQueue.TryDequeue(out var task))
         {
             await task;
-            if (reservations.Count == 0)
+            if (backgroundQueue.Count == 0)
             {
                 break;
             }
@@ -113,32 +113,6 @@ public class DatadogMetricsRecorder
             var responseContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Failed to post metrics to Datadog. StatusCode: {(int)response.StatusCode}, Response: {responseContent}");
         }
-    }
-}
-
-/// <summary>
-/// see: https://docs.datadoghq.com/api/latest/metrics/?code-lang=go#submit-metrics
-/// </summary>
-public static class DatadogMetricsRecorderExtensions
-{
-    /// <summary>
-    /// Put Client Benchmark metrics to background. 
-    /// </summary>
-    /// <param name="recorder"></param>
-    /// <param name="scenario"></param>
-    /// <param name="applicationInfo"></param>
-    /// <param name="serialization"></param>
-    /// <param name="requestsPerSecond"></param>
-    /// <param name="duration"></param>
-    /// <param name="totalRequests"></param>
-    public static void PutClientBenchmarkMetrics(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, double requestsPerSecond, TimeSpan duration, int totalRequests)
-    {
-        var tags = MetricsTagCache.Get((scenario, applicationInfo, serialization), static x => [$"app:MagicOnion", $"magiconion_version:{x.applicationInfo.MagicOnionVersion}", $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}", $"messagepack_version:{x.applicationInfo.MessagePackVersion}", $"memorypack_version:{x.applicationInfo.MemoryPackVersion}", $"process_arch:{x.applicationInfo.ProcessArchitecture}", $"process_count:{x.applicationInfo.ProcessorCount}", $"scenario:{x.scenario}", $"serialization:{x.serialization}"]);
-
-        // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.client.rps", requestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.client.duration", duration.TotalSeconds, DatadogMetricsType.Gauge, tags, "second"));
-        recorder.Record(recorder.SendAsync("benchmark.client.total_requests", totalRequests, DatadogMetricsType.Gauge, tags, "request"));
     }
 }
 
