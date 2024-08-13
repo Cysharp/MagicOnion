@@ -72,6 +72,9 @@ public class PerformanceTestRunningContext
             var latencyMean = (totalCount != 0) ? totalSum / totalCount : totalSum;
             var latencyAllConnection = new List<double>(totalCount);
             foreach (var connections in latencyPerConnection) latencyAllConnection.AddRange(connections);
+            // sort before get percentile
+            latencyAllConnection.Sort();
+
             var latency50p = GetPercentile(50, latencyAllConnection);
             var latency75p = GetPercentile(75, latencyAllConnection);
             var latency90p = GetPercentile(90, latencyAllConnection);
