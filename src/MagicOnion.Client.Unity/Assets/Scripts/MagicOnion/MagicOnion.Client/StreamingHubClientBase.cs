@@ -186,7 +186,7 @@ namespace MagicOnion.Client
         StreamingHubClientHeartbeatManager heartbeatManager = default!;
         Task subscription = default!;
 
-        readonly TReceiver receiver;
+        protected readonly TReceiver receiver;
 
         protected StreamingHubClientBase(string serviceName, TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
         {

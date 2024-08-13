@@ -153,6 +153,7 @@ override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRe
 override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeUnary(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult<TResponse>
 override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeUnaryNonGeneric(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult
 override MagicOnion.Client.RequestContext<T>.RequestType.get -> System.Type!
+readonly MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.receiver -> TReceiver
 static MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance.get -> MagicOnion.Client.IMagicOnionClientFactoryProvider!
 static MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance.get -> MagicOnion.Client.IMagicOnionClientFactoryProvider!
 static MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance.get -> MagicOnion.Client.IStreamingHubClientFactoryProvider!
