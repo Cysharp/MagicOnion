@@ -29,4 +29,17 @@ public class PerfTestHub : StreamingHubBase<IPerfTestHub, IPerfTestHubReceiver>,
     {
         return Task.FromResult((123, arg5));
     }
+
+    public Task<SimpleResponse> PingpongAsync(SimpleRequest request)
+    {
+        return Task.FromResult(request.UseCache ? SimpleResponse.Cached : new SimpleResponse
+        {
+            Payload = request.ResponseSize == 0 ? [] : new byte[request.ResponseSize],
+        });
+    }
+
+    public Task<SimpleResponse> PingpongCachedAsync(SimpleRequest request)
+    {
+        return Task.FromResult(SimpleResponse.Cached);
+    }
 }

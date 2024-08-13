@@ -1,8 +1,84 @@
 {
   "profiles": {
-    "PerformanceTest.Client": {
+    "PerformanceTest.Client (CI 1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s CI --channels 28 --streams 1"
+    },
+    "PerformanceTest.Client (CI 1x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s CI --channels 1 --streams 1"
+    },
+    "PerformanceTest.Client (CI 70)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s CI --channels 28 --streams 70"
+    },
+    "PerformanceTest.Client (CI 70x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s CI --channels 1 --streams 70"
+    },
+    "PerformanceTest.Client (PingpongStreamingHub 1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s PingpongStreamingHub --channels 28 --streams 1"
+    },
+    "PerformanceTest.Client (PingpongStreamingHub 1x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s PingpongStreamingHub --channels 1 --streams 1"
+    },
+    "PerformanceTest.Client (PingpongStreamingHub 70)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s PingpongStreamingHub --channels 28 --streams 70"
+    },
+    "PerformanceTest.Client (PingpongStreamingHub 70x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s PingpongStreamingHub --channels 1 --streams 70"
+    },
+    "PerformanceTest.Client (StreamingHub 1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHub --channels 28 --streams 1"
+    },
+    "PerformanceTest.Client (StreamingHub 1x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHub --channels 1 --streams 1"
+    },
+    "PerformanceTest.Client (StreamingHub 70)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHub --channels 28 --streams 70"
+    },
+    "PerformanceTest.Client (StreamingHub 70x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHub --channels 1 --streams 70"
+    },
+    "PerformanceTest.Client (StreamingHubValueTask 1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHubValueTask --channels 28 --streams 1"
+    },
+    "PerformanceTest.Client (StreamingHubValueTask 1x1)": {
       "commandName": "Project",
       "commandLineArgs": "-u http://localhost:5000 -s StreamingHubValueTask --channels 1 --streams 1"
+    },
+    "PerformanceTest.Client (StreamingHubValueTask 70)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHubValueTask --channels 28 --streams 70"
+    },
+    "PerformanceTest.Client (StreamingHubValueTask 70x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s StreamingHubValueTask --channels 1 --streams 70"
+    },
+    "PerformanceTest.Client (Unary 1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s Unary --channels 28 --streams 1"
+    },
+    "PerformanceTest.Client (Unary 1x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s Unary --channels 1 --streams 1"
+    },
+    "PerformanceTest.Client (Unary 70)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s Unary --channels 28 --streams 70"
+    },
+    "PerformanceTest.Client (Unary 70x1)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s Unary --channels 1 --streams 70"
     }
   }
 }

@@ -6,6 +6,7 @@ public abstract class UnaryLargePayloadScenarioBase : IScenario
 {
     IPerfTestService client = default!;
     readonly int payloadSize;
+    readonly TimeProvider timeProvider = TimeProvider.System;
 
     public UnaryLargePayloadScenarioBase(int payloadSize)
     {
@@ -18,14 +19,16 @@ public abstract class UnaryLargePayloadScenarioBase : IScenario
         return ValueTask.CompletedTask;
     }
 
-    public async ValueTask RunAsync(PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
+    public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
         var data = new byte[payloadSize];
 
         while (!cancellationToken.IsCancellationRequested)
         {
+            var begin = timeProvider.GetTimestamp();
             _ = await client.UnaryLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
             ctx.Increment();
+            ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
 }
