@@ -1,0 +1,8 @@
+﻿#nullable enable
+const MagicOnion.MetadataExtensions.BinarySuffix = "-bin" -> string!
+MagicOnion.MetadataExtensions
+MagicOnion.Serialization.MagicOnionSerializerProvider
+static MagicOnion.MetadataExtensions.GetOrDefault(this Grpc.Core.Metadata! metadata, string! key, bool ignoreCase = true) -> Grpc.Core.Metadata.Entry?
+static MagicOnion.MetadataExtensions.GetValueOrDefault(this Grpc.Core.Metadata! metadata, string! key, bool ignoreCase = true) -> string?
+static MagicOnion.Serialization.MagicOnionSerializerProvider.Default.get -> MagicOnion.Serialization.IMagicOnionSerializerProvider!
+static MagicOnion.Serialization.MagicOnionSerializerProvider.Default.set -> void

@@ -1,0 +1,154 @@
+﻿#nullable enable
+abstract MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.InvokeClientStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path) -> System.Threading.Tasks.Task<MagicOnion.ClientStreamingResult<TRequest, TResponse>>!
+abstract MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.InvokeDuplexStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path) -> System.Threading.Tasks.Task<MagicOnion.DuplexStreamingResult<TRequest, TResponse>>!
+abstract MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.InvokeServerStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> System.Threading.Tasks.Task<MagicOnion.ServerStreamingResult<TResponse>>!
+abstract MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.InvokeUnary(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult<TResponse>
+abstract MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.InvokeUnaryNonGeneric(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult
+abstract MagicOnion.Client.MagicOnionClientBase<T>.Clone(MagicOnion.Client.MagicOnionClientOptions options) -> MagicOnion.Client.MagicOnionClientBase<T>!
+abstract MagicOnion.Client.RequestContext.RequestType.get -> System.Type!
+abstract MagicOnion.Client.ResponseContext.Dispose() -> void
+abstract MagicOnion.Client.ResponseContext.GetStatus() -> Grpc.Core.Status
+abstract MagicOnion.Client.ResponseContext.GetTrailers() -> Grpc.Core.Metadata!
+abstract MagicOnion.Client.ResponseContext.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+abstract MagicOnion.Client.ResponseContext.ResponseType.get -> System.Type!
+abstract MagicOnion.Client.ResponseContext.WaitResponseAsync() -> System.Threading.Tasks.Task<MagicOnion.Client.ResponseContext!>!
+abstract MagicOnion.Client.ResponseContext<T>.ResponseAsync.get -> System.Threading.Tasks.Task<T>!
+abstract MagicOnion.Client.ResponseContext<T>.WithNewResult(T newValue) -> MagicOnion.Client.ResponseContext<T>!
+abstract MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.OnBroadcastEvent(int methodId, System.ArraySegment<byte> data) -> void
+abstract MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.OnResponseEvent(int methodId, object! taskCompletionSource, System.ArraySegment<byte> data) -> void
+MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider
+MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>? factory) -> bool
+MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider
+MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>? factory) -> bool
+MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider
+MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) -> bool
+MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider
+MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) -> bool
+MagicOnion.Client.IClientFilter
+MagicOnion.Client.IClientFilter.SendAsync(MagicOnion.Client.RequestContext! context, System.Func<MagicOnion.Client.RequestContext!, System.Threading.Tasks.ValueTask<MagicOnion.Client.ResponseContext!>>! next) -> System.Threading.Tasks.ValueTask<MagicOnion.Client.ResponseContext!>
+MagicOnion.Client.IMagicOnionAwareGrpcChannel
+MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker() -> Grpc.Core.CallInvoker!
+MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs() -> System.Collections.Generic.IReadOnlyCollection<MagicOnion.Client.ManagedStreamingHubInfo>!
+MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(System.Type! streamingHubInterfaceType, MagicOnion.IStreamingHubMarker! streamingHub, System.Func<System.Threading.Tasks.Task!>! disposeAsync, System.Threading.Tasks.Task! waitForDisconnect) -> void
+MagicOnion.Client.IMagicOnionClientFactoryProvider
+MagicOnion.Client.IMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>? factory) -> bool
+MagicOnion.Client.IMagicOnionClientLogger
+MagicOnion.Client.IMagicOnionClientLogger.Debug(string! message) -> void
+MagicOnion.Client.IMagicOnionClientLogger.Error(System.Exception! ex, string! message) -> void
+MagicOnion.Client.IMagicOnionClientLogger.Information(string! message) -> void
+MagicOnion.Client.IMagicOnionClientLogger.Trace(string! message) -> void
+MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider
+MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider.Add(MagicOnion.Client.IMagicOnionClientFactoryProvider! provider) -> MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider!
+MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider.ImmutableMagicOnionClientFactoryProvider(params MagicOnion.Client.IMagicOnionClientFactoryProvider![]! providers) -> void
+MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>? factory) -> bool
+MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider
+MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider.Add(MagicOnion.Client.IStreamingHubClientFactoryProvider! provider) -> MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider!
+MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider.ImmutableStreamingHubClientFactoryProvider(params MagicOnion.Client.IStreamingHubClientFactoryProvider![]! providers) -> void
+MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) -> bool
+MagicOnion.Client.Internal.RawMethodInvoker
+MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>
+MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.RawMethodInvoker(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializer! messageSerializer) -> void
+MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>
+MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.RawMethodInvoker() -> void
+MagicOnion.Client.IStreamingHubClientFactoryProvider
+MagicOnion.Client.IStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) -> bool
+MagicOnion.Client.IStreamingHubDiagnosticHandler
+MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>
+MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEvent<THub, T>(THub hubInstance, string! methodName, T value) -> void
+MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string! methodName, TRequest request, bool isFireAndForget, MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>! invokeMethod) -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.Client.MagicOnionClient
+MagicOnion.Client.MagicOnionClientBase
+MagicOnion.Client.MagicOnionClientBase.MagicOnionClientBase(MagicOnion.Client.MagicOnionClientOptions options) -> void
+MagicOnion.Client.MagicOnionClientBase.Options.get -> MagicOnion.Client.MagicOnionClientOptions
+MagicOnion.Client.MagicOnionClientBase<T>
+MagicOnion.Client.MagicOnionClientBase<T>.MagicOnionClientBase(MagicOnion.Client.MagicOnionClientOptions options) -> void
+MagicOnion.Client.MagicOnionClientFactoryDelegate<T>
+MagicOnion.Client.MagicOnionClientFactoryProvider
+MagicOnion.Client.MagicOnionClientOptions
+MagicOnion.Client.MagicOnionClientOptions.CallInvoker.get -> Grpc.Core.CallInvoker!
+MagicOnion.Client.MagicOnionClientOptions.CallOptions.get -> Grpc.Core.CallOptions
+MagicOnion.Client.MagicOnionClientOptions.Filters.get -> System.Collections.Generic.IReadOnlyList<MagicOnion.Client.IClientFilter!>!
+MagicOnion.Client.MagicOnionClientOptions.Host.get -> string?
+MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions() -> void
+MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions(Grpc.Core.CallInvoker! callInvoker, string? host, Grpc.Core.CallOptions callOptions, System.Collections.Generic.IReadOnlyList<MagicOnion.Client.IClientFilter!>! filters) -> void
+MagicOnion.Client.MagicOnionClientOptions.WithCallOptions(Grpc.Core.CallOptions callOptions) -> MagicOnion.Client.MagicOnionClientOptions
+MagicOnion.Client.MagicOnionClientOptions.WithFilters(System.Collections.Generic.IReadOnlyList<MagicOnion.Client.IClientFilter!>! filters) -> MagicOnion.Client.MagicOnionClientOptions
+MagicOnion.Client.MagicOnionClientOptions.WithHost(string? host) -> MagicOnion.Client.MagicOnionClientOptions
+MagicOnion.Client.ManagedStreamingHubInfo
+MagicOnion.Client.ManagedStreamingHubInfo.Client.get -> MagicOnion.IStreamingHubMarker!
+MagicOnion.Client.ManagedStreamingHubInfo.ManagedStreamingHubInfo() -> void
+MagicOnion.Client.ManagedStreamingHubInfo.ManagedStreamingHubInfo(System.Type! streamingHubType, MagicOnion.IStreamingHubMarker! client) -> void
+MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType.get -> System.Type!
+MagicOnion.Client.NullMagicOnionClientLogger
+MagicOnion.Client.NullMagicOnionClientLogger.Debug(string! message) -> void
+MagicOnion.Client.NullMagicOnionClientLogger.Error(System.Exception! ex, string! message) -> void
+MagicOnion.Client.NullMagicOnionClientLogger.Information(string! message) -> void
+MagicOnion.Client.NullMagicOnionClientLogger.Trace(string! message) -> void
+MagicOnion.Client.RequestContext
+MagicOnion.Client.RequestContext.CallOptions.get -> Grpc.Core.CallOptions
+MagicOnion.Client.RequestContext.Items.get -> System.Collections.Generic.IDictionary<string!, object!>!
+MagicOnion.Client.RequestContext.MethodPath.get -> string!
+MagicOnion.Client.RequestContext.ResponseType.get -> System.Type!
+MagicOnion.Client.RequestContext<T>
+MagicOnion.Client.RequestContext<T>.Request.get -> T
+MagicOnion.Client.RequestContext<T>.RequestContext(T request, MagicOnion.Client.MagicOnionClientBase! client, string! methodPath, Grpc.Core.CallOptions callOptions, System.Type! responseType, System.Collections.Generic.IReadOnlyList<MagicOnion.Client.IClientFilter!>! filters, System.Func<MagicOnion.Client.RequestContext!, MagicOnion.Client.ResponseContext!>! requestMethod) -> void
+MagicOnion.Client.ResponseContext
+MagicOnion.Client.ResponseContext.As<T>() -> MagicOnion.Client.ResponseContext<T>!
+MagicOnion.Client.ResponseContext.GetResponseAs<T>() -> System.Threading.Tasks.Task<T>!
+MagicOnion.Client.ResponseContext.ResponseContext() -> void
+MagicOnion.Client.ResponseContext<T>
+MagicOnion.Client.ResponseContext<T>.ResponseContext() -> void
+MagicOnion.Client.StreamingHubClient
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.cts -> System.Threading.CancellationTokenSource!
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.Deserialize<T>(System.ArraySegment<byte> bytes) -> T
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.DisposeAsync() -> System.Threading.Tasks.Task!
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.receiver -> TReceiver
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.Serialize<T>(System.Buffers.IBufferWriter<byte>! writer, in T value) -> void
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.SetResultForResponse<TResponse>(object! taskCompletionSource, System.ArraySegment<byte> data) -> void
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase(string! serviceName, Grpc.Core.CallInvoker! callInvoker, string? host, Grpc.Core.CallOptions option, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IMagicOnionClientLogger! logger) -> void
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WaitForDisconnect() -> System.Threading.Tasks.Task!
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>
+MagicOnion.Client.StreamingHubClientFactoryProvider
+override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeClientStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path) -> System.Threading.Tasks.Task<MagicOnion.ClientStreamingResult<TRequest, TResponse>>!
+override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeDuplexStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path) -> System.Threading.Tasks.Task<MagicOnion.DuplexStreamingResult<TRequest, TResponse>>!
+override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeServerStreaming(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> System.Threading.Tasks.Task<MagicOnion.ServerStreamingResult<TResponse>>!
+override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeUnary(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult<TResponse>
+override MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.InvokeUnaryNonGeneric(MagicOnion.Client.MagicOnionClientBase! client, string! path, TRequest request) -> MagicOnion.UnaryResult
+override MagicOnion.Client.RequestContext<T>.RequestType.get -> System.Type!
+static MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance.get -> MagicOnion.Client.IMagicOnionClientFactoryProvider!
+static MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance.get -> MagicOnion.Client.IMagicOnionClientFactoryProvider!
+static MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance.get -> MagicOnion.Client.IStreamingHubClientFactoryProvider!
+static MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance.get -> MagicOnion.Client.IStreamingHubClientFactoryProvider!
+static MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<TRequest, TResponse>(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializerProvider! messageSerializerProvider) -> MagicOnion.Client.Internal.RawMethodInvoker<TRequest!, TResponse!>!
+static MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<TRequest, TResponse>(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializerProvider! messageSerializerProvider) -> MagicOnion.Client.Internal.RawMethodInvoker<TRequest!, TResponse>!
+static MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<TRequest, TResponse>(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializerProvider! messageSerializerProvider) -> MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse!>!
+static MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<TRequest, TResponse>(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializerProvider! messageSerializerProvider) -> MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>!
+static MagicOnion.Client.NullMagicOnionClientLogger.Instance.get -> MagicOnion.Client.IMagicOnionClientLogger!
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.CallInvoker! invoker) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.CallInvoker! invoker, MagicOnion.Client.IClientFilter![]! clientFilters) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.CallInvoker! invoker, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.CallInvoker! invoker, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IClientFilter![]! clientFilters) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.CallInvoker! invoker, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IClientFilter![]! clientFilters, MagicOnion.Client.IMagicOnionClientFactoryProvider! clientFactoryProvider) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.ChannelBase! channel) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.ChannelBase! channel, MagicOnion.Client.IClientFilter![]! clientFilters) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.ChannelBase! channel, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.ChannelBase! channel, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IClientFilter![]! clientFilters) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(Grpc.Core.ChannelBase! channel, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IClientFilter![]! clientFilters, MagicOnion.Client.IMagicOnionClientFactoryProvider! clientFactoryProvider) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(MagicOnion.Client.MagicOnionClientOptions clientOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider) -> T
+static MagicOnion.Client.MagicOnionClient.Create<T>(MagicOnion.Client.MagicOnionClientOptions clientOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IMagicOnionClientFactoryProvider! clientFactoryProvider) -> T
+static MagicOnion.Client.MagicOnionClientFactoryProvider.Default.get -> MagicOnion.Client.IMagicOnionClientFactoryProvider!
+static MagicOnion.Client.MagicOnionClientFactoryProvider.Default.set -> void
+static MagicOnion.Client.ResponseContext<T>.Create(T value, Grpc.Core.Status status, Grpc.Core.Metadata! responseHeaders, Grpc.Core.Metadata! trailers) -> MagicOnion.Client.ResponseContext<T>!
+static MagicOnion.Client.ResponseContext<T>.Create<TRaw>(Grpc.Core.AsyncUnaryCall<TRaw>! inner, System.Func<TRaw, T>! fromRawResponseToResponse) -> MagicOnion.Client.ResponseContext<T>!
+static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(Grpc.Core.CallInvoker! callInvoker, TReceiver receiver, string? host = null, Grpc.Core.CallOptions option = default(Grpc.Core.CallOptions), MagicOnion.Serialization.IMagicOnionSerializerProvider? serializerProvider = null, MagicOnion.Client.IStreamingHubClientFactoryProvider? factoryProvider = null, MagicOnion.Client.IMagicOnionClientLogger? logger = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TStreamingHub>!
+static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(Grpc.Core.ChannelBase! channel, TReceiver receiver, string? host = null, Grpc.Core.CallOptions option = default(Grpc.Core.CallOptions), MagicOnion.Serialization.IMagicOnionSerializerProvider? serializerProvider = null, MagicOnion.Client.IStreamingHubClientFactoryProvider? factoryProvider = null, MagicOnion.Client.IMagicOnionClientLogger? logger = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TStreamingHub>!
+static MagicOnion.Client.StreamingHubClientFactoryProvider.Default.get -> MagicOnion.Client.IStreamingHubClientFactoryProvider!
+static MagicOnion.Client.StreamingHubClientFactoryProvider.Default.set -> void
+virtual MagicOnion.Client.MagicOnionClientBase<T>.WithCancellationToken(System.Threading.CancellationToken cancellationToken) -> T
+virtual MagicOnion.Client.MagicOnionClientBase<T>.WithDeadline(System.DateTime deadline) -> T
+virtual MagicOnion.Client.MagicOnionClientBase<T>.WithHeaders(Grpc.Core.Metadata! headers) -> T
+virtual MagicOnion.Client.MagicOnionClientBase<T>.WithHost(string! host) -> T
+virtual MagicOnion.Client.MagicOnionClientBase<T>.WithOptions(Grpc.Core.CallOptions options) -> T

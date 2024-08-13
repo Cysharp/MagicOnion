@@ -1,0 +1,289 @@
+﻿#nullable enable
+MagicOnion.Client.IResponseContext
+MagicOnion.Client.IResponseContext.GetStatus() -> Grpc.Core.Status
+MagicOnion.Client.IResponseContext.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.Client.IResponseContext.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.Client.IResponseContext.ResponseType.get -> System.Type!
+MagicOnion.Client.IResponseContext<T>
+MagicOnion.Client.IResponseContext<T>.ResponseAsync.get -> System.Threading.Tasks.Task<T>!
+MagicOnion.ClientStreamingResult<TRequest, TResponse>
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.ClientStreamingResult() -> void
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.ClientStreamingResult(MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>! inner) -> void
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.ClientStreamingResult(TResponse rawValue) -> void
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.Dispose() -> void
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter<TResponse>
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.GetStatus() -> Grpc.Core.Status
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.RequestStream.get -> Grpc.Core.IClientStreamWriter<TRequest>!
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.ResponseAsync.get -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.ClientStreamingResult<TRequest, TResponse>.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.AsyncUnaryResultMethodBuilder() -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.SetException(System.Exception! ex) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.SetResult() -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine! stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.Start<TStateMachine>(ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.Task.get -> MagicOnion.UnaryResult
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.AsyncUnaryResultMethodBuilder() -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.SetException(System.Exception! exception) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.SetResult(T result) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine! stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.Start<TStateMachine>(ref TStateMachine stateMachine) -> void
+MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.Task.get -> MagicOnion.UnaryResult<T>
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.Dispose() -> void
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.DuplexStreamingResult() -> void
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.DuplexStreamingResult(MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>! inner) -> void
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.GetStatus() -> Grpc.Core.Status
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.RequestStream.get -> Grpc.Core.IClientStreamWriter<TRequest>!
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.DuplexStreamingResult<TRequest, TResponse>.ResponseStream.get -> Grpc.Core.IAsyncStreamReader<TResponse>!
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3>
+MagicOnion.DynamicArgumentTuple<T1, T2, T3>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2, T3>.DynamicArgumentTuple(T1 item1, T2 item2, T3 item3) -> void
+MagicOnion.DynamicArgumentTuple<T1, T2>
+MagicOnion.DynamicArgumentTuple<T1, T2>.DynamicArgumentTuple() -> void
+MagicOnion.DynamicArgumentTuple<T1, T2>.DynamicArgumentTuple(T1 item1, T2 item2) -> void
+MagicOnion.IgnoreAttribute
+MagicOnion.IgnoreAttribute.IgnoreAttribute() -> void
+MagicOnion.Internal.Box
+MagicOnion.Internal.Box<T>
+MagicOnion.Internal.Box<T>.Equals(MagicOnion.Internal.Box<T>! other) -> bool
+MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>
+MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>.RequestStream.get -> Grpc.Core.IClientStreamWriter<TRequest>!
+MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>.ResponseAsync.get -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>
+MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>.RequestStream.get -> Grpc.Core.IClientStreamWriter<TRequest>!
+MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>.ResponseStream.get -> Grpc.Core.IAsyncStreamReader<TResponse>!
+MagicOnion.Internal.IAsyncGrpcCallWrapper
+MagicOnion.Internal.IAsyncGrpcCallWrapper.GetStatus() -> Grpc.Core.Status
+MagicOnion.Internal.IAsyncGrpcCallWrapper.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.Internal.IAsyncGrpcCallWrapper.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.Internal.IAsyncServerStreamingCallWrapper<TResponse>
+MagicOnion.Internal.IAsyncServerStreamingCallWrapper<TResponse>.ResponseStream.get -> Grpc.Core.IAsyncStreamReader<TResponse>!
+MagicOnion.Internal.RawBytesBox
+MagicOnion.Internal.RawBytesBox.Bytes.get -> System.ReadOnlyMemory<byte>
+MagicOnion.Internal.RawBytesBox.RawBytesBox(System.ReadOnlyMemory<byte> bytes) -> void
+MagicOnion.IService<TSelf>
+MagicOnion.IService<TSelf>.WithCancellationToken(System.Threading.CancellationToken cancellationToken) -> TSelf
+MagicOnion.IService<TSelf>.WithDeadline(System.DateTime deadline) -> TSelf
+MagicOnion.IService<TSelf>.WithHeaders(Grpc.Core.Metadata! headers) -> TSelf
+MagicOnion.IService<TSelf>.WithHost(string! host) -> TSelf
+MagicOnion.IService<TSelf>.WithOptions(Grpc.Core.CallOptions option) -> TSelf
+MagicOnion.IServiceMarker
+MagicOnion.IStreamingHub<TSelf, TReceiver>
+MagicOnion.IStreamingHub<TSelf, TReceiver>.DisposeAsync() -> System.Threading.Tasks.Task!
+MagicOnion.IStreamingHub<TSelf, TReceiver>.FireAndForget() -> TSelf
+MagicOnion.IStreamingHub<TSelf, TReceiver>.WaitForDisconnect() -> System.Threading.Tasks.Task!
+MagicOnion.IStreamingHubMarker
+MagicOnion.Serialization.IMagicOnionSerializer
+MagicOnion.Serialization.IMagicOnionSerializer.Deserialize<T>(in System.Buffers.ReadOnlySequence<byte> bytes) -> T
+MagicOnion.Serialization.IMagicOnionSerializer.Serialize<T>(System.Buffers.IBufferWriter<byte>! writer, in T value) -> void
+MagicOnion.Serialization.IMagicOnionSerializerProvider
+MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(Grpc.Core.MethodType methodType, System.Reflection.MethodInfo? methodInfo) -> MagicOnion.Serialization.IMagicOnionSerializer!
+MagicOnion.Server.Hubs.MethodIdAttribute
+MagicOnion.Server.Hubs.MethodIdAttribute.MethodIdAttribute(int methodId) -> void
+MagicOnion.ServerStreamingResult<TResponse>
+MagicOnion.ServerStreamingResult<TResponse>.Dispose() -> void
+MagicOnion.ServerStreamingResult<TResponse>.GetStatus() -> Grpc.Core.Status
+MagicOnion.ServerStreamingResult<TResponse>.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.ServerStreamingResult<TResponse>.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.ServerStreamingResult<TResponse>.ResponseStream.get -> Grpc.Core.IAsyncStreamReader<TResponse>!
+MagicOnion.ServerStreamingResult<TResponse>.ServerStreamingResult() -> void
+MagicOnion.ServerStreamingResult<TResponse>.ServerStreamingResult(MagicOnion.Internal.IAsyncServerStreamingCallWrapper<TResponse>! inner) -> void
+MagicOnion.UnaryResult
+MagicOnion.UnaryResult.Dispose() -> void
+MagicOnion.UnaryResult.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter
+MagicOnion.UnaryResult.GetStatus() -> Grpc.Core.Status
+MagicOnion.UnaryResult.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.UnaryResult.ResponseAsync.get -> System.Threading.Tasks.Task!
+MagicOnion.UnaryResult.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.UnaryResult.UnaryResult() -> void
+MagicOnion.UnaryResult.UnaryResult(MessagePack.Nil nil) -> void
+MagicOnion.UnaryResult.UnaryResult(System.Threading.Tasks.Task<MagicOnion.Client.IResponseContext<MessagePack.Nil>!>! response) -> void
+MagicOnion.UnaryResult.UnaryResult(System.Threading.Tasks.Task<MessagePack.Nil>! rawTaskValue) -> void
+MagicOnion.UnaryResult<TResponse>
+MagicOnion.UnaryResult<TResponse>.Dispose() -> void
+MagicOnion.UnaryResult<TResponse>.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter<TResponse>
+MagicOnion.UnaryResult<TResponse>.GetStatus() -> Grpc.Core.Status
+MagicOnion.UnaryResult<TResponse>.GetTrailers() -> Grpc.Core.Metadata!
+MagicOnion.UnaryResult<TResponse>.ResponseAsync.get -> System.Threading.Tasks.Task<TResponse>!
+MagicOnion.UnaryResult<TResponse>.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
+MagicOnion.UnaryResult<TResponse>.UnaryResult() -> void
+MagicOnion.UnaryResult<TResponse>.UnaryResult(System.Threading.Tasks.Task<MagicOnion.Client.IResponseContext<TResponse>!>! response) -> void
+MagicOnion.UnaryResult<TResponse>.UnaryResult(System.Threading.Tasks.Task<TResponse>! rawTaskValue) -> void
+MagicOnion.UnaryResult<TResponse>.UnaryResult(TResponse rawValue) -> void
+override MagicOnion.Internal.Box<T>.Equals(object! obj) -> bool
+override MagicOnion.Internal.Box<T>.GetHashCode() -> int
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item11 -> T11
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item12 -> T12
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item13 -> T13
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item14 -> T14
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item15 -> T15
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item11 -> T11
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item12 -> T12
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item13 -> T13
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item14 -> T14
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item11 -> T11
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item12 -> T12
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item13 -> T13
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item11 -> T11
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item12 -> T12
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item11 -> T11
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item10 -> T10
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>.Item9 -> T9
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>.Item8 -> T8
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>.Item7 -> T7
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>.Item6 -> T6
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5>.Item5 -> T5
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4>.Item4 -> T4
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3>.Item2 -> T2
+readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3>.Item3 -> T3
+readonly MagicOnion.DynamicArgumentTuple<T1, T2>.Item1 -> T1
+readonly MagicOnion.DynamicArgumentTuple<T1, T2>.Item2 -> T2
+readonly MagicOnion.Internal.Box<T>.Value -> T
+readonly MagicOnion.Server.Hubs.MethodIdAttribute.MethodId -> int
+static MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder.Create() -> MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder
+static MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>.Create() -> MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder<T>
+static MagicOnion.Internal.Box.Create<T>(T value) -> MagicOnion.Internal.Box<T>!
+static MagicOnion.Internal.Box<T>.operator !=(MagicOnion.Internal.Box<T>! valueA, MagicOnion.Internal.Box<T>! valueB) -> bool
+static MagicOnion.Internal.Box<T>.operator ==(MagicOnion.Internal.Box<T>! valueA, MagicOnion.Internal.Box<T>! valueB) -> bool
+static MagicOnion.UnaryResult.CompletedResult.get -> MagicOnion.UnaryResult
+static MagicOnion.UnaryResult.FromResult<T>(System.Threading.Tasks.Task<T>! task) -> MagicOnion.UnaryResult<T>
+static MagicOnion.UnaryResult.FromResult<T>(T value) -> MagicOnion.UnaryResult<T>
+static MagicOnion.UnaryResult.Nil.get -> MagicOnion.UnaryResult<MessagePack.Nil>
