@@ -4221,23 +4221,6 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase
   nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase
   nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase
-- uid: MagicOnion.Client.StreamingHubClientBase`2.__ConnectAndSubscribeAsync(CancellationToken)
-  name: __ConnectAndSubscribeAsync(CancellationToken)
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2___ConnectAndSubscribeAsync_CancellationToken_
-  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.__ConnectAndSubscribeAsync(CancellationToken)
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.__ConnectAndSubscribeAsync(CancellationToken)
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).__ConnectAndSubscribeAsync(CancellationToken)
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.__ConnectAndSubscribeAsync(CancellationToken)
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).__ConnectAndSubscribeAsync(CancellationToken)
-- uid: MagicOnion.Client.StreamingHubClientBase`2.__ConnectAndSubscribeAsync*
-  name: __ConnectAndSubscribeAsync
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2___ConnectAndSubscribeAsync_
-  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.__ConnectAndSubscribeAsync
-  isSpec: "True"
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.__ConnectAndSubscribeAsync
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).__ConnectAndSubscribeAsync
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.__ConnectAndSubscribeAsync
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).__ConnectAndSubscribeAsync
 - uid: MagicOnion.Client.StreamingHubClientBase`2.AwaitAndWriteClientResultResponseMessage(System.Int32,Guid,Task)
   name: AwaitAndWriteClientResultResponseMessage(Int32, Guid, Task)
   href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_AwaitAndWriteClientResultResponseMessage_System_Int32_Guid_Task_
@@ -4634,15 +4617,15 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
   nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
   nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
-- uid: MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
-  name: StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>)
-  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_MagicOnion_Client_ServerHeartbeatEvent___System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___
-  commentId: M:MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}})
-  name.vb: StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)))
-  fullName: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable<TimeSpan>, System.Nullable<TimeSpan>, System.Nullable<Action<MagicOnion.Client.ServerHeartbeatEvent>>, System.Nullable<Action<MagicOnion.Client.ClientHeartbeatEvent>>)
-  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable(Of TimeSpan), System.Nullable(Of TimeSpan), System.Nullable(Of Action(Of MagicOnion.Client.ServerHeartbeatEvent)), System.Nullable(Of Action(Of MagicOnion.Client.ClientHeartbeatEvent)))
-  nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>)
-  nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)))
+- uid: MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}},System.Nullable{TimeProvider})
+  name: StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>, Nullable<TimeProvider>)
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_System_Nullable_TimeSpan__System_Nullable_TimeSpan__System_Nullable_Action_MagicOnion_Client_ServerHeartbeatEvent___System_Nullable_Action_MagicOnion_Client_ClientHeartbeatEvent___System_Nullable_TimeProvider__
+  commentId: M:MagicOnion.Client.StreamingHubClientOptions.#ctor(System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger,System.Nullable{TimeSpan},System.Nullable{TimeSpan},System.Nullable{Action{MagicOnion.Client.ServerHeartbeatEvent}},System.Nullable{Action{MagicOnion.Client.ClientHeartbeatEvent}},System.Nullable{TimeProvider})
+  name.vb: StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)), Nullable(Of TimeProvider))
+  fullName: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable<TimeSpan>, System.Nullable<TimeSpan>, System.Nullable<Action<MagicOnion.Client.ServerHeartbeatEvent>>, System.Nullable<Action<MagicOnion.Client.ClientHeartbeatEvent>>, System.Nullable<TimeProvider>)
+  fullName.vb: MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger, System.Nullable(Of TimeSpan), System.Nullable(Of TimeSpan), System.Nullable(Of Action(Of MagicOnion.Client.ServerHeartbeatEvent)), System.Nullable(Of Action(Of MagicOnion.Client.ClientHeartbeatEvent)), System.Nullable(Of TimeProvider))
+  nameWithType: StreamingHubClientOptions.StreamingHubClientOptions(Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable<TimeSpan>, Nullable<TimeSpan>, Nullable<Action<ServerHeartbeatEvent>>, Nullable<Action<ClientHeartbeatEvent>>, Nullable<TimeProvider>)
+  nameWithType.vb: StreamingHubClientOptions.StreamingHubClientOptions(Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, Nullable(Of TimeSpan), Nullable(Of TimeSpan), Nullable(Of Action(Of ServerHeartbeatEvent)), Nullable(Of Action(Of ClientHeartbeatEvent)), Nullable(Of TimeProvider))
 - uid: MagicOnion.Client.StreamingHubClientOptions.#ctor*
   name: StreamingHubClientOptions
   href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions__ctor_
@@ -4770,6 +4753,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.StreamingHubClientOptions.SerializerProvider
   nameWithType: StreamingHubClientOptions.SerializerProvider
+- uid: MagicOnion.Client.StreamingHubClientOptions.TimeProvider
+  name: TimeProvider
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_TimeProvider
+  commentId: P:MagicOnion.Client.StreamingHubClientOptions.TimeProvider
+  fullName: MagicOnion.Client.StreamingHubClientOptions.TimeProvider
+  nameWithType: StreamingHubClientOptions.TimeProvider
+- uid: MagicOnion.Client.StreamingHubClientOptions.TimeProvider*
+  name: TimeProvider
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_TimeProvider_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientOptions.TimeProvider
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientOptions.TimeProvider
+  nameWithType: StreamingHubClientOptions.TimeProvider
 - uid: MagicOnion.Client.StreamingHubClientOptions.WithCallOptions(CallOptions)
   name: WithCallOptions(CallOptions)
   href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithCallOptions_CallOptions_
@@ -4889,6 +4885,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived
   nameWithType: StreamingHubClientOptions.WithServerHeartbeatReceived
+- uid: MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider(TimeProvider)
+  name: WithTimeProvider(TimeProvider)
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithTimeProvider_TimeProvider_
+  commentId: M:MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider(TimeProvider)
+  fullName: MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider(TimeProvider)
+  nameWithType: StreamingHubClientOptions.WithTimeProvider(TimeProvider)
+- uid: MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider*
+  name: WithTimeProvider
+  href: api/MagicOnion.Client.StreamingHubClientOptions.html#MagicOnion_Client_StreamingHubClientOptions_WithTimeProvider_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider
+  nameWithType: StreamingHubClientOptions.WithTimeProvider
 - uid: MagicOnion.ClientStreamingResult`2
   name: ClientStreamingResult<TRequest, TResponse>
   href: api/MagicOnion.ClientStreamingResult-2.html
@@ -6929,99 +6938,6 @@ references:
   fullName.vb: MagicOnion.Internal.Box(Of T).Value
   nameWithType: Box<T>.Value
   nameWithType.vb: Box(Of T).Value
-- uid: MagicOnion.Internal.Buffers
-  name: MagicOnion.Internal.Buffers
-  href: api/MagicOnion.Internal.Buffers.html
-  commentId: N:MagicOnion.Internal.Buffers
-  fullName: MagicOnion.Internal.Buffers
-  nameWithType: MagicOnion.Internal.Buffers
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter
-  name: MemoryPoolBufferWriter
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html
-  commentId: T:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter
-  nameWithType: MemoryPoolBufferWriter
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor(MemoryPool{System.Byte})
-  name: MemoryPoolBufferWriter(MemoryPool<Byte>)
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter__ctor_MemoryPool_System_Byte__
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor(MemoryPool{System.Byte})
-  name.vb: MemoryPoolBufferWriter(MemoryPool(Of Byte))
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.MemoryPoolBufferWriter(MemoryPool<System.Byte>)
-  fullName.vb: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.MemoryPoolBufferWriter(MemoryPool(Of System.Byte))
-  nameWithType: MemoryPoolBufferWriter.MemoryPoolBufferWriter(MemoryPool<Byte>)
-  nameWithType.vb: MemoryPoolBufferWriter.MemoryPoolBufferWriter(MemoryPool(Of Byte))
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor*
-  name: MemoryPoolBufferWriter
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter__ctor_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.MemoryPoolBufferWriter
-  nameWithType: MemoryPoolBufferWriter.MemoryPoolBufferWriter
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance(System.Int32)
-  name: Advance(Int32)
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_Advance_System_Int32_
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance(System.Int32)
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance(System.Int32)
-  nameWithType: MemoryPoolBufferWriter.Advance(Int32)
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance*
-  name: Advance
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_Advance_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance
-  nameWithType: MemoryPoolBufferWriter.Advance
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory(System.Int32)
-  name: GetMemory(Int32)
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetMemory_System_Int32_
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory(System.Int32)
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory(System.Int32)
-  nameWithType: MemoryPoolBufferWriter.GetMemory(Int32)
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory*
-  name: GetMemory
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetMemory_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory
-  nameWithType: MemoryPoolBufferWriter.GetMemory
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan(System.Int32)
-  name: GetSpan(Int32)
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetSpan_System_Int32_
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan(System.Int32)
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan(System.Int32)
-  nameWithType: MemoryPoolBufferWriter.GetSpan(Int32)
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan*
-  name: GetSpan
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetSpan_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan
-  nameWithType: MemoryPoolBufferWriter.GetSpan
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter
-  name: RentThreadStaticWriter()
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_RentThreadStaticWriter
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter()
-  nameWithType: MemoryPoolBufferWriter.RentThreadStaticWriter()
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter*
-  name: RentThreadStaticWriter
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_RentThreadStaticWriter_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter
-  nameWithType: MemoryPoolBufferWriter.RentThreadStaticWriter
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn
-  name: ToMemoryOwnerAndReturn()
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_ToMemoryOwnerAndReturn
-  commentId: M:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn()
-  nameWithType: MemoryPoolBufferWriter.ToMemoryOwnerAndReturn()
-- uid: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn*
-  name: ToMemoryOwnerAndReturn
-  href: api/MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_ToMemoryOwnerAndReturn_
-  commentId: Overload:MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn
-  isSpec: "True"
-  fullName: MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn
-  nameWithType: MemoryPoolBufferWriter.ToMemoryOwnerAndReturn
 - uid: MagicOnion.Internal.IAsyncClientStreamingCallWrapper`2
   name: IAsyncClientStreamingCallWrapper<TRequest, TResponse>
   href: api/MagicOnion.Internal.IAsyncClientStreamingCallWrapper-2.html
