@@ -20,6 +20,7 @@
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="MemoryPack" Version="$(MemoryPackVersion)" />
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
+    <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="8.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
     <PackageVersion Include="Multicaster" Version="$(MulticasterVersion)" />

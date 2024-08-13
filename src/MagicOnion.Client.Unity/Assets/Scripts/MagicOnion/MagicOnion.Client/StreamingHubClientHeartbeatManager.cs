@@ -57,7 +57,7 @@ namespace MagicOnion.Client
         readonly Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived;
         readonly SynchronizationContext? synchronizationContext;
         readonly ChannelWriter<StreamingHubPayload> writer;
-#if NET8_0_OR_GREATER
+#if NON_UNITY
         readonly TimeProvider timeProvider;
 #endif
 
@@ -77,7 +77,7 @@ namespace MagicOnion.Client
             Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,
             SynchronizationContext? synchronizationContext,
             CancellationToken shutdownToken
-#if NET8_0_OR_GREATER
+#if NON_UNITY
             , TimeProvider timeProvider
 #endif
         )
@@ -94,7 +94,7 @@ namespace MagicOnion.Client
             this.onClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
             this.synchronizationContext = synchronizationContext;
             this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken, timeoutTokenSource.Token);
-#if NET8_0_OR_GREATER
+#if NON_UNITY
             this.timeProvider = timeProvider;
 #endif
         }
@@ -177,7 +177,7 @@ namespace MagicOnion.Client
             }
 
             var now =
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 timeProvider.GetUtcNow();
 #else
                 DateTimeOffset.UtcNow;
@@ -215,7 +215,7 @@ namespace MagicOnion.Client
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
 
             var now =
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 timeProvider.GetUtcNow();
 #else
                 DateTimeOffset.UtcNow;

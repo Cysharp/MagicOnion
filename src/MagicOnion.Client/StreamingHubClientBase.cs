@@ -24,12 +24,12 @@ namespace MagicOnion.Client
         public TimeSpan? ClientHeartbeatTimeout { get; }
         public Action<ServerHeartbeatEvent>? OnServerHeartbeatReceived { get; }
         public Action<ClientHeartbeatEvent>? OnClientHeartbeatResponseReceived { get; }
-#if NET8_0_OR_GREATER
+#if NON_UNITY
         public TimeProvider? TimeProvider { get; }
 #endif
 
         public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
-#if NET8_0_OR_GREATER
+#if NON_UNITY
             : this(host, callOptions, serializerProvider, logger, default, default, default, default, default)
 #else
             : this(host, callOptions, serializerProvider, logger, default, default, default, default)
@@ -37,7 +37,7 @@ namespace MagicOnion.Client
         {
         }
 
-#if NET8_0_OR_GREATER
+#if NON_UNITY
         public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
 #else
         public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
@@ -51,7 +51,7 @@ namespace MagicOnion.Client
             ClientHeartbeatTimeout = clientHeartbeatTimeout;
             OnServerHeartbeatReceived = onServerHeartbeatReceived;
             OnClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
-#if NET8_0_OR_GREATER
+#if NON_UNITY
             TimeProvider = timeProvider;
 #endif
         }
@@ -62,14 +62,14 @@ namespace MagicOnion.Client
         public StreamingHubClientOptions WithHost(string? host)
             => new(host, CallOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
         public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
             => new(Host, callOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
@@ -77,14 +77,14 @@ namespace MagicOnion.Client
             => new(
                 Host, CallOptions, serializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
         public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
             => new(Host, CallOptions, SerializerProvider, logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
@@ -97,7 +97,7 @@ namespace MagicOnion.Client
         public StreamingHubClientOptions WithClientHeartbeatInterval(TimeSpan? interval)
             => new(Host, CallOptions, SerializerProvider, Logger
                 , interval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
@@ -110,7 +110,7 @@ namespace MagicOnion.Client
         public StreamingHubClientOptions WithClientHeartbeatTimeout(TimeSpan? timeout)
             => new(Host, CallOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, timeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
@@ -123,7 +123,7 @@ namespace MagicOnion.Client
         public StreamingHubClientOptions WithServerHeartbeatReceived(Action<ServerHeartbeatEvent>? onServerHeartbeatReceived)
             => new(Host, CallOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, onServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
@@ -136,12 +136,12 @@ namespace MagicOnion.Client
         public StreamingHubClientOptions WithClientHeartbeatResponseReceived(Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
             => new(Host, CallOptions, SerializerProvider, Logger
                 , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, onClientHeartbeatResponseReceived
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , TimeProvider
 #endif
             );
 
-#if NET8_0_OR_GREATER
+#if NON_UNITY
         /// <summary>
         /// Sets a <see cref="TimeProvider"/>
         /// </summary>
@@ -279,7 +279,7 @@ namespace MagicOnion.Client
                 options.OnClientHeartbeatResponseReceived,
                 syncContext,
                 cancellationTokenSource.Token
-#if NET8_0_OR_GREATER
+#if NON_UNITY
                 , options.TimeProvider ?? TimeProvider.System
 #endif
             );
