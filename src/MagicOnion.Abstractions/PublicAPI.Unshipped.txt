@@ -1,0 +1,5 @@
+﻿#nullable enable
+MagicOnion.GenerateDefineDebugAttribute
+MagicOnion.GenerateDefineDebugAttribute.GenerateDefineDebugAttribute() -> void
+MagicOnion.GenerateIfDirectiveAttribute
+MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute(string! condition) -> void
