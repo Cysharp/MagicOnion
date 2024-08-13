@@ -5,16 +5,16 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
-    List<List<double>> latencyPerConnection = new();
-    List<object> locks = new();
+    List<List<double>> latencyPerConnection = [];
+    List<object> locks = [];
 
     public PerformanceTestRunningContext(int connectionCount)
     {
         stopwatch = new Stopwatch();
         for (var i = 0; i < connectionCount; i++)
         {
-            latencyPerConnection.Add(new ());
-            locks.Add(new ());
+            latencyPerConnection.Add([]);
+            locks.Add(new());
         }
     }
 
