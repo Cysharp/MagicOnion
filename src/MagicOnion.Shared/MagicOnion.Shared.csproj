@@ -12,6 +12,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PolySharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
   </ItemGroup>

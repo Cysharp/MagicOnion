@@ -20,6 +20,10 @@ MagicOnion.IgnoreAttribute</Description>
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" />
     <PackageReference Include="MessagePack" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
    <ItemGroup>
