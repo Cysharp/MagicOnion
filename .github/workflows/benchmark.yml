@@ -3,6 +3,8 @@ name: Benchmark
 on:
   issue_comment:
     types: [created]
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       reuse:
@@ -48,7 +50,7 @@ jobs:
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-timeout: 20 # 10min (env prepare) + 5min (clone & benchmark) + 5min (spare)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
-      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --tags '${{ matrix.tags }}'\""
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --validate true --tags '${{ matrix.tags }}'\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
       server-benchmark-script-args: ""
     secrets: inherit
