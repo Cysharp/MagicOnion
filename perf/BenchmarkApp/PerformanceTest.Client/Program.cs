@@ -24,11 +24,12 @@ async Task Main(
     uint rounds = 1,
     [Option("v")] bool verbose = false,
     SerializationType serialization = SerializationType.MessagePack,
+    bool validate = false,
     string? tags = null
 )
 {
     var config = new ScenarioConfiguration(url, warmup, duration, streams, channels, verbose);
-    var datadog = DatadogMetricsRecorder.Create(tags);
+    var datadog = DatadogMetricsRecorder.Create(tags, validate: validate);
 
     PrintStartupInformation();
 
