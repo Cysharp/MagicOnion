@@ -6,14 +6,14 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
-    HardwareReporter hardwareReporter;
+    HardwarePerformanceReporter hardwarePerformanceReporter;
     List<List<double>> latencyPerConnection;
     List<object> locks;
 
     public PerformanceTestRunningContext(int connectionCount)
     {
         stopwatch = new Stopwatch();
-        hardwareReporter = new HardwareReporter();
+        hardwarePerformanceReporter = new HardwarePerformanceReporter();
         latencyPerConnection = new (connectionCount);
         locks = new (connectionCount);
         for (var i = 0; i < connectionCount; i++)
@@ -27,7 +27,7 @@ public class PerformanceTestRunningContext
     {
         isRunning = true;
         stopwatch.Start();
-        hardwareReporter.Start();
+        hardwarePerformanceReporter.Start();
     }
 
     public void Increment()
@@ -50,7 +50,7 @@ public class PerformanceTestRunningContext
     {
         isRunning = false;
         stopwatch.Stop();
-        hardwareReporter.Stop();
+        hardwarePerformanceReporter.Stop();
     }
 
     public PerformanceResult GetResult()
@@ -58,7 +58,7 @@ public class PerformanceTestRunningContext
         var latency = MeasureLatency();
         latencyPerConnection.Clear();
         locks.Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwareReporter.GetResult());
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResult());
 
         Latency MeasureLatency()
         {
@@ -104,5 +104,5 @@ public class PerformanceTestRunningContext
     }
 }
 
-public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency, HardwareResult hardware);
+public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency, HardwarePerformanceResult hardware);
 public record Latency(double Mean, double P50, double P75, double P90, double P99, double Max);

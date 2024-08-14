@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace PerformanceTest.Shared.Reporting;
 
-public class HardwareReporter
+public class HardwarePerformanceReporter
 {
     private readonly TimeSpan samplingInterval;
     private readonly TimeProvider timeProvider;
@@ -12,10 +12,10 @@ public class HardwareReporter
     private CancellationTokenSource cancellationTokenSource;
     private bool running;
 
-    public HardwareReporter() :this(TimeSpan.FromMilliseconds(100))
+    public HardwarePerformanceReporter() :this(TimeSpan.FromMilliseconds(100))
     { }
 
-    public HardwareReporter(TimeSpan samplingInterval)
+    public HardwarePerformanceReporter(TimeSpan samplingInterval)
     {
         this.samplingInterval = samplingInterval;
         this.timeProvider = SystemTimeProvider.TimeProvider;
@@ -61,7 +61,7 @@ public class HardwareReporter
         cancellationTokenSource.Cancel();
     }
 
-    public HardwareResult GetResult()
+    public HardwarePerformanceResult GetResult()
     {
         var maxCpuUsage = cpuUsages.Count > 0 ? cpuUsages.Max() : 0d;
         var avgCpuUsage = cpuUsages.Count > 0 ? cpuUsages.Average() : 0d;
@@ -70,8 +70,8 @@ public class HardwareReporter
         cpuUsages.Clear();
         memoryUsages.Clear();
 
-        return new HardwareResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
+        return new HardwarePerformanceResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
     }
 }
 
-public record HardwareResult(double MaxCpuUsage, double AvgCpuUsage,double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+public record HardwarePerformanceResult(double MaxCpuUsage, double AvgCpuUsage,double MaxMemoryUsageMB, double AvgMemoryUsageMB);
