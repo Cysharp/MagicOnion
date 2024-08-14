@@ -1,3 +1,4 @@
+using PerformanceTest.Shared.Reporting;
 using System.Diagnostics;
 
 public class PerformanceTestRunningContext
@@ -5,12 +6,14 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
+    HardwareReporter hardwareReporter;
     List<List<double>> latencyPerConnection;
     List<object> locks;
 
     public PerformanceTestRunningContext(int connectionCount)
     {
         stopwatch = new Stopwatch();
+        hardwareReporter = new HardwareReporter();
         latencyPerConnection = new (connectionCount);
         locks = new (connectionCount);
         for (var i = 0; i < connectionCount; i++)
@@ -24,6 +27,7 @@ public class PerformanceTestRunningContext
     {
         isRunning = true;
         stopwatch.Start();
+        hardwareReporter.Start();
     }
 
     public void Increment()
@@ -46,6 +50,7 @@ public class PerformanceTestRunningContext
     {
         isRunning = false;
         stopwatch.Stop();
+        hardwareReporter.Stop();
     }
 
     public PerformanceResult GetResult()
@@ -53,7 +58,7 @@ public class PerformanceTestRunningContext
         var latency = MeasureLatency();
         latencyPerConnection.Clear();
         locks.Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency);
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwareReporter.GetResult());
 
         Latency MeasureLatency()
         {
@@ -99,5 +104,5 @@ public class PerformanceTestRunningContext
     }
 }
 
-public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency);
+public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency, HardwareResult hardware);
 public record Latency(double Mean, double P50, double P75, double P90, double P99, double Max);
