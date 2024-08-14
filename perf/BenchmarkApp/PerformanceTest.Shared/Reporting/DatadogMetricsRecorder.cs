@@ -49,11 +49,13 @@ public class DatadogMetricsRecorder
             {
                 if (item.StartsWith("legend:"))
                 {
-                    tagLegend = item;
+                    var index = item.IndexOf(':') + 1;
+                    tagLegend = item.Substring(index);
                 }
                 else if (item.StartsWith("streams:"))
                 {
-                    tagStreams = item;
+                    var index = item.IndexOf(':') + 1;
+                    tagStreams = item.Substring(index);
                 }
             }
         }
