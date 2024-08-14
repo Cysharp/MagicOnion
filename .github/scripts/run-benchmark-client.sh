@@ -10,6 +10,7 @@ set -euo pipefail
 function usage {
     echo "usage: $(basename $0) --args <string> [options]"
     echo "Required:"
+    echo "  --branch        string      git branch name"
     echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
     echo "Options:"
     echo "  --help                      Show this help message"
@@ -18,6 +19,7 @@ function usage {
 while [ $# -gt 0 ]; do
   case $1 in
     # required
+    --branch) _BRANCH=$2; shift 2; ;;
     --args) _ARGS=$2; shift 2; ;;
     # optional
     --help) usage; exit 1; ;;
@@ -42,6 +44,9 @@ publish_dir="artifacts/$binary_name"
 clone_path="$HOME/github/$repo"
 output_dir="$clone_path/$publish_dir"
 full_process_path="$output_dir/$binary_name"
+
+# show branch
+print "BRANCH: ${_BRANCH}"
 
 # show machine name
 print "MACHINE_NAME: $(hostname)"
@@ -84,6 +89,10 @@ ps -eo pid,cmd | while read -r pid cmd; do
     kill "$pid"
   fi
 done
+
+# set branch
+print "# Set branch name to environment variables"
+export BRANCH_NAME="${_BRANCH}"
 
 # run dotnet app
 print "# Run $full_process_path $args"

@@ -277,8 +277,9 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, PerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
+        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
             $"legend:{x.scenario.ToString().ToLower()}-{x.serialization}-{x.TagLegend}{x.TagStreams}",
+            $"branch:{x.TagBranch}",
             $"streams:{x.TagStreams}",
             $"process_arch:{x.applicationInfo.ProcessArchitecture}",
             $"process_count:{x.applicationInfo.ProcessorCount}",

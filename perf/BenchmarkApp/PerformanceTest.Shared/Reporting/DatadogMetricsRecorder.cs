@@ -7,6 +7,7 @@ namespace PerformanceTest.Shared.Reporting;
 
 public class DatadogMetricsRecorder
 {
+    public string TagBranch { get; }
     public string TagLegend { get; }
     public string TagStreams { get; }
     private readonly JsonSerializerOptions jsonSerializerOptions;
@@ -14,8 +15,9 @@ public class DatadogMetricsRecorder
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
 
-    private DatadogMetricsRecorder(string tagLegend, string tagStreams, string apiKey, TimeProvider timeProvider)
+    private DatadogMetricsRecorder(string tagBranch, string tagLegend, string tagStreams, string apiKey, TimeProvider timeProvider)
     {
+        TagBranch = tagBranch;
         TagLegend = tagLegend;
         TagStreams = tagStreams;
         jsonSerializerOptions = new JsonSerializerOptions()
@@ -53,6 +55,7 @@ public class DatadogMetricsRecorder
                 }
             }
         }
+        var branch = Environment.GetEnvironmentVariable("BRANCH_NAME") ?? "";
         var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
         if (validate)
         {

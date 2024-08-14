@@ -9,12 +9,17 @@ set -euo pipefail
 
 function usage {
     echo "usage: $(basename $0) [options]"
+    echo "Required:"
+    echo "  --branch        string      git branch name"
     echo "Options:"
     echo "  --help                      Show this help message"
 }
 
 while [ $# -gt 0 ]; do
   case $1 in
+    # required
+    --branch) _BRANCH=$2; shift 2; ;;
+    # optional
     --help) usage; exit 1; ;;
     *) shift ;;
   esac
@@ -39,6 +44,9 @@ full_process_path="$output_dir/$binary_name"
 
 stdoutfile="stdout.log"
 stderrfile="stderr.log"
+
+# show branch
+print "BRANCH: ${_BRANCH}"
 
 # show machine name
 print "MACHINE_NAME: $(hostname)"
@@ -81,6 +89,10 @@ pushd "$clone_path"
   print "  ## add +x permission to published file $full_process_path"
   chmod +x "$full_process_path"
 popd
+
+# set branch
+print "# Set branch name to environment variables"
+export BRANCH_NAME="${_BRANCH}"
 
 # run dotnet app
 print "# Run $full_process_path"
