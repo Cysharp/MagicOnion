@@ -59,6 +59,7 @@ public class HardwarePerformanceReporter
     {
         running = false;
         cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
     }
 
     public HardwarePerformanceResult GetResult()

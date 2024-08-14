@@ -55,12 +55,12 @@ public class PerformanceTestRunningContext
 
     public PerformanceResult GetResult()
     {
-        var latency = MeasureLatency();
+        var latency = MeasureLatency(latencyPerConnection);
         latencyPerConnection.Clear();
         locks.Clear();
         return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResult());
 
-        Latency MeasureLatency()
+        static Latency MeasureLatency(List<List<double>> latencyPerConnection)
         {
             var totalCount = 0;
             var totalSum = 0.0;
@@ -87,6 +87,7 @@ public class PerformanceTestRunningContext
             var latencyMax = GetPercentile(100, latencyAllConnection);
             var latency = new Latency(latencyMean, latency50p, latency75p, latency90p, latency99p, latencyMax);
 
+            latencyAllConnection.Clear();
             return latency;
         }
         static double GetPercentile(int percent, IReadOnlyList<double> sortedData)
