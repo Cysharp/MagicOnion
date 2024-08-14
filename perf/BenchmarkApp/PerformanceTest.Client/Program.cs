@@ -81,7 +81,7 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
             results.Add(result);
-            await datadog.PutClientBenchmarkMetricsAsync(scenario.ToString(), ApplicationInformation.Current, serialization.ToString(), result);
+            await datadog.PutClientBenchmarkMetricsAsync(scenario2, ApplicationInformation.Current, serialization, result);
         }
     }
 
@@ -255,7 +255,7 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
     };
 }
 
-public static class DatadogMetricsRecorderExtensions
+static class DatadogMetricsRecorderExtensions
 {
     /// <summary>
     /// Put Client Benchmark metrics to background. 
@@ -265,10 +265,10 @@ public static class DatadogMetricsRecorderExtensions
     /// <param name="applicationInfo"></param>
     /// <param name="serialization"></param>
     /// <param name="result"></param>
-    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, string scenario, ApplicationInformation applicationInfo, string serialization, PerformanceResult result)
+    static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, PerformanceResult result)
     {
         var tags = MetricsTagCache.Get((recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
-            $"legend:{x.scenario.ToLower()}-{x.TagLegend}{x.TagStreams}",
+            $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
             $"streams:{x.TagStreams}",
             $"magiconion_version:{x.applicationInfo.MagicOnionVersion}",
             $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}",
