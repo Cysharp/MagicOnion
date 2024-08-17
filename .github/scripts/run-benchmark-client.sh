@@ -10,7 +10,6 @@ set -euo pipefail
 function usage {
     echo "usage: $(basename $0) --args <string> [options]"
     echo "Required:"
-    echo "  --branch        string      git branch name"
     echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
     echo "Options:"
     echo "  --help                      Show this help message"
@@ -19,7 +18,6 @@ function usage {
 while [ $# -gt 0 ]; do
   case $1 in
     # required
-    --branch) _BRANCH=$2; shift 2; ;;
     --args) _ARGS=$2; shift 2; ;;
     # optional
     --help) usage; exit 1; ;;
@@ -45,9 +43,6 @@ clone_path="$HOME/github/$repo"
 output_dir="$clone_path/$publish_dir"
 full_process_path="$output_dir/$binary_name"
 
-# show branch
-print "BRANCH: ${_BRANCH}"
-
 # show machine name
 print "MACHINE_NAME: $(hostname)"
 
@@ -56,12 +51,33 @@ print "# Show installed dotnet sdk versions"
 echo "dotnet sdk versions (list): $(dotnet --list-sdks)"
 echo "dotnet sdk version (default): $(dotnet --version)"
 
+# is already clones?
+print "# Check if already cloned $repo"
+if [[ ! -d "$clone_path" ]]; then
+  echop "Failed to find $clone_path, not yet git cloned?"
+  exit 1
+fi
+
+# get branch name and set to environment variables
+print "# Set branch name as Environment variable"
+pushd "$clone_path"
+  print "  ## get current git branch name"
+  git_branch=$(git rev-parse --abbrev-ref HEAD)
+  if [ -z "$git_branch" ]; then
+    echo "Failed to get branch name, exiting..."
+    exit 1
+  fi
+
+  print "  ## set branch name to environment variables $git_branch"
+  export BRANCH_NAME="$git_branch"
+popd
+
 # setup env
 print "# Setup environment"
 IFS=';' read -ra env_array <<< "$env_settings"
 for item in "${env_array[@]}"; do
-  if [ -n "$item" ]; then
-    export "$item"
+  if [[ -n "$item" ]]; then
+    export "${item?}"
   fi
 done
 
@@ -89,10 +105,6 @@ ps -eo pid,cmd | while read -r pid cmd; do
     kill "$pid"
   fi
 done
-
-# set branch
-print "# Set branch name to environment variables"
-export BRANCH_NAME="${_BRANCH}"
 
 # run dotnet app
 print "# Run $full_process_path $args"
