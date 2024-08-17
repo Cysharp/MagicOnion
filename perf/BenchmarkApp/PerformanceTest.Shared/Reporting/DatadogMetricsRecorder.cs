@@ -5,24 +5,19 @@ using System.Text.Json.Serialization;
 
 namespace PerformanceTest.Shared.Reporting;
 
-// see: https://docs.datadoghq.com/api/latest/metrics/#submit-metrics
-// spec:
-// * 64 bits for the timestamp
-// * 64 bits for the value
-// * 20 bytes for the metric names
-// * 50 bytes for the timeseries
-// * The full payload is approximately 100 bytes.
 public class DatadogMetricsRecorder
 {
+    public string TagBranch { get; }
     public string TagLegend { get; }
     public string TagStreams { get; }
     private readonly JsonSerializerOptions jsonSerializerOptions;
-    private readonly TimeProvider timeProvider = TimeProvider.System;
+    private readonly TimeProvider timeProvider;
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
 
-    private DatadogMetricsRecorder(string tagLegend, string tagStreams, string apiKey)
+    private DatadogMetricsRecorder(string tagBranch, string tagLegend, string tagStreams, string apiKey, TimeProvider timeProvider)
     {
+        TagBranch = tagBranch;
         TagLegend = tagLegend;
         TagStreams = tagStreams;
         jsonSerializerOptions = new JsonSerializerOptions()
@@ -31,6 +26,7 @@ public class DatadogMetricsRecorder
             WriteIndented = false,
         };
         jsonSerializerOptions.Converters.Add(new JsonNumberEnumConverter<DatadogMetricsType>());
+        this.timeProvider = timeProvider;
 
         client = new HttpClient();
         client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -59,12 +55,13 @@ public class DatadogMetricsRecorder
                 }
             }
         }
+        var branch = Environment.GetEnvironmentVariable("BRANCH_NAME") ?? "";
         var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
         if (validate)
         {
             ArgumentException.ThrowIfNullOrEmpty(apiKey);
         }
-        return new DatadogMetricsRecorder(tagLegend, tagStreams, apiKey!);
+        return new DatadogMetricsRecorder(branch, tagLegend, tagStreams, apiKey!, SystemTimeProvider.TimeProvider);
     }
 
     /// <summary>
@@ -138,6 +135,13 @@ public class DatadogMetricsRecorder
     }
 }
 
+// see: https://docs.datadoghq.com/api/latest/metrics/#submit-metrics
+// spec:
+// * 64 bits for the timestamp
+// * 64 bits for the value
+// * 20 bytes for the metric names
+// * 50 bytes for the timeseries
+// * The full payload is approximately 100 bytes.
 public class DatadogMetricsRecord
 {
     [JsonPropertyName("series")]

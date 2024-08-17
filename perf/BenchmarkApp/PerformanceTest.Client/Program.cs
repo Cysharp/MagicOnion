@@ -129,6 +129,10 @@ async Task Main(
                 writer.WriteLine($"p50 latency        : {result.Latency.P50:0.###} ms");
                 writer.WriteLine($"p90 latency        : {result.Latency.P90:0.###} ms");
                 writer.WriteLine($"p99 latency        : {result.Latency.P99:0.###} ms");
+                writer.WriteLine($"Max CPU Usage      : {result.hardware.MaxCpuUsage:0.00} %");
+                writer.WriteLine($"Avg CPU Usage      : {result.hardware.AvgCpuUsage:0.00} %");
+                writer.WriteLine($"Max Memory Usage   : {result.hardware.MaxMemoryUsageMB} MB");
+                writer.WriteLine($"Avg Memory Usage   : {result.hardware.AvgMemoryUsageMB} MB");
                 writer.WriteLine($"========================================");
             }
         }
@@ -216,6 +220,11 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"p90 latency: {result.Latency.P90:0.###} ms");
     WriteLog($"p99 latency: {result.Latency.P99:0.###} ms");
 
+    WriteLog($"Max CPU Usage: {result.hardware.MaxCpuUsage:0.000} %");
+    WriteLog($"Avg CPU Usage: {result.hardware.AvgCpuUsage:0.000} %");
+    WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
+    WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
+
     return result;
 }
 
@@ -268,13 +277,10 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, PerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
+        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
             $"legend:{x.scenario.ToString().ToLower()}-{x.serialization}-{x.TagLegend}{x.TagStreams}",
+            $"branch:{x.TagBranch}",
             $"streams:{x.TagStreams}",
-            $"magiconion_version:{x.applicationInfo.MagicOnionVersion}",
-            $"grpcdotnet_version:{x.applicationInfo.GrpcNetVersion}",
-            $"messagepack_version:{x.applicationInfo.MessagePackVersion}",
-            $"memorypack_version:{x.applicationInfo.MemoryPackVersion}",
             $"process_arch:{x.applicationInfo.ProcessArchitecture}",
             $"process_count:{x.applicationInfo.ProcessorCount}",
             $"scenario:{x.scenario}",
@@ -285,6 +291,10 @@ static class DatadogMetricsRecorderExtensions
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", result.hardware.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", result.hardware.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", result.hardware.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", result.hardware.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
 
         // wait until send complete
         await recorder.WaitSaveAsync();

@@ -1,3 +1,4 @@
+using PerformanceTest.Shared.Reporting;
 using System.Diagnostics;
 
 public class PerformanceTestRunningContext
@@ -5,12 +6,14 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
+    HardwarePerformanceReporter hardwarePerformanceReporter;
     List<List<double>> latencyPerConnection;
     List<object> locks;
 
     public PerformanceTestRunningContext(int connectionCount)
     {
         stopwatch = new Stopwatch();
+        hardwarePerformanceReporter = new HardwarePerformanceReporter();
         latencyPerConnection = new (connectionCount);
         locks = new (connectionCount);
         for (var i = 0; i < connectionCount; i++)
@@ -24,6 +27,7 @@ public class PerformanceTestRunningContext
     {
         isRunning = true;
         stopwatch.Start();
+        hardwarePerformanceReporter.Start();
     }
 
     public void Increment()
@@ -46,16 +50,17 @@ public class PerformanceTestRunningContext
     {
         isRunning = false;
         stopwatch.Stop();
+        hardwarePerformanceReporter.Stop();
     }
 
     public PerformanceResult GetResult()
     {
-        var latency = MeasureLatency();
+        var latency = MeasureLatency(latencyPerConnection);
         latencyPerConnection.Clear();
         locks.Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency);
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResult());
 
-        Latency MeasureLatency()
+        static Latency MeasureLatency(List<List<double>> latencyPerConnection)
         {
             var totalCount = 0;
             var totalSum = 0.0;
@@ -82,6 +87,7 @@ public class PerformanceTestRunningContext
             var latencyMax = GetPercentile(100, latencyAllConnection);
             var latency = new Latency(latencyMean, latency50p, latency75p, latency90p, latency99p, latencyMax);
 
+            latencyAllConnection.Clear();
             return latency;
         }
         static double GetPercentile(int percent, IReadOnlyList<double> sortedData)
@@ -99,5 +105,5 @@ public class PerformanceTestRunningContext
     }
 }
 
-public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency);
+public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency, HardwarePerformanceResult hardware);
 public record Latency(double Mean, double P50, double P75, double P90, double P99, double Max);

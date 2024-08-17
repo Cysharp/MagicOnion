@@ -15,6 +15,7 @@ function usage {
 
 while [ $# -gt 0 ]; do
   case $1 in
+    # optional
     --help) usage; exit 1; ;;
     *) shift ;;
   esac
@@ -47,6 +48,27 @@ print "MACHINE_NAME: $(hostname)"
 print "# Show installed dotnet sdk versions"
 echo "dotnet sdk versions (list): $(dotnet --list-sdks)"
 echo "dotnet sdk version (default): $(dotnet --version)"
+
+# is already clones?
+print "# Check if already cloned $repo"
+if [[ ! -d "$clone_path" ]]; then
+  echop "Failed to find $clone_path, not yet git cloned?"
+  exit 1
+fi
+
+# get branch name and set to environment variables
+print "# Set branch name as Environment variable"
+pushd "$clone_path"
+  print "  ## get current git branch name"
+  git_branch=$(git rev-parse --abbrev-ref HEAD)
+  if [ -z "$git_branch" ]; then
+    echo "Failed to get branch name, exiting..."
+    exit 1
+  fi
+
+  print "  ## set branch name to environment variables $git_branch"
+  export BRANCH_NAME="$git_branch"
+popd
 
 # setup env
 print "# Setup environment"
