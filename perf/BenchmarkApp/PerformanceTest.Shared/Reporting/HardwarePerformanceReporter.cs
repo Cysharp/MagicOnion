@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace PerformanceTest.Shared.Reporting;
@@ -7,8 +8,8 @@ public class HardwarePerformanceReporter
     private readonly TimeSpan samplingInterval;
     private readonly TimeProvider timeProvider;
     private readonly Process currentProcess;
-    private readonly List<double> cpuUsages;
-    private readonly List<double> memoryUsages;
+    private readonly ConcurrentBag<double> cpuUsages;
+    private readonly ConcurrentBag<double> memoryUsages;
     private CancellationTokenSource cancellationTokenSource;
     private bool running;
 
@@ -68,6 +69,7 @@ public class HardwarePerformanceReporter
         var avgCpuUsage = cpuUsages.Count > 0 ? cpuUsages.Average() : 0d;
         var maxMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Max() / 1024 / 1024: 0d;
         var avgMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Average() / 1024 / 1024: 0d;
+
         cpuUsages.Clear();
         memoryUsages.Clear();
 

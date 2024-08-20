@@ -2,6 +2,7 @@
   "profiles": {
     "PerformanceTest.Server": {
       "commandName": "Project",
+      "commandLineArgs": "--tags legend:h2c-linux,streams:1",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5000;https://localhost:5001",
