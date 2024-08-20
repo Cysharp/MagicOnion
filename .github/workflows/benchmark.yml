@@ -52,7 +52,7 @@ jobs:
       dotnet-version: "8.0"
       environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
-      benchmark-timeout: 20 # 10min (env prepare) + 5min (clone & benchmark) + 5min (spare)
+      benchmark-expire-min: 10 # 5min (clone & benchmark) + 5min (next benchmark)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
       client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
