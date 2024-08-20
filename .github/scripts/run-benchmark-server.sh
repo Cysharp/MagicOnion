@@ -9,12 +9,16 @@ set -euo pipefail
 
 function usage {
     echo "usage: $(basename $0) [options]"
+    echo "Required:"
+    echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
     echo "Options:"
     echo "  --help                      Show this help message"
 }
 
 while [ $# -gt 0 ]; do
   case $1 in
+    # required
+    --args) _ARGS=$2; shift 2; ;;
     # optional
     --help) usage; exit 1; ;;
     *) shift ;;
@@ -29,6 +33,7 @@ function print() {
 # parameter setup
 repo="MagicOnion"
 build_config="Release"
+args="${_ARGS:=""}"
 build_csproj="perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
 env_settings=""
 
@@ -105,10 +110,11 @@ pushd "$clone_path"
 popd
 
 # run dotnet app
-print "# Run $full_process_path"
+print "# Run $full_process_path $args"
 pushd "$output_dir"
-  # run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
-  nohup "./$binary_name" > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
+  # use nohup to run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
+  # shellcheck disable=SC2086
+  nohup "./$binary_name" $args > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
 
   # wait 10s will be enough to start the server or not
   sleep 10s

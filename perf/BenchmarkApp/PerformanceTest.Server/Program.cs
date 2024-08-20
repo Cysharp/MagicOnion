@@ -9,6 +9,11 @@ if (Array.IndexOf(args, "--serialization") is var index and > -1 && args[index +
 }
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddCommandLine(args, new Dictionary<string, string>()
+{
+    { "--tags", "Tags" },
+    { "--validate", "Validate" },
+});
 
 builder.Logging.ClearProviders();
 
@@ -18,7 +23,9 @@ builder.Logging.ClearProviders();
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHostedService<StartupService>();
+builder.Services.AddHostedService<ProfileService>();
 
 var app = builder.Build();
 

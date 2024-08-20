@@ -28,21 +28,25 @@ jobs:
       matrix:
         include:
           # 1
-          - tags: "legend:h2c-linux,streams:1"
+          - tags: "legend:messagepack-h2c-linux,streams:1"
             channels: 28
             streams: 1
+            serialization: messagepack
           # 1x1
-          - tags: "legend:h2c-linux,streams:1x1"
+          - tags: "legend:messagepack-h2c-linux,streams:1x1"
             channels: 1
             streams: 1
+            serialization: messagepack
           # 70
-          - tags: "legend:h2c-linux,streams:70"
+          - tags: "legend:messagepack-h2c-linux,streams:70"
             channels: 28
             streams: 70
+            serialization: messagepack
           # 70x1
-          - tags: "legend:h2c-linux,streams:70x1"
+          - tags: "legend:messagepack-h2c-linux,streams:70x1"
             channels: 1
             streams: 70
+            serialization: messagepack
     uses: Cysharp/Actions/.github/workflows/benchmark.yaml@main
     with:
       dotnet-version: "8.0"
@@ -50,7 +54,7 @@ jobs:
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-timeout: 20 # 10min (env prepare) + 5min (clone & benchmark) + 5min (spare)
       client-benchmark-script-path: ".github/scripts/run-benchmark-client.sh"
-      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --validate true --tags '${{ matrix.tags }}'\""
+      client-benchmark-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
       server-benchmark-script-path: ".github/scripts/run-benchmark-server.sh"
-      server-benchmark-script-args: ""
+      server-benchmark-script-args: "--args \"--validate true --tags ${{ matrix.tags }}\""
     secrets: inherit
