@@ -49,7 +49,7 @@ static class DatadogMetricsRecorderExtensions
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
         recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
 

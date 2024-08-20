@@ -292,7 +292,7 @@ static class DatadogMetricsRecorderExtensions
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", result.hardware.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", result.hardware.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", result.hardware.AvgCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", result.hardware.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", result.hardware.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
 
