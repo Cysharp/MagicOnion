@@ -3,12 +3,12 @@ set -euo pipefail
 
 # benchmark over ssh
 #
-# MagicOnion Client
-# $ ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@4.215.237.255 'bash -s -- --args "-u http://${BENCHMARK_SERVER_NAME}:5000 -s streaminghub --channels 1 --streams 1"' < ./scripts/run-benchmark.sh
+# MagicOnion Server
+# ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 azure-user@4.215.238.2 'bash -s -- ' < ./scripts/benchmark-server-run.sh
 # $ echo $?
 
 function usage {
-    echo "usage: $(basename $0) --args <string> [options]"
+    echo "usage: $(basename $0) [options]"
     echo "Required:"
     echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
     echo "Options:"
@@ -34,7 +34,7 @@ function print() {
 repo="MagicOnion"
 build_config="Release"
 args="${_ARGS:=""}"
-build_csproj="perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj"
+build_csproj="perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
 env_settings=""
 
 binary_name=$(basename "$(dirname "$build_csproj")")
@@ -42,6 +42,9 @@ publish_dir="artifacts/$binary_name"
 clone_path="$HOME/github/$repo"
 output_dir="$clone_path/$publish_dir"
 full_process_path="$output_dir/$binary_name"
+
+stdoutfile="stdout.log"
+stderrfile="stderr.log"
 
 # show machine name
 print "MACHINE_NAME: $(hostname)"
@@ -76,8 +79,17 @@ popd
 print "# Setup environment"
 IFS=';' read -ra env_array <<< "$env_settings"
 for item in "${env_array[@]}"; do
-  if [[ -n "$item" ]]; then
-    export "${item?}"
+  if [ -n "$item" ]; then
+    export "$item"
+  fi
+done
+
+# process check
+print "# Checking process $binary_name already runnning, kill if exists"
+ps -eo pid,cmd | while read -r pid cmd; do
+  if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
+    echo "Found & killing process $pid ($cmd)"
+    kill "$pid"
   fi
 done
 
@@ -97,18 +109,23 @@ pushd "$clone_path"
   chmod +x "$full_process_path"
 popd
 
-# process check
-print "# Checking process $binary_name already runnning, kill if exists"
-ps -eo pid,cmd | while read -r pid cmd; do
-  if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
-    echo "Found & killing process $pid ($cmd)"
-    kill "$pid"
-  fi
-done
-
 # run dotnet app
 print "# Run $full_process_path $args"
 pushd "$output_dir"
-  # run foreground
-  "./$binary_name" $args
+  # use nohup to run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
+  # shellcheck disable=SC2086
+  nohup "./$binary_name" $args > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
+
+  # wait 10s will be enough to start the server or not
+  sleep 10s
+
+  # output stdout
+  cat "${stdoutfile}"
+
+  # output stderr
+  if [[ "$(stat -c%s "$stderrfile")" -ne "0" ]]; then
+    echo "Error found when running the server."
+    cat "${stderrfile}"
+    exit 1
+  fi
 popd
