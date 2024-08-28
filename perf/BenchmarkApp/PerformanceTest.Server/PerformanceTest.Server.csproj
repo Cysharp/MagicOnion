@@ -13,6 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\PerformanceTest.Shared\Certs\*.*" LinkBase="Certs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Compile Include="..\PerformanceTest.Shared\**\*.cs" Exclude="**\obj\**;**\bin\**" LinkBase="Shared" />
   </ItemGroup>
 

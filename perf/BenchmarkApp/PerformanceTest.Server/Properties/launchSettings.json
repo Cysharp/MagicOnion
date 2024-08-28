@@ -2,13 +2,65 @@
   "profiles": {
     "PerformanceTest.Server": {
       "commandName": "Project",
-      "commandLineArgs": "--tags legend:h2c-linux,streams:1",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5000;https://localhost:5001",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "Kestrel__Endpoints__Grpc__Url": "http://localhost:5000"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h2c)": {
+      "commandName": "Project",
+      "commandLineArgs": "--protocol h2c --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h2)": {
+      "commandName": "Project",
+      "commandLineArgs": "--protocol h2 --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h3)": {
+      "commandName": "Project",
+      "commandLineArgs": "--protocol h3 --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h2c any)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://0.0.0.0:5000 --protocol h2c --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h2 any)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u https://0.0.0.0:5000 --protocol h2 --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "PerformanceTest.Server (h3 any)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u https://0.0.0.0:5000 --protocol h3 --tags legend:h2c-linux,streams:1",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

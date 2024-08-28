@@ -16,6 +16,8 @@ app.Run();
 async Task Main(
     [Option("s")] ScenarioType scenario,
     [Option("u")] string url,
+    [Option("p")] string protocol = "h2c",
+    bool clientauth = false,
     [Option("w")] int warmup = 10,
     [Option("d")] int duration = 10,
     [Option("t")] int streams = 10,
@@ -28,13 +30,14 @@ async Task Main(
     string? tags = null
 )
 {
-    var config = new ScenarioConfiguration(url, warmup, duration, streams, channels, verbose);
+    var config = new ScenarioConfiguration(url, protocol, clientauth, warmup, duration, streams, channels, verbose);
     var datadog = DatadogMetricsRecorder.Create(tags, validate: validate);
 
     PrintStartupInformation();
 
     WriteLog($"Scenario: {scenario}");
     WriteLog($"Url: {config.Url}");
+    WriteLog($"Protocol: {config.Protocol}");
     WriteLog($"Warmup: {config.Warmup} s");
     WriteLog($"Duration: {config.Duration} s");
     WriteLog($"Streams: {config.Streams}");
@@ -55,7 +58,7 @@ async Task Main(
     }
 
     // Create a control channel
-    using var channelControl = GrpcChannel.ForAddress(config.Url);
+    using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
     await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
 
@@ -109,6 +112,7 @@ async Task Main(
         writer.WriteLine($"========================================");
         writer.WriteLine($"Scenario     : {scenario}");
         writer.WriteLine($"Url          : {config.Url}");
+        writer.WriteLine($"Protocol     : {config.Protocol}");
         writer.WriteLine($"Warmup       : {config.Warmup} s");
         writer.WriteLine($"Duration     : {config.Duration} s");
         writer.WriteLine($"Streams      : {config.Streams}");
@@ -181,7 +185,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     var tasks = new List<Task>();
     for (var i = 0; i < config.Channels; i++)
     {
-        var channel = GrpcChannel.ForAddress(config.Url);
+        var channel = config.CreateChannel();
         for (var j = 0; j < config.Streams; j++)
         {
             if (config.Verbose) WriteLog($"Channel[{i}] - Stream[{j}]: Run");
@@ -301,4 +305,109 @@ static class DatadogMetricsRecorderExtensions
     }
 }
 
-public record ScenarioConfiguration(string Url, int Warmup, int Duration, int Streams, int Channels, bool Verbose);
+public class ScenarioConfiguration
+{
+    public string Url { get; }
+    public string Protocol { get; }
+    public int Warmup { get; }
+    public int Duration { get; }
+    public int Streams { get; }
+    public int Channels { get; }
+    public bool Verbose { get; }
+
+    private readonly HttpMessageHandler httpHandler;
+
+    private record TlsFile(string PfxFileName, string Password)
+    {
+        public static TlsFile Default = new TlsFile("Certs/client.pfx", "1111");
+    }
+
+    public ScenarioConfiguration(string url, string protocol, bool clientauth, int warmup, int duration, int streams, int channels, bool verbose)
+    {
+        var handler = new SocketsHttpHandler()
+        {
+            UseProxy = false,
+            AllowAutoRedirect = false,
+        };
+        handler.SslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true; // allow self cert
+        if (clientauth)
+        {
+            var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
+            var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
+            // .NET 9 API....
+            //var clientCertificates = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
+            var clientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection(new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, TlsFile.Default.Password));
+            handler.SslOptions.ClientCertificates = clientCertificates;
+        }
+
+        switch (protocol)
+        {
+            case "h2c":
+                {
+                    url = url.Replace("https://", "http://");
+                    httpHandler = handler;
+                    break;
+                }
+            case "h2":
+                {
+                    url = url.Replace("http://", "https://");
+                    httpHandler = handler;
+                    break;
+                }
+            case "h3":
+                {
+                    url = url.Replace("http://", "https://");
+
+                    handler.ConnectCallback = (_, _) => throw new InvalidOperationException("Should never be called for H3");
+                    httpHandler = new Http3Handler(handler);
+                    break;
+                }
+            default:
+                throw new NotImplementedException(protocol);
+        };
+
+        Url = url;
+        Protocol = protocol;
+        Warmup = warmup;
+        Duration = duration;
+        Streams = streams;
+        Channels = channels;
+        Verbose = verbose;
+    }
+
+    public GrpcChannel CreateChannel()
+    {
+        return Protocol switch
+        {
+            "h2c" => GrpcChannel.ForAddress(Url),
+            "h2" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
+            {
+                HttpHandler = httpHandler,
+            }),
+            // h3 can use from Windows 11 Build 22000+, or Linux with libmsquic. https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-8.0
+            "h3" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
+            {
+                HttpHandler = httpHandler,
+                // .NET 9 API....
+                // HttpVersion = new Version(3, 0), // Force H3 on all requests
+            }),
+            _ => throw new NotImplementedException(Protocol),
+        };
+    }
+
+    // temporary solution for .NET8 and lower
+    public class Http3Handler : DelegatingHandler
+    {
+        public Http3Handler() { }
+        public Http3Handler(HttpMessageHandler innerHandler) : base(innerHandler) { }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            // Force H3 on all requests.
+            request.Version = System.Net.HttpVersion.Version30;
+            request.VersionPolicy = HttpVersionPolicy.RequestVersionExact;
+
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
+}

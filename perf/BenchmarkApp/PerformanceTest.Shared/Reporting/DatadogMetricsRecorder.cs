@@ -14,9 +14,11 @@ public class DatadogMetricsRecorder
     private readonly TimeProvider timeProvider;
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
+    private readonly bool enabled;
 
     private DatadogMetricsRecorder(string tagBranch, string tagLegend, string tagStreams, string apiKey, TimeProvider timeProvider)
     {
+        enabled = !string.IsNullOrEmpty(apiKey);
         TagBranch = tagBranch;
         TagLegend = tagLegend;
         TagStreams = tagStreams;
@@ -56,7 +58,7 @@ public class DatadogMetricsRecorder
             }
         }
         var branch = Environment.GetEnvironmentVariable("BRANCH_NAME") ?? "";
-        var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
+        var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY") ?? "";
         if (validate)
         {
             ArgumentException.ThrowIfNullOrEmpty(apiKey);
@@ -124,11 +126,17 @@ public class DatadogMetricsRecorder
 
         var json = JsonSerializer.Serialize(data, jsonSerializerOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await client.PostAsync("https://api.datadoghq.com/api/v2/series", content);
 
-        // don't want to throw, show error message when failed instead
+        // don't send when disabled
+        if (!enabled)
+        {
+            return;
+        }
+
+        var response = await client.PostAsync("https://api.datadoghq.com/api/v2/series", content);
         if (!response.IsSuccessStatusCode)
         {
+            // don't want to throw, show error message when failed instead
             var responseContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Failed to post metrics to Datadog. StatusCode: {(int)response.StatusCode}, Response: {responseContent}");
         }
