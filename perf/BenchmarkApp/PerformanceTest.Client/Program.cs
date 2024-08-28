@@ -359,7 +359,7 @@ public class ScenarioConfiguration
                     url = url.Replace("http://", "https://");
 
                     handler.ConnectCallback = (_, _) => throw new InvalidOperationException("Should never be called for H3");
-                    httpHandler = handler;
+                    httpHandler = new Http3Handler(handler);
                     break;
                 }
             default:
@@ -387,7 +387,7 @@ public class ScenarioConfiguration
             // h3 can use from Windows 11 Build 22000+, or Linux with libmsquic. https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-8.0
             "h3" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
             {
-                HttpHandler = new Http3Handler(httpHandler),
+                HttpHandler = httpHandler,
                 // .NET 9 API....
                 // HttpVersion = new Version(3, 0), // Force H3 on all requests
             }),
