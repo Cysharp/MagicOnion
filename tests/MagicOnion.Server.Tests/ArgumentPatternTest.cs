@@ -318,7 +318,7 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
 
             var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 
-            var response = ResponseContext<MyResponse>.Create(callResult, method.FromRawResponse);
+            var response = ResponseContext<MyResponse>.Create(callResult);
             return new UnaryResult<MyResponse>(Task.FromResult<IResponseContext<MyResponse>>(response));
         }
 

@@ -7,16 +7,14 @@ namespace MagicOnion.Internal
     internal class MagicOnionClientStreamWriter<T, TRaw> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<TRaw> inner;
-        readonly Func<T, TRaw> toRawMessage;
 
-        public MagicOnionClientStreamWriter(IClientStreamWriter<TRaw> inner, Func<T, TRaw> toRawMessage)
+        public MagicOnionClientStreamWriter(IClientStreamWriter<TRaw> inner)
         {
             this.inner = inner;
-            this.toRawMessage = toRawMessage;
         }
 
         public Task WriteAsync(T message)
-            => inner.WriteAsync(toRawMessage(message));
+            => inner.WriteAsync(GrpcMethodHelper.ToRaw<T, TRaw>(message));
 
         public WriteOptions? WriteOptions
         {
