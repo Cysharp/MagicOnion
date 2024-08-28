@@ -33,24 +33,28 @@ jobs:
             channels: 28
             streams: 1
             serialization: messagepack
+            comment-behavior: new
           # 1x1
           - tags: "legend:messagepack-h2c-linux,streams:1x1,protocol:h2c"
             protocol: h2c
             channels: 1
             streams: 1
             serialization: messagepack
+            comment-behavior: update
           # 70
           - tags: "legend:messagepack-h2c-linux,streams:70,protocol:h2c"
             protocol: h2c
             channels: 28
             streams: 70
             serialization: messagepack
+            comment-behavior: update
           # 70x1
           - tags: "legend:messagepack-h2c-linux,streams:70x1,protocol:h2c"
             protocol: h2c
             channels: 1
             streams: 70
             serialization: messagepack
+            comment-behavior: update
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
       dotnet-version: "8.0"
