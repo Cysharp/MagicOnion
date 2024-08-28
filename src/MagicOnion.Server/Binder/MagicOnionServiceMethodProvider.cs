@@ -1,6 +1,6 @@
 using Grpc.AspNetCore.Server.Model;
 
-namespace MagicOnion.Server.Glue;
+namespace MagicOnion.Server.Binder;
 
 internal class MagicOnionServiceMethodProvider<TService> : IServiceMethodProvider<TService>
     where TService : class

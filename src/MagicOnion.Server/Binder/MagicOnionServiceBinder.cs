@@ -1,12 +1,12 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Routing;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
-namespace MagicOnion.Server.Glue;
+namespace MagicOnion.Server.Binder;
 
 internal record MagicOnionMethodBindingContext(IMagicOnionServiceBinder Binder, MethodHandler MethodHandler);
 

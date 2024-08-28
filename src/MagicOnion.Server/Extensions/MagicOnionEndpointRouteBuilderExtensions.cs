@@ -1,7 +1,5 @@
-using System.Reflection;
-using MagicOnion.Server.Glue;
+using MagicOnion.Server.Binder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Builder;
 
