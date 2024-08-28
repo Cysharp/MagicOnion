@@ -12,20 +12,10 @@ public static class KestrelHelperExtensions
         builder.WebHost.ConfigureKestrel((context, options) =>
         {
             var endpoint = CreateIPEndpoint(context.Configuration);
-            if (endpoint.Address == System.Net.IPAddress.Loopback)
+            options.Listen(endpoint.Address, endpoint.Port, listenOptions =>
             {
-                options.ListenLocalhost(endpoint.Port, listenOptions =>
-                {
-                    ConfigureListenOptions(listenOptions, context.Configuration, endpoint);
-                });
-            }
-            else
-            {
-                options.ListenAnyIP(endpoint.Port, listenOptions =>
-                {
-                    ConfigureListenOptions(listenOptions, context.Configuration, endpoint);
-                });
-            }
+                ConfigureListenOptions(listenOptions, context.Configuration, endpoint);
+            });
 
             // Other languages gRPC server don't include a server header
             options.AddServerHeader = false;
@@ -36,6 +26,7 @@ public static class KestrelHelperExtensions
     {
         var address = CreateBindingAddress(config);
 
+        // listen on `127.0.0.1` or `0.0.0.0` or `[::]`, won't listen on server name.
         System.Net.IPAddress? ip;
         if (string.Equals(address.Host, "localhost", StringComparison.OrdinalIgnoreCase))
         {
