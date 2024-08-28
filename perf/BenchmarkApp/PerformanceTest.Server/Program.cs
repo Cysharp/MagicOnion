@@ -14,6 +14,7 @@ builder.Configuration.AddCommandLine(args, new Dictionary<string, string>()
     // kestrel
     { "-u", "Url" },
     { "--protocol", "Protocol" },
+    { "--client-auth", "ClientAuth" },
     // datadog
     { "--tags", "Tags" },
     { "--validate", "Validate" },

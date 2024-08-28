@@ -17,6 +17,7 @@ async Task Main(
     [Option("s")] ScenarioType scenario,
     [Option("u")] string url,
     [Option("p")] string protocol = "h2c",
+    bool clientauth = false,
     [Option("w")] int warmup = 10,
     [Option("d")] int duration = 10,
     [Option("t")] int streams = 10,
@@ -29,7 +30,7 @@ async Task Main(
     string? tags = null
 )
 {
-    var config = new ScenarioConfiguration(url, protocol, warmup, duration, streams, channels, verbose);
+    var config = new ScenarioConfiguration(url, protocol, clientauth, warmup, duration, streams, channels, verbose);
     var datadog = DatadogMetricsRecorder.Create(tags, validate: validate);
 
     PrintStartupInformation();
@@ -318,10 +319,10 @@ public class ScenarioConfiguration
 
     private record TlsFile(string PfxFileName, string Password)
     {
-        public static TlsFile Default = new TlsFile("client.pfx", "1111");
+        public static TlsFile Default = new TlsFile("Certs/client.pfx", "1111");
     }
 
-    public ScenarioConfiguration(string url, string protocol, int warmup, int duration, int streams, int channels, bool verbose)
+    public ScenarioConfiguration(string url, string protocol, bool clientauth, int warmup, int duration, int streams, int channels, bool verbose)
     {
         var handler = new SocketsHttpHandler()
         {
@@ -329,7 +330,15 @@ public class ScenarioConfiguration
             AllowAutoRedirect = false,
         };
         handler.SslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true; // allow self cert
-        // TODO: handle clientAuth?
+        if (clientauth)
+        {
+            var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
+            var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
+            // .NET 9 API....
+            //var clientCertificates = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
+            var clientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection(new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, TlsFile.Default.Password));
+            handler.SslOptions.ClientCertificates = clientCertificates;
+        }
 
         switch (protocol)
         {
@@ -379,7 +388,8 @@ public class ScenarioConfiguration
             "h3" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
             {
                 HttpHandler = new Http3Handler(httpHandler),
-                // HttpVersion = new Version(3, 0), // Force H3 on all requests for .NET9 and higher
+                // .NET 9 API....
+                // HttpVersion = new Version(3, 0), // Force H3 on all requests
             }),
             _ => throw new NotImplementedException(Protocol),
         };

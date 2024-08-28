@@ -2,9 +2,10 @@ public static class KestrelHelperExtensions
 {
     private static readonly string defaultListenAddress = "http://localhost:5000";
     private static readonly string defaultProtocol = "h2c";
+
     private record TlsFile(string PfxFileName, string Password)
     {
-        public static TlsFile Default = new TlsFile("server1.pfx", "1111");
+        public static TlsFile Default = new TlsFile("Certs/server1.pfx", "1111");
     }
 
     public static void ConfigureEndpoint(this WebApplicationBuilder builder)
@@ -49,12 +50,13 @@ public static class KestrelHelperExtensions
     private static void ConfigureListenOptions(Microsoft.AspNetCore.Server.Kestrel.Core.ListenOptions listenOptions, IConfiguration config, System.Net.IPEndPoint endPoint)
     {
         var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
-        var certPath = Path.Combine(basePath!, "Certs", TlsFile.Default.PfxFileName);
+        var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
 
         // default is Insecure gRPC
         var protocol = config.GetValue<string>("Protocol") ?? defaultProtocol;
+        var useClientAuth = config.GetValue<bool?>("ClientAuth") ?? false;
 
-        Console.WriteLine($"Listener Address: {endPoint.Address}:{endPoint.Port}, Protocol: {protocol}");
+        Console.WriteLine($"Listener Address: {endPoint.Address}:{endPoint.Port}, Protocol: {protocol}, ClientAuth: {useClientAuth}");
 
         switch (protocol)
         {
@@ -66,13 +68,27 @@ public static class KestrelHelperExtensions
             case "h2":
                 {
                     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2;
-                    listenOptions.UseHttps(certPath, TlsFile.Default.Password);
+                    listenOptions.UseHttps(certPath, TlsFile.Default.Password, httpsOptions =>
+                    {
+                        if (useClientAuth)
+                        {
+                            httpsOptions.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate;
+                            httpsOptions.AllowAnyClientCertificate();
+                        }
+                    });
                     break;
                 }
             case "h3":
                 {
                     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
-                    listenOptions.UseHttps(certPath, TlsFile.Default.Password);
+                    listenOptions.UseHttps(certPath, TlsFile.Default.Password, httpsOptions =>
+                    {
+                        if (useClientAuth)
+                        {
+                            httpsOptions.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate;
+                            httpsOptions.AllowAnyClientCertificate();
+                        }
+                    });
                     break;
                 }
             default:
