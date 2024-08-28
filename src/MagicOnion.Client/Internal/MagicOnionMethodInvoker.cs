@@ -51,7 +51,7 @@ namespace MagicOnion.Client.Internal
         {
             this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, messageSerializer);
             this.createUnaryResponseContext = context => ResponseContext<TResponse>.Create<TRawResponse>(
-                context.Client.Options.CallInvoker.AsyncUnaryCall(method.Method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)),
+                context.Client.Options.CallInvoker.AsyncUnaryCall(method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)),
                 method.FromRawResponse
             );
         }
@@ -87,21 +87,21 @@ namespace MagicOnion.Client.Internal
             => Task.FromResult(
                 new ServerStreamingResult<TResponse>(
                     new AsyncServerStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncServerStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions, method.ToRawRequest(request)),
+                        client.Options.CallInvoker.AsyncServerStreamingCall(method, client.Options.Host, client.Options.CallOptions, method.ToRawRequest(request)),
                         method.FromRawResponse)));
 
         public override Task<ClientStreamingResult<TRequest, TResponse>> InvokeClientStreaming(MagicOnionClientBase client, string path)
             => Task.FromResult(
                 new ClientStreamingResult<TRequest, TResponse>(
                     new AsyncClientStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncClientStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions),
+                        client.Options.CallInvoker.AsyncClientStreamingCall(method, client.Options.Host, client.Options.CallOptions),
                         method.ToRawRequest, method.FromRawResponse)));
 
         public override Task<DuplexStreamingResult<TRequest, TResponse>> InvokeDuplexStreaming(MagicOnionClientBase client, string path)
             => Task.FromResult(
                 new DuplexStreamingResult<TRequest, TResponse>(
                     new AsyncDuplexStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncDuplexStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions),
+                        client.Options.CallInvoker.AsyncDuplexStreamingCall(method, client.Options.Host, client.Options.CallOptions),
                         method.ToRawRequest, method.FromRawResponse)));
 
         class AsyncServerStreamingCallWrapper : IAsyncServerStreamingCallWrapper<TResponse>

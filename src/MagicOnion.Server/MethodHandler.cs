@@ -4,9 +4,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using MagicOnion.Internal;
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
-using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Glue;
 using MagicOnion.Server.Internal;
 using MagicOnion.Serialization;
 using Microsoft.Extensions.Logging;
@@ -175,7 +176,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
     }
 
-    internal void BindHandler(ServiceBinderBase binder)
+    internal void BindHandler(IMagicOnionServiceBinder binder)
     {
         // NOTE: ServiceBinderBase.AddMethod has `class` generic constraint.
         //       We need to box an instance of the value type.
@@ -188,37 +189,37 @@ public class MethodHandler : IEquatable<MethodHandler>
             .Invoke(this, new [] { binder });
     }
 
-    void BindHandlerTyped<TRequest, TResponse, TRawRequest, TRawResponse>(ServiceBinderBase binder)
+    void BindHandlerTyped<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionServiceBinder binder)
         where TRawRequest : class
         where TRawResponse : class
     {
-        var handlerBinder = MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse>.Instance;
+        var bindingContext = new MagicOnionMethodBindingContext(binder, this);
         switch (this.MethodType)
         {
             case MethodType.Unary:
                 if (this.MethodInfo.GetParameters().Any())
                 {
-                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, messageSerializer);
+                    binder.BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, UnaryServerMethod<TRequest, TResponse>);
                 }
                 else
                 {
-                    handlerBinder.BindUnaryParameterless(binder, UnaryServerMethod<Nil, TResponse>, this, messageSerializer);
+                    binder.BindUnaryParameterless<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, UnaryServerMethod<Nil, TResponse>);
                 }
                 break;
             case MethodType.ClientStreaming:
-                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
+                binder.BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, ClientStreamingServerMethod<TRequest, TResponse>);
                 break;
             case MethodType.ServerStreaming:
-                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
+                binder.BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, ServerStreamingServerMethod<TRequest, TResponse>);
                 break;
             case MethodType.DuplexStreaming:
                 if (isStreamingHub)
                 {
-                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
+                    binder.BindStreamingHub<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, DuplexStreamingServerMethod<TRequest, TResponse>);
                 }
                 else
                 {
-                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
+                    binder.BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(bindingContext, DuplexStreamingServerMethod<TRequest, TResponse>);
                 }
                 break;
             default:

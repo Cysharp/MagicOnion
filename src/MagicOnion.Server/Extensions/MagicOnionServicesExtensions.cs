@@ -48,11 +48,8 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
-        var glueServiceType = MagicOnionGlueService.CreateType();
-
         services.TryAddSingleton<StreamingHubHandlerRepository>();
-        services.TryAddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
-        services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
+        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>();
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();

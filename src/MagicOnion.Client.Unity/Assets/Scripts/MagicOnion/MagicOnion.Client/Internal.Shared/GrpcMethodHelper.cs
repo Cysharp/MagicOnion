@@ -9,13 +9,14 @@ namespace MagicOnion.Internal
 {
     internal static class GrpcMethodHelper
     {
-        public sealed class MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
+        public sealed class MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> : Method<TRawRequest, TRawResponse>
+            where TRawRequest : class
+            where TRawResponse : class
         {
-            public Method<TRawRequest, TRawResponse> Method { get; }
 
-            public MagicOnionMethod(Method<TRawRequest, TRawResponse> method)
+            public MagicOnionMethod(MethodType methodType, string serviceName, string name, Marshaller<TRawRequest> requestMarshaller, Marshaller<TRawResponse> responseMarshaller)
+                : base(methodType, serviceName, name, requestMarshaller, responseMarshaller)
             {
-                Method = method;
             }
 
             public TRawRequest ToRawRequest(TRequest obj) => ToRaw<TRequest, TRawRequest>(obj);
@@ -49,10 +50,12 @@ namespace MagicOnion.Internal
         }
 
         public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
+            where TRawResponse : class
         {
             return CreateMethod<TResponse, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
         public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
+            where TRawResponse : class
         {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
             //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
@@ -62,20 +65,24 @@ namespace MagicOnion.Internal
                 ? CreateBoxedMarshaller<TResponse>(messageSerializer)
                 : (object)CreateMarshaller<TResponse>(messageSerializer);
 
-            return new MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse>(new Method<Box<Nil>, TRawResponse>(
+            return new MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse>(
                 methodType,
                 serviceName,
                 name,
                 IgnoreNilMarshaller,
                 (Marshaller<TRawResponse>)responseMarshaller
-            ));
+            );
         }
 
         public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
+            where TRawRequest : class
+            where TRawResponse : class
         {
             return CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
         public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
+            where TRawRequest : class
+            where TRawResponse : class
         {
             var isMethodRequestTypeBoxed = typeof(TRequest).IsValueType;
             var isMethodResponseTypeBoxed = typeof(TResponse).IsValueType;
@@ -87,13 +94,13 @@ namespace MagicOnion.Internal
                 ? CreateBoxedMarshaller<TResponse>(messageSerializer)
                 : (object)CreateMarshaller<TResponse>(messageSerializer);
 
-            return new MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>(new Method<TRawRequest, TRawResponse>(
+            return new MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>(
                 methodType,
                 serviceName,
                 name,
                 (Marshaller<TRawRequest>)requestMarshaller,
                 (Marshaller<TRawResponse>)responseMarshaller
-            ));
+            );
         }
 
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
