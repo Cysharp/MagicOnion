@@ -12,27 +12,27 @@ internal record MagicOnionMethodBindingContext(IMagicOnionServiceBinder Binder, 
 
 internal interface IMagicOnionServiceBinder
 {
-    void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, ServerCallContext, Task<object?>> serverMethod)
+    void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, ServerCallContext, ValueTask<object?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 
-    void BindUnaryParameterless<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<Nil, ServerCallContext, Task<object?>> serverMethod)
+    void BindUnaryParameterless<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<Nil, ServerCallContext, ValueTask<object?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 
-    void BindStreamingHub<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    void BindStreamingHub<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 
-    void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 
-    void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 
-    void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, ServerCallContext, Task<TResponse?>> serverMethod)
+    void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, ServerCallContext, ValueTask<TResponse?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class;
 }
@@ -62,7 +62,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
     }
 
 
-    public void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, ServerCallContext, Task<object?>> serverMethod)
+    public void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, ServerCallContext, ValueTask<object?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {
@@ -81,7 +81,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         context.AddUnaryMethod(method, GetMetadataFromHandler(ctx.MethodHandler), invoker);
     }
 
-    public void BindUnaryParameterless<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<Nil, ServerCallContext, Task<object?>> serverMethod)
+    public void BindUnaryParameterless<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<Nil, ServerCallContext, ValueTask<object?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {
@@ -103,7 +103,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         context.AddUnaryMethod(method, GetMetadataFromHandler(ctx.MethodHandler), invoker);
     }
 
-    public void BindStreamingHub<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    public void BindStreamingHub<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {
@@ -127,7 +127,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         context.AddDuplexStreamingMethod(method, GetMetadataFromHandler(ctx.MethodHandler), invoker);
     }
 
-    public void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    public void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {
@@ -141,7 +141,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         context.AddDuplexStreamingMethod(method, GetMetadataFromHandler(ctx.MethodHandler), invoker);
     }
 
-    public void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod)
+    public void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, ValueTask> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {
@@ -155,7 +155,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         context.AddServerStreamingMethod(method, GetMetadataFromHandler(ctx.MethodHandler), invoker);
     }
 
-    public void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, ServerCallContext, Task<TResponse?>> serverMethod)
+    public void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionMethodBindingContext ctx, Func<IAsyncStreamReader<TRequest>, ServerCallContext, ValueTask<TResponse?>> serverMethod)
         where TRawRequest : class
         where TRawResponse : class
     {

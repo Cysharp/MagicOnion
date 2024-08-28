@@ -227,7 +227,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
     }
 
-    async Task<object?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
+    async ValueTask<object?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, messageSerializer, Logger, this, context.GetHttpContext().RequestServices);
@@ -308,7 +308,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         return response;
     }
 
-    async Task<TResponse?> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context)
+    async ValueTask<TResponse?> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<TRequest, Nil /* Dummy */>(
@@ -367,7 +367,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         return response;
     }
 
-    async Task ServerStreamingServerMethod<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
+    async ValueTask ServerStreamingServerMethod<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
@@ -420,7 +420,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
     }
 
-    async Task DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
+    async ValueTask DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
