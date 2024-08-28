@@ -28,22 +28,26 @@ jobs:
       matrix:
         include:
           # 1
-          - tags: "legend:messagepack-h2c-linux,streams:1"
+          - tags: "legend:messagepack-h2c-linux,streams:1,protocol:h2c"
+            protocol: h2c
             channels: 28
             streams: 1
             serialization: messagepack
           # 1x1
-          - tags: "legend:messagepack-h2c-linux,streams:1x1"
+          - tags: "legend:messagepack-h2c-linux,streams:1x1,protocol:h2c"
+            protocol: h2c
             channels: 1
             streams: 1
             serialization: messagepack
           # 70
-          - tags: "legend:messagepack-h2c-linux,streams:70"
+          - tags: "legend:messagepack-h2c-linux,streams:70,protocol:h2c"
+            protocol: h2c
             channels: 28
             streams: 70
             serialization: messagepack
           # 70x1
-          - tags: "legend:messagepack-h2c-linux,streams:70x1"
+          - tags: "legend:messagepack-h2c-linux,streams:70x1,protocol:h2c"
+            protocol: h2c
             channels: 1
             streams: 70
             serialization: messagepack
@@ -54,13 +58,13 @@ jobs:
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-expire-min: 10 # 5min (clone & benchmark) + 5min (next benchmark)
       benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-      benchmark-client-run-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
+      benchmark-client-run-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol ${{ matrix.protocol }} -s CI --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
       benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
-      benchmark-server-run-script-args: "--args \"--validate true --tags ${{ matrix.tags }}\""
+      benchmark-server-run-script-args: "--args \"--validate true --protocol ${{ matrix.protocol }} --tags ${{ matrix.tags }}\""
       benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
     secrets: inherit
 
-  cleanup:
+  cleanup-failed:
     if: ${{ always() }}
     needs: [benchmark]
     uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
