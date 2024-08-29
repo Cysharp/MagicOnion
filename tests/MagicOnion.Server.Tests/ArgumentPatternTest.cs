@@ -316,9 +316,9 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
             var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionSerializerProvider.Default.Create(MethodType.Unary, null));
             var request = Box.Create(tuple);
 
-            var callResult = invoker.AsyncUnaryCall(method.Method, null, default(CallOptions), request);
+            var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 
-            var response = ResponseContext<MyResponse>.Create(callResult, method.FromRawResponse);
+            var response = ResponseContext<MyResponse>.Create(callResult);
             return new UnaryResult<MyResponse>(Task.FromResult<IResponseContext<MyResponse>>(response));
         }
 

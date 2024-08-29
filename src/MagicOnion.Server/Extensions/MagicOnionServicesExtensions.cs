@@ -4,8 +4,8 @@ using Cysharp.Runtime.Multicast.InMemory;
 using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
+using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
-using MagicOnion.Server.Glue;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -48,11 +48,8 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
-        var glueServiceType = MagicOnionGlueService.CreateType();
-
         services.TryAddSingleton<StreamingHubHandlerRepository>();
-        services.TryAddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
-        services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
+        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>();
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();

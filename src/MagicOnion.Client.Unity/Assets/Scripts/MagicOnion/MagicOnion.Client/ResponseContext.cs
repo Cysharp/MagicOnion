@@ -16,22 +16,20 @@ namespace MagicOnion.Client
         readonly Status status;
         readonly Metadata? responseHeaders;
         readonly Metadata? trailers;
-        readonly Func<TRaw, T> fromRawResponseToResponse;
 
         public ResponseContextRaw(T value, Status status, Metadata responseHeaders, Metadata trailers)
-            : this(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers, x => (T)(object)x!)
+            : this(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers)
         { }
 
-        public ResponseContextRaw(AsyncUnaryCall<TRaw> inner, Func<TRaw, T> fromRawResponseToResponse)
-            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
+        public ResponseContextRaw(AsyncUnaryCall<TRaw> inner)
+            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
 
-        public ResponseContextRaw(AsyncUnaryCall<TRaw>? inner, bool hasValue, T? value, bool hasMetadataAndStatus, Status status, Metadata? responseHeaders, Metadata? trailers, Func<TRaw, T> fromRawResponseToResponse)
+        public ResponseContextRaw(AsyncUnaryCall<TRaw>? inner, bool hasValue, T? value, bool hasMetadataAndStatus, Status status, Metadata? responseHeaders, Metadata? trailers)
         {
             if (!hasValue && inner == null) throw new ArgumentNullException(nameof(inner));
             if (hasMetadataAndStatus && responseHeaders == null) throw new ArgumentNullException(nameof(responseHeaders));
             if (hasMetadataAndStatus && trailers == null) throw new ArgumentNullException(nameof(trailers));
-            if (fromRawResponseToResponse == null) throw new ArgumentNullException(nameof(fromRawResponseToResponse));
 
             this.inner = inner;
 
@@ -42,7 +40,6 @@ namespace MagicOnion.Client
             this.status = status;
             this.responseHeaders = responseHeaders;
             this.trailers = trailers;
-            this.fromRawResponseToResponse = fromRawResponseToResponse;
         }
 
         AsyncUnaryCall<TRaw> GetRequiredInner()
@@ -76,22 +73,22 @@ namespace MagicOnion.Client
                 : FromRawResponseToResponseAsync();
 
         async Task<T> FromRawResponseToResponseAsync()
-            => fromRawResponseToResponse(await GetRequiredInner().ResponseAsync.ConfigureAwait(false));
+            => GrpcMethodHelper.FromRaw<TRaw, T>(await GetRequiredInner().ResponseAsync.ConfigureAwait(false));
  
         public override void Dispose()
             => inner?.Dispose();
 
         public override ResponseContext<T> WithNewResult(T newValue)
-            => new ResponseContextRaw<T, TRaw>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers, fromRawResponseToResponse);
+            => new ResponseContextRaw<T, TRaw>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers);
     }
 
     public abstract class ResponseContext<T> : ResponseContext, IResponseContext<T>
     {
-        public static ResponseContext<T> Create<TRaw>(AsyncUnaryCall<TRaw> inner, Func<TRaw, T> fromRawResponseToResponse)
-            => new ResponseContextRaw<T, TRaw>(inner, fromRawResponseToResponse);
+        public static ResponseContext<T> Create<TRaw>(AsyncUnaryCall<TRaw> inner)
+            => new ResponseContextRaw<T, TRaw>(inner);
 
         public static ResponseContext<T> Create(T value, Status status, Metadata responseHeaders, Metadata trailers)
-            => new ResponseContextRaw<T, T>(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers, x => x);
+            => new ResponseContextRaw<T, T>(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers);
 
         public abstract Task<T> ResponseAsync { get; }
         public abstract ResponseContext<T> WithNewResult(T newValue);

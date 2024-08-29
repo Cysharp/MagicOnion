@@ -1,7 +1,5 @@
-using System.Reflection;
-using MagicOnion.Server.Glue;
+using MagicOnion.Server.Binder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Builder;
 
@@ -9,13 +7,6 @@ public static class MagicOnionEndpointRouteBuilderExtensions
 {
     public static GrpcServiceEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder)
     {
-        var descriptor = builder.ServiceProvider.GetRequiredService<MagicOnionServiceDefinitionGlueDescriptor>();
-
-        // builder.MapGrpcService<GlueServiceType>();
-        var mapGrpcServiceMethod = typeof(GrpcEndpointRouteBuilderExtensions)
-            .GetMethod(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService), BindingFlags.Static | BindingFlags.Public)!
-            .MakeGenericMethod(descriptor.GlueServiceType);
-
-        return (GrpcServiceEndpointConventionBuilder)mapGrpcServiceMethod.Invoke(null, new[] { builder })!;
+        return builder.MapGrpcService<MagicOnionService>();
     }
 }

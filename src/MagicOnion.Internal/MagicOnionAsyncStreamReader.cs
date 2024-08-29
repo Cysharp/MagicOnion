@@ -8,18 +8,16 @@ namespace MagicOnion.Internal
     internal class MagicOnionAsyncStreamReader<T, TRaw> : IAsyncStreamReader<T>
     {
         readonly IAsyncStreamReader<TRaw> inner;
-        readonly Func<TRaw, T> fromRawMessage;
 
-        public MagicOnionAsyncStreamReader(IAsyncStreamReader<TRaw> inner, Func<TRaw, T> fromRawMessage)
+        public MagicOnionAsyncStreamReader(IAsyncStreamReader<TRaw> inner)
         {
             this.inner = inner;
-            this.fromRawMessage = fromRawMessage;
         }
 
         public Task<bool> MoveNext(CancellationToken cancellationToken)
             => inner.MoveNext(cancellationToken);
 
         public T Current
-            => fromRawMessage(inner.Current);
+            => GrpcMethodHelper.FromRaw<TRaw, T>(inner.Current);
     }
 }
