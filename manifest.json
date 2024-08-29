@@ -381,7 +381,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.ResponseContext-1.html",
-          "hash": "P/6EcDPtIx5R8ZXUKp2F9FQ93Pusb2EVtFzlL9C5W94="
+          "hash": "nPuGUtAYUv4nHeFKmhdZCZ7WUZftekQ0o/tHGr1FM8E="
         }
       },
       "is_incremental": false,
@@ -2057,30 +2057,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html",
-          "hash": "Y7X10SVYrso/aNnX4/vMPLAT8uhtM5drEPEZEitQVVg="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.Glue.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.Server.Glue.html",
-          "hash": "75XsaaLa/u4wrLheOmvksCIQ5gF8lrvHNuJ9AgI/hmU="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Server.HttpGateway.MagicOnionHttpGatewayMiddleware.yml",
       "output": {
         ".html": {
@@ -2901,7 +2877,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "u3DvEECJBzVcQzoEMUASPr2L/vhRz7IH+S+vN0M2jmY="
+          "hash": "UJdbbBuxmKRWCve+qlpyvZ7BVremfoBapKtbytOskyQ="
         }
       },
       "is_incremental": false,
@@ -2988,7 +2964,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 241,
+          "total_file_count": 239,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

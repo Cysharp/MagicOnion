@@ -1727,15 +1727,15 @@ references:
   fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create
   nameWithType: ResponseContext<T>.Create
   nameWithType.vb: ResponseContext(Of T).Create
-- uid: MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0},Func{``0,`0})
-  name: Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__Func___0__0__
-  commentId: M:MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0},Func{``0,`0})
-  name.vb: Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
-  fullName: MagicOnion.Client.ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
-  nameWithType: ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
-  nameWithType.vb: ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
+- uid: MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})
+  name: Create<TRaw>(AsyncUnaryCall<TRaw>)
+  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__
+  commentId: M:MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})
+  name.vb: Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
+  fullName: MagicOnion.Client.ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>)
+  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
+  nameWithType: ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>)
+  nameWithType.vb: ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
 - uid: MagicOnion.Client.ResponseContext`1.ResponseAsync
   name: ResponseAsync
   href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseAsync
@@ -10374,57 +10374,6 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.FromTypeFilterAttribute.Type
   nameWithType: FromTypeFilterAttribute.Type
-- uid: MagicOnion.Server.Glue
-  name: MagicOnion.Server.Glue
-  href: api/MagicOnion.Server.Glue.html
-  commentId: N:MagicOnion.Server.Glue
-  fullName: MagicOnion.Server.Glue
-  nameWithType: MagicOnion.Server.Glue
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor
-  name: MagicOnionServiceDefinitionGlueDescriptor
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html
-  commentId: T:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.#ctor(Type,MagicOnion.Server.MagicOnionServiceDefinition)
-  name: MagicOnionServiceDefinitionGlueDescriptor(Type, MagicOnionServiceDefinition)
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor__ctor_Type_MagicOnion_Server_MagicOnionServiceDefinition_
-  commentId: M:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.#ctor(Type,MagicOnion.Server.MagicOnionServiceDefinition)
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.MagicOnionServiceDefinitionGlueDescriptor(Type, MagicOnion.Server.MagicOnionServiceDefinition)
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.MagicOnionServiceDefinitionGlueDescriptor(Type, MagicOnionServiceDefinition)
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.#ctor*
-  name: MagicOnionServiceDefinitionGlueDescriptor
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor__ctor_
-  commentId: Overload:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.MagicOnionServiceDefinitionGlueDescriptor
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.MagicOnionServiceDefinitionGlueDescriptor
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-  name: GlueServiceType
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor_GlueServiceType
-  commentId: P:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType*
-  name: GlueServiceType
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor_GlueServiceType_
-  commentId: Overload:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-  isSpec: "True"
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.GlueServiceType
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-  name: ServiceDefinition
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor_ServiceDefinition
-  commentId: P:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-- uid: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition*
-  name: ServiceDefinition
-  href: api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html#MagicOnion_Server_Glue_MagicOnionServiceDefinitionGlueDescriptor_ServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-  isSpec: "True"
-  fullName: MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
-  nameWithType: MagicOnionServiceDefinitionGlueDescriptor.ServiceDefinition
 - uid: MagicOnion.Server.HttpGateway
   name: MagicOnion.Server.HttpGateway
   href: api/MagicOnion.Server.HttpGateway.html
