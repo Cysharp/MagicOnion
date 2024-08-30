@@ -41,7 +41,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.Wait,
             SingleReader = true,
-            SingleWriter = false,
+            SingleWriter = true,
         });
 
     public HubGroupRepository<TReceiver> Group { get; private set; } = default!;
