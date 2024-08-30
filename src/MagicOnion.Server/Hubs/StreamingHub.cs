@@ -134,6 +134,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
+            requests.Writer.Complete();
             StreamingServiceContext.CompleteStreamingHub();
             heartbeatHandle.Unregister(); // NOTE: To be able to use CancellationToken within OnDisconnected event, separate the calls to Dispose and Unregister.
 
@@ -169,7 +170,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var handlers = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetHandlers(Context.MethodHandler);
 
         // Starts a loop that consumes the request queue.
-        var consumeRequestsTask = ConsumeRequestQueueAsync(ct);
+        var consumeRequestsTask = ConsumeRequestQueueAsync();
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
@@ -184,10 +185,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    async ValueTask ConsumeRequestQueueAsync(CancellationToken cancellationToken)
+    async ValueTask ConsumeRequestQueueAsync()
     {
         // We need to process client requests sequentially.
-        await foreach (var request in requests.Reader.ReadAllAsync(cancellationToken))
+        // NOTE: Do not pass a CancellationToken to avoid allocation. We call Writer.Complete when we want to stop the consumption loop.
+        await foreach (var request in requests.Reader.ReadAllAsync(default))
         {
             try
             {
