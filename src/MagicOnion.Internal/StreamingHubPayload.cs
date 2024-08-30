@@ -74,6 +74,9 @@ namespace MagicOnion.Internal
 
     internal class StreamingHubPayloadCore
     {
+        const int PreAllocatedBufferSize = 4096;
+
+        readonly byte[] preAllocatedBuffer = new byte[PreAllocatedBufferSize];
         byte[]? buffer;
         ReadOnlyMemory<byte>? memory;
 
@@ -89,7 +92,14 @@ namespace MagicOnion.Internal
         {
             ThrowIfUsing();
 
-            buffer = ArrayPool<byte>.Shared.Rent(data.Length);
+            if (data.Length > preAllocatedBuffer.Length)
+            {
+                buffer = ArrayPool<byte>.Shared.Rent(data.Length);
+            }
+            else
+            {
+                buffer = preAllocatedBuffer;
+            }
             data.CopyTo(buffer);
             memory = buffer.AsMemory(0, (int)data.Length);
         }
@@ -99,7 +109,15 @@ namespace MagicOnion.Internal
             ThrowIfUsing();
             if (data.Length > int.MaxValue) throw new InvalidOperationException("A body size of StreamingHubPayload must be less than int.MaxValue");
 
-            buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+            if (data.Length > preAllocatedBuffer.Length)
+            {
+                buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+            }
+            else
+            {
+                buffer = preAllocatedBuffer;
+            }
+
             data.CopyTo(buffer);
             memory = buffer.AsMemory(0, (int)data.Length);
         }
@@ -115,7 +133,14 @@ namespace MagicOnion.Internal
             }
             else
             {
-                buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+                if (data.Length > preAllocatedBuffer.Length)
+                {
+                    buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+                }
+                else
+                {
+                    buffer = preAllocatedBuffer;
+                }
                 data.CopyTo(buffer);
                 memory = buffer.AsMemory(0, (int)data.Length);
             }
@@ -130,7 +155,10 @@ namespace MagicOnion.Internal
 #if DEBUG && NET6_0_OR_GREATER
                 Array.Fill<byte>(buffer, 0xff);
 #endif
-                ArrayPool<byte>.Shared.Return(buffer);
+                if (buffer != preAllocatedBuffer)
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
             }
 
             memory = null;

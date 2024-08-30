@@ -6,7 +6,7 @@ namespace MagicOnion.Internal;
 
 internal class StreamingHubPayloadPool
 {
-    const int MaximumRetained = 2 << 7;
+    const int MaximumRetained = 2 << 10;
 
     readonly ObjectPool<StreamingHubPayloadCore> pool = new DefaultObjectPool<StreamingHubPayloadCore>(new Policy(), MaximumRetained);
 
