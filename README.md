@@ -1004,7 +1004,7 @@ There are two ways to use the gRPC library in Unity:
 - Using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) and grpc-dotnet (recommended)
 - Using gRPC's C-core (not recommended)
 
-Since the maintenance of the C-core based library has ended in the gRPC project, we recommend using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) . Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions.
+Since the maintenance of the C-core based library has ended in the gRPC project, we recommend using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) . Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions. [It also covers how to install grpc-dotnet (Grpc.Net.Client)](https://github.com/Cysharp/YetAnotherHttpHandler#using-grpc-grpc-dotnet-library).
 
 If you are using the C-core gRPC library, please define `MAGICONION_USE_GRPC_CCORE` symbol in "Scripting Define Symbols".
 
