@@ -135,10 +135,9 @@ public class StreamingHubContext
         }
     }
 
-    internal ValueTask WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
+    internal void WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
     {
         WriteMessageCore(BuildMessageForError(statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail));
-        return default;
     }
 
     void WriteMessageCore(StreamingHubPayload payload)
