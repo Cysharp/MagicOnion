@@ -296,6 +296,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         catch (Exception ex)
         {
+            isErrorOrInterrupted = true;
             HandleException(context, handler, ex, hasResponse);
         }
         finally
@@ -329,6 +330,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         catch (Exception ex)
         {
+            isErrorOrInterrupted = true;
             HandleException(context, handler, ex, hasResponse);
         }
         finally
