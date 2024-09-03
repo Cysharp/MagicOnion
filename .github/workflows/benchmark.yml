@@ -59,6 +59,7 @@ jobs:
     with:
       dotnet-version: "8.0"
       environment: benchmark
+      comment-behavior: ${{ matrix.comment-behavior }}
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-expire-min: 10 # 5min (clone & benchmark) + 5min (next benchmark)
       benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
