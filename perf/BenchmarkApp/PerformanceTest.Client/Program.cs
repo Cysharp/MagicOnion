@@ -295,17 +295,70 @@ static class DatadogMetricsRecorderExtensions
             $"serialization:{x.serialization}"
         ]);
 
+        var filtered = RemoveOutlinerByIQR(results);
+
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", results.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", results.Select(x =>x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", results.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", results.Select(x => x.hardware.MaxCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", results.Select(x => x.hardware.AvgCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", results.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", results.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x =>x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", filtered.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", filtered.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
 
         // wait until send complete
         await recorder.WaitSaveAsync();
+
+        // Remove Outliner by IQR
+        static IReadOnlyList<PerformanceResult> RemoveOutlinerByIQR(IReadOnlyList<PerformanceResult> data)
+        {
+            // sort rps, latency.mean
+            var rps = data.Select(x => x.RequestsPerSecond).OrderBy(x => x).ToArray();
+            var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
+
+            // get outliner for rps
+            var lowerBoundRps = GetLowerBound(rps);
+            var upperBoundRps = GetUpperBound(rps);
+
+            // get outliner for mean
+            var lowerBoundMean = GetLowerBound(mean);
+            var upperBoundMean = GetUpperBound(mean);
+
+            // compute tuple in range
+            var filteredData = data
+                .Where(x => x.RequestsPerSecond >= lowerBoundRps && x.RequestsPerSecond <= upperBoundRps)
+                .Where(x =>x.Latency.Mean >= lowerBoundMean && x.Latency.Mean <= upperBoundMean)
+                .ToArray();
+
+            return filteredData;
+        }
+
+        static double GetLowerBound(IReadOnlyList<double> sortedData)
+        {
+            var Q1 = GetPercentile(sortedData, 25);
+            var Q3 = GetPercentile(sortedData, 75);
+            var IQR = Q3 - Q1;
+            return Q1 - 1.5 * IQR;
+        }
+
+        static double GetUpperBound(IReadOnlyList<double> sortedData)
+        {
+            var Q1 = GetPercentile(sortedData, 25);
+            var Q3 = GetPercentile(sortedData, 75);
+            var IQR = Q3 - Q1;
+            return Q3 + 1.5 * IQR;
+        }
+
+        static double GetPercentile(IReadOnlyList<double> sortedData, double percentile)
+        {
+            var N = sortedData.Count;
+            var n = (N - 1) * percentile / 100.0 + 1;
+            if (n == 1) return sortedData[0];
+            if (n == N) return sortedData[N - 1];
+            var k = (int)Math.Floor(n) - 1;
+            var d = n - Math.Floor(n);
+            return sortedData[k] + d * (sortedData[k + 1] - sortedData[k]);
+        }
     }
 }
 
