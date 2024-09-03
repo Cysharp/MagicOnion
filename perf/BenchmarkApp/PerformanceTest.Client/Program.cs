@@ -137,8 +137,8 @@ async Task Main(
                 writer.WriteLine($"p50 latency        : {result.Latency.P50:0.###} ms");
                 writer.WriteLine($"p90 latency        : {result.Latency.P90:0.###} ms");
                 writer.WriteLine($"p99 latency        : {result.Latency.P99:0.###} ms");
-                writer.WriteLine($"Max CPU Usage      : {result.hardware.MaxCpuUsage:0.00} %");
-                writer.WriteLine($"Avg CPU Usage      : {result.hardware.AvgCpuUsage:0.00} %");
+                writer.WriteLine($"Max CPU Usage      : {result.hardware.MaxCpuUsagePercent:0.00} %");
+                writer.WriteLine($"Avg CPU Usage      : {result.hardware.AvgCpuUsagePercent:0.00} %");
                 writer.WriteLine($"Max Memory Usage   : {result.hardware.MaxMemoryUsageMB} MB");
                 writer.WriteLine($"Avg Memory Usage   : {result.hardware.AvgMemoryUsageMB} MB");
                 writer.WriteLine($"========================================");
@@ -228,8 +228,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"p90 latency: {result.Latency.P90:0.###} ms");
     WriteLog($"p99 latency: {result.Latency.P99:0.###} ms");
 
-    WriteLog($"Max CPU Usage: {result.hardware.MaxCpuUsage:0.000} %");
-    WriteLog($"Avg CPU Usage: {result.hardware.AvgCpuUsage:0.000} %");
+    WriteLog($"Max CPU Usage: {result.hardware.MaxCpuUsagePercent:0.000} %");
+    WriteLog($"Avg CPU Usage: {result.hardware.AvgCpuUsagePercent:0.000} %");
     WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
     WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
 
@@ -301,8 +301,8 @@ static class DatadogMetricsRecorderExtensions
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x =>x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", filtered.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", filtered.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
 

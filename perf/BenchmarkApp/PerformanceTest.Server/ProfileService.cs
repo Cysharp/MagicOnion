@@ -23,7 +23,7 @@ class ProfileService : BackgroundService
         hardwarehardwarePerformanceReporter.Start();
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            var result = hardwarehardwarePerformanceReporter.GetResult();
+            var result = hardwarehardwarePerformanceReporter.GetResultAndClear();
             await datadog.PutServerBenchmarkMetricsAsync(ApplicationInformation.Current, result);
         }
     }
@@ -48,8 +48,8 @@ static class DatadogMetricsRecorderExtensions
         ]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
 

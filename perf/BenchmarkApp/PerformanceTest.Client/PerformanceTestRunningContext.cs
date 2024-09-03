@@ -58,7 +58,7 @@ public class PerformanceTestRunningContext
         var latency = MeasureLatency(latencyPerConnection);
         latencyPerConnection.Clear();
         locks.Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResult());
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResultAndClear());
 
         static Latency MeasureLatency(List<List<double>> latencyPerConnection)
         {
