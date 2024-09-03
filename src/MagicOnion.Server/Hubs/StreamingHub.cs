@@ -189,13 +189,16 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     async ValueTask ConsumeRequestQueueAsync()
     {
+        // Create and reuse a single StreamingHubContext for each hub connection.
+        var context = new StreamingHubContext();
+
         // We need to process client requests sequentially.
         // NOTE: Do not pass a CancellationToken to avoid allocation. We call Writer.Complete when we want to stop the consumption loop.
         await foreach (var request in requests.Reader.ReadAllAsync(default))
         {
             try
             {
-                await ProcessRequestAsync(request.Handlers, request.MethodId, request.MessageId, request.Body, request.HasResponse);
+                await ProcessRequestAsync(context, request.Handlers, request.MethodId, request.MessageId, request.Body, request.HasResponse);
             }
             finally
             {
@@ -266,12 +269,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             => throw new InvalidOperationException($"Unknown MessageType: {messageType}");
     }
 
-    ValueTask ProcessRequestAsync(UniqueHashDictionary<StreamingHubHandler> handlers, int methodId, int messageId, ReadOnlyMemory<byte> body, bool hasResponse)
+    ValueTask ProcessRequestAsync(StreamingHubContext context, UniqueHashDictionary<StreamingHubHandler> handlers, int methodId, int messageId, ReadOnlyMemory<byte> body, bool hasResponse)
     {
         var handler = GetOrThrowHandler(handlers, methodId);
 
-        // Create a context for each call to the hub method.
-        var context = StreamingHubContextPool.Shared.Get();
         context.Initialize(
             handler: handler,
             streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
@@ -366,7 +367,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var elapsed = timeProvider.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp);
         MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.ResponseSize, context.ResponseType, elapsed.TotalMilliseconds, isErrorOrInterrupted);
         Metrics.StreamingHubMethodCompleted(Context.Metrics, handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
-        StreamingHubContextPool.Shared.Return(context);
+        context.Uninitialize();
     }
 
     // Interface methods for Client
