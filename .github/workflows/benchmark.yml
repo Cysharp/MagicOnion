@@ -63,7 +63,7 @@ jobs:
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-expire-min: 10 # 5min (clone & benchmark) + 5min (next benchmark)
       benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-      benchmark-client-run-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol ${{ matrix.protocol }} -s CI --rounds 10 --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
+      benchmark-client-run-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol ${{ matrix.protocol }} -s CI --rounds 8 --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
       benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
       benchmark-server-run-script-args: "--args \"-u http://0.0.0.0:5000 --protocol ${{ matrix.protocol }} --validate true --tags ${{ matrix.tags }}\""
       benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
