@@ -85,8 +85,12 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
             results.Add(result);
-            await datadog.PutClientBenchmarkMetricsAsync(scenario2, ApplicationInformation.Current, serialization, result);
         }
+    }
+
+    foreach (var (s, results) in resultsByScenario)
+    {
+        await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, serialization, results);
     }
 
     if (!string.IsNullOrWhiteSpace(report))
@@ -272,14 +276,14 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
 static class DatadogMetricsRecorderExtensions
 {
     /// <summary>
-    /// Put Client Benchmark metrics to background. 
+    /// Put Client Benchmark metrics average to background. 
     /// </summary>
     /// <param name="recorder"></param>
     /// <param name="scenario"></param>
     /// <param name="applicationInfo"></param>
     /// <param name="serialization"></param>
-    /// <param name="result"></param>
-    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, PerformanceResult result)
+    /// <param name="results"></param>
+    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, IReadOnlyList<PerformanceResult> results)
     {
         var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization), static x => [
             $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
@@ -292,13 +296,13 @@ static class DatadogMetricsRecorderExtensions
         ]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", result.RequestsPerSecond, DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", result.TotalRequests, DatadogMetricsType.Gauge, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", result.Latency.Mean, DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", result.hardware.MaxCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", result.hardware.AvgCpuUsage, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", result.hardware.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", result.hardware.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", results.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", results.Select(x =>x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", results.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", results.Select(x => x.hardware.MaxCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", results.Select(x => x.hardware.AvgCpuUsage).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", results.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", results.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
 
         // wait until send complete
         await recorder.WaitSaveAsync();
