@@ -15,6 +15,7 @@ on:
       benchmark-config-name:
         description: "benchmark-config-name: Select benchmark config name"
         required: false
+        default: workflow_dispatch_messagepack_h2c
         type: choice
         options:
           - workflow_dispatch_memorypack_h2
