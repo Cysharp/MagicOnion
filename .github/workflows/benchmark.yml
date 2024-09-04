@@ -68,3 +68,11 @@ jobs:
       benchmark-server-run-script-args: "--args \"-u http://0.0.0.0:5000 --protocol ${{ matrix.protocol }} --validate true --tags ${{ matrix.tags }}\""
       benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
     secrets: inherit
+
+  cleanup-failed:
+    if: ${{ always() }}
+    needs: [benchmark]
+    uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
+    with:
+      environment: benchmark
+    secrets: inherit
