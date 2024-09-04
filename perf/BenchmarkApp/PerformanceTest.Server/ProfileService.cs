@@ -26,6 +26,8 @@ class ProfileService : BackgroundService
             var result = hardwarehardwarePerformanceReporter.GetResultAndClear();
             await datadog.PutServerBenchmarkMetricsAsync(ApplicationInformation.Current, result);
         }
+
+        hardwarehardwarePerformanceReporter.Stop();
     }
 }
 

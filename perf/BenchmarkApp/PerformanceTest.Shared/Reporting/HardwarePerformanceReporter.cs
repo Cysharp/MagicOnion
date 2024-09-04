@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace PerformanceTest.Shared.Reporting;
@@ -8,8 +9,8 @@ public class HardwarePerformanceReporter
     private readonly TimeProvider timeProvider;
     private readonly Process currentProcess;
     private readonly int cpuCores;
-    private readonly List<double> cpuUsages;
-    private readonly List<double> memoryUsages;
+    private readonly ConcurrentBag<double> cpuUsages;
+    private readonly ConcurrentBag<double> memoryUsages;
     private CancellationTokenSource cancellationTokenSource;
     private bool running;
 
@@ -22,15 +23,13 @@ public class HardwarePerformanceReporter
         this.timeProvider = SystemTimeProvider.TimeProvider;
         currentProcess = Process.GetCurrentProcess();
         cpuCores = Environment.ProcessorCount;
-        cpuUsages = new List<double>(1000);
-        memoryUsages = new List<double>(1000);
+        cpuUsages = new ConcurrentBag<double>();
+        memoryUsages = new ConcurrentBag<double>();
         cancellationTokenSource = new CancellationTokenSource();
     }
 
     public void Start()
     {
-        if (running) return;
-
         running = true;
         var prevMemory = currentProcess.WorkingSet64;
         Task.Run(async () =>
@@ -45,8 +44,8 @@ public class HardwarePerformanceReporter
                 if (cancellationTokenSource.IsCancellationRequested) break;
 
                 // end
-                var duration = timeProvider.GetElapsedTime(start);
                 TimeSpan endCpuTime = currentProcess.TotalProcessorTime;
+                var duration = timeProvider.GetElapsedTime(start);
 
                 // CPU usage
                 var cpuUsedMs = (endCpuTime - startCpuTime).TotalMilliseconds;
@@ -66,13 +65,13 @@ public class HardwarePerformanceReporter
         running = false;
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
-        cancellationTokenSource = new CancellationTokenSource();
     }
 
     public HardwarePerformanceResult GetResult()
     {
-        var maxCpuUsage = cpuUsages.Count > 0 ? cpuUsages.Max() : 0d;
-        var avgCpuUsage = cpuUsages.Count > 0 ? cpuUsages.Average() : 0d;
+        var filteredCpuUsages = OutlinerHelper.RemoveOutlinerByIQR(cpuUsages.ToArray(), 100.0);
+        var maxCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Max() : 0d;
+        var avgCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Average() : 0d;
         var maxMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Max() / 1024 / 1024 : 0d;
         var avgMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Average() / 1024 / 1024 : 0d;
 

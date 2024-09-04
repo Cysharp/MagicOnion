@@ -317,12 +317,12 @@ static class DatadogMetricsRecorderExtensions
             var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
 
             // get outliner for rps
-            var lowerBoundRps = GetLowerBound(rps);
-            var upperBoundRps = GetUpperBound(rps);
+            var lowerBoundRps = OutlinerHelper.GetLowerBound(rps);
+            var upperBoundRps = OutlinerHelper.GetUpperBound(rps);
 
             // get outliner for mean
-            var lowerBoundMean = GetLowerBound(mean);
-            var upperBoundMean = GetUpperBound(mean);
+            var lowerBoundMean = OutlinerHelper.GetLowerBound(mean);
+            var upperBoundMean = OutlinerHelper.GetUpperBound(mean);
 
             // compute tuple in range
             var filteredData = data
@@ -331,33 +331,6 @@ static class DatadogMetricsRecorderExtensions
                 .ToArray();
 
             return filteredData;
-        }
-
-        static double GetLowerBound(IReadOnlyList<double> sortedData)
-        {
-            var Q1 = GetPercentile(sortedData, 25);
-            var Q3 = GetPercentile(sortedData, 75);
-            var IQR = Q3 - Q1;
-            return Q1 - 1.5 * IQR;
-        }
-
-        static double GetUpperBound(IReadOnlyList<double> sortedData)
-        {
-            var Q1 = GetPercentile(sortedData, 25);
-            var Q3 = GetPercentile(sortedData, 75);
-            var IQR = Q3 - Q1;
-            return Q3 + 1.5 * IQR;
-        }
-
-        static double GetPercentile(IReadOnlyList<double> sortedData, double percentile)
-        {
-            var N = sortedData.Count;
-            var n = (N - 1) * percentile / 100.0 + 1;
-            if (n == 1) return sortedData[0];
-            if (n == N) return sortedData[N - 1];
-            var k = (int)Math.Floor(n) - 1;
-            var d = n - Math.Floor(n);
-            return sortedData[k] + d * (sortedData[k + 1] - sortedData[k]);
         }
     }
 }
