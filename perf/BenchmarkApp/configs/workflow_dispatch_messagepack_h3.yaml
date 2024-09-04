@@ -8,31 +8,24 @@ benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --validate true --tags {{ tags }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
-  # 1
-  - match: messagepack-h2c-linux-1
-    tags: legend:messagepack-h2c-linux,streams:1,protocol:h2c
-    protocol: h2c
+  # h2c
+  - tags: legend:messagepack-h3-linux,streams:1,protocol:h3
+    protocol: h3
     channels: 28
     streams: 1
     serialization: messagepack
-  # 1x1
-  - match: messagepack-h2c-linux-1x1
-    tags: "legend:messagepack-h2c-linux,streams:1x1,protocol:h2c"
-    protocol: h2c
+  - tags: legend:messagepack-h3-linux,streams:1x1,protocol:h3
+    protocol: h3
     channels: 1
     streams: 1
     serialization: messagepack
-  # 70
-  - match: messagepack-h2c-linux-70
-    tags: "legend:messagepack-h2c-linux,streams:70,protocol:h2c"
-    protocol: h2c
+  - tags: legend:messagepack-h3-linux,streams:70,protocol:h3
+    protocol: h3
     channels: 28
     streams: 70
     serialization: messagepack
-  # 70x1
-  - match: messagepack-h2c-linux-70x1
-    tags: "legend:messagepack-h2c-linux,streams:70x1,protocol:h2c"
-    protocol: h2c
+  - tags: legend:messagepack-h3-linux,streams:70x1,protocol:h3
+    protocol: h3
     channels: 1
     streams: 70
     serialization: messagepack

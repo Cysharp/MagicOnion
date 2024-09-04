@@ -12,6 +12,19 @@ on:
         required: false
         default: true
         type: boolean
+      benchmark-config-name:
+        description: "benchmark-config-name: Select benchmark config name"
+        required: false
+        type: choice
+        options:
+          - workflow_dispatch_memorypack_h2
+          - workflow_dispatch_memorypack_h2c
+          - workflow_dispatch_memorypack_h3
+          - workflow_dispatch_messagepack_h2
+          - workflow_dispatch_messagepack_h2c
+          - workflow_dispatch_messagepack_h3
+          - issue
+          - schedule
 
 permissions:
   contents: read
@@ -26,7 +39,7 @@ jobs:
     with:
       environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
-      benchmark-config-path: "perf/BenchmarkApp/configs/benchmark_${{ github.event_name }}.yaml"
+      benchmark-config-path: "perf/BenchmarkApp/configs/benchmark_${{ inputs.benchmark-config-name || github.event_name }}.yaml"
     secrets: inherit
 
   cleanup-failed:
