@@ -40,7 +40,7 @@ jobs:
     with:
       environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
-      benchmark-config-path: "perf/BenchmarkApp/configs/benchmark_${{ inputs.benchmark-config-name || github.event_name }}.yaml"
+      benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
     secrets: inherit
 
   cleanup-failed:
