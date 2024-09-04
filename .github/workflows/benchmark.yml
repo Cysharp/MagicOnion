@@ -22,51 +22,11 @@ permissions:
 jobs:
   # run benchmark
   benchmark:
-    strategy:
-      fail-fast: false
-      max-parallel: 1 # serial execution
-      matrix:
-        include:
-          # 1
-          - tags: "legend:messagepack-h2c-linux,streams:1,protocol:h2c"
-            protocol: h2c
-            channels: 28
-            streams: 1
-            serialization: messagepack
-            comment-behavior: new
-          # 1x1
-          - tags: "legend:messagepack-h2c-linux,streams:1x1,protocol:h2c"
-            protocol: h2c
-            channels: 1
-            streams: 1
-            serialization: messagepack
-            comment-behavior: update
-          # 70
-          - tags: "legend:messagepack-h2c-linux,streams:70,protocol:h2c"
-            protocol: h2c
-            channels: 28
-            streams: 70
-            serialization: messagepack
-            comment-behavior: update
-          # 70x1
-          - tags: "legend:messagepack-h2c-linux,streams:70x1,protocol:h2c"
-            protocol: h2c
-            channels: 1
-            streams: 70
-            serialization: messagepack
-            comment-behavior: update
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
-      dotnet-version: "8.0"
       environment: benchmark
-      comment-behavior: ${{ matrix.comment-behavior }}
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
-      benchmark-expire-min: 15 # 5min (clone & benchmark) + 5min (next benchmark)
-      benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-      benchmark-client-run-script-args: "--args \"-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol ${{ matrix.protocol }} -s CI --rounds 8 --channels ${{ matrix.channels }} --streams ${{ matrix.streams }} --serialization ${{ matrix.serialization }} --validate true --tags ${{ matrix.tags }}\""
-      benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
-      benchmark-server-run-script-args: "--args \"-u http://0.0.0.0:5000 --protocol ${{ matrix.protocol }} --validate true --tags ${{ matrix.tags }}\""
-      benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
+      benchmark-config-path: "perf/BenchmarkApp/configs/benchmark_${{ github.event_name }}.yaml"
     secrets: inherit
 
   cleanup-failed:
