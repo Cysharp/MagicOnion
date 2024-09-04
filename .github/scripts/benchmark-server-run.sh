@@ -112,6 +112,7 @@ popd
 # run dotnet app
 print "# Run $full_process_path $args"
 pushd "$output_dir"
+  touch "${stdoutfile}"
   # use nohup to run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
   # shellcheck disable=SC2086
   nohup "./$binary_name" $args > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
