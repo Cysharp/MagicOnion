@@ -1,8 +1,6 @@
 using System.Buffers;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
-using Cysharp.Runtime.Multicast;
 using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
 using MagicOnion.Internal;
@@ -23,6 +21,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 {
     IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = default!;
     StreamingHubHeartbeatHandle heartbeatHandle = default!;
+    TimeProvider timeProvider = default!;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -88,10 +87,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var features = this.Context.CallContext.GetHttpContext().Features;
         var magicOnionOptions = serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value;
+        timeProvider = magicOnionOptions.TimeProvider ?? TimeProvider.System;
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
-        this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(magicOnionOptions.ClientResultsDefaultTimeout, magicOnionOptions.TimeProvider ?? TimeProvider.System);
+        this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(magicOnionOptions.ClientResultsDefaultTimeout, timeProvider);
         this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
         var handlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
@@ -270,10 +270,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 hubInstance: this,
                 request: body,
                 messageId: messageId,
-                timestamp: DateTime.UtcNow
+                timestamp: timeProvider.GetUtcNow().UtcDateTime
             );
 
-            var methodStartingTimestamp = Stopwatch.GetTimestamp();
+            var methodStartingTimestamp = timeProvider.GetTimestamp();
             var isErrorOrInterrupted = false;
             MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, context, context.Request, handler.RequestType);
             try
@@ -300,8 +300,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             }
             finally
             {
-                var methodEndingTimestamp = Stopwatch.GetTimestamp();
-                MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.ResponseSize, context.ResponseType, StopwatchHelper.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
+                var methodEndingTimestamp = timeProvider.GetTimestamp();
+                MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.ResponseSize, context.ResponseType, timeProvider.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
                 Metrics.StreamingHubMethodCompleted(Context.Metrics, handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
 
                 StreamingHubContextPool.Shared.Return(context);

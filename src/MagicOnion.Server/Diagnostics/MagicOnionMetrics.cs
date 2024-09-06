@@ -63,7 +63,7 @@ internal class MagicOnionMetrics : IDisposable
             var tags = InitializeTagListForStreamingHub(handler.HubName);
             tags.Add("rpc.method", handler.MethodInfo.Name);
             tags.Add("magiconion.streaminghub.is_error", isErrorOrInterrupted ? BoxedTrue : BoxedFalse);
-            streamingHubMethodDuration.Record((long)StopwatchHelper.GetElapsedTime(startingTimestamp, endingTimestamp).TotalMilliseconds, tags);
+            streamingHubMethodDuration.Record((long)TimeProvider.System.GetElapsedTime(startingTimestamp, endingTimestamp).TotalMilliseconds, tags);
             streamingHubMethodCompletedCounter.Add(1, tags);
         }
     }

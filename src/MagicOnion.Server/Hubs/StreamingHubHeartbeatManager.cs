@@ -82,7 +82,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
         lock (gate)
         {
             var receivedAtTimestamp = manager.TimeProvider.GetTimestamp();
-            var elapsed = StopwatchHelper.GetElapsedTime(lastSentAtTimestamp, receivedAtTimestamp);
+            var elapsed = manager.TimeProvider.GetElapsedTime(lastSentAtTimestamp, receivedAtTimestamp);
 
             LastReceivedAt = lastSentAt.Add(elapsed);
             Latency = elapsed;
