@@ -23,6 +23,12 @@ public interface IMagicOnionHeartbeatFeature
     CancellationToken TimeoutToken { get; }
 
     /// <summary>
+    /// Sets the callback action to be performed when an Ack message is received from the client.
+    /// </summary>
+    /// <param name="callbackAction"></param>
+    void SetAckCallback(Action<TimeSpan>? callbackAction);
+
+    /// <summary>
     /// Unregister the current StreamingHub connection from the HeartbeatManager.
     /// </summary>
     void Unregister();
@@ -37,4 +43,6 @@ internal sealed class MagicOnionHeartbeatFeature(StreamingHubHeartbeatHandle han
     public CancellationToken TimeoutToken => handle.TimeoutToken;
 
     public void Unregister() => handle.Unregister();
+
+    public void SetAckCallback(Action<TimeSpan>? callbackAction) => handle.SetAckCallback(callbackAction);
 }
