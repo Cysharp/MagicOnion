@@ -37,8 +37,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
     static ReadOnlySpan<byte> MarkerResponseBytes => [0x93, 0xff, 0x00, 0x0c]; // MsgPack: [-1, 0, nil]
 
-    readonly Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> requests
-        = Channel.CreateBounded<(StreamingHubPayload, UniqueHashDictionary<StreamingHubHandler>, int, int, ReadOnlyMemory<byte>, bool)>(new BoundedChannelOptions(capacity: 10)
+    readonly record struct StreamingHubMethodRequest(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse);
+
+    readonly Channel<StreamingHubMethodRequest> requests = Channel.CreateBounded<StreamingHubMethodRequest>(new BoundedChannelOptions(capacity: 10)
         {
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.Wait,
@@ -198,7 +199,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             try
             {
-                await ProcessRequestAsync(context, request.Handlers, request.MethodId, request.MessageId, request.Body, request.HasResponse);
+                await ProcessRequestAsync(context, request);
             }
             finally
             {
@@ -217,12 +218,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             case StreamingHubMessageType.Request:
                 {
                     var requestMessage = reader.ReadRequest();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
+                    return requests.Writer.WriteAsync(new (payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
                 }
             case StreamingHubMessageType.RequestFireAndForget:
                 {
                     var requestMessage = reader.ReadRequestFireAndForget();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
+                    return requests.Writer.WriteAsync(new (payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
             case StreamingHubMessageType.ClientResultResponse:
                 {
@@ -269,16 +270,16 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             => throw new InvalidOperationException($"Unknown MessageType: {messageType}");
     }
 
-    ValueTask ProcessRequestAsync(StreamingHubContext context, UniqueHashDictionary<StreamingHubHandler> handlers, int methodId, int messageId, ReadOnlyMemory<byte> body, bool hasResponse)
+    ValueTask ProcessRequestAsync(StreamingHubContext context, in StreamingHubMethodRequest request)
     {
-        var handler = GetOrThrowHandler(handlers, methodId);
+        var handler = GetOrThrowHandler(request.Handlers, request.MethodId);
 
         context.Initialize(
             handler: handler,
             streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
             hubInstance: this,
-            request: body,
-            messageId: messageId,
+            request: request.Body,
+            messageId: request.MessageId,
             timestamp: timeProvider.GetUtcNow().UtcDateTime
         );
 
@@ -292,13 +293,13 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             if (!resultTask.IsCompletedSuccessfully)
             {
                 hasCompletedSynchronously = false;
-                return ProcessRequestAsyncAwait(resultTask, context, handler, methodStartingTimestamp, hasResponse);
+                return ProcessRequestAsyncAwait(resultTask, context, handler, methodStartingTimestamp, request.HasResponse);
             }
         }
         catch (Exception ex)
         {
             isErrorOrInterrupted = true;
-            HandleException(context, handler, ex, hasResponse);
+            HandleException(context, handler, ex, request.HasResponse);
         }
         finally
         {
