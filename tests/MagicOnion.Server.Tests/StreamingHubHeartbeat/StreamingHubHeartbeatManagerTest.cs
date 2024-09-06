@@ -58,12 +58,12 @@ public class StreamingHubHeartbeatManagerTest
         // Act
         using var handle = manager.Register(context);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Simulate to send heartbeat responses from clients.
         timeProvider.Advance(TimeSpan.FromMilliseconds(50));
         handle.Ack(0);
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.Equal(TimeSpan.FromMilliseconds(50), handle.Latency);
@@ -99,7 +99,7 @@ public class StreamingHubHeartbeatManagerTest
         // Act
         using var handle = manager.Register(context);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.Equal(TimeSpan.Zero, handle.Latency);
@@ -124,11 +124,11 @@ public class StreamingHubHeartbeatManagerTest
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
@@ -162,7 +162,7 @@ public class StreamingHubHeartbeatManagerTest
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
         var isCanceled2 = handle2.TimeoutToken.IsCancellationRequested;
         var isCanceled3 = handle3.TimeoutToken.IsCancellationRequested;
@@ -171,7 +171,7 @@ public class StreamingHubHeartbeatManagerTest
         handle2.Ack(0);
         handle3.Ack(0);
         timeProvider.Advance(TimeSpan.FromMilliseconds(250));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.False(isCanceled1);
@@ -199,12 +199,12 @@ public class StreamingHubHeartbeatManagerTest
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
         var isCanceled2 = handle2.TimeoutToken.IsCancellationRequested;
         var isCanceled3 = handle3.TimeoutToken.IsCancellationRequested;
         timeProvider.Advance(TimeSpan.FromMilliseconds(250)); // No responses from clients and timeouts are reached.
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.False(isCanceled1);
@@ -234,20 +234,20 @@ public class StreamingHubHeartbeatManagerTest
         var handle2 = manager.Register(context2);
         var handle3 = manager.Register(context3);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         handle1.Dispose();
         handle2.Dispose();
         handle3.Dispose();
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
@@ -283,11 +283,11 @@ public class StreamingHubHeartbeatManagerTest
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
 
         // Assert
         Assert.Equal(3, context1.Responses.Count);
@@ -317,21 +317,21 @@ public class StreamingHubHeartbeatManagerTest
         // Act & Assert
         using var handle = manager.Register(context);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
         Assert.Single(context.Responses);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
         Assert.Equal(2, context.Responses.Count);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
 
         handle.Ack(0);
@@ -339,7 +339,7 @@ public class StreamingHubHeartbeatManagerTest
         handle.Ack(2);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
         Assert.Equal(4, context.Responses.Count);
     }
@@ -357,21 +357,21 @@ public class StreamingHubHeartbeatManagerTest
         // Act & Assert
         using var handle = manager.Register(context);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
         Assert.Single(context.Responses);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 1s has elapsed since the first message.
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
         Assert.Equal(2, context.Responses.Count);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 2s has elapsed since the first message.
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900)); // 2.9s has elapsed since the first message.
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
 
         // Only returns a response to the first message.
@@ -380,7 +380,7 @@ public class StreamingHubHeartbeatManagerTest
         //handle.Ack(2);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 3s has elapsed since the first message.
-        await Task.Delay(1);
+        await Task.Delay(16);
         Assert.True(handle.TimeoutToken.IsCancellationRequested); // The client should be disconnected.
         Assert.Equal(4, context.Responses.Count);
     }
@@ -399,12 +399,12 @@ public class StreamingHubHeartbeatManagerTest
         // Act
         using var handle1 = manager.Register(context1);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
         // Simulate to send heartbeat responses from clients.
         handle1.Ack(0);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
-        await Task.Delay(1);
+        await Task.Delay(16);
         handle1.Ack(1);
 
         // Assert
@@ -426,6 +426,33 @@ public class StreamingHubHeartbeatManagerTest
         // Assert
         Assert.Equal(BuildMessageHeader(0, DateTimeOffset.FromUnixTimeMilliseconds(123456)), bufferWriter1.WrittenSpan.ToArray());
         Assert.Equal(BuildMessageHeader(1, DateTimeOffset.FromUnixTimeMilliseconds(456789)), bufferWriter2.WrittenSpan.ToArray());
+    }
+
+    [Fact]
+    public async Task AckCallback()
+    {
+        // Arrange
+        var collector = FakeLogCollector.Create(new FakeLogCollectorOptions());
+        var logger = new FakeLogger<StreamingHubHeartbeatManager>(collector);
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(200), null, timeProvider, logger);
+        var context = CreateFakeStreamingServiceContext();
+
+        // Act
+        var ackCalled = default(TimeSpan?);
+        using var handle = manager.Register(context);
+        handle.SetAckCallback(x => ackCalled = x);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(350)); // SentAt = 00:00.0350
+        await Task.Delay(16);
+
+        // Simulate to send heartbeat responses from clients.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(50)); // ReceivedAt = 00:00.0400
+        handle.Ack(0);
+        await Task.Delay(16);
+
+        // Assert
+        Assert.True(ackCalled.HasValue);
+        Assert.Equal(TimeSpan.FromMilliseconds(50), ackCalled.Value);
     }
 
     static byte[] BuildMessageHeader(byte sequence, DateTimeOffset serverSentAt)

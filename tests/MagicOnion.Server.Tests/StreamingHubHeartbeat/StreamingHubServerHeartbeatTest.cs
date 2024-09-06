@@ -134,6 +134,7 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Assert
         Assert.True((bool)Fixture.Items.GetValueOrDefault("Disconnected"));
+        Assert.True((bool)Fixture.Items.GetValueOrDefault("Heartbeat/TimeoutToken/IsCancellationRequested"));
         Assert.True(client.WaitForDisconnect().IsCompleted);
     }
 
@@ -269,7 +270,11 @@ public class StreamingHubServerHeartbeatTestHub_TimeoutBehavior([FromKeyedServic
 {
     protected override ValueTask OnDisconnected()
     {
+        var httpContext = Context.CallContext.GetHttpContext();
+        var heartbeatFeature = httpContext.Features.GetRequiredFeature<IMagicOnionHeartbeatFeature>();
+
         items["Disconnected"] = true;
+        items["Heartbeat/TimeoutToken/IsCancellationRequested"] = heartbeatFeature.TimeoutToken.IsCancellationRequested;
         return base.OnDisconnected();
     }
 }
