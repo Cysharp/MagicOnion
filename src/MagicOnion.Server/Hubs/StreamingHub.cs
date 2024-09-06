@@ -1,6 +1,5 @@
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
@@ -188,25 +187,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    async ValueTask ConsumeRequestQueueAsync()
-    {
-        // Create and reuse a single StreamingHubContext for each hub connection.
-        var context = new StreamingHubContext();
-
-        // We need to process client requests sequentially.
-        // NOTE: Do not pass a CancellationToken to avoid allocation. We call Writer.Complete when we want to stop the consumption loop.
-        await foreach (var request in requests.Reader.ReadAllAsync(default))
-        {
-            try
-            {
-                await ProcessRequestAsync(context, request);
-            }
-            finally
-            {
-                StreamingHubPayloadPool.Shared.Return(request.Payload);
-            }
-        }
-    }
 
     ValueTask ProcessMessageAsync(StreamingHubPayload payload, CancellationToken cancellationToken)
     {
@@ -270,46 +250,51 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             => throw new InvalidOperationException($"Unknown MessageType: {messageType}");
     }
 
-    ValueTask ProcessRequestAsync(StreamingHubContext hubContext, in StreamingHubMethodRequest request)
+    async ValueTask ConsumeRequestQueueAsync()
     {
-        var handler = GetOrThrowHandler(request.MethodId);
+        // Create and reuse a single StreamingHubContext for each hub connection.
+        var hubContext = new StreamingHubContext();
 
-        hubContext.Initialize(
-            handler: handler,
-            streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
-            hubInstance: this,
-            request: request.Body,
-            messageId: request.MessageId,
-            timestamp: timeProvider.GetUtcNow().UtcDateTime
-        );
-
-        var methodStartingTimestamp = timeProvider.GetTimestamp();
-        var isErrorOrInterrupted = false;
-        var hasCompletedSynchronously = true;
-        MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, hubContext, hubContext.Request, handler.RequestType);
-        try
+        // We need to process client requests sequentially.
+        // NOTE: Do not pass a CancellationToken to avoid allocation. We call Writer.Complete when we want to stop the consumption loop.
+        await foreach (var request in requests.Reader.ReadAllAsync(default))
         {
-            var resultTask = handler.MethodBody.Invoke(hubContext);
-            if (!resultTask.IsCompletedSuccessfully)
+            try
             {
-                hasCompletedSynchronously = false;
-                return ProcessRequestAsyncAwait(resultTask, hubContext, methodStartingTimestamp, request.HasResponse);
+                var handler = GetOrThrowHandler(request.MethodId);
+
+                hubContext.Initialize(
+                    handler: handler,
+                    streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
+                    hubInstance: this,
+                    request: request.Body,
+                    messageId: request.MessageId,
+                    timestamp: timeProvider.GetUtcNow().UtcDateTime
+                );
+
+                var isErrorOrInterrupted = false;
+                var methodStartingTimestamp = timeProvider.GetTimestamp();
+                MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, hubContext, hubContext.Request, handler.RequestType);
+
+                try
+                {
+                    await handler.MethodBody.Invoke(hubContext);
+                }
+                catch (Exception ex)
+                {
+                    isErrorOrInterrupted = true;
+                    HandleException(hubContext, ex, request.HasResponse);
+                }
+                finally
+                {
+                    CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
+                }
+            }
+            finally
+            {
+                StreamingHubPayloadPool.Shared.Return(request.Payload);
             }
         }
-        catch (Exception ex)
-        {
-            isErrorOrInterrupted = true;
-            HandleException(hubContext, ex, request.HasResponse);
-        }
-        finally
-        {
-            if (hasCompletedSynchronously)
-            {
-                CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
-            }
-        }
-
-        return default;
     }
 
     StreamingHubHandler GetOrThrowHandler(int methodId)
@@ -320,25 +305,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
 
         return handler;
-    }
-
-    [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder))]
-    async ValueTask ProcessRequestAsyncAwait(ValueTask resultTask, StreamingHubContext hubContext, long methodStartingTimestamp, bool hasResponse)
-    {
-        var isErrorOrInterrupted = false;
-        try
-        {
-            await resultTask;
-        }
-        catch (Exception ex)
-        {
-            isErrorOrInterrupted = true;
-            HandleException(hubContext, ex, hasResponse);
-        }
-        finally
-        {
-            CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
-        }
     }
 
     void HandleException(StreamingHubContext hubContext, Exception ex, bool hasResponse)
