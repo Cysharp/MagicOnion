@@ -37,6 +37,7 @@ public class StreamingHubContext
 
     public IServiceContext ServiceContext => streamingServiceContext;
 
+    internal StreamingHubHandler Handler => handler;
     internal int MessageId { get; private set; }
     internal int MethodId => handler.MethodId;
 
