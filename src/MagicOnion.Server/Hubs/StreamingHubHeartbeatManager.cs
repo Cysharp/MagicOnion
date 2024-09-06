@@ -23,6 +23,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     readonly CancellationTokenSource timeoutToken;
     readonly TimeSpan timeoutDuration;
     bool disposed;
+    bool unregistered;
     short waitingSequence = -1;
     bool timeoutTimerIsRunning;
     DateTimeOffset lastSentAt;
@@ -99,17 +100,24 @@ internal class StreamingHubHeartbeatHandle : IDisposable
 
     public void Unregister()
     {
+        if (unregistered) return;
+
         manager.Unregister(ServiceContext);
         timeoutToken.CancelAfter(Timeout.InfiniteTimeSpan);
         timeoutTimerIsRunning = false;
+        unregistered = true;
     }
 
     public void Dispose()
     {
         if (disposed) return;
+
         disposed = true;
         onAckCallback = null;
-        manager.Unregister(ServiceContext);
+        if (!unregistered)
+        {
+            manager.Unregister(ServiceContext);
+        }
         timeoutToken.Dispose();
     }
 }

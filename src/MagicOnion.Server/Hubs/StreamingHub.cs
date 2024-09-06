@@ -134,10 +134,13 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
-            heartbeatHandle.Dispose();
             StreamingServiceContext.CompleteStreamingHub();
+            heartbeatHandle.Unregister(); // NOTE: To be able to use CancellationToken within OnDisconnected event, separate the calls to Dispose and Unregister.
+
             await OnDisconnected();
+
             await this.Group.DisposeAsync();
+            heartbeatHandle.Dispose();
             remoteClientResultPendingTasks.Dispose();
         }
 
