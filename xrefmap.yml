@@ -9917,6 +9917,22 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.Latency
   nameWithType: IMagicOnionHeartbeatFeature.Latency
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback(System.Nullable{Action{TimeSpan}})
+  name: SetAckCallback(Nullable<Action<TimeSpan>>)
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_SetAckCallback_System_Nullable_Action_TimeSpan___
+  commentId: M:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback(System.Nullable{Action{TimeSpan}})
+  name.vb: SetAckCallback(Nullable(Of Action(Of TimeSpan)))
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback(System.Nullable<Action<TimeSpan>>)
+  fullName.vb: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback(System.Nullable(Of Action(Of TimeSpan)))
+  nameWithType: IMagicOnionHeartbeatFeature.SetAckCallback(Nullable<Action<TimeSpan>>)
+  nameWithType.vb: IMagicOnionHeartbeatFeature.SetAckCallback(Nullable(Of Action(Of TimeSpan)))
+- uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback*
+  name: SetAckCallback
+  href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_SetAckCallback_
+  commentId: Overload:MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback
+  isSpec: "True"
+  fullName: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.SetAckCallback
+  nameWithType: IMagicOnionHeartbeatFeature.SetAckCallback
 - uid: MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.TimeoutToken
   name: TimeoutToken
   href: api/MagicOnion.Server.Features.IMagicOnionHeartbeatFeature.html#MagicOnion_Server_Features_IMagicOnionHeartbeatFeature_TimeoutToken
