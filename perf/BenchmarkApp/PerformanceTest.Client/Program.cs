@@ -27,6 +27,7 @@ async Task Main(
     [Option("v")] bool verbose = false,
     SerializationType serialization = SerializationType.MessagePack,
     bool validate = false,
+    bool debug = false,
     string? tags = null
 )
 {
@@ -38,12 +39,15 @@ async Task Main(
     WriteLog($"Scenario: {scenario}");
     WriteLog($"Url: {config.Url}");
     WriteLog($"Protocol: {config.Protocol}");
+    WriteLog($"ClientAuth: {clientauth}");
     WriteLog($"Warmup: {config.Warmup} s");
     WriteLog($"Duration: {config.Duration} s");
     WriteLog($"Streams: {config.Streams}");
     WriteLog($"Channels: {config.Channels}");
     WriteLog($"Rounds: {rounds}");
+    WriteLog($"Verbose: {verbose}");
     WriteLog($"Serialization: {serialization}");
+    WriteLog($"Debug: {debug}");
     WriteLog($"Tags: {tags}");
 
     // Setup serializer
@@ -60,7 +64,7 @@ async Task Main(
     // Create a control channel
     using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
-    await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
+    await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(debug);
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
@@ -183,13 +187,15 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     };
 
     var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
-    var cts = new CancellationTokenSource();
+    using var cts = new CancellationTokenSource();
 
     WriteLog($"Starting scenario '{scenario}'...");
     var tasks = new List<Task>();
+    var channels = new List<GrpcChannel>();
     for (var i = 0; i < config.Channels; i++)
     {
         var channel = config.CreateChannel();
+        channels.Add(channel);
         for (var j = 0; j < config.Streams; j++)
         {
             if (config.Verbose) WriteLog($"Channel[{i}] - Stream[{j}]: Run");
@@ -204,18 +210,22 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     }
 
     await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
-    WriteLog("Warming up...");
+    WriteLog($"Warming up...");
     await Task.Delay(TimeSpan.FromSeconds(config.Warmup));
     ctx.Ready();
     await controlService.CreateMemoryProfilerSnapshotAsync("After Warmup/Run");
     WriteLog("Warmup completed");
 
-    WriteLog("Running...");
+    WriteLog($"Running...");
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
     ctx.Complete();
     WriteLog("Completed.");
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
+
+    WriteLog("Cleaning up...");
+    foreach (var channel in channels) channel.Dispose();
+    WriteLog("Cleanup completed");
 
     var result = ctx.GetResult();
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
@@ -299,7 +309,7 @@ static class DatadogMetricsRecorderExtensions
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x =>x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
+        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x => x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
         recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
@@ -327,7 +337,7 @@ static class DatadogMetricsRecorderExtensions
             // compute tuple in range
             var filteredData = data
                 .Where(x => x.RequestsPerSecond >= lowerBoundRps && x.RequestsPerSecond <= upperBoundRps)
-                .Where(x =>x.Latency.Mean >= lowerBoundMean && x.Latency.Mean <= upperBoundMean)
+                .Where(x => x.Latency.Mean >= lowerBoundMean && x.Latency.Mean <= upperBoundMean)
                 .ToArray();
 
             return filteredData;
