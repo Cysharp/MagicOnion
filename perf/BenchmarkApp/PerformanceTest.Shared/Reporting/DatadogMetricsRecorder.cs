@@ -10,18 +10,20 @@ public class DatadogMetricsRecorder
     public string TagBranch { get; }
     public string TagLegend { get; }
     public string TagStreams { get; }
+    public string TagProtocol { get; }
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider;
     private readonly HttpClient client;
     private readonly ConcurrentQueue<Task> backgroundQueue;
     private readonly bool enabled;
 
-    private DatadogMetricsRecorder(string tagBranch, string tagLegend, string tagStreams, string apiKey, TimeProvider timeProvider)
+    private DatadogMetricsRecorder(string tagBranch, string tagLegend, string tagStreams, string tagProtocol, string apiKey, TimeProvider timeProvider)
     {
         enabled = !string.IsNullOrEmpty(apiKey);
         TagBranch = tagBranch;
         TagLegend = tagLegend;
         TagStreams = tagStreams;
+        TagProtocol = tagProtocol;
         jsonSerializerOptions = new JsonSerializerOptions()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -41,6 +43,7 @@ public class DatadogMetricsRecorder
     {
         string tagLegend = "";
         string tagStreams = "";
+        string tagProtocol = "";
         if (!string.IsNullOrEmpty(tagString))
         {
             foreach (var item in tagString.Split(","))
@@ -55,6 +58,11 @@ public class DatadogMetricsRecorder
                     var index = item.IndexOf(':') + 1;
                     tagStreams = item.Substring(index);
                 }
+                else if (item.StartsWith("protocol:"))
+                {
+                    var index = item.IndexOf(':') + 1;
+                    tagProtocol = item.Substring(index);
+                }
             }
         }
         var branch = Environment.GetEnvironmentVariable("BRANCH_NAME") ?? "";
@@ -63,7 +71,7 @@ public class DatadogMetricsRecorder
         {
             ArgumentException.ThrowIfNullOrEmpty(apiKey);
         }
-        return new DatadogMetricsRecorder(branch, tagLegend, tagStreams, apiKey!, SystemTimeProvider.TimeProvider);
+        return new DatadogMetricsRecorder(branch, tagLegend, tagStreams, tagProtocol, apiKey!, SystemTimeProvider.TimeProvider);
     }
 
     /// <summary>

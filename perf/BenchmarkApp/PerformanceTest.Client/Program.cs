@@ -94,7 +94,7 @@ async Task Main(
 
     foreach (var (s, results) in resultsByScenario)
     {
-        await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, serialization, protocol, results);
+        await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, serialization, results);
     }
 
     if (!string.IsNullOrWhiteSpace(report))
@@ -292,19 +292,18 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="scenario"></param>
     /// <param name="applicationInfo"></param>
     /// <param name="serialization"></param>
-    /// <param name="protocol"></param>
     /// <param name="results"></param>
-    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, string protocol, IReadOnlyList<PerformanceResult> results)
+    public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, SerializationType serialization, IReadOnlyList<PerformanceResult> results)
     {
-        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, scenario, applicationInfo, serialization, protocol), static x => [
+        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, scenario, applicationInfo, serialization), static x => [
             $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
             $"branch:{x.TagBranch}",
             $"streams:{x.TagStreams}",
+            $"protocol:{x.TagProtocol}",
             $"process_arch:{x.applicationInfo.ProcessArchitecture}",
             $"process_count:{x.applicationInfo.ProcessorCount}",
             $"scenario:{x.scenario}",
             $"serialization:{x.serialization}",
-            $"protocol:{x.protocol}",
         ]);
 
         var filtered = RemoveOutlinerByIQR(results);
