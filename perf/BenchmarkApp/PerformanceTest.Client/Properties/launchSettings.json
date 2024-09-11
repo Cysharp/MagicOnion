@@ -24,6 +24,10 @@
       "commandName": "Project",
       "commandLineArgs": "-u https://localhost:5000 -p h2 -s CI --rounds 5 --channels 1 --streams 1"
     },
+    "PerformanceTest.Client (h2 CI 3)": {
+      "commandName": "Project",
+      "commandLineArgs": "-u https://localhost:5000 -p h2 -s CI --rounds 5 --channels 28 --streams 3"
+    },
     "PerformanceTest.Client (h2 CI 70)": {
       "commandName": "Project",
       "commandLineArgs": "-u https://localhost:5000 -p h2 -s CI --rounds 5 --channels 28 --streams 70"
