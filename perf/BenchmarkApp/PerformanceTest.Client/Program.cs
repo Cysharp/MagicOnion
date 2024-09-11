@@ -61,6 +61,9 @@ async Task Main(
             break;
     }
 
+    // Setup threadpool
+    // SetThreads(config.Channels * config.Streams);
+
     // Create a control channel
     using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
@@ -209,6 +212,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
     }
 
+    WriteLog($"ThreadCount current: {ThreadPool.ThreadCount}");
+
     await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
     WriteLog($"Warming up...");
     await Task.Delay(TimeSpan.FromSeconds(config.Warmup));
@@ -275,6 +280,18 @@ void PrintStartupInformation(TextWriter? writer = null)
 void WriteLog(string value)
 {
     Console.WriteLine($"[{DateTime.Now:s}] {value}");
+}
+
+void SetThreads(int threadCount)
+{
+    ThreadPool.GetAvailableThreads(out var workerThread, out var ioCompletionPortThreads);
+    var count = Math.Min(150, Math.Max(ThreadPool.ThreadCount, threadCount)); // (ThreadPool.ThreadCount < threadCount) <= n <= 150
+    WriteLog($"ThreadCount before: {ThreadPool.ThreadCount}, tobe: {count}");
+    if (!ThreadPool.SetMinThreads(count, ioCompletionPortThreads))
+    {
+        WriteLog("Settings thread failed.");
+    }
+    WriteLog($"ThreadCount after: {ThreadPool.ThreadCount}, available workerthreads: {workerThread}");
 }
 
 IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
