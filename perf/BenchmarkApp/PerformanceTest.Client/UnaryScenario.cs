@@ -23,6 +23,11 @@ public class UnaryScenario : IScenario
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public Task CompleteAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public class UnaryComplexScenario : IScenario
@@ -45,5 +50,10 @@ public class UnaryComplexScenario : IScenario
             ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
+    }
+
+    public Task CompleteAsync()
+    {
+        return Task.CompletedTask;
     }
 }

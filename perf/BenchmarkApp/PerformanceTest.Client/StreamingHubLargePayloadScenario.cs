@@ -30,6 +30,11 @@ public abstract class StreamingHubLargePayloadScenarioBase : IScenario, IPerfTes
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
+    }
 }
 
 public class StreamingHubLargePayload1KScenario : StreamingHubLargePayloadScenarioBase

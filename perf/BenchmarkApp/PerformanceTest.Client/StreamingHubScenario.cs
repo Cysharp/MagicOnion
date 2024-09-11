@@ -9,6 +9,7 @@ public class StreamingHubScenario : IScenario, IPerfTestHubReceiver
 
     public async ValueTask PrepareAsync(GrpcChannel channel)
     {
+        //this.client = await StreamingHubClient.ConnectAsync<IPerfTestHub, IPerfTestHubReceiver>(channel, this);
         this.client = await StreamingHubClient.ConnectAsync<IPerfTestHub, IPerfTestHubReceiver>(channel, this);
     }
 
@@ -21,6 +22,11 @@ public class StreamingHubScenario : IScenario, IPerfTestHubReceiver
             ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
+    }
+
+    public async Task CompleteAsync()
+    {
+       await this.client.DisposeAsync();
     }
 }
 
@@ -44,6 +50,11 @@ public class StreamingHubValueTaskScenario : IScenario, IPerfTestHubReceiver
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
+    }
 }
 
 public class StreamingHubComplexScenario : IScenario, IPerfTestHubReceiver
@@ -66,6 +77,11 @@ public class StreamingHubComplexScenario : IScenario, IPerfTestHubReceiver
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
+    }
 }
 
 public class StreamingHubComplexValueTaskScenario : IScenario, IPerfTestHubReceiver
@@ -87,6 +103,11 @@ public class StreamingHubComplexValueTaskScenario : IScenario, IPerfTestHubRecei
             ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
+    }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
     }
 }
 
@@ -115,6 +136,11 @@ public class PingpongStreamingHubScenario : IScenario, IPerfTestHubReceiver
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
+    }
 }
 
 public class PingpongCachedStreamingHubScenario : IScenario, IPerfTestHubReceiver
@@ -136,5 +162,10 @@ public class PingpongCachedStreamingHubScenario : IScenario, IPerfTestHubReceive
             ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
+    }
+
+    public async Task CompleteAsync()
+    {
+        await this.client.DisposeAsync();
     }
 }

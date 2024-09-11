@@ -31,6 +31,11 @@ public abstract class UnaryLargePayloadScenarioBase : IScenario
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
+
+    public Task CompleteAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public class UnaryLargePayload1KScenario : UnaryLargePayloadScenarioBase

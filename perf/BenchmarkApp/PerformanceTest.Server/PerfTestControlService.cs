@@ -36,5 +36,4 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
         MemoryProfiler.GetSnapshot(name);
         return UnaryResult.CompletedResult;
     }
-
 }
