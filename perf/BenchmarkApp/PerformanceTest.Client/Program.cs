@@ -64,7 +64,7 @@ async Task Main(
     // Create a control channel
     using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
-    await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(debug);
+    await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
@@ -87,7 +87,7 @@ async Task Main(
                 results = new List<PerformanceResult>();
                 resultsByScenario[scenario2] = results;
             }
-            var result = await RunScenarioAsync(scenario2, config, controlServiceClient);
+            var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient);
             results.Add(result);
         }
     }
@@ -157,7 +157,7 @@ async Task Main(
     }
 }
 
-async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IPerfTestControlService controlService)
+async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IReadOnlyList<GrpcChannel> channels, IPerfTestControlService controlService)
 {
     Func<IScenario> scenarioFactory = scenario switch
     {
@@ -191,20 +191,20 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
 
     WriteLog($"Starting scenario '{scenario}'...");
     var tasks = new List<Task>();
-    var channels = new List<GrpcChannel>();
+    var scenarios = new List<IScenario>();
     for (var i = 0; i < config.Channels; i++)
     {
-        var channel = config.CreateChannel();
-        channels.Add(channel);
         for (var j = 0; j < config.Streams; j++)
         {
             if (config.Verbose) WriteLog($"Channel[{i}] - Stream[{j}]: Run");
-            var connectionId = i;
+            var (connectionId, streamId) = (i, j);
             tasks.Add(Task.Run(async () =>
             {
                 var scenarioRunner = scenarioFactory();
-                await scenarioRunner.PrepareAsync(channel);
+                scenarios.Add(scenarioRunner);
+                await scenarioRunner.PrepareAsync(channels[connectionId]);
                 await scenarioRunner.RunAsync(connectionId, ctx, cts.Token);
+                if (config.Verbose) WriteLog($"Complete: {connectionId}:{streamId}");
             }));
         }
     }
@@ -224,7 +224,11 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var channel in channels) channel.Dispose();
+    foreach (var s in scenarios.Chunk(Environment.ProcessorCount))
+    {
+        await Task.WhenAll(s.Select(x => x.CompleteAsync()));
+    }
+
     WriteLog("Cleanup completed");
 
     var result = ctx.GetResult();
@@ -355,8 +359,10 @@ public class ScenarioConfiguration
     public int Streams { get; }
     public int Channels { get; }
     public bool Verbose { get; }
+    public IReadOnlyList<GrpcChannel> ChannelList => channelList;
 
     private readonly HttpMessageHandler httpHandler;
+    private readonly List<GrpcChannel> channelList;
 
     private record TlsFile(string PfxFileName, string Password)
     {
@@ -414,6 +420,12 @@ public class ScenarioConfiguration
         Streams = streams;
         Channels = channels;
         Verbose = verbose;
+
+        channelList = new List<GrpcChannel>(channels);
+        for (var i = 0; i < Channels; i++)
+        {
+            channelList.Add(CreateChannel());
+        }
     }
 
     public GrpcChannel CreateChannel()
