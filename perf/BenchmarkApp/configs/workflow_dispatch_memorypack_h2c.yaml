@@ -10,23 +10,23 @@ benchmark-server-run-script-args: '--args "-u http://0.0.0.0:5000 --protocol {{ 
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   # h2c
-  - tags: legend:memorypack-h2c-linux,streams:1,protocol:h2c
-    protocol: h2c
-    channels: 28
-    streams: 1
-    serialization: memorypack
   - tags: legend:memorypack-h2c-linux,streams:1x1,protocol:h2c
     protocol: h2c
     channels: 1
     streams: 1
     serialization: memorypack
-  - tags: legend:memorypack-h2c-linux,streams:70,protocol:h2c
+  - tags: legend:memorypack-h2c-linux,streams:1,protocol:h2c
     protocol: h2c
     channels: 28
-    streams: 70
+    streams: 1
     serialization: memorypack
   - tags: legend:memorypack-h2c-linux,streams:70x1,protocol:h2c
     protocol: h2c
     channels: 1
+    streams: 70
+    serialization: memorypack
+  - tags: legend:memorypack-h2c-linux,streams:70,protocol:h2c
+    protocol: h2c
+    channels: 28
     streams: 70
     serialization: memorypack
