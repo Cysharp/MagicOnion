@@ -34,17 +34,6 @@ internal class StreamingHubPayloadPool
 #endif
     }
 
-    public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data, bool holdReference)
-    {
-        var payload = pool.Get();
-        payload.Initialize(data, holdReference);
-#if DEBUG
-        return new StreamingHubPayload(payload);
-#else
-        return (StreamingHubPayload)payload;
-#endif
-    }
-
     public void Return(StreamingHubPayload payload)
     {
 #if DEBUG
