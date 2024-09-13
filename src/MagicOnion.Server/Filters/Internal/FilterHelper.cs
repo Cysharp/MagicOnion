@@ -64,30 +64,30 @@ internal class FilterHelper
 
     public static Func<ServiceContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<MagicOnionServiceFilterDescriptor> filters, Func<ServiceContext, ValueTask> methodBody)
     {
-        Func<ServiceContext, ValueTask> prev = methodBody;
+        Func<ServiceContext, ValueTask> outer = methodBody;
 
         foreach (var filterDescriptor in filters.Reverse())
         {
             var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
-            var next = prev;
-            prev = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, next);
+            var inner = outer;
+            outer = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, inner);
         }
 
-        return prev;
+        return outer;
     }
 
     public static Func<StreamingHubContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<StreamingHubFilterDescriptor> filters, Func<StreamingHubContext, ValueTask> methodBody)
     {
-        Func<StreamingHubContext, ValueTask> prev = methodBody;
+        Func<StreamingHubContext, ValueTask> outer = methodBody;
 
         foreach (var filterDescriptor in filters.Reverse())
         {
             var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
-            var next = prev;
-            prev = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, next);
+            var inner = outer;
+            outer = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, inner);
         }
 
-        return prev;
+        return outer;
     }
 
     public static TFilter CreateOrGetInstance<TFilter>(IServiceProvider serviceProvider, MagicOnionFilterDescriptor<TFilter> descriptor)
