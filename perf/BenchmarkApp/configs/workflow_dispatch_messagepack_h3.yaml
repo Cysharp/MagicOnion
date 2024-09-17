@@ -10,22 +10,22 @@ benchmark-server-run-script-args: '--args "-u http://0.0.0.0:5000 --protocol {{ 
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   # h2c
-  - tags: legend:messagepack-h3-linux,streams:1x1,protocol:h3
+  - tags: legend:messagepack-h3-linux,streams:1x1,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 1
     streams: 1
     serialization: messagepack
-  - tags: legend:messagepack-h3-linux,streams:1,protocol:h3
+  - tags: legend:messagepack-h3-linux,streams:1,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 28
     streams: 1
     serialization: messagepack
-  - tags: legend:messagepack-h3-linux,streams:70x1,protocol:h3
+  - tags: legend:messagepack-h3-linux,streams:70x1,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 1
     streams: 70
     serialization: messagepack
-  # - tags: legend:messagepack-h3-linux,streams:70,protocol:h3
+  # - tags: legend:messagepack-h3-linux,streams:70,protocol:h3,serialization:messagepack
   #   protocol: h3
   #   channels: 28
   #   streams: 70
