@@ -22,7 +22,7 @@ public class HardwarePerformanceReporter
         this.samplingInterval = samplingInterval;
         this.timeProvider = SystemTimeProvider.TimeProvider;
         currentProcess = Process.GetCurrentProcess();
-        cpuCores = Environment.ProcessorCount;
+        cpuCores = ApplicationInformation.Current.ProcessorCount;
         cpuUsages = new ConcurrentBag<double>();
         memoryUsages = new ConcurrentBag<double>();
         cancellationTokenSource = new CancellationTokenSource();

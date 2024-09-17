@@ -229,7 +229,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var s in scenarios.Chunk(Environment.ProcessorCount))
+    foreach (var s in scenarios.Chunk(ApplicationInformation.Current.ProcessorCount))
     {
         await Task.WhenAll(s.Select(x => x.CompleteAsync()));
     }
@@ -272,7 +272,7 @@ void PrintStartupInformation(TextWriter? writer = null)
     writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {ApplicationInformation.Current.OSArchitecture}");
     writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {ApplicationInformation.Current.ProcessArchitecture}");
     writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
-    writer.WriteLine($"{nameof(Environment.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
+    writer.WriteLine($"{nameof(ApplicationInformation.Current.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
     writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
     writer.WriteLine();
 }
