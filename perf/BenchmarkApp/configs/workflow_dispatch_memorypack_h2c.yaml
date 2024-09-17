@@ -15,7 +15,7 @@ jobs:
     channels: 1
     streams: 1
     serialization: memorypack
-  - tags: legend:memorypack-h2c-linux,streams:1,protocol:h2c,serialization:memorypack
+  - tags: legend:memorypack-h2c-linux,streams:1x28,protocol:h2c,serialization:memorypack
     protocol: h2c
     channels: 28
     streams: 1
@@ -25,7 +25,7 @@ jobs:
     channels: 1
     streams: 70
     serialization: memorypack
-  - tags: legend:memorypack-h2c-linux,streams:70,protocol:h2c,serialization:memorypack
+  - tags: legend:memorypack-h2c-linux,streams:70x28,protocol:h2c,serialization:memorypack
     protocol: h2c
     channels: 28
     streams: 70

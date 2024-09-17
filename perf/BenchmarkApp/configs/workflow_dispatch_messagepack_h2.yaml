@@ -15,7 +15,7 @@ jobs:
     channels: 1
     streams: 1
     serialization: messagepack
-  - tags: legend:messagepack-h2-linux,streams:1,protocol:h2,serialization:messagepack
+  - tags: legend:messagepack-h2-linux,streams:1x28,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 28
     streams: 1
@@ -25,7 +25,7 @@ jobs:
     channels: 1
     streams: 70
     serialization: messagepack
-  # - tags: legend:messagepack-h2-linux,streams:70,protocol:h2,serialization:messagepack
+  # - tags: legend:messagepack-h2-linux,streams:70x28,protocol:h2,serialization:messagepack
   #   protocol: h2
   #   channels: 28
   #   streams: 70
