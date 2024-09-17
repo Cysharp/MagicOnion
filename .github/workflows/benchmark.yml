@@ -34,11 +34,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  # run benchmark
   benchmark:
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
-      environment: benchmark
       benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
       benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
     secrets: inherit
@@ -47,6 +45,4 @@ jobs:
     if: ${{ always() }}
     needs: [benchmark]
     uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
-    with:
-      environment: benchmark
     secrets: inherit
