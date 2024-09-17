@@ -231,9 +231,15 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog("Cleaning up...");
     foreach (var s in scenarios.Chunk(ApplicationInformation.Current.ProcessorCount))
     {
-        await Task.WhenAll(s.Select(x => x.CompleteAsync()));
+        try
+        {
+            await Task.WhenAll(s.Select(x => x.CompleteAsync()));
+        }
+        catch (NullReferenceException)
+        {
+            // ignore
+        }
     }
-
     WriteLog("Cleanup completed");
 
     var result = ctx.GetResult();
