@@ -47,8 +47,9 @@ namespace MagicOnion.Client
         }
     }
 
-    internal class StreamingHubClientHeartbeatManager : IDisposable
+    internal class StreamingHubClientHeartbeatManager : IAsyncDisposable
     {
+        readonly object gate = new();
         readonly CancellationTokenSource timeoutTokenSource;
         readonly CancellationTokenSource shutdownTokenSource;
         readonly TimeSpan heartbeatInterval;
@@ -62,12 +63,15 @@ namespace MagicOnion.Client
 #endif
 
         SendOrPostCallback? processServerHeartbeatCoreCache;
-        SendOrPostCallback? proecssClientHeartbeatResponseCoreCache;
+        SendOrPostCallback? processClientHeartbeatResponseCoreCache;
         Task? heartbeatLoopTask;
         short sequence;
         bool isTimeoutTimerRunning;
+        bool disposed;
 
         public CancellationToken TimeoutToken => timeoutTokenSource.Token;
+
+        bool IsDisposed => Volatile.Read(ref disposed);
 
         public StreamingHubClientHeartbeatManager(
             ChannelWriter<StreamingHubPayload> writer,
@@ -106,13 +110,23 @@ namespace MagicOnion.Client
 
         async Task RunClientHeartbeatLoopAsync()
         {
-            while (!shutdownTokenSource.IsCancellationRequested)
+            while (!IsDisposed)
             {
                 await Task.Delay(heartbeatInterval
 #if NET8_0_OR_GREATER
                     , timeProvider
 #endif
                     , shutdownTokenSource.Token).ConfigureAwait(false);
+
+                SendClientHeartbeat();
+            }
+        }
+
+        void SendClientHeartbeat()
+        {
+            lock (gate)
+            {
+                if (IsDisposed) return;
 
                 shutdownTokenSource.Token.ThrowIfCancellationRequested();
 
@@ -130,25 +144,26 @@ namespace MagicOnion.Client
             }
         }
 
+
         public void ProcessClientHeartbeatResponse(StreamingHubPayload payload)
         {
-            if (shutdownTokenSource.IsCancellationRequested) return;
+            if (IsDisposed) return;
 
-            proecssClientHeartbeatResponseCoreCache ??= ProcessClientHeartbeatResponseCore(onClientHeartbeatResponseReceived);
+            processClientHeartbeatResponseCoreCache ??= ProcessClientHeartbeatResponseCore(onClientHeartbeatResponseReceived);
 
             if (synchronizationContext is null)
             {
-                proecssClientHeartbeatResponseCoreCache(payload);
+                processClientHeartbeatResponseCoreCache(payload);
             }
             else
             {
-                synchronizationContext.Post(proecssClientHeartbeatResponseCoreCache, payload);
+                synchronizationContext.Post(processClientHeartbeatResponseCoreCache, payload);
             }
         }
 
         public void ProcessServerHeartbeat(StreamingHubPayload payload)
         {
-            if (shutdownTokenSource.IsCancellationRequested) return;
+            if (IsDisposed) return;
 
             processServerHeartbeatCoreCache ??= ProcessServerHeartbeatCore(onServerHeartbeatReceived);
 
@@ -164,43 +179,53 @@ namespace MagicOnion.Client
 
         SendOrPostCallback ProcessClientHeartbeatResponseCore(Action<ClientHeartbeatEvent>? clientHeartbeatReceivedAction) => (state) =>
         {
-            var payload = (StreamingHubPayload)state!;
-            var reader = new StreamingHubClientMessageReader(payload.Memory);
-            _ = reader.ReadMessageType();
-            var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
-
-            if (sentSequence == (sequence - 1)/* NOTE: Sequence already 1 advanced.*/)
+            lock (gate)
             {
-                // Cancel the running timeout cancellation timer.
-                timeoutTokenSource.CancelAfter(Timeout.InfiniteTimeSpan);
-                isTimeoutTimerRunning = false;
-            }
+                if (IsDisposed) return;
 
-            var now =
+                var payload = (StreamingHubPayload)state!;
+                var reader = new StreamingHubClientMessageReader(payload.Memory);
+                _ = reader.ReadMessageType();
+                var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
+
+                if (sentSequence == (sequence - 1)/* NOTE: Sequence already 1 advanced.*/)
+                {
+                    // Cancel the running timeout cancellation timer.
+                    timeoutTokenSource.CancelAfter(Timeout.InfiniteTimeSpan);
+                    isTimeoutTimerRunning = false;
+                }
+
+                var now =
 #if NON_UNITY
-                timeProvider.GetUtcNow();
+                    timeProvider.GetUtcNow();
 #else
-                DateTimeOffset.UtcNow;
+                    DateTimeOffset.UtcNow;
 #endif
-            var elapsed = now.ToUnixTimeMilliseconds() - clientSentAt;
+                var elapsed = now.ToUnixTimeMilliseconds() - clientSentAt;
 
-            clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
-            StreamingHubPayloadPool.Shared.Return(payload);
+                clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
         };
 
         SendOrPostCallback ProcessServerHeartbeatCore(Action<ServerHeartbeatEvent>? serverHeartbeatReceivedAction) => (state) =>
         {
-            var payload = (StreamingHubPayload)state!;
-            var reader = new StreamingHubClientMessageReader(payload.Memory);
-            _ = reader.ReadMessageType();
-            var (serverSentSequence, serverSentAt, metadata) = reader.ReadServerHeartbeat();
+            lock (gate)
+            {
+                if (IsDisposed) return;
 
-            serverHeartbeatReceivedAction?.Invoke(new ServerHeartbeatEvent(serverSentAt, metadata));
+                var payload = (StreamingHubPayload)state!;
+                var reader = new StreamingHubClientMessageReader(payload.Memory);
+                _ = reader.ReadMessageType();
+                var (serverSentSequence, serverSentAt, metadata) = reader.ReadServerHeartbeat();
 
-            // Writes a ServerHeartbeatResponse to the writer queue.
-            _ = writer.TryWrite(BuildServerHeartbeatMessage(serverSentSequence, serverSentAt));
+                serverHeartbeatReceivedAction?.Invoke(new ServerHeartbeatEvent(serverSentAt, metadata));
 
-            StreamingHubPayloadPool.Shared.Return(payload);
+                // Writes a ServerHeartbeatResponse to the writer queue.
+                _ = writer.TryWrite(BuildServerHeartbeatMessage(serverSentSequence, serverSentAt));
+
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
         };
 
         StreamingHubPayload BuildServerHeartbeatMessage(short serverSequence, long serverSentAt)
@@ -225,11 +250,32 @@ namespace MagicOnion.Client
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            Volatile.Write(ref disposed, true);
             shutdownTokenSource.Cancel();
-            shutdownTokenSource.Dispose();
-            timeoutTokenSource.Dispose();
+
+            if (heartbeatLoopTask != null)
+            {
+                try
+                {
+                    await heartbeatLoopTask.ConfigureAwait(false);
+                }
+                catch
+                {
+                }
+            }
+
+            DisposeCore();
+
+            void DisposeCore()
+            {
+                lock (gate)
+                {
+                    shutdownTokenSource.Dispose();
+                    timeoutTokenSource.Dispose();
+                }
+            }
         }
     }
 }

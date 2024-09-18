@@ -19,7 +19,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,
@@ -61,7 +61,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,
@@ -120,7 +120,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,
@@ -158,7 +158,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,
@@ -207,7 +207,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,
@@ -256,7 +256,7 @@ public class StreamingHubClientHeartbeatManagerTest
         var clientHeartbeatResponseReceived = new List<ClientHeartbeatEvent>();
         var origin = new DateTimeOffset(2024, 7, 1, 0, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(origin);
-        using var manager = new StreamingHubClientHeartbeatManager(
+        await using var manager = new StreamingHubClientHeartbeatManager(
             channel.Writer,
             interval,
             timeout,

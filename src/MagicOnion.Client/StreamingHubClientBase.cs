@@ -339,8 +339,6 @@ namespace MagicOnion.Client
             }
             finally
             {
-                heartbeatManager.Dispose();
-
                 try
                 {
 #if !UNITY_WEBGL
@@ -351,6 +349,7 @@ namespace MagicOnion.Client
                         SynchronizationContext.SetSynchronizationContext(syncContext);
                     }
 #endif
+                    await heartbeatManager.DisposeAsync().ConfigureAwait(false);
                     await DisposeAsyncCore(false).ConfigureAwait(false);
                 }
                 finally
