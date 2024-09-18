@@ -47,6 +47,11 @@ jobs:
     channels: 28
     streams: 1
     serialization: messagepack
+  - tags: legend:messagepack-h2-linux,streams:28x1,protocol:h2,serialization:messagepack
+    protocol: h2
+    channels: 1
+    streams: 28
+    serialization: messagepack
   - tags: legend:messagepack-h2-linux,streams:70x1,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 1
@@ -94,6 +99,11 @@ jobs:
     protocol: h2
     channels: 28
     streams: 1
+    serialization: memorypack
+  - tags: legend:memorypack-h2-linux,streams:28x1,protocol:h2,serialization:memorypack
+    protocol: h2
+    channels: 1
+    streams: 28
     serialization: memorypack
   - tags: legend:memorypack-h2-linux,streams:70x1,protocol:h2,serialization:memorypack
     protocol: h2
