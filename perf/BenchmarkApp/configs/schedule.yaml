@@ -11,14 +11,14 @@ benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   ##### MessagePack #####
   # h2c
-  - tags: legend:messagepack-h2c-linux,streams:1x28,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 28
-    streams: 1
-    serialization: messagepack
   - tags: legend:messagepack-h2c-linux,streams:1x1,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 1
+    streams: 1
+    serialization: messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x28,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 28
     streams: 1
     serialization: messagepack
   - tags: legend:messagepack-h2c-linux,streams:70x1,protocol:h2c,serialization:messagepack
@@ -32,14 +32,14 @@ jobs:
     streams: 70
     serialization: messagepack
   # h2
-  - tags: legend:messagepack-h2-linux,streams:1x28,protocol:h2,serialization:messagepack
-    protocol: h2
-    channels: 28
-    streams: 1
-    serialization: messagepack
   - tags: legend:messagepack-h2-linux,streams:1x1,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 1
+    streams: 1
+    serialization: messagepack
+  - tags: legend:messagepack-h2-linux,streams:1x28,protocol:h2,serialization:messagepack
+    protocol: h2
+    channels: 28
     streams: 1
     serialization: messagepack
   - tags: legend:messagepack-h2-linux,streams:70x1,protocol:h2,serialization:messagepack
@@ -54,14 +54,14 @@ jobs:
   #   serialization: messagepack
   ##### MemoryPack #####
   # h2c
-  - tags: legend:memorypack-h2c-linux,streams:1x28,protocol:h2c,serialization:memorypack
-    protocol: h2c
-    channels: 28
-    streams: 1
-    serialization: memorypack
   - tags: legend:memorypack-h2c-linux,streams:1x1,protocol:h2c,serialization:memorypack
     protocol: h2c
     channels: 1
+    streams: 1
+    serialization: memorypack
+  - tags: legend:memorypack-h2c-linux,streams:1x28,protocol:h2c,serialization:memorypack
+    protocol: h2c
+    channels: 28
     streams: 1
     serialization: memorypack
   - tags: legend:memorypack-h2c-linux,streams:70x1,protocol:h2c,serialization:memorypack
@@ -75,14 +75,14 @@ jobs:
     streams: 70
     serialization: memorypack
   # h2
-  - tags: legend:memorypack-h2-linux,streams:1x28,protocol:h2,serialization:memorypack
-    protocol: h2
-    channels: 28
-    streams: 1
-    serialization: memorypack
   - tags: legend:memorypack-h2-linux,streams:1x1,protocol:h2,serialization:memorypack
     protocol: h2
     channels: 1
+    streams: 1
+    serialization: memorypack
+  - tags: legend:memorypack-h2-linux,streams:1x28,protocol:h2,serialization:memorypack
+    protocol: h2
+    channels: 28
     streams: 1
     serialization: memorypack
   - tags: legend:memorypack-h2-linux,streams:70x1,protocol:h2,serialization:memorypack
