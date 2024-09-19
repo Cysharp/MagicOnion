@@ -172,7 +172,7 @@ namespace MagicOnion.Client
         // {messageId, TaskCompletionSource}
         readonly Dictionary<int, IStreamingHubResponseTaskSource> responseFutures = new();
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
-        readonly CancellationTokenSource cancellationTokenSource = new();
+        readonly CancellationTokenSource subscriptionCts = new();
         readonly Dictionary<int, SendOrPostCallback> postCallbackCache = new();
 
 
@@ -200,7 +200,7 @@ namespace MagicOnion.Client
         }
 
         // call immediately after create.
-        internal async Task __ConnectAndSubscribeAsync(CancellationToken cancellationToken)
+        internal async Task __ConnectAndSubscribeAsync(CancellationToken connectAndSubscribeCancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, options.CallOptions);
@@ -221,7 +221,7 @@ namespace MagicOnion.Client
                 var headers = await callResult.ResponseHeadersAsync.ConfigureAwait(false);
                 messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
-                cancellationToken.ThrowIfCancellationRequested();
+                connectAndSubscribeCancellationToken.ThrowIfCancellationRequested();
 
                 // Check message version of StreamingHub.
                 if (messageVersion != null && messageVersion.Value != StreamingHubVersionHeaderValue)
@@ -234,7 +234,28 @@ namespace MagicOnion.Client
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
             }
 
-            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token).Token);
+            // Set up the Heartbeat Manager
+            heartbeatManager = new StreamingHubClientHeartbeatManager(
+                writerQueue.Writer,
+                options.ClientHeartbeatInterval ?? TimeSpan.Zero /* Disable */,
+                options.ClientHeartbeatTimeout ?? Timeout.InfiniteTimeSpan,
+                options.OnServerHeartbeatReceived,
+                options.OnClientHeartbeatResponseReceived,
+                syncContext
+#if NON_UNITY
+                , options.TimeProvider ?? TimeProvider.System
+#endif
+            );
+
+            // Activate the Heartbeat Manager if enabled in the options.
+            var subscriptionToken = subscriptionCts.Token;
+            if (options.ClientHeartbeatInterval is { } heartbeatInterval && heartbeatInterval > TimeSpan.Zero)
+            {
+                heartbeatManager.StartClientHeartbeatLoop();
+                subscriptionToken = CancellationTokenSource.CreateLinkedTokenSource(heartbeatManager.TimeoutToken, subscriptionCts.Token).Token;
+            }
+
+            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(connectAndSubscribeCancellationToken, subscriptionToken).Token);
             if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
                 // NOTE: Grpc.Net:
@@ -250,7 +271,7 @@ namespace MagicOnion.Client
                 throw new RpcException(new Status(StatusCode.Internal, $"The request started successfully (StatusCode = OK), but the StreamingHub client has failed to negotiate with the server."));
             }
 
-            this.subscription = StartSubscribe(syncContext, firstMoveNextTask);
+            this.subscription = StartSubscribe(syncContext, firstMoveNextTask, subscriptionToken);
         }
 
         // Helper methods to make building clients easy.
@@ -268,31 +289,9 @@ namespace MagicOnion.Client
         static Method<StreamingHubPayload, StreamingHubPayload> CreateConnectMethod(string serviceName)
             => new (MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.StreamingHubMarshaller, MagicOnionMarshallers.StreamingHubMarshaller);
 
-        async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
+        async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext, CancellationToken subscriptionToken)
         {
-            var cancellationToken = cancellationTokenSource.Token;
-
-            heartbeatManager = new StreamingHubClientHeartbeatManager(
-                writerQueue.Writer,
-                options.ClientHeartbeatInterval ?? TimeSpan.Zero /* Disable */,
-                options.ClientHeartbeatTimeout ?? Timeout.InfiniteTimeSpan,
-                options.OnServerHeartbeatReceived,
-                options.OnClientHeartbeatResponseReceived,
-                syncContext,
-                cancellationTokenSource.Token
-#if NON_UNITY
-                , options.TimeProvider ?? TimeProvider.System
-#endif
-            );
-
-            // Activate the Heartbeat Manager if enabled in the options.
-            if (options.ClientHeartbeatInterval is {} heartbeatInterval && heartbeatInterval > TimeSpan.Zero)
-            {
-                heartbeatManager.StartClientHeartbeatLoop();
-                cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(heartbeatManager.TimeoutToken, cancellationTokenSource.Token).Token;
-            }
-
-            writerTask = RunWriterLoopAsync(cancellationToken);
+            writerTask = RunWriterLoopAsync(subscriptionToken);
 
             var reader = this.reader;
             try
@@ -318,7 +317,7 @@ namespace MagicOnion.Client
                         }
                     }
 
-                    moveNext = reader.MoveNext(cancellationToken);
+                    moveNext = reader.MoveNext(subscriptionToken);
                 }
             }
             catch (Exception ex)
@@ -658,8 +657,8 @@ namespace MagicOnion.Client
             catch { } // ignore error?
             finally
             {
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Dispose();
+                subscriptionCts.Cancel();
+                subscriptionCts.Dispose();
                 try
                 {
                     if (waitSubscription)
