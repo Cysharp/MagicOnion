@@ -41,8 +41,7 @@ namespace MagicOnion.Client.Internal
             TimeSpan timeoutPeriod,
             Action<ServerHeartbeatEvent>? onServerHeartbeatReceived,
             Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,
-            SynchronizationContext? synchronizationContext,
-            CancellationToken shutdownToken
+            SynchronizationContext? synchronizationContext
 #if NON_UNITY
             , TimeProvider timeProvider
 #endif
@@ -59,7 +58,7 @@ namespace MagicOnion.Client.Internal
             this.onServerHeartbeatReceived = onServerHeartbeatReceived;
             this.onClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
             this.synchronizationContext = synchronizationContext;
-            shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken, timeoutTokenSource.Token);
+            this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token);
 #if NON_UNITY
             this.timeProvider = timeProvider;
 #endif

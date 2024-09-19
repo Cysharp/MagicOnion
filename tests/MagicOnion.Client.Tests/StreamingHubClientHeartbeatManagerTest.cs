@@ -27,7 +27,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 
@@ -69,7 +68,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 
@@ -128,7 +126,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 
@@ -166,7 +163,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 
@@ -215,7 +211,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 
@@ -264,7 +259,6 @@ public class StreamingHubClientHeartbeatManagerTest
             onServerHeartbeatReceived: x => serverHeartbeatReceived.Add(x.Metadata.ToArray()),
             onClientHeartbeatResponseReceived: x => clientHeartbeatResponseReceived.Add(x),
             synchronizationContext: null,
-            shutdownToken: CancellationToken.None,
             timeProvider
         );
 

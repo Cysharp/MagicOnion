@@ -478,6 +478,33 @@ public class StreamingHubTest
     }
 
     [Fact]
+    public async Task ClientHeartbeat_FirstTime()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var timeProvider = new FakeTimeProvider();
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault()
+            .WithTimeProvider(timeProvider)
+            .WithClientHeartbeatTimeout(TimeSpan.FromSeconds(1))
+            .WithClientHeartbeatInterval(TimeSpan.FromSeconds(1));
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var waitForDisconnectTask = client.WaitForDisconnect();
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100); // Wait for processing queue.
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100); // Wait for processing queue.
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100); // Wait for processing queue.
+        await waitForDisconnectTask.WaitAsync(timeout.Token);
+
+        // Assert
+        Assert.True(waitForDisconnectTask.IsCompletedSuccessfully); // the client should be timed-out by heartbeat timer.
+    }
+
+    [Fact]
     public async Task ServerHeartbeat_Respond()
     {
         // Arrange
