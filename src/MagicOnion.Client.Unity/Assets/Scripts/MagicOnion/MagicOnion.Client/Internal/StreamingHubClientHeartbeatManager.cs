@@ -58,7 +58,7 @@ namespace MagicOnion.Client.Internal
             this.onServerHeartbeatReceived = onServerHeartbeatReceived;
             this.onClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
             this.synchronizationContext = synchronizationContext;
-            this.shutdownTokenSource = new CancellationTokenSource();
+            this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token);
 #if NON_UNITY
             this.timeProvider = timeProvider;
 #endif
