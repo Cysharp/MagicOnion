@@ -99,6 +99,16 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         responseChannel.Writer.TryWrite(BuildResponsePayload(messageId, methodId, response));
     }
 
+    public void ThrowIOException()
+    {
+        responseChannel.Writer.TryComplete(new IOException("Connection reset by peer. (Simulated)"));
+    }
+
+    public void ThrowRpcException()
+    {
+        responseChannel.Writer.TryComplete(new RpcException(new Status(StatusCode.Aborted, "Connection has been closed.", new IOException("Connection reset by peer. (Simulated)"))));
+    }
+
     static StreamingHubPayload BuildResponsePayload<T>(int messageId, int methodId, T response)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();

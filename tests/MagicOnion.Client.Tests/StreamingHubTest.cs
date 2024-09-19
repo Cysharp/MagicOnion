@@ -573,6 +573,70 @@ public class StreamingHubTest
         var request1 = await helper.ReadRequestRawAsync();
         Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, .. (byte[])[0xcd, 0x30, 0x39] /* ServerSentAt */, 0xc0 /* Nil */], request1.ToArray()); // Respond to the heartbeat from the server.
     }
+
+    [Fact]
+    public async Task WaitForDisconnectAsync_CompletedNormally()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Act
+        var waitForDisconnectTask = client.WaitForDisconnectAsync();
+        await client.DisposeAsync(); // Complete request and disconnect from the server.
+        var disconnectionReason = await waitForDisconnectTask.WaitAsync(timeout.Token);
+
+        // Assert
+        Assert.Equal(DisconnectionType.CompletedNormally, disconnectionReason.Type);
+        Assert.Null(disconnectionReason.Exception);
+    }
+
+    [Fact]
+    public async Task WaitForDisconnectAsync_TimedOut()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var timeProvider = new FakeTimeProvider();
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault()
+            .WithTimeProvider(timeProvider)
+            .WithClientHeartbeatTimeout(TimeSpan.FromSeconds(1))
+            .WithClientHeartbeatInterval(TimeSpan.FromSeconds(1));
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var waitForDisconnectTask = client.WaitForDisconnectAsync();
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100);
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100);
+        timeProvider.Advance(TimeSpan.FromSeconds(1));
+        await Task.Delay(100);
+        var disconnectionReason = await waitForDisconnectTask.WaitAsync(timeout.Token);
+
+        // Assert
+        Assert.Equal(DisconnectionType.TimedOut, disconnectionReason.Type);
+        Assert.IsType<OperationCanceledException>(disconnectionReason.Exception);
+    }
+
+    [Fact]
+    public async Task WaitForDisconnectAsync_Faulted()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Act
+        var waitForDisconnectTask = client.WaitForDisconnectAsync();
+        helper.ThrowIOException();
+        var disconnectionReason = await waitForDisconnectTask.WaitAsync(timeout.Token);
+
+        // Assert
+        Assert.Equal(DisconnectionType.Faulted, disconnectionReason.Type);
+        Assert.IsType<IOException>(disconnectionReason.Exception);
+    }
 }
 
 public interface IGreeterHubReceiver

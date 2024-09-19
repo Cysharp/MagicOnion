@@ -156,7 +156,7 @@ namespace MagicOnion.Client
 #endif
     }
 
-    public abstract class StreamingHubClientBase<TStreamingHub, TReceiver>
+    public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStreamingHubClient
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
 #pragma warning disable IDE1006 // Naming Styles
@@ -171,7 +171,7 @@ namespace MagicOnion.Client
         readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
         readonly Dictionary<int, IStreamingHubResponseTaskSource> responseFutures = new();
-        readonly TaskCompletionSource<bool> waitForDisconnect = new();
+        readonly TaskCompletionSource<DisconnectionReason> waitForDisconnect = new();
         readonly CancellationTokenSource subscriptionCts = new();
         readonly Dictionary<int, SendOrPostCallback> postCallbackCache = new();
 
@@ -291,6 +291,7 @@ namespace MagicOnion.Client
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext, CancellationToken subscriptionToken)
         {
+            var disconnectionReason = new DisconnectionReason(DisconnectionType.CompletedNormally, null);
             writerTask = RunWriterLoopAsync(subscriptionToken);
 
             var reader = this.reader;
@@ -322,8 +323,12 @@ namespace MagicOnion.Client
             }
             catch (Exception ex)
             {
-                if (ex is OperationCanceledException)
+                if (ex is OperationCanceledException oce)
                 {
+                    if (heartbeatManager.TimeoutToken.IsCancellationRequested)
+                    {
+                        disconnectionReason = new DisconnectionReason(DisconnectionType.TimedOut, ex);
+                    }
                     return;
                 }
                 const string msg = "An error occurred while subscribing to messages.";
@@ -336,6 +341,8 @@ namespace MagicOnion.Client
                 {
                     logger.Error(ex, msg);
                 }
+
+                disconnectionReason = new DisconnectionReason(DisconnectionType.Faulted, ex);
             }
             finally
             {
@@ -354,7 +361,7 @@ namespace MagicOnion.Client
                 }
                 finally
                 {
-                    waitForDisconnect.TrySetResult(true);
+                    waitForDisconnect.TrySetResult(disconnectionReason);
                 }
             }
         }
@@ -633,9 +640,10 @@ namespace MagicOnion.Client
         }
 
         public Task WaitForDisconnect()
-        {
-            return waitForDisconnect.Task;
-        }
+            => ((IStreamingHubClient)this).WaitForDisconnectAsync();
+
+        Task<DisconnectionReason> IStreamingHubClient.WaitForDisconnectAsync()
+            => waitForDisconnect.Task;
 
         public Task DisposeAsync()
         {

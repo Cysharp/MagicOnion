@@ -21,6 +21,15 @@ MagicOnion.Client.ClientHeartbeatEvent
 MagicOnion.Client.ClientHeartbeatEvent.ClientHeartbeatEvent() -> void
 MagicOnion.Client.ClientHeartbeatEvent.ClientHeartbeatEvent(long roundTripTimeMs) -> void
 MagicOnion.Client.ClientHeartbeatEvent.RoundTripTime.get -> System.TimeSpan
+MagicOnion.Client.DisconnectionReason
+MagicOnion.Client.DisconnectionReason.DisconnectionReason() -> void
+MagicOnion.Client.DisconnectionReason.DisconnectionReason(MagicOnion.Client.DisconnectionType type, System.Exception? exception) -> void
+MagicOnion.Client.DisconnectionReason.Exception.get -> System.Exception?
+MagicOnion.Client.DisconnectionReason.Type.get -> MagicOnion.Client.DisconnectionType
+MagicOnion.Client.DisconnectionType
+MagicOnion.Client.DisconnectionType.CompletedNormally = 0 -> MagicOnion.Client.DisconnectionType
+MagicOnion.Client.DisconnectionType.Faulted = 1 -> MagicOnion.Client.DisconnectionType
+MagicOnion.Client.DisconnectionType.TimedOut = 2 -> MagicOnion.Client.DisconnectionType
 MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider
 MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>? factory) -> bool
 MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider
@@ -55,6 +64,8 @@ MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TR
 MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse>.RawMethodInvoker(Grpc.Core.MethodType methodType, string! serviceName, string! name, MagicOnion.Serialization.IMagicOnionSerializer! messageSerializer) -> void
 MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>
 MagicOnion.Client.Internal.RawMethodInvoker<TRequest, TResponse>.RawMethodInvoker() -> void
+MagicOnion.Client.IStreamingHubClient
+MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync() -> System.Threading.Tasks.Task<MagicOnion.Client.DisconnectionReason>!
 MagicOnion.Client.IStreamingHubClientFactoryProvider
 MagicOnion.Client.IStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) -> bool
 MagicOnion.Client.MagicOnionClient
@@ -124,6 +135,7 @@ MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageF
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.Task<TResponse>!
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.ValueTask
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.ValueTask<TResponse>
+MagicOnion.Client.StreamingHubClientExtensions
 MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>
 MagicOnion.Client.StreamingHubClientFactoryProvider
 MagicOnion.Client.StreamingHubClientOptions
@@ -183,6 +195,7 @@ static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceive
 static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(Grpc.Core.ChannelBase! channel, TReceiver receiver, string? host = null, Grpc.Core.CallOptions option = default(Grpc.Core.CallOptions), MagicOnion.Serialization.IMagicOnionSerializerProvider? serializerProvider = null, MagicOnion.Client.IStreamingHubClientFactoryProvider? factoryProvider = null, MagicOnion.Client.IMagicOnionClientLogger? logger = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TStreamingHub>!
 static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(Grpc.Core.CallInvoker! callInvoker, TReceiver receiver, MagicOnion.Client.StreamingHubClientOptions! options, MagicOnion.Client.IStreamingHubClientFactoryProvider? factoryProvider = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TStreamingHub>!
 static MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(Grpc.Core.ChannelBase! channel, TReceiver receiver, MagicOnion.Client.StreamingHubClientOptions! options, MagicOnion.Client.IStreamingHubClientFactoryProvider? factoryProvider = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TStreamingHub>!
+static MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync<TStreamingHub>(this TStreamingHub hub) -> System.Threading.Tasks.Task<MagicOnion.Client.DisconnectionReason>!
 static MagicOnion.Client.StreamingHubClientOptions.CreateWithDefault(string? host = null, Grpc.Core.CallOptions callOptions = default(Grpc.Core.CallOptions), MagicOnion.Serialization.IMagicOnionSerializerProvider? serializerProvider = null, MagicOnion.Client.IMagicOnionClientLogger? logger = null) -> MagicOnion.Client.StreamingHubClientOptions!
 static MagicOnion.Client.StreamingHubClientFactoryProvider.Default.get -> MagicOnion.Client.IStreamingHubClientFactoryProvider!
 static MagicOnion.Client.StreamingHubClientFactoryProvider.Default.set -> void
