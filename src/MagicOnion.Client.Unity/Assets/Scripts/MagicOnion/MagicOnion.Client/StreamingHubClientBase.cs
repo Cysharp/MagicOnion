@@ -10,6 +10,7 @@ using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
+using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client
 {
