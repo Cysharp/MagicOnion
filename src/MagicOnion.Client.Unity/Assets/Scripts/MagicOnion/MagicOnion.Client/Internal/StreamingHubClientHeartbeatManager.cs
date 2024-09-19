@@ -7,46 +7,8 @@ using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
 using MessagePack;
 
-namespace MagicOnion.Client
+namespace MagicOnion.Client.Internal
 {
-    /// <summary>
-    /// Represents a client heartbeat received event.
-    /// </summary>
-    public readonly struct ClientHeartbeatEvent
-    {
-        /// <summary>
-        /// Gets the round trip time (RTT) between client and server.
-        /// </summary>
-        public TimeSpan RoundTripTime { get; }
-
-        public ClientHeartbeatEvent(long roundTripTimeMs)
-        {
-            RoundTripTime = TimeSpan.FromMilliseconds(roundTripTimeMs);
-        }
-    }
-
-    /// <summary>
-    /// Represents a server heartbeat received event.
-    /// </summary>
-    public readonly struct ServerHeartbeatEvent
-    {
-        /// <summary>
-        /// Gets the server time at when the heartbeat was sent.
-        /// </summary>
-        public DateTimeOffset ServerTime { get; }
-
-        /// <summary>
-        /// Gets the metadata data. The data is only available during event processing.
-        /// </summary>
-        public ReadOnlyMemory<byte> Metadata { get; }
-
-        public ServerHeartbeatEvent(long serverTimeUnixMs, ReadOnlyMemory<byte> metadata)
-        {
-            ServerTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeUnixMs);
-            Metadata = metadata;
-        }
-    }
-
     internal class StreamingHubClientHeartbeatManager : IAsyncDisposable
     {
         readonly object gate = new();
@@ -86,7 +48,7 @@ namespace MagicOnion.Client
 #endif
         )
         {
-            this.timeoutTokenSource = new(
+            timeoutTokenSource = new(
 #if NET8_0_OR_GREATER
                 Timeout.InfiniteTimeSpan, timeProvider
 #endif
@@ -97,7 +59,7 @@ namespace MagicOnion.Client
             this.onServerHeartbeatReceived = onServerHeartbeatReceived;
             this.onClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
             this.synchronizationContext = synchronizationContext;
-            this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken, timeoutTokenSource.Token);
+            shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(shutdownToken, timeoutTokenSource.Token);
 #if NON_UNITY
             this.timeProvider = timeProvider;
 #endif
@@ -188,7 +150,7 @@ namespace MagicOnion.Client
                 _ = reader.ReadMessageType();
                 var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
 
-                if (sentSequence == (sequence - 1)/* NOTE: Sequence already 1 advanced.*/)
+                if (sentSequence == sequence - 1/* NOTE: Sequence already 1 advanced.*/)
                 {
                     // Cancel the running timeout cancellation timer.
                     timeoutTokenSource.CancelAfter(Timeout.InfiniteTimeSpan);

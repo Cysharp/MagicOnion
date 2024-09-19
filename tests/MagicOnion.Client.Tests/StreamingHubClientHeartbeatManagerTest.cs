@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Diagnostics;
 using System.Threading.Channels;
+using MagicOnion.Client.Internal;
 using MagicOnion.Internal;
 using Microsoft.Extensions.Time.Testing;
 

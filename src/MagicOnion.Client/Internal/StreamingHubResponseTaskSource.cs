@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
-namespace MagicOnion.Client
+namespace MagicOnion.Client.Internal
 {
     internal class StreamingHubResponseTaskSourcePool<T> : ObjectPool<StreamingHubResponseTaskSource<T>>
     {
@@ -12,7 +12,7 @@ namespace MagicOnion.Client
 
         public StreamingHubResponseTaskSourcePool()
             : base(static () => new StreamingHubResponseTaskSource<T>())
-        {}
+        { }
 
         public StreamingHubResponseTaskSource<T> RentOrCreate()
         {
