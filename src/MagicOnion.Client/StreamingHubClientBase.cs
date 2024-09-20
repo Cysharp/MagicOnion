@@ -175,9 +175,16 @@ namespace MagicOnion.Client
         readonly CancellationTokenSource subscriptionCts = new();
         readonly Dictionary<int, SendOrPostCallback> postCallbackCache = new();
 
-
         int messageIdSequence = 0;
-        bool disposed;
+        State state = State.Uninitialized;
+
+        enum State
+        {
+            Uninitialized,
+            Connected,
+            Disconnected,
+            Disposed,
+        }
 
         readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = false });
         Task? writerTask;
@@ -291,6 +298,8 @@ namespace MagicOnion.Client
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext, CancellationToken subscriptionToken)
         {
+            state = State.Connected;
+
             var disconnectionReason = new DisconnectionReason(DisconnectionType.CompletedNormally, null);
             writerTask = RunWriterLoopAsync(subscriptionToken);
 
@@ -310,7 +319,7 @@ namespace MagicOnion.Client
                         // log post on main thread.
                         if (syncContext != null)
                         {
-                            syncContext.Post(state => logger.Error((Exception)state!, msg), ex);
+                            syncContext.Post(s => logger.Error((Exception)s!, msg), ex);
                         }
                         else
                         {
@@ -335,7 +344,7 @@ namespace MagicOnion.Client
                 // log post on main thread.
                 if (syncContext != null)
                 {
-                    syncContext.Post(state => logger.Error((Exception)state!, msg), ex);
+                    syncContext.Post(s => logger.Error((Exception)s!, msg), ex);
                 }
                 else
                 {
@@ -346,6 +355,8 @@ namespace MagicOnion.Client
             }
             finally
             {
+                state = State.Disconnected;
+
                 try
                 {
 #if !UNITY_WEBGL
@@ -414,9 +425,9 @@ namespace MagicOnion.Client
 
         SendOrPostCallback CreateBroadcastCallback(int methodId, int consumed)
         {
-            return (state) =>
+            return (s) =>
             {
-                var p = (StreamingHubPayload)state!;
+                var p = (StreamingHubPayload)s!;
                 this.OnBroadcastEvent(methodId, p.Memory.Slice(consumed));
                 StreamingHubPayloadPool.Shared.Return(p);
             };
@@ -547,7 +558,11 @@ namespace MagicOnion.Client
             }
 
             var v = BuildRequestMessage(methodId, mid, message);
-            _ = writerQueue.Writer.TryWrite(v);
+            if (!writerQueue.Writer.TryWrite(v))
+            {
+                // If the channel writer is closed, it is likely that the connection has already been disconnected.
+                ThrowIfDisconnected();
+            }
 
             return new ValueTask<TResponse>(taskSource, taskSource.Version); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }
@@ -566,7 +581,11 @@ namespace MagicOnion.Client
             }
 
             var v = BuildRequestMessage(methodId, mid, message);
-            _ = writerQueue.Writer.TryWrite(v);
+            if (!writerQueue.Writer.TryWrite(v))
+            {
+                // If the channel writer is closed, it is likely that the connection has already been disconnected.
+                ThrowIfDisconnected();
+            }
 
             return new ValueTask(taskSource, taskSource.Version); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }
@@ -636,7 +655,7 @@ namespace MagicOnion.Client
 
         void ThrowIfDisconnected()
         {
-            if (waitForDisconnect.Task.IsCompleted)
+            if (state == State.Disconnected)
             {
                 throw new RpcException(new Status(StatusCode.Unavailable, $"The StreamingHubClient has already been disconnected from the server."));
             }
@@ -644,7 +663,7 @@ namespace MagicOnion.Client
 
         void ThrowIfDisposed()
         {
-            if (disposed)
+            if (state == State.Disposed)
             {
                 throw new ObjectDisposedException("StreamingHubClient", $"The StreamingHub has already been disconnected from the server.");
             }
@@ -658,8 +677,8 @@ namespace MagicOnion.Client
 
         public async Task DisposeAsync()
         {
-            if (disposed) return;
-            disposed = true;
+            if (state == State.Disposed) return;
+            state = State.Disposed;
 
             await CleanupAsync(true).ConfigureAwait(false);
 
