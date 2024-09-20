@@ -659,6 +659,50 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         receiver.Received().Receiver_CustomMethodId();
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task WaitForDisconnectAsync_CompletedNormally(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.DisposeAsync();
+        var reason = await client.WaitForDisconnectAsync();
+
+        // Assert
+        reason.Type.Should().Be(DisconnectionType.CompletedNormally);
+        reason.Exception.Should().BeNull();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task WaitForDisconnectAsync_Faulted(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        try
+        {
+            await client.DisconnectFromServerAsync();
+        }
+        catch { }
+        var reason = await client.WaitForDisconnectAsync();
+
+        // Assert
+        reason.Type.Should().Be(DisconnectionType.Faulted);
+        reason.Exception.Should().NotBeNull();
+    }
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -870,6 +914,12 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         return Task.CompletedTask;
     }
+
+    public Task DisconnectFromServerAsync()
+    {
+        this.Context.CallContext.GetHttpContext().Abort();
+        return Task.CompletedTask;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -940,4 +990,6 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     [MethodId(12345)]
     Task CustomMethodId();
+
+    Task DisconnectFromServerAsync();
 }

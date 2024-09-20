@@ -324,7 +324,10 @@ namespace MagicOnion.Client
             }
             catch (Exception ex)
             {
-                if (ex is OperationCanceledException oce)
+                // When terminating by Heartbeat or DisposeAsync, a RpcException with a Status of Canceled is thrown.
+                // If `ex.InnerException` is OperationCanceledException` and `subscriptionToken.IsCancellationRequested` is true, it is treated as a normal cancellation.
+                if ((ex is OperationCanceledException oce) ||
+                    (ex is RpcException { InnerException: OperationCanceledException } && subscriptionToken.IsCancellationRequested))
                 {
                     if (heartbeatManager.TimeoutToken.IsCancellationRequested)
                     {
@@ -332,6 +335,7 @@ namespace MagicOnion.Client
                     }
                     return;
                 }
+
                 const string msg = "An error occurred while subscribing to messages.";
                 // log post on main thread.
                 if (syncContext != null)

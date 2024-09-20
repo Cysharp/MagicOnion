@@ -15,13 +15,24 @@ class ChannelAsyncStreamReader<T> : IAsyncStreamReader<T>
 
     public async Task<bool> MoveNext(CancellationToken cancellationToken)
     {
-        if (await reader.WaitToReadAsync(cancellationToken))
+        try
         {
-            if (reader.TryRead(out var item))
+            if (await reader.WaitToReadAsync(cancellationToken))
             {
-                Current = item;
-                return true;
+                if (reader.TryRead(out var item))
+                {
+                    Current = item;
+                    return true;
+                }
             }
+        }
+        catch (OperationCanceledException e)
+        {
+            throw new RpcException(new Status(StatusCode.Cancelled, e.Message, e));
+        }
+        catch (Exception e)
+        {
+            throw new RpcException(new Status(StatusCode.Unknown, e.Message, e));
         }
 
         return false;
