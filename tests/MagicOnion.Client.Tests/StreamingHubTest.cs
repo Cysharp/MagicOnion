@@ -673,7 +673,9 @@ public class StreamingHubTest
         var ex = await Record.ExceptionAsync(async () => await client.Parameter_Zero());
 
         // Assert
-        Assert.IsType<ObjectDisposedException>(ex);
+        var ode = Assert.IsType<ObjectDisposedException>(ex);
+        Assert.Equal(nameof(StreamingHubClient), ode.ObjectName);
+        Assert.Contains("StreamingHubClient has already been disconnected from the server.", ex.Message);
     }
 }
 
