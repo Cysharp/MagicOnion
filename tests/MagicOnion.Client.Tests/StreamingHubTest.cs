@@ -637,6 +637,44 @@ public class StreamingHubTest
         Assert.Equal(DisconnectionType.Faulted, disconnectionReason.Type);
         Assert.IsType<IOException>(disconnectionReason.Exception);
     }
+
+    [Fact]
+    public async Task ThrowRpcException_After_Disconnected()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+        // Set the client's connection status to “Disconnected”.
+        helper.ThrowRpcException();
+        var disconnectionReason = await client.WaitForDisconnectAsync().WaitAsync(timeout.Token);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () => await client.Parameter_Zero());
+
+        // Assert
+        Assert.IsType<RpcException>(ex);
+        Assert.Contains("StreamingHubClient has already been disconnected from the server.", ex.Message);
+    }
+
+    [Fact]
+    public async Task ThrowObjectDisposedException_After_Disposed()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+        // Set the client's connection status to “Disconnected”.
+        helper.ThrowRpcException();
+        var disconnectionReason = await client.WaitForDisconnectAsync().WaitAsync(timeout.Token);
+
+        // Act
+        await client.DisposeAsync();
+        var ex = await Record.ExceptionAsync(async () => await client.Parameter_Zero());
+
+        // Assert
+        Assert.IsType<ObjectDisposedException>(ex);
+    }
 }
 
 public interface IGreeterHubReceiver

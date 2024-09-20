@@ -357,7 +357,7 @@ namespace MagicOnion.Client
                     }
 #endif
                     await heartbeatManager.DisposeAsync().ConfigureAwait(false);
-                    await DisposeAsyncCore(false).ConfigureAwait(false);
+                    await CleanupAsync(false).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -516,6 +516,7 @@ namespace MagicOnion.Client
         protected ValueTask<TResponse> WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
+            ThrowIfDisconnected();
 
             var v = BuildRequestMessage(methodId, message);
             _ = writerQueue.Writer.TryWrite(v);
@@ -535,6 +536,7 @@ namespace MagicOnion.Client
         protected ValueTask<TResponse> WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
+            ThrowIfDisconnected();
 
             var mid = Interlocked.Increment(ref messageIdSequence);
 
@@ -553,6 +555,7 @@ namespace MagicOnion.Client
         protected ValueTask WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
+            ThrowIfDisconnected();
 
             var mid = Interlocked.Increment(ref messageIdSequence);
 
@@ -631,6 +634,14 @@ namespace MagicOnion.Client
             return Task.CompletedTask;
         }
 
+        void ThrowIfDisconnected()
+        {
+            if (waitForDisconnect.Task.IsCompleted)
+            {
+                throw new RpcException(new Status(StatusCode.Unavailable, $"The StreamingHubClient has already been disconnected from the server."));
+            }
+        }
+
         void ThrowIfDisposed()
         {
             if (disposed)
@@ -645,18 +656,19 @@ namespace MagicOnion.Client
         Task<DisconnectionReason> IStreamingHubClient.WaitForDisconnectAsync()
             => waitForDisconnect.Task;
 
-        public Task DisposeAsync()
-        {
-            return DisposeAsyncCore(true);
-        }
-
-        async Task DisposeAsyncCore(bool waitSubscription)
+        public async Task DisposeAsync()
         {
             if (disposed) return;
-            if (writer == null) return;
-
             disposed = true;
 
+            await CleanupAsync(true).ConfigureAwait(false);
+
+            subscriptionCts.Dispose();
+        }
+
+        async ValueTask CleanupAsync(bool waitSubscription)
+        {
+            if (writer == null) return;
             try
             {
                 writerQueue.Writer.Complete();
@@ -666,7 +678,6 @@ namespace MagicOnion.Client
             finally
             {
                 subscriptionCts.Cancel();
-                subscriptionCts.Dispose();
                 try
                 {
                     if (waitSubscription)
