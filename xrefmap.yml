@@ -45,6 +45,78 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.ClientHeartbeatEvent.RoundTripTime
   nameWithType: ClientHeartbeatEvent.RoundTripTime
+- uid: MagicOnion.Client.DisconnectionReason
+  name: DisconnectionReason
+  href: api/MagicOnion.Client.DisconnectionReason.html
+  commentId: T:MagicOnion.Client.DisconnectionReason
+  fullName: MagicOnion.Client.DisconnectionReason
+  nameWithType: DisconnectionReason
+- uid: MagicOnion.Client.DisconnectionReason.#ctor(MagicOnion.Client.DisconnectionType,System.Nullable{Exception})
+  name: DisconnectionReason(DisconnectionType, Nullable<Exception>)
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason__ctor_MagicOnion_Client_DisconnectionType_System_Nullable_Exception__
+  commentId: M:MagicOnion.Client.DisconnectionReason.#ctor(MagicOnion.Client.DisconnectionType,System.Nullable{Exception})
+  name.vb: DisconnectionReason(DisconnectionType, Nullable(Of Exception))
+  fullName: MagicOnion.Client.DisconnectionReason.DisconnectionReason(MagicOnion.Client.DisconnectionType, System.Nullable<Exception>)
+  fullName.vb: MagicOnion.Client.DisconnectionReason.DisconnectionReason(MagicOnion.Client.DisconnectionType, System.Nullable(Of Exception))
+  nameWithType: DisconnectionReason.DisconnectionReason(DisconnectionType, Nullable<Exception>)
+  nameWithType.vb: DisconnectionReason.DisconnectionReason(DisconnectionType, Nullable(Of Exception))
+- uid: MagicOnion.Client.DisconnectionReason.#ctor*
+  name: DisconnectionReason
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason__ctor_
+  commentId: Overload:MagicOnion.Client.DisconnectionReason.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Client.DisconnectionReason.DisconnectionReason
+  nameWithType: DisconnectionReason.DisconnectionReason
+- uid: MagicOnion.Client.DisconnectionReason.Exception
+  name: Exception
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason_Exception
+  commentId: P:MagicOnion.Client.DisconnectionReason.Exception
+  fullName: MagicOnion.Client.DisconnectionReason.Exception
+  nameWithType: DisconnectionReason.Exception
+- uid: MagicOnion.Client.DisconnectionReason.Exception*
+  name: Exception
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason_Exception_
+  commentId: Overload:MagicOnion.Client.DisconnectionReason.Exception
+  isSpec: "True"
+  fullName: MagicOnion.Client.DisconnectionReason.Exception
+  nameWithType: DisconnectionReason.Exception
+- uid: MagicOnion.Client.DisconnectionReason.Type
+  name: Type
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason_Type
+  commentId: P:MagicOnion.Client.DisconnectionReason.Type
+  fullName: MagicOnion.Client.DisconnectionReason.Type
+  nameWithType: DisconnectionReason.Type
+- uid: MagicOnion.Client.DisconnectionReason.Type*
+  name: Type
+  href: api/MagicOnion.Client.DisconnectionReason.html#MagicOnion_Client_DisconnectionReason_Type_
+  commentId: Overload:MagicOnion.Client.DisconnectionReason.Type
+  isSpec: "True"
+  fullName: MagicOnion.Client.DisconnectionReason.Type
+  nameWithType: DisconnectionReason.Type
+- uid: MagicOnion.Client.DisconnectionType
+  name: DisconnectionType
+  href: api/MagicOnion.Client.DisconnectionType.html
+  commentId: T:MagicOnion.Client.DisconnectionType
+  fullName: MagicOnion.Client.DisconnectionType
+  nameWithType: DisconnectionType
+- uid: MagicOnion.Client.DisconnectionType.CompletedNormally
+  name: CompletedNormally
+  href: api/MagicOnion.Client.DisconnectionType.html#MagicOnion_Client_DisconnectionType_CompletedNormally
+  commentId: F:MagicOnion.Client.DisconnectionType.CompletedNormally
+  fullName: MagicOnion.Client.DisconnectionType.CompletedNormally
+  nameWithType: DisconnectionType.CompletedNormally
+- uid: MagicOnion.Client.DisconnectionType.Faulted
+  name: Faulted
+  href: api/MagicOnion.Client.DisconnectionType.html#MagicOnion_Client_DisconnectionType_Faulted
+  commentId: F:MagicOnion.Client.DisconnectionType.Faulted
+  fullName: MagicOnion.Client.DisconnectionType.Faulted
+  nameWithType: DisconnectionType.Faulted
+- uid: MagicOnion.Client.DisconnectionType.TimedOut
+  name: TimedOut
+  href: api/MagicOnion.Client.DisconnectionType.html#MagicOnion_Client_DisconnectionType_TimedOut
+  commentId: F:MagicOnion.Client.DisconnectionType.TimedOut
+  fullName: MagicOnion.Client.DisconnectionType.TimedOut
+  nameWithType: DisconnectionType.TimedOut
 - uid: MagicOnion.Client.DynamicClient
   name: MagicOnion.Client.DynamicClient
   href: api/MagicOnion.Client.DynamicClient.html
@@ -808,6 +880,25 @@ references:
   fullName.vb: MagicOnion.Client.IResponseContext(Of T).ResponseAsync
   nameWithType: IResponseContext<T>.ResponseAsync
   nameWithType.vb: IResponseContext(Of T).ResponseAsync
+- uid: MagicOnion.Client.IStreamingHubClient
+  name: IStreamingHubClient
+  href: api/MagicOnion.Client.IStreamingHubClient.html
+  commentId: T:MagicOnion.Client.IStreamingHubClient
+  fullName: MagicOnion.Client.IStreamingHubClient
+  nameWithType: IStreamingHubClient
+- uid: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  name: WaitForDisconnectAsync()
+  href: api/MagicOnion.Client.IStreamingHubClient.html#MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync
+  commentId: M:MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  fullName: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync()
+  nameWithType: IStreamingHubClient.WaitForDisconnectAsync()
+- uid: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync*
+  name: WaitForDisconnectAsync
+  href: api/MagicOnion.Client.IStreamingHubClient.html#MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync_
+  commentId: Overload:MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  nameWithType: IStreamingHubClient.WaitForDisconnectAsync
 - uid: MagicOnion.Client.IStreamingHubClientFactoryProvider
   name: IStreamingHubClientFactoryProvider
   href: api/MagicOnion.Client.IStreamingHubClientFactoryProvider.html
@@ -4299,6 +4390,25 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).DisposeAsync
   nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.DisposeAsync
   nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).DisposeAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync
+  name: IStreamingHubClient.WaitForDisconnectAsync()
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync
+  name.vb: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync()
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync()
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync()
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.IStreamingHubClient.WaitForDisconnectAsync()
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync()
+- uid: MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync*
+  name: IStreamingHubClient.WaitForDisconnectAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync
+  isSpec: "True"
+  name.vb: MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.IStreamingHubClient.WaitForDisconnectAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync
 - uid: MagicOnion.Client.StreamingHubClientBase`2.OnBroadcastEvent(System.Int32,ReadOnlyMemory{System.Byte})
   name: OnBroadcastEvent(Int32, ReadOnlyMemory<Byte>)
   href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_OnBroadcastEvent_System_Int32_ReadOnlyMemory_System_Byte__
@@ -4574,6 +4684,28 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync(Of TRequest, TResponse)(System.Int32, TRequest)
   nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(Int32, TRequest)
   nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientExtensions
+  name: StreamingHubClientExtensions
+  href: api/MagicOnion.Client.StreamingHubClientExtensions.html
+  commentId: T:MagicOnion.Client.StreamingHubClientExtensions
+  fullName: MagicOnion.Client.StreamingHubClientExtensions
+  nameWithType: StreamingHubClientExtensions
+- uid: MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync*
+  name: WaitForDisconnectAsync
+  href: api/MagicOnion.Client.StreamingHubClientExtensions.html#MagicOnion_Client_StreamingHubClientExtensions_WaitForDisconnectAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync
+  nameWithType: StreamingHubClientExtensions.WaitForDisconnectAsync
+- uid: MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync``1(``0)
+  name: WaitForDisconnectAsync<TStreamingHub>(TStreamingHub)
+  href: api/MagicOnion.Client.StreamingHubClientExtensions.html#MagicOnion_Client_StreamingHubClientExtensions_WaitForDisconnectAsync__1___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync``1(``0)
+  name.vb: WaitForDisconnectAsync(Of TStreamingHub)(TStreamingHub)
+  fullName: MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync<TStreamingHub>(TStreamingHub)
+  fullName.vb: MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync(Of TStreamingHub)(TStreamingHub)
+  nameWithType: StreamingHubClientExtensions.WaitForDisconnectAsync<TStreamingHub>(TStreamingHub)
+  nameWithType.vb: StreamingHubClientExtensions.WaitForDisconnectAsync(Of TStreamingHub)(TStreamingHub)
 - uid: MagicOnion.Client.StreamingHubClientFactoryDelegate`2
   name: StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>
   href: api/MagicOnion.Client.StreamingHubClientFactoryDelegate-2.html

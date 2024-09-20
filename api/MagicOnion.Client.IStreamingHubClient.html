@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>IStreamingHubMarker Interface
+    <title>IStreamingHubClient Interface
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="IStreamingHubMarker Interface
+    <meta name="title" content="IStreamingHubClient Interface
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,18 +71,19 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.IStreamingHubMarker">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Client.IStreamingHubClient">
   
-  <h1 id="MagicOnion_IStreamingHubMarker" data-uid="MagicOnion.IStreamingHubMarker" class="text-break">IStreamingHubMarker Interface
+  <h1 id="MagicOnion_Client_IStreamingHubClient" data-uid="MagicOnion.Client.IStreamingHubClient" class="text-break">IStreamingHubClient Interface
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.html">MagicOnion</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.Abstractions.dll</h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Client.html">MagicOnion.Client</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Client.dll</h6>
   
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>An interface that indicates that the StreamingHub client is implemented.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public interface IStreamingHubMarker</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IStreamingHubClient</code></pre>
   </div>
 
   
@@ -93,13 +94,61 @@
   
   
   <h3 id="members">Members</h3>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.IStreamingHubClient.html#MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync">WaitForDisconnectAsync()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Wait for the disconnection and return the reason.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync_" data-uid="MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync*"></a>
+  <h4 id="MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync" data-uid="MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync">WaitForDisconnectAsync()</h4>
+  <div class="markdown level1 summary"><p>Wait for the disconnection and return the reason.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
   
-  
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="MagicOnion.Client.StreamingHubClientExtensions.html#MagicOnion_Client_StreamingHubClientExtensions_WaitForDisconnectAsync__1___0_">StreamingHubClientExtensions.WaitForDisconnectAsync&lt;TStreamingHub&gt;(TStreamingHub)</a>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task&lt;DisconnectionReason&gt; WaitForDisconnectAsync()</code></pre>
   </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.Client.DisconnectionReason.html">DisconnectionReason</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  
   
 </article>
           </div>

@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class StreamingHubClientBase&lt;TStreamingHub, TReceiver&gt; : object where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class StreamingHubClientBase&lt;TStreamingHub, TReceiver&gt; : object, IStreamingHubClient where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;</code></pre>
   </div>
 
   <div class="inheritance">
@@ -91,6 +91,10 @@
     <span class="xref">StreamingHubClientBase&lt;TStreamingHub, TReceiver&gt;</span>
   </div>
   
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="MagicOnion.Client.IStreamingHubClient.html">IStreamingHubClient</a></div>
+  </div>
   
   
   
@@ -276,6 +280,24 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync__2_System_Int32___0_">WriteMessageWithResponseValueTaskOfTAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Explicit Interface Implementations
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync">IStreamingHubClient.WaitForDisconnectAsync()</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -1196,7 +1218,43 @@
   
   
   </section>
+  <h3 id="eii">Explicit Interface Implementations
+  </h3>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_MagicOnion_Client_IStreamingHubClient_WaitForDisconnectAsync" data-uid="MagicOnion.Client.StreamingHubClientBase`2.MagicOnion#Client#IStreamingHubClient#WaitForDisconnectAsync">IStreamingHubClient.WaitForDisconnectAsync()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
   
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Task&lt;DisconnectionReason&gt; IStreamingHubClient.WaitForDisconnectAsync()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.Client.DisconnectionReason.html">DisconnectionReason</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="MagicOnion.Client.IStreamingHubClient.html">IStreamingHubClient</a>
+  </div>
   
   
 </article>
