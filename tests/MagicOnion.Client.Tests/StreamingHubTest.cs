@@ -617,7 +617,7 @@ public class StreamingHubTest
 
         // Assert
         Assert.Equal(DisconnectionType.TimedOut, disconnectionReason.Type);
-        Assert.IsType<OperationCanceledException>(disconnectionReason.Exception);
+        Assert.IsType<RpcException>(disconnectionReason.Exception);
     }
 
     [Fact]
@@ -635,7 +635,7 @@ public class StreamingHubTest
 
         // Assert
         Assert.Equal(DisconnectionType.Faulted, disconnectionReason.Type);
-        Assert.IsType<IOException>(disconnectionReason.Exception);
+        Assert.IsType<RpcException>(disconnectionReason.Exception);
     }
 
     [Fact]
