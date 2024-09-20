@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>7.0.0-preview.7</VersionPrefix>
+    <VersionPrefix>7.0.0-preview.8</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
