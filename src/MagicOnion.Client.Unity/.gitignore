@@ -1,3 +1,4 @@
 *.csproj
 *.unitypackage
 *.sln
+!Packages/

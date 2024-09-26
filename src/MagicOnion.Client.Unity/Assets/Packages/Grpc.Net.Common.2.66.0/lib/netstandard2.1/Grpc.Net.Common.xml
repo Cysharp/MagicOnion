@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Grpc.Net.Common</name>
+    </assembly>
+    <members>
+        <member name="T:Grpc.Core.AsyncStreamReaderExtensions">
+            <summary>
+            Extension methods for <see cref="T:Grpc.Core.IAsyncStreamReader`1"/>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncStreamReaderExtensions.ReadAllAsync``1(Grpc.Core.IAsyncStreamReader{``0},System.Threading.CancellationToken)">
+            <summary>
+            Creates an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> that enables reading all of the data from the stream reader.
+            </summary>
+            <typeparam name="T">The message type.</typeparam>
+            <param name="streamReader">The stream reader.</param>
+            <param name="cancellationToken">The cancellation token to use to cancel the enumeration.</param>
+            <returns>The created async enumerable.</returns>
+        </member>
+        <member name="T:Grpc.Net.Compression.GzipCompressionProvider">
+            <summary>
+            GZIP compression provider.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Compression.GzipCompressionProvider.#ctor(System.IO.Compression.CompressionLevel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Compression.GzipCompressionProvider"/> class with the specified <see cref="T:System.IO.Compression.CompressionLevel"/>.
+            </summary>
+            <param name="defaultCompressionLevel">The default compression level to use when compressing data.</param>
+        </member>
+        <member name="P:Grpc.Net.Compression.GzipCompressionProvider.EncodingName">
+            <summary>
+            The encoding name used in the 'grpc-encoding' and 'grpc-accept-encoding' request and response headers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Compression.GzipCompressionProvider.CreateCompressionStream(System.IO.Stream,System.Nullable{System.IO.Compression.CompressionLevel})">
+            <summary>
+            Create a new compression stream.
+            </summary>
+            <param name="stream">The stream that compressed data is written to.</param>
+            <param name="compressionLevel">The compression level.</param>
+            <returns>A stream used to compress data.</returns>
+        </member>
+        <member name="M:Grpc.Net.Compression.GzipCompressionProvider.CreateDecompressionStream(System.IO.Stream)">
+            <summary>
+            Create a new decompression stream.
+            </summary>
+            <param name="stream">The stream that compressed data is copied from.</param>
+            <returns>A stream used to decompress data.</returns>
+        </member>
+        <member name="T:Grpc.Net.Compression.ICompressionProvider">
+            <summary>
+            Provides a specific compression implementation to compress gRPC messages.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Compression.ICompressionProvider.EncodingName">
+            <summary>
+            The encoding name used in the 'grpc-encoding' and 'grpc-accept-encoding' request and response headers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Compression.ICompressionProvider.CreateCompressionStream(System.IO.Stream,System.Nullable{System.IO.Compression.CompressionLevel})">
+            <summary>
+            Create a new compression stream.
+            </summary>
+            <param name="stream">The stream that compressed data is written to.</param>
+            <param name="compressionLevel">The compression level.</param>
+            <returns>A stream used to compress data.</returns>
+        </member>
+        <member name="M:Grpc.Net.Compression.ICompressionProvider.CreateDecompressionStream(System.IO.Stream)">
+            <summary>
+            Create a new decompression stream.
+            </summary>
+            <param name="stream">The stream that compressed data is copied from.</param>
+            <returns>A stream used to decompress data.</returns>
+        </member>
+        <member name="M:Grpc.Shared.ArgumentNullThrowHelper.ThrowIfNull(System.Object,System.String)">
+            <summary>Throws an <see cref="T:System.ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
+            <param name="argument">The reference type argument to validate as non-null.</param>
+            <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with a field or property member.</summary>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>Initializes the attribute with the list of field and property members.</summary>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values when returning with the specified return value condition.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>Initializes the attribute with the specified return value condition and a field or property member.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>Initializes the attribute with the specified return value condition and list of field and property members.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+    </members>
+</doc>
