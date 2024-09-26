@@ -1,4 +1,3 @@
-#if !MAGICONION_USE_GRPC_CCORE
 using System;
 using System.Collections.Generic;
 using Grpc.Net.Client;
@@ -67,4 +66,3 @@ namespace MagicOnion.Client
         }
     }
 }
-#endif

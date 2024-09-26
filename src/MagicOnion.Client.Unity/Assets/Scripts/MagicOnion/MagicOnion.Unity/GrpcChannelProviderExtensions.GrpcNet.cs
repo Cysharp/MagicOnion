@@ -1,4 +1,3 @@
-#if !MAGICONION_USE_GRPC_CCORE
 using Grpc.Net.Client;
 
 namespace MagicOnion.Unity
@@ -12,4 +11,3 @@ namespace MagicOnion.Unity
             => provider.CreateChannel(new CreateGrpcChannelContext(provider, target, channelOptions));
     }
 }
-#endif

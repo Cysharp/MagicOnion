@@ -5,11 +5,7 @@ using System.Linq;
 #if MAGICONION_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
 #endif
-#if MAGICONION_USE_GRPC_CCORE
-using Channel = Grpc.Core.Channel;
-#else
 using Grpc.Net.Client;
-#endif
 using MagicOnion.Client;
 using UnityEditor;
 using UnityEngine;
@@ -73,16 +69,7 @@ namespace MagicOnion.Unity.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-#if MAGICONION_USE_GRPC_CCORE
-                        if (diagInfo.UnderlyingChannel is Channel grpcCCoreChannel)
-                        {
-                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={grpcCCoreChannel.State})", EditorStyles.boldLabel);
-                        }
-                        else
-#endif
-                        {
-                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target})", EditorStyles.boldLabel);
-                        }
+                        EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target})", EditorStyles.boldLabel);
                         if (GUILayout.Button("...", GUILayout.ExpandWidth(false)))
                         {
                             var menu = new GenericMenu();

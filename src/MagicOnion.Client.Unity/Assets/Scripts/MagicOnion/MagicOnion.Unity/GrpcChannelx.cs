@@ -7,11 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-#if MAGICONION_USE_GRPC_CCORE
-using Channel = Grpc.Core.Channel;
-#else
-using Grpc.Net.Client;
-#endif
 using MagicOnion.Client;
 using MagicOnion.Unity;
 using UnityEngine;
@@ -137,12 +132,6 @@ namespace MagicOnion
 #pragma warning restore CS1998
         {
             ThrowIfDisposed();
-#if MAGICONION_USE_GRPC_CCORE
-            if (channel is Channel grpcCChannel)
-            {
-                await grpcCChannel.ConnectAsync(deadline);
-            }
-#endif
         }
 
         /// <inheritdoc />
