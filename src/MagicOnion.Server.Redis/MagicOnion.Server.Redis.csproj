@@ -7,7 +7,6 @@
     <Nullable>enable</Nullable>
 
     <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
-    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server.Redis</PackageId>

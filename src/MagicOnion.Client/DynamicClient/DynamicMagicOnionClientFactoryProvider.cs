@@ -15,7 +15,6 @@ namespace MagicOnion.Client.DynamicClient
         }
     }
 
-#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
     /// <summary>
     /// Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
     /// </summary>
@@ -37,5 +36,4 @@ namespace MagicOnion.Client.DynamicClient
                 = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider)!;
         }
     }
-#endif
 }

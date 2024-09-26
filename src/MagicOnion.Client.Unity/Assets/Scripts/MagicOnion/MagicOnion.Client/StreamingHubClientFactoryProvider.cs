@@ -2,7 +2,7 @@ using Grpc.Core;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using MagicOnion.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Client
 {
@@ -15,10 +15,12 @@ namespace MagicOnion.Client
         /// Gets or set the StreamingHubClient factory provider to use by default.
         /// </summary>
         public static IStreamingHubClientFactoryProvider Default { get; set; }
-#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
-            =  DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance;
+#if NETSTANDARD2_0
+            = DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance;
 #else
-            =  DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance;
+            = RuntimeFeature.IsDynamicCodeSupported
+                ? DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
+                : DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance;
 #endif
     }
 

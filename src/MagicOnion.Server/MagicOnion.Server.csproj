@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
-    <DefineConstants>$(DefineConstants);NON_UNITY;USE_OBJECTPOOL_STREAMINGHUBPAYLOADPOOL</DefineConstants>
+    <DefineConstants>$(DefineConstants);USE_OBJECTPOOL_STREAMINGHUBPAYLOADPOOL</DefineConstants>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server</PackageId>
