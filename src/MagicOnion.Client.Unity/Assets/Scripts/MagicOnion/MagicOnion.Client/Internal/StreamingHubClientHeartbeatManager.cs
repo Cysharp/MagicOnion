@@ -20,9 +20,7 @@ namespace MagicOnion.Client.Internal
         readonly Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived;
         readonly SynchronizationContext? synchronizationContext;
         readonly ChannelWriter<StreamingHubPayload> writer;
-#if NON_UNITY
         readonly TimeProvider timeProvider;
-#endif
 
         SendOrPostCallback? processServerHeartbeatCoreCache;
         SendOrPostCallback? processClientHeartbeatResponseCoreCache;
@@ -41,10 +39,8 @@ namespace MagicOnion.Client.Internal
             TimeSpan timeoutPeriod,
             Action<ServerHeartbeatEvent>? onServerHeartbeatReceived,
             Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,
-            SynchronizationContext? synchronizationContext
-#if NON_UNITY
-            , TimeProvider timeProvider
-#endif
+            SynchronizationContext? synchronizationContext,
+            TimeProvider timeProvider
         )
         {
             timeoutTokenSource = new(
@@ -59,9 +55,7 @@ namespace MagicOnion.Client.Internal
             this.onClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
             this.synchronizationContext = synchronizationContext;
             this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token);
-#if NON_UNITY
             this.timeProvider = timeProvider;
-#endif
         }
 
         public void StartClientHeartbeatLoop()
@@ -156,12 +150,7 @@ namespace MagicOnion.Client.Internal
                     isTimeoutTimerRunning = false;
                 }
 
-                var now =
-#if NON_UNITY
-                    timeProvider.GetUtcNow();
-#else
-                    DateTimeOffset.UtcNow;
-#endif
+                var now = timeProvider.GetUtcNow();
                 var elapsed = now.ToUnixTimeMilliseconds() - clientSentAt;
 
                 clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
@@ -200,12 +189,7 @@ namespace MagicOnion.Client.Internal
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
 
-            var now =
-#if NON_UNITY
-                timeProvider.GetUtcNow();
-#else
-                DateTimeOffset.UtcNow;
-#endif
+            var now = timeProvider.GetUtcNow();
 
             StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, now);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
