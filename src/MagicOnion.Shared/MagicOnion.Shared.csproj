@@ -5,7 +5,6 @@
 
     <LangVersion>$(_LangVersionUnityBaseline)</LangVersion>
     <Nullable>enable</Nullable>
-    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
     <RootNamespace>MagicOnion</RootNamespace>
     <Description>Provides shared classes and interfaces used by MagicOnion server and client. $(MagicOnionPackageDescription)</Description>

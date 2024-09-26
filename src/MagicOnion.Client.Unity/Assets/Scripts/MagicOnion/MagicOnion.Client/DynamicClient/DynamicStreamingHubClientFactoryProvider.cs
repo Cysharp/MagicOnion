@@ -15,7 +15,6 @@ namespace MagicOnion.Client.DynamicClient
         }
     }
 
-#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
     public class DynamicStreamingHubClientFactoryProvider : IStreamingHubClientFactoryProvider
     {
         public static IStreamingHubClientFactoryProvider Instance { get; } = new DynamicStreamingHubClientFactoryProvider();
@@ -34,5 +33,4 @@ namespace MagicOnion.Client.DynamicClient
                 = (receiver, callInvoker, options) => (TStreamingHub)Activator.CreateInstance(DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType, receiver, callInvoker, options)!;
         }
     }
-#endif
 }

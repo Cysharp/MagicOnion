@@ -8,7 +8,6 @@
 
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
     <!--<nullable>enable</nullable>-->
 
     <!-- NuGet -->

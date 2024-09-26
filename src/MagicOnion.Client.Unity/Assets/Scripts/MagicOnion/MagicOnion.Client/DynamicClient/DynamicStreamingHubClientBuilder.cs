@@ -1,5 +1,3 @@
-#if NON_UNITY || ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
-
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Reflection;
@@ -783,5 +781,3 @@ namespace MagicOnion.Client.DynamicClient
         }
     }
 }
-
-#endif

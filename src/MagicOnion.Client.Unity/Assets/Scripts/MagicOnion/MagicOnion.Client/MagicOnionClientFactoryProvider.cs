@@ -2,6 +2,7 @@ using MagicOnion.Serialization;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Client
 {
@@ -14,10 +15,12 @@ namespace MagicOnion.Client
         /// Gets or set the MagicOnionClient factory provider to use by default.
         /// </summary>
         public static IMagicOnionClientFactoryProvider Default { get; set; }
-#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
+#if NETSTANDARD2_0
             = DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance;
 #else
-            =  DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance;
+            = RuntimeFeature.IsDynamicCodeSupported
+                ? DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
+                : DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance;
 #endif
     }
 

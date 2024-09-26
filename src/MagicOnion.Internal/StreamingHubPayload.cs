@@ -141,7 +141,7 @@ namespace MagicOnion.Internal
 #endif
         }
 
-#if NON_UNITY && !NETSTANDARD2_0 && !NETSTANDARD2_1
+#if !UNITY_2021_1_OR_NEWER && !NETSTANDARD2_0 && !NETSTANDARD2_1
         [MemberNotNull(nameof(memory))]
 #endif
         void ThrowIfUninitialized()

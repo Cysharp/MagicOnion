@@ -1,5 +1,3 @@
-#if NON_UNITY || ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
-
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -94,5 +92,3 @@ namespace System.Runtime.CompilerServices
         public string AssemblyName { get; }
     }
 }
-
-#endif
