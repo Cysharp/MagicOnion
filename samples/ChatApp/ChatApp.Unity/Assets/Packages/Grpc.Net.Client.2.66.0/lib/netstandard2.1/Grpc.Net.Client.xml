@@ -1,0 +1,778 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Grpc.Net.Client</name>
+    </assembly>
+    <members>
+        <member name="T:Grpc.Net.Client.Configuration.ConfigObject">
+            <summary>
+            Represents a configuration object. Implementations provide strongly typed wrappers over
+            collections of untyped values.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.ConfigObject.Inner">
+            <summary>
+            Gets the underlying configuration values.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.HedgingPolicy">
+            <summary>
+            The hedging policy for outgoing calls. Hedged calls may execute more than
+            once on the server, so only idempotent methods should specify a hedging
+            policy.
+            </summary>
+            <remarks>
+            <para>
+            Represents the <c>HedgingPolicy</c> message in <see href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.HedgingPolicy.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.HedgingPolicy"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.HedgingPolicy.MaxAttempts">
+             <summary>
+             Gets or sets the maximum number of call attempts. This value includes the original attempt.
+             The hedging policy will send up to this number of calls.
+            
+             This property is required and must be 2 or greater.
+             This value is limited by <see cref="P:Grpc.Net.Client.GrpcChannelOptions.MaxRetryAttempts"/>.
+             </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.HedgingPolicy.HedgingDelay">
+            <summary>
+            Gets or sets the hedging delay.
+            The first call will be sent immediately, but the subsequent
+            hedged call will be sent at intervals of the specified delay.
+            Set this to 0 or <c>null</c> to immediately send all hedged calls.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.HedgingPolicy.NonFatalStatusCodes">
+             <summary>
+             Gets a collection of status codes which indicate other hedged calls may still
+             succeed. If a non-fatal status code is returned by the server, hedged
+             calls will continue. Otherwise, outstanding requests will be canceled and
+             the error returned to the client application layer.
+            
+             Specifying status codes is optional.
+             </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.LoadBalancingConfig">
+            <summary>
+            Base type for load balancer policy configuration.
+            </summary>
+        </member>
+        <member name="F:Grpc.Net.Client.Configuration.LoadBalancingConfig.PickFirstPolicyName">
+            <summary>
+            <c>pick_first</c> policy name.
+            </summary>
+        </member>
+        <member name="F:Grpc.Net.Client.Configuration.LoadBalancingConfig.RoundRobinPolicyName">
+            <summary>
+            <c>round_robin</c> policy name.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.LoadBalancingConfig.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.LoadBalancingConfig"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.LoadBalancingConfig.PolicyName">
+            <summary>
+            Gets the load balancer policy name.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.MethodConfig">
+            <summary>
+            Configuration for a method.
+            The <see cref="P:Grpc.Net.Client.Configuration.MethodConfig.Names"/> collection is used to determine which methods this configuration applies to.
+            </summary>
+            <remarks>
+            <para>
+            Represents the <c>MethodConfig</c> message in <see href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.MethodConfig.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.MethodConfig"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.MethodConfig.RetryPolicy">
+            <summary>
+            Gets or sets the retry policy for outgoing calls.
+            A retry policy can't be combined with <see cref="P:Grpc.Net.Client.Configuration.MethodConfig.HedgingPolicy"/>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.MethodConfig.HedgingPolicy">
+            <summary>
+            Gets or sets the hedging policy for outgoing calls. Hedged calls may execute
+            more than once on the server, so only idempotent methods should specify a hedging
+            policy. A hedging policy can't be combined with <see cref="P:Grpc.Net.Client.Configuration.MethodConfig.RetryPolicy"/>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.MethodConfig.Names">
+            <summary>
+            Gets a collection of names which determine the calls the method config will apply to.
+            A <see cref="T:Grpc.Net.Client.Configuration.MethodConfig"/> without names won't be used. Each name must be unique
+            across an entire <see cref="T:Grpc.Net.Client.Configuration.ServiceConfig"/>.
+            </summary>
+            <remarks>
+            <para>
+            If a name's <see cref="P:Grpc.Net.Client.Configuration.MethodName.Method"/> property isn't set then the method config is the default
+            for all methods for the specified service.
+            </para>
+            <para>
+            If a name's <see cref="P:Grpc.Net.Client.Configuration.MethodName.Service"/> property isn't set then <see cref="P:Grpc.Net.Client.Configuration.MethodName.Method"/> must also be unset,
+            and the method config is the default for all methods on all services.
+            <see cref="F:Grpc.Net.Client.Configuration.MethodName.Default"/> represents this global default name.
+            </para>
+            <para>
+            When determining which method config to use for a given RPC, the most specific match wins. A method config
+            with a configured <see cref="T:Grpc.Net.Client.Configuration.MethodName"/> that exactly matches a call's method and service will be used
+            instead of a service or global default method config.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.MethodName">
+            <summary>
+            The name of a method. Used to configure what calls a <see cref="T:Grpc.Net.Client.Configuration.MethodConfig"/> applies to using
+            the <see cref="P:Grpc.Net.Client.Configuration.MethodConfig.Names"/> collection.
+            </summary>
+            <remarks>
+            <para>
+            Represents the <c>Name</c> message in <see href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto"/>.
+            </para>
+            <para>
+            If a name's <see cref="P:Grpc.Net.Client.Configuration.MethodName.Method"/> property isn't set then the method config is the default
+            for all methods for the specified service.
+            </para>
+            <para>
+            If a name's <see cref="P:Grpc.Net.Client.Configuration.MethodName.Service"/> property isn't set then <see cref="P:Grpc.Net.Client.Configuration.MethodName.Method"/> must also be unset,
+            and the method config is the default for all methods on all services.
+            <see cref="F:Grpc.Net.Client.Configuration.MethodName.Default"/> represents this global default name.
+            </para>
+            <para>
+            When determining which method config to use for a given RPC, the most specific match wins. A method config
+            with a configured <see cref="T:Grpc.Net.Client.Configuration.MethodName"/> that exactly matches a call's method and service will be used
+            instead of a service or global default method config.
+            </para>
+            </remarks>
+        </member>
+        <member name="F:Grpc.Net.Client.Configuration.MethodName.Default">
+            <summary>
+            A global default name.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.MethodName.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.MethodName"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.MethodName.Service">
+            <summary>
+            Gets or sets the service name.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.MethodName.Method">
+            <summary>
+            Gets or sets the method name.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.PickFirstConfig">
+            <summary>
+            Configuration for pick_first load balancer policy.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.PickFirstConfig.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.PickFirstConfig"/> class.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.RetryPolicy">
+            <summary>
+            The retry policy for outgoing calls.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.RetryPolicy.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.RetryPolicy"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryPolicy.MaxAttempts">
+            <summary>
+            Gets or sets the maximum number of call attempts. This value includes the original attempt.
+            This property is required and must be greater than 1.
+            This value is limited by <see cref="P:Grpc.Net.Client.GrpcChannelOptions.MaxRetryAttempts"/>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryPolicy.InitialBackoff">
+            <summary>
+            Gets or sets the initial backoff.
+            A randomized delay between 0 and the current backoff value will determine when the next
+            retry attempt is made.
+            This property is required and must be greater than zero.
+            <para>
+            The backoff will be multiplied by <see cref="P:Grpc.Net.Client.Configuration.RetryPolicy.BackoffMultiplier"/> after each retry
+            attempt and will increase exponentially when the multiplier is greater than 1.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryPolicy.MaxBackoff">
+            <summary>
+            Gets or sets the maximum backoff.
+            The maximum backoff places an upper limit on exponential backoff growth.
+            This property is required and must be greater than zero.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryPolicy.BackoffMultiplier">
+            <summary>
+            Gets or sets the backoff multiplier.
+            The backoff will be multiplied by <see cref="P:Grpc.Net.Client.Configuration.RetryPolicy.BackoffMultiplier"/> after each retry
+            attempt and will increase exponentially when the multiplier is greater than 1.
+            This property is required and must be greater than 0.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryPolicy.RetryableStatusCodes">
+            <summary>
+            Gets a collection of status codes which may be retried.
+            At least one status code is required.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.RetryThrottlingPolicy">
+            <summary>
+            The retry throttling policy for a server.
+            <para>
+            For more information about configuring throttling, see <see href="https://github.com/grpc/proposal/blob/master/A6-client-retries.md#throttling-retry-attempts-and-hedged-rpcs"/>.
+            </para>
+            </summary>
+            <remarks>
+            <para>
+            Represents the <c>RetryThrottlingPolicy</c> message in <see href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.RetryThrottlingPolicy.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.RetryThrottlingPolicy"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryThrottlingPolicy.MaxTokens">
+            <summary>
+            Gets or sets the maximum number of tokens.
+            The number of tokens starts at <see cref="P:Grpc.Net.Client.Configuration.RetryThrottlingPolicy.MaxTokens"/> and the token count will
+            always be between 0 and <see cref="P:Grpc.Net.Client.Configuration.RetryThrottlingPolicy.MaxTokens"/>.
+            This property is required and must be greater than zero.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.RetryThrottlingPolicy.TokenRatio">
+            <summary>
+            Gets or sets the amount of tokens to add on each successful call. Typically this will
+            be some number between 0 and 1, e.g., 0.1.
+            This property is required and must be greater than zero. Up to 3 decimal places are supported.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.RoundRobinConfig">
+            <summary>
+            Configuration for pick_first load balancer policy.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.RoundRobinConfig.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.RoundRobinConfig"/> class.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Configuration.ServiceConfig">
+            <summary>
+            A <see cref="T:Grpc.Net.Client.Configuration.ServiceConfig"/> represents information about a service.
+            </summary>
+            <remarks>
+            <para>
+            Represents the <c>ServiceConfig</c> message in <see href="https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Grpc.Net.Client.Configuration.ServiceConfig.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.Configuration.ServiceConfig"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.ServiceConfig.LoadBalancingConfigs">
+            <summary>
+            Gets a collection of <see cref="T:Grpc.Net.Client.Configuration.LoadBalancingConfig"/> instances. The client will iterate
+            through the configured policies in order and use the first policy that is supported.
+            If none are supported by the client then a configuration error is thrown.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.ServiceConfig.MethodConfigs">
+            <summary>
+            Gets a collection of <see cref="T:Grpc.Net.Client.Configuration.MethodConfig"/> instances. This collection is used to specify
+            configuration on a per-method basis. <see cref="P:Grpc.Net.Client.Configuration.MethodConfig.Names"/> determines which calls
+            a method config applies to.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Configuration.ServiceConfig.RetryThrottling">
+            <summary>
+            Gets or sets the retry throttling policy.
+            If a <see cref="T:Grpc.Net.Client.Configuration.RetryThrottlingPolicy"/> is provided, gRPC will automatically throttle
+            retry attempts and hedged RPCs when the client's ratio of failures to
+            successes exceeds a threshold.
+            <para>
+            For more information about configuring throttling, see <see href="https://github.com/grpc/proposal/blob/master/A6-client-retries.md#throttling-retry-attempts-and-hedged-rpcs"/>.
+            </para>
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.GrpcChannel">
+            <summary>
+            Represents a gRPC channel. Channels are an abstraction of long-lived connections to remote servers.
+            Client objects can reuse the same channel. Creating a channel is an expensive operation compared to invoking
+            a remote call so in general you should reuse a single channel for as many calls as possible.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.CreateCallInvoker">
+            <summary>
+            Create a new <see cref="T:Grpc.Core.CallInvoker"/> for the channel.
+            </summary>
+            <returns>A new <see cref="T:Grpc.Core.CallInvoker"/>.</returns>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.ForAddress(System.String)">
+            <summary>
+            Creates a <see cref="T:Grpc.Net.Client.GrpcChannel"/> for the specified address.
+            </summary>
+            <param name="address">The address the channel will use.</param>
+            <returns>A new instance of <see cref="T:Grpc.Net.Client.GrpcChannel"/>.</returns>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.ForAddress(System.String,Grpc.Net.Client.GrpcChannelOptions)">
+            <summary>
+            Creates a <see cref="T:Grpc.Net.Client.GrpcChannel"/> for the specified address and configuration options.
+            </summary>
+            <param name="address">The address the channel will use.</param>
+            <param name="channelOptions">The channel configuration options.</param>
+            <returns>A new instance of <see cref="T:Grpc.Net.Client.GrpcChannel"/>.</returns>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.ForAddress(System.Uri)">
+            <summary>
+            Creates a <see cref="T:Grpc.Net.Client.GrpcChannel"/> for the specified address.
+            </summary>
+            <param name="address">The address the channel will use.</param>
+            <returns>A new instance of <see cref="T:Grpc.Net.Client.GrpcChannel"/>.</returns>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.ForAddress(System.Uri,Grpc.Net.Client.GrpcChannelOptions)">
+            <summary>
+            Creates a <see cref="T:Grpc.Net.Client.GrpcChannel"/> for the specified address and configuration options.
+            </summary>
+            <param name="address">The address the channel will use.</param>
+            <param name="channelOptions">The channel configuration options.</param>
+            <returns>A new instance of <see cref="T:Grpc.Net.Client.GrpcChannel"/>.</returns>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannel.Dispose">
+            <summary>
+            Releases the resources used by the <see cref="T:Grpc.Net.Client.GrpcChannel"/> class.
+            Clients created with the channel can't be used after the channel is disposed.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.GrpcChannelOptions">
+            <summary>
+            An options class for configuring a <see cref="T:Grpc.Net.Client.GrpcChannel"/>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.Credentials">
+            <summary>
+            Gets or sets the credentials for the channel. This setting is used to set <see cref="T:Grpc.Core.ChannelCredentials"/> for
+            a channel. Connection transport layer security (TLS) is determined by the address used to create the channel.
+            </summary>
+            <remarks>
+            <para>
+            The channel credentials you use must match the address TLS setting. Use <see cref="P:Grpc.Core.ChannelCredentials.Insecure"/>
+            for an "http" address and <see cref="P:Grpc.Core.ChannelCredentials.SecureSsl"/> for "https".
+            </para>
+            <para>
+            The underlying <see cref="T:System.Net.Http.HttpClient"/> used by the channel automatically loads root certificates
+            from the operating system certificate store.
+            Client certificates should be configured on HttpClient. See <see href="https://aka.ms/aspnet/grpc/certauth"/> for details.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.MaxSendMessageSize">
+            <summary>
+            Gets or sets the maximum message size in bytes that can be sent from the client. Attempting to send a message
+            that exceeds the configured maximum message size results in an exception.
+            <para>
+            A <c>null</c> value removes the maximum message size limit. Defaults to <c>null</c>.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.MaxReceiveMessageSize">
+            <summary>
+            Gets or sets the maximum message size in bytes that can be received by the client. If the client receives a
+            message that exceeds this limit, it throws an exception.
+            <para>
+            A <c>null</c> value removes the maximum message size limit. Defaults to 4,194,304 (4 MB).
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.MaxRetryAttempts">
+            <summary>
+            Gets or sets the maximum retry attempts. This value limits any retry and hedging attempt values specified in
+            the service config.
+            <para>
+            Setting this value alone doesn't enable retries. Retries are enabled in the service config, which can be done
+            using <see cref="P:Grpc.Net.Client.GrpcChannelOptions.ServiceConfig"/>.
+            </para>
+            <para>
+            A <c>null</c> value removes the maximum retry attempts limit. Defaults to 5.
+            </para>
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.MaxRetryBufferSize">
+            <summary>
+            Gets or sets the maximum buffer size in bytes that can be used to store sent messages when retrying
+            or hedging calls. If the buffer limit is exceeded, then no more retry attempts are made and all
+            hedging calls but one will be canceled. This limit is applied across all calls made using the channel.
+            <para>
+            Setting this value alone doesn't enable retries. Retries are enabled in the service config, which can be done
+            using <see cref="P:Grpc.Net.Client.GrpcChannelOptions.ServiceConfig"/>.
+            </para>
+            <para>
+            A <c>null</c> value removes the maximum retry buffer size limit. Defaults to 16,777,216 (16 MB).
+            </para>
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.MaxRetryBufferPerCallSize">
+            <summary>
+            Gets or sets the maximum buffer size in bytes that can be used to store sent messages when retrying
+            or hedging calls. If the buffer limit is exceeded, then no more retry attempts are made and all
+            hedging calls but one will be canceled. This limit is applied to one call.
+            <para>
+            Setting this value alone doesn't enable retries. Retries are enabled in the service config, which can be done
+            using <see cref="P:Grpc.Net.Client.GrpcChannelOptions.ServiceConfig"/>.
+            </para>
+            <para>
+            A <c>null</c> value removes the maximum retry buffer size limit per call. Defaults to 1,048,576 (1 MB).
+            </para>
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.CompressionProviders">
+            <summary>
+            Gets or sets a collection of compression providers.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.LoggerFactory">
+            <summary>
+            Gets or sets the logger factory used by the channel. If no value is specified then the channel
+            attempts to resolve an <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory"/> from the <see cref="P:Grpc.Net.Client.GrpcChannelOptions.ServiceProvider"/>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.HttpClient">
+            <summary>
+            Gets or sets the <see cref="T:System.Net.Http.HttpClient"/> used by the channel to make HTTP calls.
+            </summary>
+            <remarks>
+            <para>
+            By default a <see cref="T:System.Net.Http.HttpClient"/> specified here will not be disposed with the channel.
+            To dispose the <see cref="T:System.Net.Http.HttpClient"/> with the channel you must set <see cref="P:Grpc.Net.Client.GrpcChannelOptions.DisposeHttpClient"/>
+            to <c>true</c>.
+            </para>
+            <para>
+            Only one HTTP caller can be specified for a channel. An error will be thrown if this is configured
+            together with <see cref="P:Grpc.Net.Client.GrpcChannelOptions.HttpHandler"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.HttpHandler">
+            <summary>
+            Gets or sets the <see cref="T:System.Net.Http.HttpMessageHandler"/> used by the channel to make HTTP calls.
+            </summary>
+            <remarks>
+            <para>
+            By default a <see cref="T:System.Net.Http.HttpMessageHandler"/> specified here will not be disposed with the channel.
+            To dispose the <see cref="T:System.Net.Http.HttpMessageHandler"/> with the channel you must set <see cref="P:Grpc.Net.Client.GrpcChannelOptions.DisposeHttpClient"/>
+            to <c>true</c>.
+            </para>
+            <para>
+            Only one HTTP caller can be specified for a channel. An error will be thrown if this is configured
+            together with <see cref="P:Grpc.Net.Client.GrpcChannelOptions.HttpClient"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.DisposeHttpClient">
+            <summary>
+            Gets or sets a value indicating whether the underlying <see cref="T:System.Net.Http.HttpClient"/> or 
+            <see cref="T:System.Net.Http.HttpMessageHandler"/> should be disposed when the <see cref="T:Grpc.Net.Client.GrpcChannel"/> instance is disposed.
+            The default value is <c>false</c>.
+            </summary>
+            <remarks>
+            This setting is used when a <see cref="P:Grpc.Net.Client.GrpcChannelOptions.HttpClient"/> or <see cref="P:Grpc.Net.Client.GrpcChannelOptions.HttpHandler"/> value is specified.
+            If they are not specified then the channel will create an internal HTTP caller that is always disposed
+            when the channel is disposed.
+            </remarks>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.ThrowOperationCanceledOnCancellation">
+            <summary>
+            Gets or sets a value indicating whether clients will throw <see cref="T:System.OperationCanceledException"/> for a call when its
+            <see cref="P:Grpc.Core.CallOptions.CancellationToken"/> is triggered or its <see cref="P:Grpc.Core.CallOptions.Deadline"/> is exceeded.
+            The default value is <c>false</c>.
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.UnsafeUseInsecureChannelCallCredentials">
+            <summary>
+            Gets or sets a value indicating whether a gRPC call's <see cref="T:Grpc.Core.CallCredentials"/> are used by an insecure channel.
+            The default value is <c>false</c>.
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+            <remarks>
+            <para>
+            The default value for this property is <c>false</c>, which causes an insecure channel to ignore a gRPC call's <see cref="T:Grpc.Core.CallCredentials"/>.
+            Sending authentication headers over an insecure connection has security implications and shouldn't be done in production environments.
+            </para>
+            <para>
+            If this property is set to <c>true</c>, call credentials are always used by a channel.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.ServiceConfig">
+            <summary>
+            Gets or sets the service config for a gRPC channel. A service config allows service owners to publish parameters
+            to be automatically used by all clients of their service. A service config can also be specified by a client
+            using this property.
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.ServiceProvider">
+            <summary>
+            Gets or sets the <see cref="T:System.IServiceProvider"/> the channel uses to resolve types.
+            <para>
+            Note: Experimental API that can change or be removed without any prior notice.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.GrpcChannelOptions.HttpVersion">
+            <summary>
+            Gets or sets the HTTP version to use when making gRPC calls.
+            <para>
+            When a <see cref="T:System.Version"/> is specified the value will be set on <see cref="P:System.Net.Http.HttpRequestMessage.Version"/>
+            as gRPC calls are made. Changing this property allows the HTTP version of gRPC calls to
+            be overridden.
+            </para>
+            <para>
+            A <c>null</c> value doesn't override the HTTP version of gRPC calls. Defaults to <c>2.0</c>.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.GrpcChannelOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Net.Client.GrpcChannelOptions"/> class.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Internal.ClientStreamWriterBase`1.IsWriteInProgressUnsynchronized">
+            <summary>
+            A value indicating whether there is an async write already in progress.
+            Should only check this property when holding the write lock.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcCall`2.Cleanup(Grpc.Core.Status)">
+            <summary>
+            Clean up can be called by:
+            1. The user. AsyncUnaryCall.Dispose et al will call this on Dispose
+            2. <see cref="M:Grpc.Net.Client.Internal.GrpcCall.ValidateHeaders(System.Net.Http.HttpResponseMessage,Grpc.Core.Metadata@)"/> will call dispose if errors fail validation
+            3. <see cref="M:Grpc.Net.Client.Internal.GrpcCall`2.FinishResponseAndCleanUp(Grpc.Core.Status)"/> will call dispose
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcCall`2.ResponseStreamEnded(Grpc.Core.Status,System.Boolean)">
+            <summary>
+            Used by response stream reader to report it is finished.
+            </summary>
+            <param name="status">The completed response status code.</param>
+            <param name="finishedGracefully">true when the end of the response stream was read, otherwise false.</param>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcCall`2.ResolveException(System.String,System.Exception,System.Nullable{Grpc.Core.Status}@,System.Exception@)">
+            <summary>
+            Resolve the specified exception to an end-user exception that will be thrown from the client.
+            The resolved exception is normally a RpcException. Returns true when the resolved exception is changed.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcCallSerializationContext.GetWrittenPayload">
+            <summary>
+            Obtains the payload from this operation. Error is thrown if complete hasn't been called.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Internal.GrpcMethodInfo">
+            <summary>
+            Cached log scope and URI for a gRPC <see cref="T:Grpc.Core.IMethod"/>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcProtocolConstants.GetDebugEnumerator(Grpc.Core.ChannelBase,Grpc.Core.IMethod,System.Object)">
+            <summary>
+            Gets key value pairs used by debugging. These are provided as an enumerator instead of a dictionary
+            because it's one method to implement an enumerator on gRPC calls compared to a dozen members for a dictionary.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.GrpcProtocolHelpers.ResolveRpcExceptionStatusCode(System.Exception)">
+            <summary>
+            Resolve the exception from HttpClient to a gRPC status code.
+            <param name="ex">The <see cref="T:System.Exception"/> to resolve a <see cref="T:Grpc.Core.StatusCode"/> from.</param>
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Internal.Http.WinHttpUnaryContent`2">
+            <summary>
+            WinHttp doesn't support streaming request data so a length needs to be specified.
+            This HttpContent pre-serializes the payload so it has a length available.
+            The payload is then written directly to the request using specialized context
+            and serializer method.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Internal.HttpClientCallInvoker">
+            <summary>
+            A client-side RPC invocation using HttpClient.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.HttpClientCallInvoker.AsyncClientStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions)">
+            <summary>
+            Invokes a client streaming call asynchronously.
+            In client streaming scenario, client sends a stream of requests and server responds with a single response.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.HttpClientCallInvoker.AsyncDuplexStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions)">
+            <summary>
+            Invokes a duplex streaming call asynchronously.
+            In duplex streaming scenario, client sends a stream of requests and server responds with a stream of responses.
+            The response stream is completely independent and both side can be sending messages at the same time.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.HttpClientCallInvoker.AsyncServerStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a server streaming call asynchronously.
+            In server streaming scenario, client sends on request and server responds with a stream of responses.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.HttpClientCallInvoker.AsyncUnaryCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a simple remote call asynchronously.
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.HttpClientCallInvoker.BlockingUnaryCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a simple remote call in a blocking fashion.
+            </summary>
+        </member>
+        <member name="P:Grpc.Net.Client.Internal.HttpContentClientStreamReader`2.IsMoveNextInProgressUnsynchronized">
+            <summary>
+            A value indicating whether there is an async move next already in progress.
+            Should only check this property when holding the move next lock.
+            </summary>
+        </member>
+        <member name="T:Grpc.Net.Client.Internal.Native">
+            <summary>
+            Types for calling RtlGetVersion. See https://www.pinvoke.net/default.aspx/ntdll/RtlGetVersion.html
+            </summary>
+        </member>
+        <member name="F:Grpc.Net.Client.Internal.Native.NTSTATUS.STATUS_SUCCESS">
+            <summary>
+            The operation completed successfully. 
+            </summary>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.TaskExtensions.ObserveException(System.Threading.Tasks.Task)">
+            <summary>
+            Observes and ignores a potential exception on a given Task.
+            If a Task fails and throws an exception which is never observed, it will be caught by the .NET finalizer thread.
+            This function awaits the given task and if the exception is thrown, it observes this exception and simply ignores it.
+            This will prevent the escalation of this exception to the .NET finalizer thread.
+            </summary>
+            <param name="task">The task to be ignored.</param>
+        </member>
+        <member name="M:Grpc.Net.Client.Internal.UserAgentGenerator.GetUserAgentString">
+            <summary>
+            Generates a user agent string to be transported in headers.
+            <example>
+              grpc-dotnet/2.41.0-dev (.NET 6.0.0-preview.7.21377.19; CLR 6.0.0; net6.0; osx; x64)
+              grpc-dotnet/2.41.0-dev (Mono 6.12.0.140; CLR 4.0.30319; netstandard2.0; osx; x64)
+              grpc-dotnet/2.41.0-dev (.NET 6.0.0-rc.1.21380.1; CLR 6.0.0; net6.0; linux; arm64)
+              grpc-dotnet/2.41.0-dev (.NET 5.0.8; CLR 5.0.8; net5.0; linux; arm64)
+              grpc-dotnet/2.41.0-dev (.NET Core; CLR 3.1.4; netstandard2.1; linux; arm64)
+              grpc-dotnet/2.41.0-dev (.NET Framework; CLR 4.0.30319.42000; netstandard2.0; windows; x86)
+              grpc-dotnet/2.41.0-dev (.NET 6.0.0-rc.1.21380.1; CLR 6.0.0; net6.0; windows; x64)
+            </example>
+            </summary>
+        </member>
+        <member name="M:Grpc.Shared.ObjectDisposedThrowHelper.ThrowIf(System.Boolean,System.Object)">
+            <summary>Throws an <see cref="T:System.ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="instance">The object whose type's full name should be included in any resulting <see cref="T:System.ObjectDisposedException"/>.</param>
+            <exception cref="T:System.ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
+        </member>
+        <member name="M:Grpc.Shared.ObjectDisposedThrowHelper.ThrowIf(System.Boolean,System.Type)">
+            <summary>Throws an <see cref="T:System.ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="type">The type whose full name should be included in any resulting <see cref="T:System.ObjectDisposedException"/>.</param>
+            <exception cref="T:System.ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
+        </member>
+        <member name="M:Grpc.Shared.ArgumentNullThrowHelper.ThrowIfNull(System.Object,System.String)">
+            <summary>Throws an <see cref="T:System.ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
+            <param name="argument">The reference type argument to validate as non-null.</param>
+            <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with a field or property member.</summary>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>Initializes the attribute with the list of field and property members.</summary>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values when returning with the specified return value condition.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>Initializes the attribute with the specified return value condition and a field or property member.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>Initializes the attribute with the specified return value condition and list of field and property members.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+    </members>
+</doc>

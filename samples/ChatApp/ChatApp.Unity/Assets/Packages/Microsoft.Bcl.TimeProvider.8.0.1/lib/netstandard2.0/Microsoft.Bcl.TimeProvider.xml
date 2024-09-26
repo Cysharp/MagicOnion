@@ -1,0 +1,415 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Bcl.TimeProvider</name>
+    </assembly>
+    <members>
+        <member name="T:System.TimeProvider">
+            <summary>Provides an abstraction for time.</summary>
+        </member>
+        <member name="P:System.TimeProvider.System">
+            <summary>
+            Gets a <see cref="T:System.TimeProvider"/> that provides a clock based on <see cref="P:System.DateTimeOffset.UtcNow"/>,
+            a time zone based on <see cref="P:System.TimeZoneInfo.Local"/>, a high-performance time stamp based on <see cref="T:System.Diagnostics.Stopwatch"/>,
+            and a timer based on <see cref="T:System.Threading.Timer"/>.
+            </summary>
+            <remarks>
+            If the <see cref="P:System.TimeZoneInfo.Local"/> changes after the object is returned, the change will be reflected in any subsequent operations that retrieve <see cref="M:System.TimeProvider.GetLocalNow"/>.
+            </remarks>
+        </member>
+        <member name="M:System.TimeProvider.#ctor">
+            <summary>
+            Initializes the <see cref="T:System.TimeProvider"/>.
+            </summary>
+        </member>
+        <member name="M:System.TimeProvider.GetUtcNow">
+            <summary>
+            Gets a <see cref="T:System.DateTimeOffset"/> value whose date and time are set to the current
+            Coordinated Universal Time (UTC) date and time and whose offset is Zero,
+            all according to this <see cref="T:System.TimeProvider"/>'s notion of time.
+            </summary>
+            <remarks>
+            The default implementation returns <see cref="P:System.DateTimeOffset.UtcNow"/>.
+            </remarks>
+        </member>
+        <member name="M:System.TimeProvider.GetLocalNow">
+            <summary>
+            Gets a <see cref="T:System.DateTimeOffset"/> value that is set to the current date and time according to this <see cref="T:System.TimeProvider"/>'s
+            notion of time based on <see cref="M:System.TimeProvider.GetUtcNow"/>, with the offset set to the <see cref="P:System.TimeProvider.LocalTimeZone"/>'s offset from Coordinated Universal Time (UTC).
+            </summary>
+        </member>
+        <member name="P:System.TimeProvider.LocalTimeZone">
+            <summary>
+            Gets a <see cref="T:System.TimeZoneInfo"/> object that represents the local time zone according to this <see cref="T:System.TimeProvider"/>'s notion of time.
+            </summary>
+            <remarks>
+            The default implementation returns <see cref="P:System.TimeZoneInfo.Local"/>.
+            </remarks>
+        </member>
+        <member name="P:System.TimeProvider.TimestampFrequency">
+            <summary>
+            Gets the frequency of <see cref="M:System.TimeProvider.GetTimestamp"/> of high-frequency value per second.
+            </summary>
+            <remarks>
+            The default implementation returns <see cref="F:System.Diagnostics.Stopwatch.Frequency"/>. For a given TimeProvider instance, the value must be idempotent and remain unchanged.
+            </remarks>
+        </member>
+        <member name="M:System.TimeProvider.GetTimestamp">
+            <summary>
+            Gets the current high-frequency value designed to measure small time intervals with high accuracy in the timer mechanism.
+            </summary>
+            <returns>A long integer representing the high-frequency counter value of the underlying timer mechanism. </returns>
+            <remarks>
+            The default implementation returns <see cref="M:System.Diagnostics.Stopwatch.GetTimestamp"/>.
+            </remarks>
+        </member>
+        <member name="M:System.TimeProvider.GetElapsedTime(System.Int64,System.Int64)">
+            <summary>
+            Gets the elapsed time between two timestamps retrieved using <see cref="M:System.TimeProvider.GetTimestamp"/>.
+            </summary>
+            <param name="startingTimestamp">The timestamp marking the beginning of the time period.</param>
+            <param name="endingTimestamp">The timestamp marking the end of the time period.</param>
+            <returns>A <see cref="T:System.TimeSpan"/> for the elapsed time between the starting and ending timestamps.</returns>
+        </member>
+        <member name="M:System.TimeProvider.GetElapsedTime(System.Int64)">
+            <summary>
+            Gets the elapsed time since the <paramref name="startingTimestamp"/> value retrieved using <see cref="M:System.TimeProvider.GetTimestamp"/>.
+            </summary>
+            <param name="startingTimestamp">The timestamp marking the beginning of the time period.</param>
+            <returns>A <see cref="T:System.TimeSpan"/> for the elapsed time between the starting timestamp and the time of this call./></returns>
+        </member>
+        <member name="M:System.TimeProvider.CreateTimer(System.Threading.TimerCallback,System.Object,System.TimeSpan,System.TimeSpan)">
+            <summary>Creates a new <see cref="T:System.Threading.ITimer"/> instance, using <see cref="T:System.TimeSpan"/> values to measure time intervals.</summary>
+            <param name="callback">
+            A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,
+            as it may be invoked simultaneously on two threads if the timer fires again before or while a previous callback is still being handled.
+            </param>
+            <param name="state">An object to be passed to the <paramref name="callback"/>. This may be null.</param>
+            <param name="dueTime">The amount of time to delay before <paramref name="callback"/> is invoked. Specify <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to prevent the timer from starting. Specify <see cref="F:System.TimeSpan.Zero"/> to start the timer immediately.</param>
+            <param name="period">The time interval between invocations of <paramref name="callback"/>. Specify <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to disable periodic signaling.</param>
+            <returns>
+            The newly created <see cref="T:System.Threading.ITimer"/> instance.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="callback"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">The number of milliseconds in the value of <paramref name="dueTime"/> or <paramref name="period"/> is negative and not equal to <see cref="F:System.Threading.Timeout.Infinite"/>, or is greater than <see cref="F:System.Int32.MaxValue"/>.</exception>
+            <remarks>
+            <para>
+            The delegate specified by the callback parameter is invoked once after <paramref name="dueTime"/> elapses, and thereafter each time the <paramref name="period"/> time interval elapses.
+            </para>
+            <para>
+            If <paramref name="dueTime"/> is zero, the callback is invoked immediately. If <paramref name="dueTime"/> is -1 milliseconds, <paramref name="callback"/> is not invoked; the timer is disabled,
+            but can be re-enabled by calling the <see cref="M:System.Threading.ITimer.Change(System.TimeSpan,System.TimeSpan)"/> method.
+            </para>
+            <para>
+            If <paramref name="period"/> is 0 or -1 milliseconds and <paramref name="dueTime"/> is positive, <paramref name="callback"/> is invoked once; the periodic behavior of the timer is disabled,
+            but can be re-enabled using the <see cref="M:System.Threading.ITimer.Change(System.TimeSpan,System.TimeSpan)"/> method.
+            </para>
+            <para>
+            The return <see cref="T:System.Threading.ITimer"/> instance will be implicitly rooted while the timer is still scheduled.
+            </para>
+            <para>
+            <see cref="M:System.TimeProvider.CreateTimer(System.Threading.TimerCallback,System.Object,System.TimeSpan,System.TimeSpan)"/> captures the <see cref="T:System.Threading.ExecutionContext"/> and stores that with the <see cref="T:System.Threading.ITimer"/> for use in invoking <paramref name="callback"/>
+            each time it's called. That capture can be suppressed with <see cref="M:System.Threading.ExecutionContext.SuppressFlow"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.TimeProvider.SystemTimeProviderTimer">
+            <summary>Thin wrapper for a <see cref="T:System.Threading.Timer"/>.</summary>
+            <remarks>
+            We don't return a TimerQueueTimer directly as it implements IThreadPoolWorkItem and we don't
+            want it exposed in a way that user code could directly queue the timer to the thread pool.
+            We also use this instead of Timer because CreateTimer needs to return a timer that's implicitly
+            rooted while scheduled.
+            </remarks>
+        </member>
+        <member name="T:System.TimeProvider.SystemTimeProvider">
+            <summary>
+            Used to create a <see cref="T:System.TimeProvider"/> instance returned from <see cref="P:System.TimeProvider.System"/> and uses the default implementation
+            provided by <see cref="T:System.TimeProvider"/> which uses <see cref="P:System.DateTimeOffset.UtcNow"/>, <see cref="P:System.TimeZoneInfo.Local"/>, <see cref="T:System.Diagnostics.Stopwatch"/>, and <see cref="T:System.Threading.Timer"/>.
+            </summary>
+        </member>
+        <member name="M:System.TimeProvider.SystemTimeProvider.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Threading.ITimer">
+            <summary>Represents a timer that can have its due time and period changed.</summary>
+            <remarks>
+            Implementations of <see cref="M:System.Threading.ITimer.Change(System.TimeSpan,System.TimeSpan)"/>, <see cref="M:System.IDisposable.Dispose"/>, and <see cref="M:System.IAsyncDisposable.DisposeAsync"/>
+            must all be thread-safe such that the timer instance may be accessed concurrently from multiple threads.
+            </remarks>
+        </member>
+        <member name="M:System.Threading.ITimer.Change(System.TimeSpan,System.TimeSpan)">
+            <summary>Changes the start time and the interval between method invocations for a timer, using <see cref="T:System.TimeSpan"/> values to measure time intervals.</summary>
+            <param name="dueTime">
+            A <see cref="T:System.TimeSpan"/> representing the amount of time to delay before invoking the callback method specified when the <see cref="T:System.Threading.ITimer"/> was constructed.
+            Specify <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to prevent the timer from restarting. Specify <see cref="F:System.TimeSpan.Zero"/> to restart the timer immediately.
+            </param>
+            <param name="period">
+            The time interval between invocations of the callback method specified when the Timer was constructed.
+            Specify <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to disable periodic signaling.
+            </param>
+            <returns><see langword="true"/> if the timer was successfully updated; otherwise, <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="dueTime"/> or <paramref name="period"/> parameter, in milliseconds, is less than -1 or greater than 4294967294.</exception>
+            <remarks>
+            It is the responsibility of the implementer of the ITimer interface to ensure thread safety.
+            </remarks>
+        </member>
+        <member name="T:System.Threading.Tasks.TimeProviderTaskExtensions">
+            <summary>
+            Provide extensions methods for <see cref="T:System.Threading.Tasks.Task"/> operations with <see cref="T:System.TimeProvider"/>.
+            </summary>
+            <remarks>
+            The Microsoft.Bcl.TimeProvider library interfaces are intended solely for use in building against pre-.NET 8 surface area.
+            If your code is being built against .NET 8 or higher, then this library should not be utilized.
+            </remarks>
+        </member>
+        <member name="M:System.Threading.Tasks.TimeProviderTaskExtensions.Delay(System.TimeProvider,System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>Creates a task that completes after a specified time interval.</summary>
+            <param name="timeProvider">The <see cref="T:System.TimeProvider"/> with which to interpret <paramref name="delay"/>.</param>
+            <param name="delay">The <see cref="T:System.TimeSpan"/> to wait before completing the returned task, or <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/> to wait indefinitely.</param>
+            <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+            <returns>A task that represents the time delay.</returns>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="timeProvider"/> argument is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="delay"/> represents a negative time interval other than <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/>.</exception>
+        </member>
+        <member name="M:System.Threading.Tasks.TimeProviderTaskExtensions.WaitAsync(System.Threading.Tasks.Task,System.TimeSpan,System.TimeProvider,System.Threading.CancellationToken)">
+            <summary>
+            Gets a <see cref="T:System.Threading.Tasks.Task"/> that will complete when this <see cref="T:System.Threading.Tasks.Task"/> completes, when the specified timeout expires, or when the specified <see cref="T:System.Threading.CancellationToken"/> has cancellation requested.
+            </summary>
+            <param name="task">The task for which to wait on until completion.</param>
+            <param name="timeout">The timeout after which the <see cref="T:System.Threading.Tasks.Task"/> should be faulted with a <see cref="T:System.TimeoutException"/> if it hasn't otherwise completed.</param>
+            <param name="timeProvider">The <see cref="T:System.TimeProvider"/> with which to interpret <paramref name="timeout"/>.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> to monitor for a cancellation request.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous wait.  It may or may not be the same instance as the current instance.</returns>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="task"/> argument is null.</exception>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="timeProvider"/> argument is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="timeout"/> represents a negative time interval other than <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/>.</exception>
+        </member>
+        <member name="M:System.Threading.Tasks.TimeProviderTaskExtensions.WaitAsync``1(System.Threading.Tasks.Task{``0},System.TimeSpan,System.TimeProvider,System.Threading.CancellationToken)">
+            <summary>
+            Gets a <see cref="T:System.Threading.Tasks.Task"/> that will complete when this <see cref="T:System.Threading.Tasks.Task"/> completes, when the specified timeout expires, or when the specified <see cref="T:System.Threading.CancellationToken"/> has cancellation requested.
+            </summary>
+            <param name="task">The task for which to wait on until completion.</param>
+            <param name="timeout">The timeout after which the <see cref="T:System.Threading.Tasks.Task"/> should be faulted with a <see cref="T:System.TimeoutException"/> if it hasn't otherwise completed.</param>
+            <param name="timeProvider">The <see cref="T:System.TimeProvider"/> with which to interpret <paramref name="timeout"/>.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> to monitor for a cancellation request.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous wait.  It may or may not be the same instance as the current instance.</returns>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="task"/> argument is null.</exception>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="timeProvider"/> argument is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="timeout"/> represents a negative time interval other than <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/>.</exception>
+        </member>
+        <member name="M:System.Threading.Tasks.TimeProviderTaskExtensions.CreateCancellationTokenSource(System.TimeProvider,System.TimeSpan)">
+            <summary>Initializes a new instance of the <see cref="T:System.Threading.CancellationTokenSource"/> class that will be canceled after the specified <see cref="T:System.TimeSpan"/>. </summary>
+            <param name="timeProvider">The <see cref="T:System.TimeProvider"/> with which to interpret the <paramref name="delay"/>. </param>
+            <param name="delay">The time interval to wait before canceling this <see cref="T:System.Threading.CancellationTokenSource"/>. </param>
+            <exception cref="T:System.ArgumentOutOfRangeException"> The <paramref name="delay"/> is negative and not equal to <see cref="F:System.Threading.Timeout.InfiniteTimeSpan" /> or greater than maximum allowed timer duration.</exception>
+            <returns><see cref="T:System.Threading.CancellationTokenSource"/> that will be canceled after the specified <paramref name="delay"/>.</returns>
+            <remarks>
+            <para>
+            The countdown for the delay starts during the call to the constructor. When the delay expires,
+            the constructed <see cref="T:System.Threading.CancellationTokenSource"/> is canceled if it has
+            not been canceled already.
+            </para>
+            <para>
+            If running on .NET versions earlier than .NET 8.0, there is a constraint when invoking <see cref="M:System.Threading.CancellationTokenSource.CancelAfter(System.TimeSpan)"/> on the resultant object.
+            This action will not terminate the initial timer indicated by <paramref name="delay"/>. However, this restriction does not apply on .NET 8.0 and later versions.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:System.SR.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero">
+            <summary>'{0}' must be a non-negative and non-zero value.</summary>
+        </member>
+        <member name="P:System.SR.ArgumentOutOfRange_Generic_MustBeGreaterOrEqual">
+            <summary>'{0}' must be greater than or equal to '{1}'.</summary>
+        </member>
+        <member name="P:System.SR.ArgumentOutOfRange_Generic_MustBeLessOrEqual">
+            <summary>'{0}' must be less than or equal to '{1}'.</summary>
+        </member>
+        <member name="P:System.SR.InvalidOperation_TimeProviderNullLocalTimeZone">
+            <summary>The operation cannot be performed when TimeProvider.LocalTimeZone is null.</summary>
+        </member>
+        <member name="P:System.SR.InvalidOperation_TimeProviderInvalidTimestampFrequency">
+            <summary>The operation cannot be performed when TimeProvider.TimestampFrequency is zero or negative.</summary>
+        </member>
+        <member name="T:System.Runtime.InteropServices.LibraryImportAttribute">
+            <summary>
+            Attribute used to indicate a source generator should create a function for marshalling
+            arguments instead of relying on the runtime to generate an equivalent marshalling function at run-time.
+            </summary>
+            <remarks>
+            This attribute is meaningless if the source generator associated with it is not enabled.
+            The current built-in source generator only supports C# and only supplies an implementation when
+            applied to static, partial, non-generic methods.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.InteropServices.LibraryImportAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.InteropServices.LibraryImportAttribute"/>.
+            </summary>
+            <param name="libraryName">Name of the library containing the import.</param>
+        </member>
+        <member name="P:System.Runtime.InteropServices.LibraryImportAttribute.LibraryName">
+            <summary>
+            Gets the name of the library containing the import.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.InteropServices.LibraryImportAttribute.EntryPoint">
+            <summary>
+            Gets or sets the name of the entry point to be called.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.InteropServices.LibraryImportAttribute.StringMarshalling">
+            <summary>
+            Gets or sets how to marshal string arguments to the method.
+            </summary>
+            <remarks>
+            If this field is set to a value other than <see cref="F:System.Runtime.InteropServices.StringMarshalling.Custom" />,
+            <see cref="P:System.Runtime.InteropServices.LibraryImportAttribute.StringMarshallingCustomType" /> must not be specified.
+            </remarks>
+        </member>
+        <member name="P:System.Runtime.InteropServices.LibraryImportAttribute.StringMarshallingCustomType">
+            <summary>
+            Gets or sets the <see cref="T:System.Type"/> used to control how string arguments to the method are marshalled.
+            </summary>
+            <remarks>
+            If this field is specified, <see cref="P:System.Runtime.InteropServices.LibraryImportAttribute.StringMarshalling" /> must not be specified
+            or must be set to <see cref="F:System.Runtime.InteropServices.StringMarshalling.Custom" />.
+            </remarks>
+        </member>
+        <member name="P:System.Runtime.InteropServices.LibraryImportAttribute.SetLastError">
+            <summary>
+            Gets or sets whether the callee sets an error (SetLastError on Windows or errno
+            on other platforms) before returning from the attributed method.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.InteropServices.StringMarshalling">
+            <summary>
+            Specifies how strings should be marshalled for generated p/invokes
+            </summary>
+        </member>
+        <member name="F:System.Runtime.InteropServices.StringMarshalling.Custom">
+            <summary>
+            Indicates the user is suppling a specific marshaller in <see cref="P:System.Runtime.InteropServices.LibraryImportAttribute.StringMarshallingCustomType"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.InteropServices.StringMarshalling.Utf8">
+            <summary>
+            Use the platform-provided UTF-8 marshaller.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.InteropServices.StringMarshalling.Utf16">
+            <summary>
+            Use the platform-provided UTF-16 marshaller.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>Specifies that an output will not be null even if the corresponding type allows it. Specifies that an input argument was not null when the call returns.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter may be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with the associated parameter name.</summary>
+            <param name="parameterName">
+            The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>Gets the associated parameter name.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>Applied to a method that will never return under any circumstance.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified parameter value.</summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+            the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>Gets the condition parameter value.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with a field or property member.</summary>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>Initializes the attribute with the list of field and property members.</summary>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values when returning with the specified return value condition.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>Initializes the attribute with the specified return value condition and a field or property member.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>Initializes the attribute with the specified return value condition and list of field and property members.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+    </members>
+</doc>
