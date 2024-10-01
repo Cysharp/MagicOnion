@@ -381,9 +381,11 @@ public class ScenarioConfiguration
     public int Streams { get; }
     public int Channels { get; }
     public bool Verbose { get; }
-    public IReadOnlyList<GrpcChannel> ChannelList => channelList;
 
-    private readonly HttpMessageHandler httpHandler;
+    private readonly bool clientAuth;
+    private bool useHttp3;
+
+    public IReadOnlyList<GrpcChannel> ChannelList => channelList;
     private readonly List<GrpcChannel> channelList;
 
     private record TlsFile(string PfxFileName, string Password)
@@ -391,44 +393,25 @@ public class ScenarioConfiguration
         public static TlsFile Default = new TlsFile("Certs/client.pfx", "1111");
     }
 
-    public ScenarioConfiguration(string url, string protocol, bool clientauth, int warmup, int duration, int streams, int channels, bool verbose)
+    public ScenarioConfiguration(string url, string protocol, bool clientAuth, int warmup, int duration, int streams, int channels, bool verbose)
     {
-        var handler = new SocketsHttpHandler()
-        {
-            UseProxy = false,
-            AllowAutoRedirect = false,
-        };
-        handler.SslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true; // allow self cert
-        if (clientauth)
-        {
-            var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
-            var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
-            // .NET 9 API....
-            //var clientCertificates = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
-            var clientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection(new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, TlsFile.Default.Password));
-            handler.SslOptions.ClientCertificates = clientCertificates;
-        }
-
+        bool useHttp3 = false;
         switch (protocol)
         {
             case "h2c":
                 {
                     url = url.Replace("https://", "http://");
-                    httpHandler = handler;
                     break;
                 }
             case "h2":
                 {
                     url = url.Replace("http://", "https://");
-                    httpHandler = handler;
                     break;
                 }
             case "h3":
                 {
                     url = url.Replace("http://", "https://");
-
-                    handler.ConnectCallback = (_, _) => throw new InvalidOperationException("Should never be called for H3");
-                    httpHandler = new Http3Handler(handler);
+                    useHttp3 = true;
                     break;
                 }
             default:
@@ -442,6 +425,8 @@ public class ScenarioConfiguration
         Streams = streams;
         Channels = channels;
         Verbose = verbose;
+        this.clientAuth = clientAuth;
+        this.useHttp3 = useHttp3;
 
         channelList = new List<GrpcChannel>(channels);
         for (var i = 0; i < Channels; i++)
@@ -452,30 +437,45 @@ public class ScenarioConfiguration
 
     public GrpcChannel CreateChannel()
     {
-        return Protocol switch
+        var httpClientHandler = new SocketsHttpHandler()
         {
-            "h2c" => GrpcChannel.ForAddress(Url),
-            "h2" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
-            {
-                HttpHandler = httpHandler,
-            }),
-            // h3 can use from Windows 11 Build 22000+, or Linux with libmsquic. https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/http3?view=aspnetcore-8.0
-            "h3" => GrpcChannel.ForAddress(Url, new GrpcChannelOptions
-            {
-                HttpHandler = httpHandler,
-                // .NET 9 API....
-                // HttpVersion = new Version(3, 0), // Force H3 on all requests
-            }),
-            _ => throw new NotImplementedException(Protocol),
+            UseProxy = false,
+            AllowAutoRedirect = false,
         };
+
+        // allow server's self cert
+        httpClientHandler.SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+        {
+            RemoteCertificateValidationCallback = (_, _, _, _) => true,
+        };
+
+        if (clientAuth)
+        {
+            var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
+            var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
+            // .NET 9 API....
+            //var clientCertificates = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
+            var clientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection(new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, TlsFile.Default.Password));
+            httpClientHandler.SslOptions.ClientCertificates = clientCertificates;
+        }
+
+        HttpMessageHandler httpMessageHandler = httpClientHandler;
+        if (useHttp3)
+        {
+            // HTTP/3 should never call this? But this is required for channel.State handling :(
+            //httpClientHandler.ConnectCallback = (_, _) => throw new InvalidOperationException("Should never be called for H3");
+            httpMessageHandler = new Http3Handler(httpClientHandler);
+        }
+
+        return GrpcChannel.ForAddress(Url, new GrpcChannelOptions
+        {
+            HttpHandler = httpMessageHandler,
+        });
     }
 
     // temporary solution for .NET8 and lower
-    public class Http3Handler : DelegatingHandler
+    public class Http3Handler(HttpMessageHandler innerHandler) : DelegatingHandler(innerHandler)
     {
-        public Http3Handler() { }
-        public Http3Handler(HttpMessageHandler innerHandler) : base(innerHandler) { }
-
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             // Force H3 on all requests.

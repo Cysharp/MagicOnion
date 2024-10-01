@@ -13,7 +13,11 @@ public static class KestrelHelperExtensions
         builder.WebHost.ConfigureKestrel((context, options) =>
         {
             var endpoint = CreateIPEndpoint(context.Configuration);
-            options.Listen(endpoint.Address, endpoint.Port, listenOptions =>
+
+            // HACK: h3 requires Listen on AnyIP, otherwise ALPN exception occurs for localhost.
+            // Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Application layer protocol negotiation error was encountered. (localhost:5000) AuthenticationException: Application layer protocol negotiation error was encountered.", DebugException="System.Net.Http.HttpRequestException: Application layer protocol negotiation error was encountered. (localhost:5000)")
+            //options.Listen(endpoint.Address, endpoint.Port, listenOptions =>
+            options.ListenAnyIP(endpoint.Port, listenOptions =>
             {
                 ConfigureListenOptions(listenOptions, context.Configuration, endpoint);
             });
