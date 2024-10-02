@@ -216,7 +216,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
     }
 
-    WriteLog($"ThreadCount current: {ThreadPool.ThreadCount}");
+    WriteLog($"Thread Count Current... {ThreadPool.ThreadCount}");
 
     await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
     WriteLog($"Warming up...");
@@ -262,6 +262,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Avg CPU Usage: {result.hardware.AvgCpuUsagePercent:0.000} %");
     WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
     WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
+
+    WriteLog($"Thread Count: {ThreadPool.ThreadCount}");
 
     return result;
 }
