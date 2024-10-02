@@ -92,6 +92,9 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient);
             results.Add(result);
+
+            WriteLog($"Interval 1s for next scenario...");
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
     }
 
@@ -191,6 +194,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
 
     var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
     using var cts = new CancellationTokenSource();
+    var cleanIndex = 0;
 
     WriteLog($"Starting scenario '{scenario}'...");
     var tasks = new List<Task>();
@@ -229,8 +233,9 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var s in scenarios.Chunk(ApplicationInformation.Current.ProcessorCount))
+    foreach (var s in scenarios.Chunk(scenarios.Count / 3))
     {
+        WriteLog($"...Cleaning up ({cleanIndex++})");
         try
         {
             await Task.WhenAll(s.Select(x => x.CompleteAsync()));
@@ -288,24 +293,13 @@ void WriteLog(string value)
     Console.WriteLine($"[{DateTime.Now:s}] {value}");
 }
 
-void SetThreads(int threadCount)
-{
-    ThreadPool.GetAvailableThreads(out var workerThread, out var ioCompletionPortThreads);
-    var count = Math.Min(150, Math.Max(ThreadPool.ThreadCount, threadCount)); // (ThreadPool.ThreadCount < threadCount) <= n <= 150
-    WriteLog($"ThreadCount before: {ThreadPool.ThreadCount}, tobe: {count}");
-    if (!ThreadPool.SetMinThreads(count, ioCompletionPortThreads))
-    {
-        WriteLog("Settings thread failed.");
-    }
-    WriteLog($"ThreadCount after: {ThreadPool.ThreadCount}, available workerthreads: {workerThread}");
-}
-
 IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
 {
     return scenario switch
     {
-        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI),
-        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.PingpongStreamingHub),
+        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI && x != ScenarioType.CIFull),
+        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub),
+        ScenarioType.CIFull => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.PingpongStreamingHub),
         _ => [scenario],
     };
 }
