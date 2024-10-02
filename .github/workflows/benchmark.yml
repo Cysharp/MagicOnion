@@ -42,7 +42,7 @@ jobs:
     secrets: inherit
 
   cleanup-failed:
-    if: ${{ always() }}
+    if: ${{ failure() || success() }}
     needs: [benchmark]
     uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
     secrets: inherit
