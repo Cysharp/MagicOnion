@@ -439,6 +439,7 @@ public class ScenarioConfiguration
         {
             UseProxy = false,
             AllowAutoRedirect = false,
+            EnableMultipleHttp2Connections = true,
         };
 
         // allow server's self cert
