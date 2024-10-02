@@ -92,6 +92,9 @@ async Task Main(
             }
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient);
             results.Add(result);
+
+            WriteLog($"Interval 1s for next scenario...");
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
     }
 
@@ -118,6 +121,7 @@ async Task Main(
         writer.WriteLine($"OSDescription: {serverInfo.OSDescription}");
         writer.WriteLine($"OSArchitecture: {serverInfo.OSArchitecture}");
         writer.WriteLine($"ProcessArchitecture : {serverInfo.ProcessArchitecture}");
+        writer.WriteLine($"CpuModelName : {serverInfo.CpuModelName}");
         writer.WriteLine($"IsServerGC: {serverInfo.IsServerGC}");
         writer.WriteLine($"ProcessorCount: {serverInfo.ProcessorCount}");
         writer.WriteLine($"========================================");
@@ -191,6 +195,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
 
     var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
     using var cts = new CancellationTokenSource();
+    var cleanIndex = 0;
 
     WriteLog($"Starting scenario '{scenario}'...");
     var tasks = new List<Task>();
@@ -212,7 +217,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
     }
 
-    WriteLog($"ThreadCount current: {ThreadPool.ThreadCount}");
+    WriteLog($"Thread Count Current... {ThreadPool.ThreadCount}");
 
     await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
     WriteLog($"Warming up...");
@@ -229,8 +234,9 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var s in scenarios.Chunk(ApplicationInformation.Current.ProcessorCount))
+    foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
     {
+        WriteLog($"...Cleaning up ({cleanIndex++})");
         try
         {
             await Task.WhenAll(s.Select(x => x.CompleteAsync()));
@@ -258,6 +264,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
     WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
 
+    WriteLog($"Thread Count: {ThreadPool.ThreadCount}");
+
     return result;
 }
 
@@ -277,6 +285,7 @@ void PrintStartupInformation(TextWriter? writer = null)
     writer.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {ApplicationInformation.Current.OSDescription}");
     writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {ApplicationInformation.Current.OSArchitecture}");
     writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {ApplicationInformation.Current.ProcessArchitecture}");
+    writer.WriteLine($"{nameof(ApplicationInformation.Current.CpuModelName)}: {ApplicationInformation.Current.CpuModelName}");
     writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
     writer.WriteLine($"{nameof(ApplicationInformation.Current.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
     writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
@@ -288,24 +297,13 @@ void WriteLog(string value)
     Console.WriteLine($"[{DateTime.Now:s}] {value}");
 }
 
-void SetThreads(int threadCount)
-{
-    ThreadPool.GetAvailableThreads(out var workerThread, out var ioCompletionPortThreads);
-    var count = Math.Min(150, Math.Max(ThreadPool.ThreadCount, threadCount)); // (ThreadPool.ThreadCount < threadCount) <= n <= 150
-    WriteLog($"ThreadCount before: {ThreadPool.ThreadCount}, tobe: {count}");
-    if (!ThreadPool.SetMinThreads(count, ioCompletionPortThreads))
-    {
-        WriteLog("Settings thread failed.");
-    }
-    WriteLog($"ThreadCount after: {ThreadPool.ThreadCount}, available workerthreads: {workerThread}");
-}
-
 IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
 {
     return scenario switch
     {
-        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI),
-        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.PingpongStreamingHub),
+        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI && x != ScenarioType.CIFull),
+        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub),
+        ScenarioType.CIFull => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.PingpongStreamingHub),
         _ => [scenario],
     };
 }

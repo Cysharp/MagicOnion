@@ -26,7 +26,7 @@ public class StreamingHubScenario : IScenario, IPerfTestHubReceiver
 
     public async Task CompleteAsync()
     {
-       await this.client.DisposeAsync();
+        await this.client.DisposeAsync();
     }
 }
 
