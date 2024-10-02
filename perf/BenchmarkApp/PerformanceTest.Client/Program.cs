@@ -234,7 +234,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var s in scenarios.Chunk(tasks.Count / 3))
+    foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
     {
         WriteLog($"...Cleaning up ({cleanIndex++})");
         try
