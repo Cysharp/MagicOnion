@@ -26,8 +26,8 @@ jobs:
     channels: 1
     streams: 70
     serialization: memorypack
-  # - tags: legend:memorypack-h3-linux,streams:70x28,protocol:h3,serialization:memorypack
-  #   protocol: h3
-  #   channels: 28
-  #   streams: 70
-  #   serialization: memorypack
+  - tags: legend:memorypack-h3-linux,streams:70x28,protocol:h3,serialization:memorypack
+    protocol: h3
+    channels: 28
+    streams: 70
+    serialization: memorypack
