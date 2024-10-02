@@ -20,6 +20,7 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
             ApplicationInformation.Current.OSDescription,
             ApplicationInformation.Current.OSArchitecture,
             ApplicationInformation.Current.ProcessArchitecture,
+            ApplicationInformation.Current.CpuModelName,
             ApplicationInformation.Current.IsServerGC,
             ApplicationInformation.Current.ProcessorCount,
             ApplicationInformation.Current.IsAttached));

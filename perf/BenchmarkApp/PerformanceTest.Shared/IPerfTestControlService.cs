@@ -27,11 +27,12 @@ public partial class ServerInformation
     public string OSDescription { get; }
     public Architecture OSArchitecture { get; }
     public Architecture ProcessArchitecture { get; }
+    public string CpuModelName { get; }
     public bool IsServerGC { get; }
     public int ProcessorCount { get; }
     public bool IsAttached { get; }
 
-    public ServerInformation(string machineName, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, string? memoryPackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, bool isServerGC, int processorCount, bool isAttached)
+    public ServerInformation(string machineName, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, string? memoryPackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, string cpuModelName, bool isServerGC, int processorCount, bool isAttached)
     {
         MachineName = machineName;
         MagicOnionVersion = magicOnionVersion;
@@ -43,6 +44,7 @@ public partial class ServerInformation
         OSDescription = osDescription;
         OSArchitecture = osArchitecture;
         ProcessArchitecture = processArchitecture;
+        CpuModelName = cpuModelName;
         IsServerGC = isServerGC;
         ProcessorCount = processorCount;
         IsAttached = isAttached;

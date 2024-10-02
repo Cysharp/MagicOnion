@@ -121,6 +121,7 @@ async Task Main(
         writer.WriteLine($"OSDescription: {serverInfo.OSDescription}");
         writer.WriteLine($"OSArchitecture: {serverInfo.OSArchitecture}");
         writer.WriteLine($"ProcessArchitecture : {serverInfo.ProcessArchitecture}");
+        writer.WriteLine($"CpuModelName : {serverInfo.CpuModelName}");
         writer.WriteLine($"IsServerGC: {serverInfo.IsServerGC}");
         writer.WriteLine($"ProcessorCount: {serverInfo.ProcessorCount}");
         writer.WriteLine($"========================================");
@@ -284,6 +285,7 @@ void PrintStartupInformation(TextWriter? writer = null)
     writer.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {ApplicationInformation.Current.OSDescription}");
     writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {ApplicationInformation.Current.OSArchitecture}");
     writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {ApplicationInformation.Current.ProcessArchitecture}");
+    writer.WriteLine($"{nameof(ApplicationInformation.Current.CpuModelName)}: {ApplicationInformation.Current.CpuModelName}");
     writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
     writer.WriteLine($"{nameof(ApplicationInformation.Current.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
     writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
