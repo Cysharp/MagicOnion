@@ -2,131 +2,131 @@
   "profiles": {
     "PerformanceTest.Client (h2c CI 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 1 -s CI -p h2c"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s CI --channels 1 --streams 1"
     },
     "PerformanceTest.Client (h2c CI 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s CI -p h2c"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s CI --channels 28 --streams 1"
     },
     "PerformanceTest.Client (h2c CI 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 70 -s CI -p h2c"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s CI --channels 1 --streams 70"
     },
     "PerformanceTest.Client (h2c CI 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 70 -s CI -p h2c"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s CI --channels 28 --streams 70"
     },
     "PerformanceTest.Client (h2 CI 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --rounds 5 --channels 1 --streams 1 -s CI -p h2"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --rounds 5 --channels 1 --streams 1"
     },
     "PerformanceTest.Client (h2 CI 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --rounds 5 --channels 28 --streams 1 -s CI -p h2"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --rounds 5 --channels 28 --streams 1"
     },
     "PerformanceTest.Client (h2 CI 3x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --rounds 5 --channels 28 --streams 3 -s CI -p h2"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --rounds 5 --channels 28 --streams 3"
     },
     "PerformanceTest.Client (h2 CI 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --rounds 5 --channels 1 --streams 70 -s CI -p h2"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --rounds 5 --channels 1 --streams 70"
     },
     "PerformanceTest.Client (h2 CI 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --rounds 5 --channels 28 --streams 70 -s CI -p h2"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --rounds 5 --channels 28 --streams 70"
     },
     "PerformanceTest.Client (h3 CI 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 1 --streams 1 -s CI -p h3"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h3 -s CI --channels 1 --streams 1"
     },
     "PerformanceTest.Client (h3 CI 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 28 --streams 1 -s CI -p h3"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h3 -s CI --channels 28 --streams 1"
     },
     "PerformanceTest.Client (h3 CI 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 1 --streams 70 -s CI -p h3"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h3 -s CI --channels 1 --streams 70"
     },
     "PerformanceTest.Client (h3 CI 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 28 --streams 70 -s CI -p h3"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h3 -s CI --channels 28 --streams 70"
     },
     "PerformanceTest.Client (h2+auth CI 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 1 --streams 1 -s CI -p h2 --clientauth true"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --channels 1 --streams 1 --clientauth true"
     },
     "PerformanceTest.Client (h2+auth CI 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 28 --streams 1 -s CI -p h2 --clientauth true"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --channels 28 --streams 1 --clientauth true"
     },
     "PerformanceTest.Client (h2+auth CI 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 1 --streams 70 -s CI -p h2 --clientauth true"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --channels 1 --streams 70 --clientauth true"
     },
     "PerformanceTest.Client (h2+auth CI 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u https://localhost:5000 --channels 28 --streams 70 -s CI -p h2 --clientauth true"
+      "commandLineArgs": "-u https://localhost:5000 --protocol h2 -s CI --channels 28 --streams 70 --clientauth true"
     },
     "PerformanceTest.Client (PingpongStreamingHub 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 1 -s PingpongStreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s PingpongStreamingHub --channels 1 --streams 1"
     },
     "PerformanceTest.Client (PingpongStreamingHub 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s PingpongStreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s PingpongStreamingHub --channels 28 --streams 1"
     },
     "PerformanceTest.Client (PingpongStreamingHub 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 70 -s PingpongStreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s PingpongStreamingHub --channels 1 --streams 70"
     },
     "PerformanceTest.Client (PingpongStreamingHub 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 70 -s PingpongStreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s PingpongStreamingHub --channels 28 --streams 70"
     },
     "PerformanceTest.Client (StreamingHub 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 1 -s StreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s StreamingHub --channels 1 --streams 1"
     },
     "PerformanceTest.Client (StreamingHub 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s StreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s StreamingHub --channels 28 --streams 1"
     },
     "PerformanceTest.Client (StreamingHub 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 70 -s StreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s StreamingHub --channels 1 --streams 70"
     },
     "PerformanceTest.Client (StreamingHub 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 70 -s StreamingHub"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s StreamingHub --channels 28 --streams 70"
     },
     "PerformanceTest.Client (Unary 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 1 -s Unary"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Unary --channels 1 --streams 1"
     },
     "PerformanceTest.Client (Unary 1x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s Unary"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Unary --channels 28 --streams 1"
     },
     "PerformanceTest.Client (Unary 70x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 1 --streams 70 -s Unary"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Unary --channels 1 --streams 70"
     },
     "PerformanceTest.Client (Unary 70x28)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 70 -s Unary"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Unary --channels 28 --streams 70"
     },
     "PerformanceTest.Client (PingpongStreamingHub 1x28, MemoryPack)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s PingpongStreamingHub --serialization MemoryPack"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s PingpongStreamingHub --channels 28 --streams 1 --serialization MemoryPack"
     },
     "PerformanceTest.Client (StreamingHub 1x28, MemoryPack)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s StreamingHub --serialization MemoryPack"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s StreamingHub --channels 28 --streams 1 --serialization MemoryPack"
     },
     "PerformanceTest.Client (Unary 1x28, MemoryPack)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --channels 28 --streams 1 -s Unary --serialization MemoryPack"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Unary --channels 28 --streams 1 --serialization MemoryPack"
     }
   }
 }
