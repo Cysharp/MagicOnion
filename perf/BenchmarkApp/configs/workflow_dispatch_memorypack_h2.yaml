@@ -5,9 +5,9 @@ dotnet-version: 8.0
 benchmark-expire-min: 15
 benchmark-timeout-min: 10
 benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-benchmark-client-run-script-args: '--args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s CI --rounds 3 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}"'
+benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s CI --rounds 3 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}"'
 benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
-benchmark-server-run-script-args: '--args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}"'
+benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   # h2c

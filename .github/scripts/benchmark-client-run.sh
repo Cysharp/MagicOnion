@@ -8,17 +8,17 @@ set -euo pipefail
 # $ echo $?
 
 function usage {
-    echo "usage: $(basename $0) --args <string> [options]"
+    echo "usage: $(basename $0) --run-args <string> [options]"
     echo "Required:"
-    echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
+    echo "  --run-args          string      Arguments to pass when running the built binary (default: \"\")"
     echo "Options:"
-    echo "  --help                      Show this help message"
+    echo "  --help                          Show this help message"
 }
 
 while [ $# -gt 0 ]; do
   case $1 in
     # required
-    --args) _ARGS=$2; shift 2; ;;
+    --run-args) _RUN_ARGS=$2; shift 2; ;;
     # optional
     --help) usage; exit 1; ;;
     *) shift ;;
@@ -38,7 +38,7 @@ function error {
 
 # parameter setup
 title "Arguments:"
-print "--args=${_ARGS:=""}"
+print "--run-args=${_RUN_ARGS:=""}"
 
 title "Constants:"
 print "  * repo=${repo:="MagicOnion"}"
@@ -121,8 +121,8 @@ echo "::group::dotnet publish"
 echo "::endgroup::"
 
 # run dotnet app
-title "Run $full_process_path $_ARGS"
+title "Run $full_process_path $_RUN_ARGS"
 pushd "$output_dir" > /dev/null
   # run foreground
-  "./$binary_name" $_ARGS
+  "./$binary_name" $_RUN_ARGS
 popd > /dev/null
