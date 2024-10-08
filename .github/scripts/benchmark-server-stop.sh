@@ -21,19 +21,23 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-function print() {
+function print {
+  echo "$(date "+%Y-%m-%d %H:%M:%S") INFO(${FUNCNAME[1]:-unknown}): $*"
+}
+function title {
   echo ""
-  echo "$*"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") INFO(${FUNCNAME[1]:-unknown}): # $*"
 }
 
 # parameter setup
-binary_name="PerformanceTest.Server"
+title "Constants:"
+print "  * binary_name=${binary_name:=PerformanceTest.Server}"
 
 # stop process
-print "# Stopping process $binary_name if exists"
+title "Stopping process $binary_name if exists"
 ps -eo pid,cmd | while read -r pid cmd; do
   if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
-    echo "Found & killing process $pid ($cmd)"
+    print "Found & killing process $pid ($cmd)"
     kill "$pid"
   fi
 done
