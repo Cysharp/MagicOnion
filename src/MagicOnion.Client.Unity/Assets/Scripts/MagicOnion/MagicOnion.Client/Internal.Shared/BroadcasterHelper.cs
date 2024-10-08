@@ -1,11 +1,13 @@
 using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
 namespace MagicOnion.Internal
 {
+    [RequiresUnreferencedCode("BroadcastHelper is incompatible with trimming.")]
     internal static class BroadcasterHelper
     {
         internal static Type[] DynamicArgumentTupleTypes { get; } = typeof(DynamicArgumentTuple<,>)

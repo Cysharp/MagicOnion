@@ -1,3 +1,4 @@
+#if NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,7 +9,6 @@ namespace System.Collections.Generic
 {
     internal static class DictionaryExtensions
     {
-#if NETSTANDARD2_0
         public static bool Remove<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, [NotNullWhen(true)] out TValue? value)
         {
             if (dict.TryGetValue(key, out var v))
@@ -21,6 +21,6 @@ namespace System.Collections.Generic
             value = default;
             return false;
         }
-#endif
     }
 }
+#endif

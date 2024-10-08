@@ -15,6 +15,7 @@ namespace MagicOnion.Client.DynamicClient
         }
     }
 
+    [RequiresUnreferencedCode(nameof(DynamicStreamingHubClientFactoryProvider) + " is incompatible with trimming and Native AOT.")]
     public class DynamicStreamingHubClientFactoryProvider : IStreamingHubClientFactoryProvider
     {
         public static IStreamingHubClientFactoryProvider Instance { get; } = new DynamicStreamingHubClientFactoryProvider();
@@ -27,6 +28,7 @@ namespace MagicOnion.Client.DynamicClient
             return true;
         }
 
+        [RequiresUnreferencedCode(nameof(DynamicStreamingHubClientFactoryProvider) + "." + nameof(Cache<TStreamingHub, TReceiver>) + " is incompatible with trimming and Native AOT.")]
         static class Cache<TStreamingHub, TReceiver> where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             public static readonly StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory

@@ -18,21 +18,21 @@ namespace MagicOnion.Internal
             Value = value;
         }
 
-        public bool Equals(Box<T> other)
+        public bool Equals(Box<T>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return EqualityComparer<T>.Default.Equals(Value, other.Value);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is Box<T> other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return EqualityComparer<T>.Default.GetHashCode(Value);
+            return EqualityComparer<T>.Default.GetHashCode(Value!);
         }
 
         public static bool operator ==(Box<T> valueA, Box<T> valueB)

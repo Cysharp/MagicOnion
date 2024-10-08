@@ -2,6 +2,7 @@ using Grpc.Core;
 using MessagePack;
 using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -10,13 +11,7 @@ namespace MagicOnion.Internal
     // invoke from dynamic methods so must be public
     internal static class MagicOnionMarshallers
     {
-        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
-
-        internal static Marshaller<StreamingHubPayload> StreamingHubMarshaller { get; } = new(
+        public static Marshaller<StreamingHubPayload> StreamingHubMarshaller { get; } = new(
             serializer: static (payload, context) =>
             {
                 context.SetPayloadLength(payload.Length);
@@ -32,7 +27,8 @@ namespace MagicOnion.Internal
             }
         );
 
-        internal static Type CreateRequestType(ParameterInfo[] parameters)
+        [RequiresUnreferencedCode(nameof(MagicOnionMarshallers) + "." + nameof(CreateRequestType) + " is incompatible with trimming and Native AOT.")]
+        public static Type CreateRequestType(ParameterInfo[] parameters)
         {
             if (parameters.Length == 0)
             {
@@ -50,17 +46,28 @@ namespace MagicOnion.Internal
             else
             {
                 // start from T2
-                var tupleTypeBase = dynamicArgumentTupleTypes[parameters.Length - 2];
+                var tupleTypeBase = DynamicArgumentTupleTypesCache.Types[parameters.Length - 2];
                 var t = tupleTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                 return t;
             }
         }
 
+        [RequiresUnreferencedCode(nameof(MagicOnionMarshallers) + "." + nameof(InstantiateDynamicArgumentTuple) + " is incompatible with trimming and Native AOT.")]
         public static object InstantiateDynamicArgumentTuple(Type[] typeParameters, object[] arguments)
         {
             // start from T2
-            var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
+            var tupleTypeBase = DynamicArgumentTupleTypesCache.Types[arguments.Length - 2];
             return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments)!;
+        }
+
+        [RequiresUnreferencedCode(nameof(DynamicArgumentTupleTypesCache) + " is incompatible with trimming and Native AOT.")]
+        static class DynamicArgumentTupleTypesCache
+        {
+            public static readonly Type[] Types = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
+                .GetTypes()
+                .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
+                .OrderBy(x => x.GetGenericArguments().Length)
+                .ToArray();
         }
     }
 

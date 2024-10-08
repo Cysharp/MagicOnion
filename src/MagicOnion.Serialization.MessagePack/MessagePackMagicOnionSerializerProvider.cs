@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MessagePack;
 using MessagePack.Formatters;
@@ -42,26 +43,43 @@ namespace MagicOnion.Serialization.MessagePack
             return new MessagePackMagicOnionSerializerProvider(SerializerOptions, enableFallback);
         }
 
+
+#if NET6_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "ClientFactoryProvider is resolved at runtime.")]
+#endif
         public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
         {
             var serializerOptions = EnableFallback && methodInfo != null ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
             return new MessagePackMagicOnionSerializer(serializerOptions);
         }
 
-        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
+#if NET6_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(nameof(DynamicArgumentTupleTypeCache) + " is incompatible with trimming and Native AOT.")]
+#endif
+        static class DynamicArgumentTupleTypeCache
+        {
+            public static readonly Type[] Types = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
+                .GetTypes()
+                .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
+                .OrderBy(x => x.GetGenericArguments().Length)
+                .ToArray();
 
-        static readonly Type[] dynamicArgumentTupleFormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).GetTypeInfo().Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
+            public static readonly Type[] FormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).GetTypeInfo().Assembly
+                .GetTypes()
+                .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
+                .OrderBy(x => x.GetGenericArguments().Length)
+                .ToArray();
+        }
 
+
+#if NET6_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(nameof(DynamicArgumentTupleTypeCache) + " is incompatible with trimming and Native AOT.")]
+#endif
         MessagePackSerializerOptions WrapFallbackResolverIfNeeded(ParameterInfo[] parameters)
         {
+#if !NETSTANDARD2_0
+            if (!RuntimeFeature.IsDynamicCodeSupported) throw new NotSupportedException("When running with AOT runtime, DynamicArgumentTupleFormatter does not support fallback resolver fro optional parameters.");
+#endif
             // If the method has no parameter or one parameter, we don't need to create fallback resolver for optional parameters.
             if (parameters.Length < 2)
             {
@@ -69,8 +87,8 @@ namespace MagicOnion.Serialization.MessagePack
             }
 
             // start from T2
-            var tupleTypeBase = dynamicArgumentTupleTypes[parameters.Length - 2];
-            var formatterTypeBase = dynamicArgumentTupleFormatterTypes[parameters.Length - 2];
+            var tupleTypeBase = DynamicArgumentTupleTypeCache.Types[parameters.Length - 2];
+            var formatterTypeBase = DynamicArgumentTupleTypeCache.FormatterTypes[parameters.Length - 2];
 
             var t = tupleTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
             var formatterType = formatterTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());

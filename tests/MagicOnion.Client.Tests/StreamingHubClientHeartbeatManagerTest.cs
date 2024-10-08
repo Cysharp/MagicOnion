@@ -281,9 +281,9 @@ public class StreamingHubClientHeartbeatManagerTest
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         // Respond to the first message. but it does not respond to subsequent messages.
-        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x0 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddSeconds(1)) /* ClientSentAt * /, 0xc0 /* Nil */, 0xc0 /* Nil */]));
-        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x1 /* Sequence(1) */, .. ToMessagePackBytes(origin.AddSeconds(2)) /* ClientSentAt * /, 0xc0 /* Nil */, 0xc0 /* Nil */]));
-        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x2 /* Sequence(2) */, .. ToMessagePackBytes(origin.AddSeconds(3)) /* ClientSentAt * /, 0xc0 /* Nil */, 0xc0 /* Nil */]));
+        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x0 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddSeconds(1)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
+        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x1 /* Sequence(1) */, .. ToMessagePackBytes(origin.AddSeconds(2)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
+        manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x2 /* Sequence(2) */, .. ToMessagePackBytes(origin.AddSeconds(3)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 3s has elapsed since the first message.
         await Task.Delay(10);
