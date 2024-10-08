@@ -13,6 +13,7 @@ usage: $(basename $0) --run-args <string> [options]
 Required:
   --run-args          string      Arguments to pass when running the built binary (default: \"\")
 Options:
+  --build-args        string      Arguments to pass when building the project (default: \"\")
   --help                          Show this help message
 EOF
 }
@@ -22,6 +23,7 @@ while [ $# -gt 0 ]; do
     # required
     --run-args) _RUN_ARGS=$2; shift 2; ;;
     # optional
+    --build-args) _BUILD_ARGS=$2; shift 2; ;;
     --help) usage; exit 1; ;;
     *) shift ;;
   esac
@@ -41,6 +43,7 @@ function error {
 # parameter setup
 title "Arguments:"
 print "--run-args=${_RUN_ARGS:=""}"
+print "--build-args=${_BUILD_ARGS:=""}"
 
 title "Constants:"
 print "  * repo=${repo:="MagicOnion"}"
@@ -111,8 +114,8 @@ echo "::group::dotnet publish"
     print "List current files under $(pwd)"
     ls -l
 
-    print "dotnet publish $build_csproj"
-    dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir"
+    print "dotnet publish $build_csproj $_BUILD_ARGS"
+    dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir" $_BUILD_ARGS
 
     print "List published files under $publish_dir"
     ls "$publish_dir"
