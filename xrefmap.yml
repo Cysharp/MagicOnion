@@ -6992,14 +6992,15 @@ references:
   fullName.vb: MagicOnion.Internal.Box(Of T).Equals(MagicOnion.Internal.Box(Of T))
   nameWithType: Box<T>.Equals(Box<T>)
   nameWithType.vb: Box(Of T).Equals(Box(Of T))
-- uid: MagicOnion.Internal.Box`1.Equals(System.Object)
-  name: Equals(Object)
-  href: api/MagicOnion.Internal.Box-1.html#MagicOnion_Internal_Box_1_Equals_System_Object_
-  commentId: M:MagicOnion.Internal.Box`1.Equals(System.Object)
-  fullName: MagicOnion.Internal.Box<T>.Equals(System.Object)
-  fullName.vb: MagicOnion.Internal.Box(Of T).Equals(System.Object)
-  nameWithType: Box<T>.Equals(Object)
-  nameWithType.vb: Box(Of T).Equals(Object)
+- uid: MagicOnion.Internal.Box`1.Equals(System.Nullable{System.Object})
+  name: Equals(Nullable<Object>)
+  href: api/MagicOnion.Internal.Box-1.html#MagicOnion_Internal_Box_1_Equals_System_Nullable_System_Object__
+  commentId: M:MagicOnion.Internal.Box`1.Equals(System.Nullable{System.Object})
+  name.vb: Equals(Nullable(Of Object))
+  fullName: MagicOnion.Internal.Box<T>.Equals(System.Nullable<System.Object>)
+  fullName.vb: MagicOnion.Internal.Box(Of T).Equals(System.Nullable(Of System.Object))
+  nameWithType: Box<T>.Equals(Nullable<Object>)
+  nameWithType.vb: Box(Of T).Equals(Nullable(Of Object))
 - uid: MagicOnion.Internal.Box`1.Equals*
   name: Equals
   href: api/MagicOnion.Internal.Box-1.html#MagicOnion_Internal_Box_1_Equals_
