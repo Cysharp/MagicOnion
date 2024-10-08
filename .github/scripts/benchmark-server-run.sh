@@ -8,11 +8,13 @@ set -euo pipefail
 # $ echo $?
 
 function usage {
-    echo "usage: $(basename $0) --run-args <string> [options]"
-    echo "Required:"
-    echo "  --run-args          string      Arguments to pass when running the built binary (default: \"\")"
-    echo "Options:"
-    echo "  --help                          Show this help message"
+  cat <<EOF
+usage: $(basename $0) --run-args <string> [options]
+Required:
+  --run-args          string      Arguments to pass when running the built binary (default: \"\")
+Options:
+  --help                          Show this help message
+EOF
 }
 
 while [ $# -gt 0 ]; do

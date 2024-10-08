@@ -8,9 +8,11 @@ set -euo pipefail
 # $ echo $?
 
 function usage {
-    echo "usage: $(basename $0) [options]"
-    echo "Options:"
-    echo "  --help                      Show this help message"
+  cat <<EOF
+usage: $(basename $0) [options]
+Options:
+  --help                      Show this help message
+EOF
 }
 
 while [ $# -gt 0 ]; do
