@@ -5,6 +5,7 @@
 
     <LangVersion>$(_LangVersionUnityBaseline)</LangVersion>
     <Nullable>enable</Nullable>
+    <IsTrimmable>true</IsTrimmable>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Client</PackageId>

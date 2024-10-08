@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using MagicOnion.Internal.Reflection;
 
 namespace MagicOnion.Client.DynamicClient
 {
+    [RequiresUnreferencedCode(nameof(DynamicClientAssemblyHolder) + " is incompatible with trimming and Native AOT.")]
 #if ENABLE_SAVE_ASSEMBLY
     public
 #else

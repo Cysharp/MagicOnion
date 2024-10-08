@@ -18,6 +18,7 @@ namespace MagicOnion.Client.DynamicClient
     /// <summary>
     /// Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
     /// </summary>
+    [RequiresUnreferencedCode(nameof(DynamicMagicOnionClientFactoryProvider) + " is incompatible with trimming and Native AOT.")]
     public class DynamicMagicOnionClientFactoryProvider : IMagicOnionClientFactoryProvider
     {
         public static IMagicOnionClientFactoryProvider Instance { get; } = new DynamicMagicOnionClientFactoryProvider();
@@ -30,6 +31,7 @@ namespace MagicOnion.Client.DynamicClient
             return true;
         }
 
+        [RequiresUnreferencedCode(nameof(DynamicMagicOnionClientFactoryProvider) + "." + nameof(Cache<T>) + " is incompatible with trimming and Native AOT.")]
         static class Cache<T> where T : IService<T>
         {
             public static readonly MagicOnionClientFactoryDelegate<T> Factory

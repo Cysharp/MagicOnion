@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient
 {
+    [RequiresUnreferencedCode(nameof(ServiceClientDefinition) + " is incompatible with trimming and Native AOT.")]
     internal class ServiceClientDefinition
     {
         public Type ServiceInterfaceType { get; }
@@ -20,6 +22,7 @@ namespace MagicOnion.Client.DynamicClient
             Methods = methods;
         }
 
+        [RequiresUnreferencedCode(nameof(MagicOnionServiceMethodInfo) + " is incompatible with trimming and Native AOT.")]
         public class MagicOnionServiceMethodInfo
         {
             public MethodType MethodType { get; }
@@ -69,7 +72,7 @@ namespace MagicOnion.Client.DynamicClient
                 return method;
             }
 
-            private void Verify()
+            void Verify()
             {
                 switch (MethodType)
                 {
@@ -91,7 +94,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
             }
 
-            private static (MethodType MethodType, Type? RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
+            static (MethodType MethodType, Type? RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
             {
                 const string UnsupportedReturnTypeErrorMessage =
                     "The method of a service must return 'UnaryResult<T>', 'Task<ClientStreamingResult<TRequest, TResponse>>', 'Task<ServerStreamingResult<T>>' or 'DuplexStreamingResult<TRequest, TResponse>'.";
@@ -171,7 +174,7 @@ namespace MagicOnion.Client.DynamicClient
             return new ServiceClientDefinition(typeof(T), GetServiceMethods(typeof(T)));
         }
         
-        private static IReadOnlyList<MagicOnionServiceMethodInfo> GetServiceMethods(Type serviceType)
+        static IReadOnlyList<MagicOnionServiceMethodInfo> GetServiceMethods(Type serviceType)
         {
             return serviceType
                 .GetInterfaces()
@@ -209,7 +212,7 @@ namespace MagicOnion.Client.DynamicClient
         /// </summary>
         /// <param name="methodInfo"></param>
         /// <returns></returns>
-        private static Type GetRequestTypeFromMethod(MethodInfo methodInfo)
+        static Type GetRequestTypeFromMethod(MethodInfo methodInfo)
         {
             var parameterTypes = methodInfo.GetParameters().Select(x => x.ParameterType).ToArray();
             switch (parameterTypes.Length)

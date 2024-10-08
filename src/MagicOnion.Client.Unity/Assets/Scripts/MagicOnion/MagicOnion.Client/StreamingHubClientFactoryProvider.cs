@@ -9,6 +9,7 @@ namespace MagicOnion.Client
     /// <summary>
     /// Provides to get a StreamingHubClient factory of the specified service type.
     /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "ClientFactoryProvider is resolved at runtime.")]
     public static class StreamingHubClientFactoryProvider
     {
         /// <summary>

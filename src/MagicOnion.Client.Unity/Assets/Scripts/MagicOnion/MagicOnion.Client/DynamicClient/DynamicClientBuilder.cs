@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using Grpc.Core;
 using MagicOnion.Client.Internal;
 using MagicOnion.Serialization;
@@ -20,6 +20,7 @@ namespace MagicOnion.Client.DynamicClient
         }
     }
 
+    [RequiresUnreferencedCode(nameof(DynamicClientBuilder<T>) + " is incompatible with trimming and Native AOT.")]
     internal class DynamicClientBuilder<T> : DynamicClientBuilder
         where T : IService<T>
     {
