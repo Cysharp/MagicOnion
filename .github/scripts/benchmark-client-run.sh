@@ -60,60 +60,65 @@ title "Show installed dotnet sdk versions"
 print "  * dotnet sdk versions (list): $(dotnet --list-sdks)"
 print "  * dotnet sdk version (default): $(dotnet --version)"
 
-# is already clones?
-title "Check if already cloned $repo"
-if [[ ! -d "$clone_path" ]]; then
-  error "Failed to find $clone_path, not yet git cloned?"
-  exit 1
-fi
-
-# get branch name and set to environment variables
-title "Set branch name as Environment variable"
-pushd "$clone_path" > /dev/null
-  print "Get current git branch name"
-  git_branch=$(git rev-parse --abbrev-ref HEAD)
-  if [ -z "$git_branch" ]; then
-    error "Failed to get branch name, exiting..."
+echo "::group::Is already cloned?"
+  title "Check if already cloned $repo"
+  if [[ ! -d "$clone_path" ]]; then
+    error "Failed to find $clone_path, not yet git cloned?"
     exit 1
   fi
+echo "::endgroup::"
 
-  print "Set branch name to environment variables $git_branch"
-  export BRANCH_NAME="$git_branch"
-popd > /dev/null
+echo "::group::Get branch name and set to environment variables"
+  title "Set branch name as Environment variable"
+  pushd "$clone_path" > /dev/null
+    print "Get current git branch name"
+    git_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [ -z "$git_branch" ]; then
+      error "Failed to get branch name, exiting..."
+      exit 1
+    fi
 
-# setup env
-title "Setup environment"
-IFS=';' read -ra env_array <<< "$env_settings"
-for item in "${env_array[@]}"; do
-  if [[ -n "$item" ]]; then
-    export "${item?}"
-  fi
-done
+    print "Set branch name to environment variables $git_branch"
+    export BRANCH_NAME="$git_branch"
+  popd > /dev/null
+echo "::endgroup::"
 
-# dotnet publish
-title "dotnet publish $build_csproj"
-pushd "$clone_path" > /dev/null
-  print "List current files under $(pwd)"
-  ls -l
+echo "::group::Setup environment variables"
+  title "Setup environment"
+  IFS=';' read -ra env_array <<< "$env_settings"
+  for item in "${env_array[@]}"; do
+    if [[ -n "$item" ]]; then
+      export "${item?}"
+    fi
+  done
+echo "::endgroup::"
 
-  print "dotnet publish $build_csproj"
-  dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir"
+echo "::group::Kill existing process"
+  title "Checking process $binary_name already runnning, kill if exists"
+  ps -eo pid,cmd | while read -r pid cmd; do
+    if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
+      print "Found & killing process $pid ($cmd)"
+      kill "$pid"
+    fi
+  done
+echo "::endgroup::"
 
-  print "List published files under $publish_dir"
-  ls "$publish_dir"
+echo "::group::dotnet publish"
+  title "dotnet publish $build_csproj"
+  pushd "$clone_path" > /dev/null
+    print "List current files under $(pwd)"
+    ls -l
 
-  print "Add +x permission to published file $full_process_path"
-  chmod +x "$full_process_path"
-popd > /dev/null
+    print "dotnet publish $build_csproj"
+    dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir"
 
-# process check
-title "Checking process $binary_name already runnning, kill if exists"
-ps -eo pid,cmd | while read -r pid cmd; do
-  if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
-    print "Found & killing process $pid ($cmd)"
-    kill "$pid"
-  fi
-done
+    print "List published files under $publish_dir"
+    ls "$publish_dir"
+
+    print "Add +x permission to published file $full_process_path"
+    chmod +x "$full_process_path"
+  popd > /dev/null
+echo "::endgroup::"
 
 # run dotnet app
 title "Run $full_process_path $_ARGS"
