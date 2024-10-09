@@ -66,7 +66,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         where TRawRequest : class
         where TRawResponse : class
     {
-        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MethodInfo, ctx.MethodHandler.MessageSerializer);
+        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MessageSerializer);
         UnaryServerMethod<TService, TRawRequest, TRawResponse> invoker = async (_, request, context) =>
         {
             var response = await serverMethod(GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(request), context);
@@ -88,7 +88,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
         //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
         //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
-        var method = GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType.Unary, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MethodInfo, ctx.MethodHandler.MessageSerializer);
+        var method = GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType.Unary, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MessageSerializer);
         UnaryServerMethod<TService, Box<Nil>, TRawResponse> invoker = async (_, request, context) =>
         {
             var response = await serverMethod(GrpcMethodHelper.FromRaw<Box<Nil>, Nil>(request), context);
@@ -131,7 +131,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         where TRawRequest : class
         where TRawResponse : class
     {
-        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MethodInfo, ctx.MethodHandler.MessageSerializer);
+        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MessageSerializer);
         DuplexStreamingServerMethod<TService, TRawRequest, TRawResponse> invoker = async (_, request, response, context) => await serverMethod(
             new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(request),
             new MagicOnionServerStreamWriter<TResponse, TRawResponse>(response),
@@ -145,7 +145,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         where TRawRequest : class
         where TRawResponse : class
     {
-        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MethodInfo, ctx.MethodHandler.MessageSerializer);
+        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MessageSerializer);
         ServerStreamingServerMethod<TService, TRawRequest, TRawResponse> invoker = async (_, request, response, context) => await serverMethod(
             GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(request),
             new MagicOnionServerStreamWriter<TResponse, TRawResponse>(response),
@@ -159,7 +159,7 @@ internal class MagicOnionServiceBinder<TService> : IMagicOnionServiceBinder
         where TRawRequest : class
         where TRawResponse : class
     {
-        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MethodInfo, ctx.MethodHandler.MessageSerializer);
+        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, ctx.MethodHandler.ServiceName, ctx.MethodHandler.MethodName, ctx.MethodHandler.MessageSerializer);
         ClientStreamingServerMethod<TService, TRawRequest, TRawResponse> invoker = async (_, request, context) => GrpcMethodHelper.ToRaw<TResponse, TRawResponse>((await serverMethod(
             new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(request),
             context

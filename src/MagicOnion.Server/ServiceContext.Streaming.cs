@@ -39,7 +39,9 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
     public bool IsDisconnected { get; private set; }
 
     public StreamingServiceContext(
+        object instance,
         Type serviceType,
+        string serviceName,
         MethodInfo methodInfo,
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
@@ -50,7 +52,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         IServiceProvider serviceProvider,
         IAsyncStreamReader<TRequest>? requestStream,
         IServerStreamWriter<TResponse>? responseStream
-    ) : base(serviceType, methodInfo, attributeLookup, methodType, context, messageSerializer, logger, methodHandler, serviceProvider)
+    ) : base(instance, serviceType, serviceName, methodInfo, attributeLookup, methodType, context, messageSerializer, logger, methodHandler, serviceProvider)
     {
         RequestStream = requestStream;
         ResponseStream = responseStream;

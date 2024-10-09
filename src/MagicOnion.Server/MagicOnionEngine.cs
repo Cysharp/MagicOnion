@@ -189,6 +189,7 @@ public static class MagicOnionEngine
                     }
                     else
                     {
+                        continue;
                         // create handler
                         var handler = new MethodHandler(classType, methodInfo, methodName, methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: false);
                         if (!handlers.Add(handler))
@@ -198,6 +199,7 @@ public static class MagicOnionEngine
                     }
                 }
 
+                continue;
                 if (isStreamingHub)
                 {
                     var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect", BindingFlags.NonPublic | BindingFlags.Instance)!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
@@ -233,7 +235,7 @@ public static class MagicOnionEngine
 
         streamingHubHandlerRepository.Freeze();
 
-        var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
+        var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray(), targetTypes.ToArray());
 
         sw.Stop();
         MagicOnionServerLog.EndBuildServiceDefinition(loggerMagicOnionEngine, sw.Elapsed.TotalMilliseconds);

@@ -65,6 +65,9 @@ public class ServiceContext : IServiceContext
 
     public Type ServiceType { get; }
 
+    public string ServiceName { get; }
+    public string MethodName => MethodInfo.Name;
+
     public MethodInfo MethodInfo { get; }
 
     /// <summary>Cached Attributes both service and method.</summary>
@@ -79,6 +82,7 @@ public class ServiceContext : IServiceContext
 
     public IServiceProvider ServiceProvider { get; }
 
+    internal object Instance { get; }
     internal object? Request => request;
     internal object? Result { get; set; }
     internal ILogger Logger { get; }
@@ -86,7 +90,9 @@ public class ServiceContext : IServiceContext
     internal MetricsContext Metrics { get; }
 
     public ServiceContext(
+        object instance,
         Type serviceType,
+        string serviceName,
         MethodInfo methodInfo,
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
@@ -98,7 +104,9 @@ public class ServiceContext : IServiceContext
     )
     {
         this.ContextId = Guid.NewGuid();
+        this.Instance = instance;
         this.ServiceType = serviceType;
+        this.ServiceName = serviceName;
         this.MethodInfo = methodInfo;
         this.AttributeLookup = attributeLookup;
         this.MethodType = methodType;

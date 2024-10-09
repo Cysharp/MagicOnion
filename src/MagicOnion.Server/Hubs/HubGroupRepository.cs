@@ -21,7 +21,7 @@ public class HubGroupRepository<T>
         this.client = remoteClient;
         this.streamingContext = streamingContext;
         this.autoDisposeGroupProvider = autoDisposeGroupProvider;
-        this.prefix = streamingContext.MethodHandler.ToString();
+        this.prefix = $"{streamingContext.ServiceName}/{streamingContext.MethodName}";
     }
 
     /// <summary>

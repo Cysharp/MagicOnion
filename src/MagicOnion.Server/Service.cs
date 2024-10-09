@@ -1,16 +1,28 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 using MessagePack;
 
 namespace MagicOnion.Server;
 
-public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>
+public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>, IServiceBase
     where TServiceInterface : IServiceMarker
 {
     // NOTE: Properties `Context` and `Metrics` are set by an internal setter during instance activation of the service.
     //       For details, please refer to `ServiceProviderHelper.CreateService`.
     public ServiceContext Context { get; internal set; }
     internal MagicOnionMetrics Metrics { get; set; }
+
+    ServiceContext IServiceBase.Context
+    {
+        get => this.Context;
+        set => this.Context = value;
+    }
+    MagicOnionMetrics IServiceBase.Metrics
+    {
+        get => this.Metrics;
+        set => this.Metrics = value;
+    }
 
     public ServiceBase()
     {

@@ -230,7 +230,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     async ValueTask<object?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, messageSerializer, Logger, this, context.GetHttpContext().RequestServices);
+        var serviceContext = new ServiceContext(null!, ServiceType, ServiceName, MethodInfo, AttributeLookup, this.MethodType, context, messageSerializer, Logger, this, context.GetHttpContext().RequestServices);
         serviceContext.SetRawRequest(request);
 
         object? response = default(TResponse?);
@@ -312,7 +312,9 @@ public class MethodHandler : IEquatable<MethodHandler>
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<TRequest, Nil /* Dummy */>(
+            default!,
             ServiceType,
+            ServiceName,
             MethodInfo,
             AttributeLookup,
             this.MethodType,
@@ -371,7 +373,9 @@ public class MethodHandler : IEquatable<MethodHandler>
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
+            default!,
             ServiceType,
+            ServiceName,
             MethodInfo,
             AttributeLookup,
             this.MethodType,
@@ -424,7 +428,9 @@ public class MethodHandler : IEquatable<MethodHandler>
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
+            default!,
             ServiceType,
+            ServiceName,
             MethodInfo,
             AttributeLookup,
             this.MethodType,
@@ -531,38 +537,60 @@ public class MethodHandlerOptions
 
 internal class MethodHandlerResultHelper
 {
-    static readonly ValueTask CopmletedValueTask = new ValueTask();
     static readonly object BoxedNil = Nil.Default;
 
     public static ValueTask NewEmptyValueTask<T>(T result)
-    {
-        // ignore result.
-        return CopmletedValueTask;
-    }
+        => default;
 
-    public static async ValueTask TaskToEmptyValueTask<T>(Task<T> result)
-    {
-        // wait and ignore result.
-        await result;
-    }
+    public static ValueTask TaskToEmptyValueTask<T>(Task<T> result)
+        => new(result);
 
-    public static async ValueTask SetUnaryResultNonGeneric(UnaryResult result, ServiceContext context)
+    public static ValueTask SetUnaryResultNonGeneric(UnaryResult result, ServiceContext context)
     {
         if (result.hasRawValue)
         {
-            if (result.rawTaskValue != null)
+            if (result.rawTaskValue is { IsCompletedSuccessfully: true })
             {
-                await result.rawTaskValue.ConfigureAwait(false);
+                return Await(result.rawTaskValue, context);
             }
+            context.Result = BoxedNil;
+        }
+
+        return default;
+
+        static async ValueTask Await(Task task, ServiceContext context)
+        {
+            await task.ConfigureAwait(false);
             context.Result = BoxedNil;
         }
     }
 
-    public static async ValueTask SetUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
+    public static ValueTask SetUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
     {
         if (result.hasRawValue)
         {
-            context.Result = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
+            if (result.rawTaskValue is { } task)
+            {
+                if (task.IsCompletedSuccessfully)
+                {
+                    context.Result = task.Result;
+                }
+                else
+                {
+                    return Await(task, context);
+                }
+            }
+            else
+            {
+                context.Result = result.rawValue;
+            }
+        }
+
+        return default;
+
+        static async ValueTask Await(Task<T> task, ServiceContext context)
+        {
+            context.Result = await task.ConfigureAwait(false);
         }
     }
 
@@ -576,21 +604,31 @@ internal class MethodHandlerResultHelper
     }
 
     public static ValueTask SerializeClientStreamingResult<TRequest, TResponse>(ClientStreamingResult<TRequest, TResponse> result, ServiceContext context)
+        => SerializeValueTaskClientStreamingResult(new ValueTask<ClientStreamingResult<TRequest, TResponse>>(result), context);
+
+    public static ValueTask SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+        => SerializeValueTaskClientStreamingResult(new ValueTask<ClientStreamingResult<TRequest, TResponse>>(taskResult), context);
+
+    public static ValueTask SerializeValueTaskClientStreamingResult<TRequest, TResponse>(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
     {
-        if (result.hasRawValue)
+        if (taskResult.IsCompletedSuccessfully)
         {
-            context.Result = result.rawValue;
+            if (taskResult.Result.hasRawValue)
+            {
+                context.Result = taskResult.Result.rawValue;
+                return default;
+            }
         }
 
-        return default(ValueTask);
-    }
+        return Await(taskResult, context);
 
-    public static async ValueTask SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
-    {
-        var result = await taskResult.ConfigureAwait(false);
-        if (result.hasRawValue)
+        static async ValueTask Await(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
         {
-            context.Result = result.rawValue;
+            var result = await taskResult.ConfigureAwait(false);
+            if (result.hasRawValue)
+            {
+                context.Result = result.rawValue;
+            }
         }
     }
 }

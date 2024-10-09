@@ -5,8 +5,10 @@ using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
 using MagicOnion.Server.Binder;
+using MagicOnion.Server.Binder.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -48,8 +50,11 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
-        services.TryAddSingleton<StreamingHubHandlerRepository>();
-        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>();
+        services.TryAddSingleton(typeof(StreamingHubRegistry<>));
+        services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
+        services.AddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
+        services.TryAddSingleton<StreamingHubHandlerRepository>(); // Legacy
+        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>(); // Legacy
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();
@@ -69,6 +74,7 @@ public static class MagicOnionServicesExtensions
         services.TryAddSingleton<IRemoteClientResultPendingTaskRegistry, RemoteClientResultPendingTaskRegistry>();
         services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
         services.TryAddSingleton<MagicOnionManagedGroupProvider>();
+
 
         return new MagicOnionServerBuilder(services);
     }

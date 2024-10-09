@@ -7,7 +7,15 @@ using Microsoft.Extensions.Logging;
 namespace MagicOnion.Server.Tests;
 
 #pragma warning disable CS1998
-public class MagicOnionApplicationFactory<TServiceImplementation> : WebApplicationFactory<MagicOnionTestServer.Program>
+public class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
+{
+    protected override IEnumerable<Type> GetServiceImplementationTypes()
+    {
+        yield return typeof(TServiceImplementation);
+    }
+}
+
+public abstract class MagicOnionApplicationFactory : WebApplicationFactory<MagicOnionTestServer.Program>
 {
     public const string ItemsKey = "MagicOnionApplicationFactory.Items";
     public ConcurrentDictionary<string, object> Items => Services.GetRequiredKeyedService<ConcurrentDictionary<string, object>>(ItemsKey);
@@ -26,9 +34,11 @@ public class MagicOnionApplicationFactory<TServiceImplementation> : WebApplicati
         builder.ConfigureServices(services =>
         {
             services.AddKeyedSingleton<ConcurrentDictionary<string, object>>(ItemsKey);
-            services.AddMagicOnion(new[] { typeof(TServiceImplementation) });
+            services.AddMagicOnion(GetServiceImplementationTypes());
         });
     }
+
+    protected abstract IEnumerable<Type> GetServiceImplementationTypes();
 
     public WebApplicationFactory<MagicOnionTestServer.Program> WithMagicOnionOptions(Action<MagicOnionOptions> configure)
     {
