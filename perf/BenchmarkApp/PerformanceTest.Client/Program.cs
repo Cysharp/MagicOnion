@@ -273,6 +273,7 @@ void PrintStartupInformation(TextWriter? writer = null)
 {
     writer ??= Console.Out;
 
+    writer.WriteLine($"Benchmarker {ApplicationInformation.Current.BenchmarkerVersion}");
     writer.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
     writer.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
     writer.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
