@@ -46,7 +46,7 @@ internal class StreamingHubRegistry<TService> : IStreamingHubFeature
     {
         var streamingHubHandlerOptions = new StreamingHubHandlerOptions(options);
         var methodAndIdPairs = methods
-            .Select(x => new StreamingHubHandler(x.Method.DeclaringType!, x.Method, streamingHubHandlerOptions, serviceProvider))
+            .Select(x => new StreamingHubHandler(typeof(TService), x, streamingHubHandlerOptions, serviceProvider))
             .Select(x => (x.MethodId, x))
             .ToArray();
 

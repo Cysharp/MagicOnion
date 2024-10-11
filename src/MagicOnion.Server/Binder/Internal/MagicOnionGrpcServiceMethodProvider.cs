@@ -16,7 +16,7 @@ internal class MagicOnionGrpcServiceMethodProvider<TService> : IServiceMethodPro
     readonly ILoggerFactory loggerFactory;
     readonly ILogger logger;
 
-    public MagicOnionGrpcServiceMethodProvider(IEnumerable<IMagicOnionGrpcMethodProvider> methodProviders, IOptions<MagicOnionOptions> options, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ILogger<MagicOnionServiceMethodProvider<TService>> logger)
+    public MagicOnionGrpcServiceMethodProvider(IEnumerable<IMagicOnionGrpcMethodProvider> methodProviders, IOptions<MagicOnionOptions> options, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ILogger<MagicOnionGrpcServiceMethodProvider<TService>> logger)
     {
         this.methodProviders = methodProviders.ToArray();
         this.options = options.Value;

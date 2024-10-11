@@ -2,6 +2,7 @@ using Grpc.AspNetCore.Server.Model;
 
 namespace MagicOnion.Server.Binder;
 
+[Obsolete]
 internal class MagicOnionServiceMethodProvider<TService> : IServiceMethodProvider<TService>
     where TService : class
 {

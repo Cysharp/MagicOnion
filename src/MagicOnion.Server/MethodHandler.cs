@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
+[Obsolete]
 public class MethodHandler : IEquatable<MethodHandler>
 {
     // reflection cache

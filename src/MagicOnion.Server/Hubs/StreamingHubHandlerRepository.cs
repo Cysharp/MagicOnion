@@ -7,6 +7,7 @@ using MagicOnion.Server.Internal;
 namespace MagicOnion.Server.Hubs;
 
 // Global cache of Streaming Handler
+[Obsolete]
 internal class StreamingHubHandlerRepository
 {
     bool frozen;

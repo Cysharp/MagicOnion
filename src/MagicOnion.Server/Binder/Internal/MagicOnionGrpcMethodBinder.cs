@@ -370,7 +370,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
     {
         var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
         var filters = FilterHelper.GetFilters(globalFilters, typeof(TService), method.MethodInfo);
-        var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, (TRequest)serviceContext.Request!, serviceContext));
+        var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;
 

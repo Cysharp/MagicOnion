@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using MagicOnion.Internal;
+using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Server.Binder.Internal;
 
@@ -48,11 +49,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             var targetMethod = methodInfo;
             var methodParameters = targetMethod.GetParameters();
-            var typeRequest = methodParameters is { Length: > 1 }
-                ? typeof(DynamicArgumentTuple<,>).MakeGenericType(methodParameters[0].ParameterType, methodParameters[1].ParameterType)
-                : methodParameters is { Length: 1 }
-                    ? methodParameters[0].ParameterType
-                    : typeof(MessagePack.Nil);
+            var typeRequest = CreateRequestType(methodParameters);
             var typeRawRequest = typeRequest.IsValueType
                 ? typeof(Box<>).MakeGenericType(typeRequest)
                 : typeRequest;
@@ -73,9 +70,10 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
                 typeMethod = typeof(MagicOnionUnaryMethod<,,,,>).MakeGenericType(typeServiceImplementation, typeRequest, typeResponse, typeRawRequest, typeRawResponse);
             }
 
+            // (instance, context, request) => instance.Foo(request.Item1, request.Item2...);
             var exprParamInstance = Expression.Parameter(typeServiceImplementation);
-            var exprParamRequest = Expression.Parameter(typeRequest);
             var exprParamServiceContext = Expression.Parameter(typeof(ServiceContext));
+            var exprParamRequest = Expression.Parameter(typeRequest);
             var exprArguments = methodParameters.Length == 1
                 ? [exprParamRequest]
                 : methodParameters
@@ -84,7 +82,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
                     .ToArray();
 
             var exprCall = Expression.Call(exprParamInstance, targetMethod, exprArguments);
-            var invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamRequest, exprParamServiceContext]).Compile();
+            var invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamServiceContext, exprParamRequest]).Compile();
 
             var serviceMethod = Activator.CreateInstance(typeMethod, [typeServiceInterface.Name, targetMethod.Name, invoker])!;
             yield return (IMagicOnionGrpcMethod)serviceMethod;
@@ -114,11 +112,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             if (methodName is "Equals" or "GetHashCode" or "GetType" or "ToString" or "WithOptions" or "WithHeaders" or "WithDeadline" or "WithCancellationToken" or "WithHost") continue;
 
             var methodParameters = methodInfo.GetParameters();
-            var typeRequest = methodParameters is { Length: > 1 }
-                ? typeof(DynamicArgumentTuple<,>).MakeGenericType(methodParameters[0].ParameterType, methodParameters[1].ParameterType)
-                : methodParameters is { Length: 1 }
-                    ? methodParameters[0].ParameterType
-                    : typeof(MessagePack.Nil);
+            var typeRequest = CreateRequestType(methodParameters);
             var typeResponse = methodInfo.ReturnType;
 
             Type hubMethodType;
@@ -126,12 +120,58 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             {
                 hubMethodType = typeof(MagicOnionStreamingHubMethod<,>).MakeGenericType([typeServiceImplementation, typeRequest]);
             }
+            else if (typeResponse.IsConstructedGenericType && typeResponse.GetGenericTypeDefinition() is {} typeResponseOpen && (typeResponseOpen == typeof(Task<>) || typeResponseOpen == typeof(ValueTask<>)))
+            {
+                hubMethodType = typeof(MagicOnionStreamingHubMethod<,,>).MakeGenericType([typeServiceImplementation, typeRequest, typeResponse.GetGenericArguments()[0]]);
+            }
             else
             {
-                hubMethodType = typeof(MagicOnionStreamingHubMethod<,,>).MakeGenericType([typeServiceImplementation, typeRequest, typeResponse]);
+                throw new InvalidOperationException("Unsupported method return type. The return type of StreamingHub method must be one of 'void', 'Task', 'ValueTask', 'Task<T>' or 'ValueTask<T>'.");
             }
 
-            yield return (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, methodInfo])!;
+            // Invoker
+            // var invokeHubMethodFunc = (service, context, request) => service.Foo(request);
+            // or
+            // var invokeHubMethodFunc = (service, context, request) => service.Foo(request.Item1, request.Item2 ...);
+            var exprParamService = Expression.Parameter(typeof(TService), "service");
+            var exprParamContext = Expression.Parameter(typeof(StreamingHubContext), "context");
+            var exprParamRequest = Expression.Parameter(typeRequest, "request");
+            var exprArguments = methodParameters.Length == 1
+                ? [exprParamRequest]
+                : methodParameters
+                    .Select((x, i) => Expression.Field(exprParamRequest, "Item" + (i + 1)))
+                    .Cast<Expression>()
+                    .ToArray();
+
+            var exprCallHubMethod = Expression.Call(exprParamService, methodInfo, exprArguments);
+            var invoker = Expression.Lambda(exprCallHubMethod, [exprParamService, exprParamContext, exprParamRequest]).Compile();
+
+            var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, invoker])!;
+            yield return hubMethod;
         }
+    }
+
+    static Type CreateRequestType(ParameterInfo[] parameters)
+    {
+        return parameters.Length switch
+        {
+            0 => typeof(MessagePack.Nil),
+            1 => parameters[0].ParameterType,
+            2 => typeof(DynamicArgumentTuple<,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType),
+            3 => typeof(DynamicArgumentTuple<,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType),
+            4 => typeof(DynamicArgumentTuple<,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType),
+            5 => typeof(DynamicArgumentTuple<,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType),
+            6 => typeof(DynamicArgumentTuple<,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType),
+            7 => typeof(DynamicArgumentTuple<,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType),
+            8 => typeof(DynamicArgumentTuple<,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType),
+            9 => typeof(DynamicArgumentTuple<,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType),
+            10 => typeof(DynamicArgumentTuple<,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType),
+            11 => typeof(DynamicArgumentTuple<,,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType, parameters[10].ParameterType),
+            12 => typeof(DynamicArgumentTuple<,,,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType, parameters[10].ParameterType, parameters[11].ParameterType),
+            13 => typeof(DynamicArgumentTuple<,,,,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType, parameters[10].ParameterType, parameters[11].ParameterType, parameters[12].ParameterType),
+            14 => typeof(DynamicArgumentTuple<,,,,,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType, parameters[10].ParameterType, parameters[11].ParameterType, parameters[12].ParameterType, parameters[13].ParameterType),
+            15 => typeof(DynamicArgumentTuple<,,,,,,,,,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType, parameters[7].ParameterType, parameters[8].ParameterType, parameters[9].ParameterType, parameters[10].ParameterType, parameters[11].ParameterType, parameters[12].ParameterType, parameters[13].ParameterType, parameters[14].ParameterType),
+            _ =>  throw new NotSupportedException("The method must have no more than 16 parameters."),
+        };
     }
 }

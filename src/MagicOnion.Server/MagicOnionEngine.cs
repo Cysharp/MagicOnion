@@ -116,124 +116,12 @@ public static class MagicOnionEngine
         var handlers = new HashSet<MethodHandler>();
         var streamingHubHandlers = new List<StreamingHubHandler>();
 
-        var methodHandlerOptions = new MethodHandlerOptions(options);
-        var streamingHubHandlerOptions = new StreamingHubHandlerOptions(options);
-
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var loggerMagicOnionEngine = loggerFactory.CreateLogger(LoggerNameMagicOnionEngine);
-        var loggerMethodHandler = loggerFactory.CreateLogger(LoggerNameMethodHandler);
-
-        var streamingHubHandlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
 
         MagicOnionServerLog.BeginBuildServiceDefinition(loggerMagicOnionEngine);
 
         var sw = Stopwatch.StartNew();
-
-        try
-        {
-            foreach (var classType in targetTypes)
-            {
-                VerifyServiceType(classType);
-
-                var className = classType.Name;
-                var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
-                HashSet<StreamingHubHandler>? tempStreamingHubHandlers = null;
-                if (isStreamingHub)
-                {
-                    tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
-                }
-
-                var inheritInterface = classType.GetInterfaces()
-                    .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == (isStreamingHub ? typeof(IStreamingHub<,>) : typeof(IService<>)))
-                    .GenericTypeArguments[0];
-
-                if (!inheritInterface.IsAssignableFrom(classType))
-                {
-                    throw new NotImplementedException($"Type '{classType.FullName}' has no implementation of interface '{inheritInterface.FullName}'.");
-                }
-
-                var interfaceMap = classType.GetInterfaceMapWithParents(inheritInterface);
-
-                for (int i = 0; i < interfaceMap.TargetMethods.Length; ++i)
-                {
-                    var methodInfo = interfaceMap.TargetMethods[i];
-                    var methodName = interfaceMap.InterfaceMethods[i].Name;
-
-                    if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
-                    if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
-
-                    // ignore default methods
-                    if (methodName == "Equals"
-                        || methodName == "GetHashCode"
-                        || methodName == "GetType"
-                        || methodName == "ToString"
-                        || methodName == "WithOptions"
-                        || methodName == "WithHeaders"
-                        || methodName == "WithDeadline"
-                        || methodName == "WithCancellationToken"
-                        || methodName == "WithHost"
-                       )
-                    {
-                        continue;
-                    }
-
-                    // register for StreamingHub
-                    if (isStreamingHub && methodName != "Connect")
-                    {
-                        var streamingHandler = new StreamingHubHandler(classType, methodInfo, streamingHubHandlerOptions, serviceProvider);
-                        if (!tempStreamingHubHandlers!.Add(streamingHandler))
-                        {
-                            throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
-                        }
-                        continue;
-                    }
-                    else
-                    {
-                        continue;
-                        // create handler
-                        var handler = new MethodHandler(classType, methodInfo, methodName, methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: false);
-                        if (!handlers.Add(handler))
-                        {
-                            throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
-                        }
-                    }
-                }
-
-                continue;
-                if (isStreamingHub)
-                {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect", BindingFlags.NonPublic | BindingFlags.Instance)!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
-                    if (!handlers.Add(connectHandler))
-                    {
-                        throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
-                    }
-
-                    streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-                    streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
-
-                    // Group Provider
-                    IMulticastGroupProvider groupProvider;
-                    var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
-                    if (attr != null)
-                    {
-                        groupProvider = (IMulticastGroupProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
-                    }
-                    else
-                    {
-                        groupProvider = serviceProvider.GetRequiredService<IMulticastGroupProvider>();
-                    }
-
-                    streamingHubHandlerRepository.RegisterGroupProvider(connectHandler, groupProvider);
-                    streamingHubHandlerRepository.RegisterHeartbeatManager(connectHandler, CreateHeartbeatManager(options, classType, serviceProvider));
-                }
-            }
-        }
-        catch (AggregateException agex)
-        {
-            ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
-        }
-
-        streamingHubHandlerRepository.Freeze();
 
         var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray(), targetTypes.ToArray());
 
@@ -243,47 +131,6 @@ public static class MagicOnionEngine
         return result;
     }
 
-    static IStreamingHubHeartbeatManager CreateHeartbeatManager(MagicOnionOptions options, Type classType, IServiceProvider serviceProvider)
-    {
-        var heartbeatEnable = options.EnableStreamingHubHeartbeat;
-        var heartbeatInterval = options.StreamingHubHeartbeatInterval;
-        var heartbeatTimeout = options.StreamingHubHeartbeatTimeout;
-        var heartbeatMetadataProvider = default(IStreamingHubHeartbeatMetadataProvider);
-        if (classType.GetCustomAttribute<HeartbeatAttribute>(inherit: true) is { } heartbeatAttr)
-        {
-            heartbeatEnable = heartbeatAttr.Enable;
-            if (heartbeatAttr.Timeout != 0)
-            {
-                heartbeatTimeout = TimeSpan.FromMilliseconds(heartbeatAttr.Timeout);
-            }
-            if (heartbeatAttr.Interval != 0)
-            {
-                heartbeatInterval = TimeSpan.FromMilliseconds(heartbeatAttr.Interval);
-            }
-            if (heartbeatAttr.MetadataProvider != null)
-            {
-                heartbeatMetadataProvider = (IStreamingHubHeartbeatMetadataProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, heartbeatAttr.MetadataProvider);
-            }
-        }
-
-        IStreamingHubHeartbeatManager heartbeatManager;
-        if (!heartbeatEnable || heartbeatInterval is null)
-        {
-            heartbeatManager = NopStreamingHubHeartbeatManager.Instance;
-        }
-        else
-        {
-            heartbeatManager = new StreamingHubHeartbeatManager(
-                heartbeatInterval.Value,
-                heartbeatTimeout ?? Timeout.InfiniteTimeSpan,
-                heartbeatMetadataProvider ?? serviceProvider.GetService<IStreamingHubHeartbeatMetadataProvider>(),
-                options.TimeProvider ?? TimeProvider.System,
-                serviceProvider.GetRequiredService<ILogger<StreamingHubHeartbeatManager>>()
-            );
-        }
-
-        return heartbeatManager;
-    }
 
     internal static void VerifyServiceType(Type type)
     {

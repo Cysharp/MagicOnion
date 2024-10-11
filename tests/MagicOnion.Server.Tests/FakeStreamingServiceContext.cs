@@ -26,7 +26,6 @@ class FakeStreamingServiceContext<TRequest, TResponse> : IStreamingServiceContex
     public FakeStreamingServiceContext(Type serviceType, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer, IServiceProvider serviceProvider, ILookup<Type, Attribute> attributeLookup = null)
     {
         ServiceType = serviceType;
-        MethodInfo = methodInfo;
         MessageSerializer = messageSerializer;
         ServiceProvider = serviceProvider;
 
