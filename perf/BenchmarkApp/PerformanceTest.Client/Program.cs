@@ -73,6 +73,7 @@ async Task Main(
     WriteLog("Gathering the server information...");
     {
         serverInfo = await controlServiceClient.GetServerInformationAsync();
+        WriteLog($"Benchmarker {serverInfo.BenchmarkerVersion}");
         WriteLog($"MagicOnion {serverInfo.MagicOnionVersion}");
         WriteLog($"grpc-dotnet {serverInfo.GrpcNetVersion}");
         WriteLog($"{nameof(ApplicationInformation.OSDescription)}: {serverInfo.OSDescription}");
@@ -112,6 +113,7 @@ async Task Main(
         PrintStartupInformation(writer);
         writer.WriteLine($"========================================");
         writer.WriteLine($"Server Information:");
+        writer.WriteLine($"Benchmarker {serverInfo.BenchmarkerVersion}");
         writer.WriteLine($"MagicOnion {serverInfo.MagicOnionVersion}");
         writer.WriteLine($"grpc-dotnet {serverInfo.GrpcNetVersion}");
         writer.WriteLine($"MessagePack {serverInfo.MessagePackVersion}");

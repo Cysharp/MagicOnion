@@ -18,6 +18,7 @@ public interface IPerfTestControlService : IService<IPerfTestControlService>
 public partial class ServerInformation
 {
     public string MachineName { get; set; }
+    public string? BenchmarkerVersion { get; set; }
     public string? MagicOnionVersion { get; }
     public string? GrpcNetVersion { get; }
     public string? MessagePackVersion { get; }
@@ -32,9 +33,10 @@ public partial class ServerInformation
     public int ProcessorCount { get; }
     public bool IsAttached { get; }
 
-    public ServerInformation(string machineName, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, string? memoryPackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, string cpuModelName, bool isServerGC, int processorCount, bool isAttached)
+    public ServerInformation(string machineName, string? benchmarkerVersion, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, string? memoryPackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, string cpuModelName, bool isServerGC, int processorCount, bool isAttached)
     {
         MachineName = machineName;
+        BenchmarkerVersion = benchmarkerVersion;
         MagicOnionVersion = magicOnionVersion;
         GrpcNetVersion = grpcNetVersion;
         MessagePackVersion = messagePackVersion;
