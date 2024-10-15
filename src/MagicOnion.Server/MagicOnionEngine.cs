@@ -113,9 +113,6 @@ public static class MagicOnionEngine
     /// <param name="options">The options for MagicOnion server</param>
     public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable<Type> targetTypes, MagicOnionOptions options)
     {
-        var handlers = new HashSet<MethodHandler>();
-        var streamingHubHandlers = new List<StreamingHubHandler>();
-
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var loggerMagicOnionEngine = loggerFactory.CreateLogger(LoggerNameMagicOnionEngine);
 
@@ -123,7 +120,7 @@ public static class MagicOnionEngine
 
         var sw = Stopwatch.StartNew();
 
-        var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray(), targetTypes.ToArray());
+        var result = new MagicOnionServiceDefinition(targetTypes.ToArray());
 
         sw.Stop();
         MagicOnionServerLog.EndBuildServiceDefinition(loggerMagicOnionEngine, sw.Elapsed.TotalMilliseconds);

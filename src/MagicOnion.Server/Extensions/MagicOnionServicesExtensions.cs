@@ -53,8 +53,6 @@ public static class MagicOnionServicesExtensions
         services.TryAddSingleton(typeof(StreamingHubRegistry<>));
         services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
         services.AddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
-        services.TryAddSingleton<StreamingHubHandlerRepository>(); // Legacy
-        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>(); // Legacy
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();

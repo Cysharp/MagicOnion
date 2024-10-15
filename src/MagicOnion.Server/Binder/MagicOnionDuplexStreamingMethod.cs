@@ -1,4 +1,5 @@
 using System.Reflection;
+using Grpc.Core;
 
 namespace MagicOnion.Server.Binder;
 
@@ -10,6 +11,8 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
 
     readonly Func<TService, ServiceContext, ValueTask> invoker;
 
+    public MethodType MethodType => MethodType.DuplexStreaming;
+    public Type ServiceType => typeof(TService);
     public string ServiceName { get; }
     public string MethodName { get; }
 

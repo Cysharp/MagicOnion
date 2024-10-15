@@ -81,11 +81,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         return CompletedTask;
     }
 
-    Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> IStreamingHubBase.Connect()
-        => Connect();
-
-    [Obsolete]
-    internal async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> Connect()
+    async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> IStreamingHubBase.Connect()
     {
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.ServiceName);
 

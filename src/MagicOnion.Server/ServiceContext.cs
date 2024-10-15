@@ -4,6 +4,7 @@ using MagicOnion.Server.Diagnostics;
 using System.Collections.Concurrent;
 using System.Reflection;
 using MagicOnion.Internal;
+using MagicOnion.Server.Binder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -63,17 +64,17 @@ public class ServiceContext : IServiceContext
 
     public DateTime Timestamp { get; }
 
-    public Type ServiceType { get; }
+    public Type ServiceType => Method.ServiceType;
 
-    public string ServiceName { get; }
+    public string ServiceName => Method.ServiceName;
     public string MethodName => MethodInfo.Name;
 
-    public MethodInfo MethodInfo { get; }
+    public MethodInfo MethodInfo => Method.MethodInfo;
 
     /// <summary>Cached Attributes both service and method.</summary>
     public ILookup<Type, Attribute> AttributeLookup { get; }
 
-    public MethodType MethodType { get; }
+    public MethodType MethodType => Method.MethodType;
 
     /// <summary>Raw gRPC Context.</summary>
     public ServerCallContext CallContext { get; }
@@ -86,35 +87,27 @@ public class ServiceContext : IServiceContext
     internal object? Request => request;
     internal object? Result { get; set; }
     internal ILogger Logger { get; }
-    internal MethodHandler MethodHandler { get; }
+    internal IMagicOnionGrpcMethod Method { get; }
     internal MetricsContext Metrics { get; }
 
     public ServiceContext(
         object instance,
-        Type serviceType,
-        string serviceName,
-        MethodInfo methodInfo,
+        IMagicOnionGrpcMethod method,
         ILookup<Type, Attribute> attributeLookup,
-        MethodType methodType,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
         ILogger logger,
-        MethodHandler methodHandler,
         IServiceProvider serviceProvider
     )
     {
         this.ContextId = Guid.NewGuid();
         this.Instance = instance;
-        this.ServiceType = serviceType;
-        this.ServiceName = serviceName;
-        this.MethodInfo = methodInfo;
         this.AttributeLookup = attributeLookup;
-        this.MethodType = methodType;
         this.CallContext = context;
         this.Timestamp = DateTime.UtcNow;
         this.MessageSerializer = messageSerializer;
         this.Logger = logger;
-        this.MethodHandler = methodHandler;
+        this.Method = method;
         this.ServiceProvider = serviceProvider;
 
         this.Metrics = serviceProvider.GetRequiredService<MagicOnionMetrics>().CreateContext();

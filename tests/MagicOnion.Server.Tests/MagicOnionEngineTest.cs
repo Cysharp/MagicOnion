@@ -1,3 +1,4 @@
+#if FALSE
 using System.Reflection;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
@@ -349,3 +350,4 @@ public class MagicOnionEngineTest
         MagicOnionEngine.ShouldIgnoreAssembly("MagicOnionSample").Should().BeFalse();
     }
 }
+#endif

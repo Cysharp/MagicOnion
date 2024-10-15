@@ -29,8 +29,7 @@ internal class MagicOnionGrpcServiceMethodProvider<TService> : IServiceMethodPro
     {
         if (!typeof(TService).IsAssignableTo(typeof(IServiceMarker))) return;
 
-        var methodBinderLogger = loggerFactory.CreateLogger<MagicOnionGrpcMethodBinder<TService>>();
-        var binder = new MagicOnionGrpcMethodBinder<TService>(context, options, serviceProvider, methodBinderLogger);
+        var binder = new MagicOnionGrpcMethodBinder<TService>(context, options, loggerFactory, serviceProvider);
 
         var registered = false;
         foreach (var methodProvider in methodProviders.OrderBy(x => x is DynamicMagicOnionMethodProvider ? 1 : 0)) // DynamicMagicOnionMethodProvider is always last.

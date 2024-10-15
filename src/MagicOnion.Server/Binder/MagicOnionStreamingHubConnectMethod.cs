@@ -1,10 +1,13 @@
 using System.Reflection;
+using Grpc.Core;
 using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Binder;
 
 public class MagicOnionStreamingHubConnectMethod<TService> : IMagicOnionGrpcMethod<TService> where TService : class
 {
+    public MethodType MethodType => MethodType.DuplexStreaming;
+    public Type ServiceType => typeof(TService);
     public string ServiceName { get; }
     public string MethodName { get; }
 
