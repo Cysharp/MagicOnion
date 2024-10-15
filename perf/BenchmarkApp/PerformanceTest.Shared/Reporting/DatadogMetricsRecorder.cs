@@ -9,6 +9,7 @@ public class DatadogMetricsRecorder
 {
     // format should be `CLIENTxSERVER` Versions.
     public static string MagicOnionVersions = "";
+    public static bool EnableLatestTag = false;
 
     public string TagBranch { get; }
     public string TagLegend { get; }
@@ -16,6 +17,8 @@ public class DatadogMetricsRecorder
     public string TagProtocol { get; }
     public string TagSerialization { get; }
     public string TagMagicOnion => MagicOnionVersions;
+    public string TagLatestMagicOnion { get; } = "latestxlatest";
+
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider;
     private readonly HttpClient client;

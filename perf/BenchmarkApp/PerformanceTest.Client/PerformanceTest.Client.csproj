@@ -12,7 +12,7 @@
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup Condition="'$(UseNuGetClient)' != ''">
-    <PackageReference Include="ConsoleAppFramework" Version="$(ConsoleAppFrameworkVersion)"/>
+    <PackageReference Include="ConsoleAppFramework" Version="$(ConsoleAppFrameworkVersion)" />
     <PackageReference Include="MagicOnion.Client" Version="$(UseNuGetClient)" />
     <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="$(UseNuGetClient)-preview" />
   </ItemGroup>
@@ -23,6 +23,12 @@
   <ItemGroup Condition="'$(UseNuGetClient)' == ''">
     <ProjectReference Include="..\..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="PerformanceTest.Shared.MagicOnionIsLatestAttirbute">
+      <_Parameter1>$(UseNuGetClient)</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>

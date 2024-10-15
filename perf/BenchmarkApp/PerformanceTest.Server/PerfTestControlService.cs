@@ -13,6 +13,7 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
         return UnaryResult.FromResult(new ServerInformation(
             Environment.MachineName,
             ApplicationInformation.Current.BenchmarkerVersion,
+            ApplicationInformation.Current.IsLatestMagicOnion,
             ApplicationInformation.Current.MagicOnionVersion,
             ApplicationInformation.Current.GrpcNetVersion,
             ApplicationInformation.Current.MessagePackVersion,
@@ -28,13 +29,16 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
             ApplicationInformation.Current.IsAttached));
     }
 
-    public UnaryResult<string> ExchangeMagicOnionVersionTagAsync(string? clientMagicOnionVersion)
+    public UnaryResult<(string serverMagicOnionVersion, bool enableLatestTag)> ExchangeMagicOnionVersionTagAsync(string? clientMagicOnionVersion, bool isLatestMagicOnionVersion)
     {
         var versionTag = $"{clientMagicOnionVersion}x{ApplicationInformation.Current.TagMagicOnionVersion}";
+        // Both Server and Client is latest
+        var isLatestTagEnabled = ApplicationInformation.Current.IsLatestMagicOnion && isLatestMagicOnionVersion;
 
         // keep in server
         DatadogMetricsRecorder.MagicOnionVersions = versionTag;
-        return UnaryResult.FromResult(versionTag);
+        DatadogMetricsRecorder.EnableLatestTag = isLatestTagEnabled;
+        return UnaryResult.FromResult((versionTag, isLatestTagEnabled));
     }
 
     public UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable)

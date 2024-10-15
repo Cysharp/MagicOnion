@@ -25,6 +25,7 @@ class StartupService : IHostedService
         Console.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
         Console.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
         Console.WriteLine($"MemoryPack {ApplicationInformation.Current.MemoryPackVersion}");
+        Console.WriteLine($"IsLatestMagicOnion {ApplicationInformation.Current.IsLatestMagicOnion}");
         Console.WriteLine();
 
         Console.WriteLine($"Listening on:");

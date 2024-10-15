@@ -28,6 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="PerformanceTest.Shared.MagicOnionIsLatestAttirbute">
+      <_Parameter1>$(UseNuGetServer)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\PerformanceTest.Shared\Certs\*.*" LinkBase="Certs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

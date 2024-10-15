@@ -9,6 +9,8 @@ public class ApplicationInformation
 {
     public static ApplicationInformation Current { get; } = new ApplicationInformation();
 
+    public bool IsLatestMagicOnion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<MagicOnionIsLatestAttirbute>()?.IsLatest ?? true; // set from csproj
+
     public string? BenchmarkerVersion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
 #if SERVER

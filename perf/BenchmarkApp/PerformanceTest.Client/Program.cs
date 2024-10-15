@@ -68,7 +68,7 @@ async Task Main(
     using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
     await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
-    DatadogMetricsRecorder.MagicOnionVersions = await controlServiceClient.ExchangeMagicOnionVersionTagAsync(ApplicationInformation.Current.TagMagicOnionVersion); // keep in Client
+    (DatadogMetricsRecorder.MagicOnionVersions, DatadogMetricsRecorder.EnableLatestTag) = await controlServiceClient.ExchangeMagicOnionVersionTagAsync(ApplicationInformation.Current.TagMagicOnionVersion, ApplicationInformation.Current.IsLatestMagicOnion); // keep in Client
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
@@ -78,6 +78,7 @@ async Task Main(
         WriteLog($"MagicOnion {serverInfo.MagicOnionVersion}");
         WriteLog($"grpc-dotnet {serverInfo.GrpcNetVersion}");
         WriteLog($"{nameof(ApplicationInformation.OSDescription)}: {serverInfo.OSDescription}");
+        WriteLog($"IsLatestMagicOnion {serverInfo.IsLatestMagicOnion}");
     }
 
     var resultsByScenario = new Dictionary<ScenarioType, List<PerformanceResult>>();
@@ -281,6 +282,7 @@ void PrintStartupInformation(TextWriter? writer = null)
     writer.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
     writer.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
     writer.WriteLine($"MemoryPack {ApplicationInformation.Current.MemoryPackVersion}");
+    writer.WriteLine($"IsLatestMagicOnion {ApplicationInformation.Current.IsLatestMagicOnion}");
     writer.WriteLine();
 
     writer.WriteLine("Configurations:");
@@ -323,31 +325,41 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="results"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, IReadOnlyList<PerformanceResult> results)
     {
-        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, recorder.TagMagicOnion, scenario, applicationInfo), static x => [
-            $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
-            $"branch:{x.TagBranch}",
-            $"magiconion:{x.TagMagicOnion}",
-            $"protocol:{x.TagProtocol}",
-            $"process_arch:{x.applicationInfo.ProcessArchitecture}",
-            $"process_count:{x.applicationInfo.ProcessorCount}",
-            $"scenario:{x.scenario}",
-            $"serialization:{x.TagSerialization}",
-            $"streams:{x.TagStreams}",
-        ]);
-
         var filtered = RemoveOutlinerByIQR(results);
 
-        // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x => x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", filtered.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", filtered.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+        Post(recorder, scenario, applicationInfo, filtered, false);
+        if (DatadogMetricsRecorder.EnableLatestTag)
+        {
+            Post(recorder, scenario, applicationInfo, filtered, true);
+        }
 
         // wait until send complete
         await recorder.WaitSaveAsync();
+
+        static void Post(DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, IReadOnlyList<PerformanceResult> filtered, bool enableLatestTag)
+        {
+            var magicOnionTag = enableLatestTag ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
+            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, scenario, applicationInfo), static x => [
+                $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
+                $"branch:{x.TagBranch}",
+                $"magiconion:{x.magicOnionTag}",
+                $"protocol:{x.TagProtocol}",
+                $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                $"process_count:{x.applicationInfo.ProcessorCount}",
+                $"scenario:{x.scenario}",
+                $"serialization:{x.TagSerialization}",
+                $"streams:{x.TagStreams}",
+            ]);
+
+            // Don't want to await each put. Let's send it to queue and await when benchmark ends.
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x => x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", filtered.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", filtered.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
+        }
 
         // Remove Outliner by IQR
         static IReadOnlyList<PerformanceResult> RemoveOutlinerByIQR(IReadOnlyList<PerformanceResult> data)
