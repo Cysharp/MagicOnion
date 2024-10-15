@@ -49,5 +49,28 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
         => binder.BindClientStreaming(this);
 
     public ValueTask InvokeAsync(TService service, ServiceContext context)
-        => MethodHandlerResultHelper.SerializeValueTaskClientStreamingResult(invoker(service, context), context);
+        => SerializeValueTaskClientStreamingResult(invoker(service, context), context);
+
+    static ValueTask SerializeValueTaskClientStreamingResult(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+    {
+        if (taskResult.IsCompletedSuccessfully)
+        {
+            if (taskResult.Result.hasRawValue)
+            {
+                context.Result = taskResult.Result.rawValue;
+                return default;
+            }
+        }
+
+        return Await(taskResult, context);
+
+        static async ValueTask Await(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+        {
+            var result = await taskResult.ConfigureAwait(false);
+            if (result.hasRawValue)
+            {
+                context.Result = result.rawValue;
+            }
+        }
+    }
 }
