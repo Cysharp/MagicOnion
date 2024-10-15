@@ -49,6 +49,15 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
         this.invoker = async (service, context) => await invoker(service, context);
     }
 
+    public MagicOnionDuplexStreamingMethod(MagicOnionStreamingHubConnectMethod<TService> hubConnectMethod, Func<TService, ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>> invoker)
+    {
+        ServiceName = hubConnectMethod.ServiceName;
+        MethodName = hubConnectMethod.MethodName;
+        MethodInfo = hubConnectMethod.MethodInfo;
+
+        this.invoker = (service, context) => new ValueTask(invoker(service, context));
+    }
+
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
         => binder.BindDuplexStreaming(this);
 

@@ -91,8 +91,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         var attrs = GetMetadataFromHandler(method.MethodInfo);
 
         var duplexMethod = new MagicOnionDuplexStreamingMethod<TService, StreamingHubPayload, StreamingHubPayload, StreamingHubPayload, StreamingHubPayload>(
-            method.ServiceName,
-            method.MethodName,
+            method,
             static (instance, context) =>
             {
                 context.CallContext.GetHttpContext().Features.Set<IStreamingHubFeature>(context.ServiceProvider.GetRequiredService<StreamingHubRegistry<TService>>());

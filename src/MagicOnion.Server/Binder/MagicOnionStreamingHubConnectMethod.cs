@@ -17,7 +17,7 @@ public class MagicOnionStreamingHubConnectMethod<TService> : IMagicOnionGrpcMeth
     {
         ServiceName = serviceName;
         MethodName = nameof(IStreamingHubBase.Connect);
-        MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
+        MethodInfo = typeof(TService).GetMethod("MagicOnion.Server.Internal.IStreamingHubBase.Connect", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
     }
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
