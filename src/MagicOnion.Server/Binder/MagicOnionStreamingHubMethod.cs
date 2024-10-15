@@ -14,7 +14,6 @@ public interface IMagicOnionStreamingHubMethod
     ValueTask InvokeAsync(StreamingHubContext context);
 }
 
-// TODO:
 public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagicOnionStreamingHubMethod
 {
     public string ServiceName { get; }

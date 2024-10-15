@@ -1,23 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
-using Cysharp.Runtime.Multicast;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Cysharp.Runtime.Multicast;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Features.Internal;
 using MagicOnion.Server.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.Hubs.Internal;
-
-internal interface IStreamingHubFeature
-{
-    MagicOnionManagedGroupProvider GroupProvider { get; }
-    IStreamingHubHeartbeatManager HeartbeatManager { get; }
-    UniqueHashDictionary<StreamingHubHandler> Handlers { get; }
-
-    bool TryGetMethod(int methodId, [NotNullWhen(true)] out StreamingHubHandler? handler);
-}
 
 internal class StreamingHubRegistry<TService> : IStreamingHubFeature
 {
