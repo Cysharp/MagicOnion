@@ -8,6 +8,7 @@ namespace PerformanceTest.Shared;
 public interface IPerfTestControlService : IService<IPerfTestControlService>
 {
     UnaryResult<ServerInformation> GetServerInformationAsync();
+    UnaryResult<string> ExchangeMagicOnionVersionTagAsync(string? clientMagicOnionVersion);
 
     UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable);
     UnaryResult CreateMemoryProfilerSnapshotAsync(string name);

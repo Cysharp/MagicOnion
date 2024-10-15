@@ -7,11 +7,15 @@ namespace PerformanceTest.Shared.Reporting;
 
 public class DatadogMetricsRecorder
 {
+    // format should be `CLIENTxSERVER` Versions.
+    public static string MagicOnionVersions = "";
+
     public string TagBranch { get; }
     public string TagLegend { get; }
     public string TagStreams { get; }
     public string TagProtocol { get; }
     public string TagSerialization { get; }
+    public string TagMagicOnion => MagicOnionVersions;
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider;
     private readonly HttpClient client;

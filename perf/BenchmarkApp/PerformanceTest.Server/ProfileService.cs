@@ -41,14 +41,15 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutServerBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, applicationInfo), static x => [
+        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, recorder.TagMagicOnion, applicationInfo), static x => [
             $"legend:{x.TagLegend}{x.TagStreams}",
             $"branch:{x.TagBranch}",
-            $"streams:{x.TagStreams}",
+            $"magiconion:{x.TagMagicOnion}",
             $"protocol:{x.TagProtocol}",
             $"process_arch:{x.applicationInfo.ProcessArchitecture}",
             $"process_count:{x.applicationInfo.ProcessorCount}",
             $"serialization:{x.TagSerialization}",
+            $"streams:{x.TagStreams}",
         ]);
 
         // Don't want to await each put. Let's send it to queue and await when benchmark ends.

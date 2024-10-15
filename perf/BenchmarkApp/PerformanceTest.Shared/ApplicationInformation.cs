@@ -9,7 +9,6 @@ public class ApplicationInformation
 {
     public static ApplicationInformation Current { get; } = new ApplicationInformation();
 
-    public string? TagBenchmarkerVersion { get; } = RemoveHashFromVersion(typeof(ApplicationInformation).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
     public string? BenchmarkerVersion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
 #if SERVER

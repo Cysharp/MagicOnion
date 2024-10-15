@@ -68,6 +68,7 @@ async Task Main(
     using var channelControl = config.CreateChannel();
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
     await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
+    DatadogMetricsRecorder.MagicOnionVersions = await controlServiceClient.ExchangeMagicOnionVersionTagAsync(ApplicationInformation.Current.TagMagicOnionVersion); // keep in Client
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
@@ -322,15 +323,16 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="results"></param>
     public static async Task PutClientBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, IReadOnlyList<PerformanceResult> results)
     {
-        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, scenario, applicationInfo), static x => [
+        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, recorder.TagMagicOnion, scenario, applicationInfo), static x => [
             $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
             $"branch:{x.TagBranch}",
-            $"streams:{x.TagStreams}",
+            $"magiconion:{x.TagMagicOnion}",
             $"protocol:{x.TagProtocol}",
             $"process_arch:{x.applicationInfo.ProcessArchitecture}",
             $"process_count:{x.applicationInfo.ProcessorCount}",
             $"scenario:{x.scenario}",
             $"serialization:{x.TagSerialization}",
+            $"streams:{x.TagStreams}",
         ]);
 
         var filtered = RemoveOutlinerByIQR(results);
