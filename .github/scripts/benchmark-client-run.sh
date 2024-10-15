@@ -114,6 +114,11 @@ echo "::group::dotnet publish"
     print "List current files under $(pwd)"
     ls -l
 
+    print "Remove all files under $publish_dir"
+    if [[ -d "./$publish_dir" ]]; then
+      rm -rf "./$publish_dir"
+    fi
+
     print "dotnet publish $build_csproj $_BUILD_ARGS"
     dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir" $_BUILD_ARGS
 
