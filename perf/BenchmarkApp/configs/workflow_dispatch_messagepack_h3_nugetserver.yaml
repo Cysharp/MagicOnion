@@ -10,28 +10,28 @@ benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
-  # h2c
-  - tags: legend:memorypack-h2c-linux,streams:1x1,protocol:h2c,serialization:memorypack
-    protocol: h2c
+  # h3
+  - tags: legend:messagepack-h3-linux,streams:1x1,protocol:h3,serialization:messagepack
+    protocol: h3
     channels: 1
     streams: 1
-    serialization: memorypack
-    buildArgsClient: --p:UseNuGetClient=6.1.4
-  - tags: legend:memorypack-h2c-linux,streams:1x28,protocol:h2c,serialization:memorypack
-    protocol: h2c
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h3-linux,streams:1x28,protocol:h3,serialization:messagepack
+    protocol: h3
     channels: 28
     streams: 1
-    serialization: memorypack
-    buildArgsClient: --p:UseNuGetClient=6.1.4
-  - tags: legend:memorypack-h2c-linux,streams:70x1,protocol:h2c,serialization:memorypack
-    protocol: h2c
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h3-linux,streams:70x1,protocol:h3,serialization:messagepack
+    protocol: h3
     channels: 1
     streams: 70
-    serialization: memorypack
-    buildArgsClient: --p:UseNuGetClient=6.1.4
-  - tags: legend:memorypack-h2c-linux,streams:70x28,protocol:h2c,serialization:memorypack
-    protocol: h2c
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h3-linux,streams:70x28,protocol:h3,serialization:messagepack
+    protocol: h3
     channels: 28
     streams: 70
-    serialization: memorypack
-    buildArgsClient: --p:UseNuGetClient=6.1.4
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4

@@ -24,6 +24,12 @@ on:
           - workflow_dispatch_messagepack_h2
           - workflow_dispatch_messagepack_h2c
           - workflow_dispatch_messagepack_h3
+          - workflow_dispatch_messagepack_h2_nugetclient
+          - workflow_dispatch_messagepack_h2_nugetserver
+          - workflow_dispatch_messagepack_h2c_nugetclient
+          - workflow_dispatch_messagepack_h2c_nugetserver
+          - workflow_dispatch_messagepack_h3_nugetclient
+          - workflow_dispatch_messagepack_h3_nugetserver
           - issue
           - schedule
 
