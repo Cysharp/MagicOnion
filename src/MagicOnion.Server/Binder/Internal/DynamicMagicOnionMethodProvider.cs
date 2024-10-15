@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using MagicOnion.Internal;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Binder.Internal;
 
@@ -30,7 +31,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             .GenericTypeArguments[0];
 
         // StreamingHub
-        if (typeof(TService).IsAssignableTo(typeof(IStreamingHubMarker)))
+        if (typeof(TService).IsAssignableTo(typeof(IStreamingHubBase)))
         {
             yield return new MagicOnionStreamingHubConnectMethod<TService>(typeServiceInterface.Name);
             yield break;
@@ -49,42 +50,105 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             var targetMethod = methodInfo;
             var methodParameters = targetMethod.GetParameters();
-            var typeRequest = CreateRequestType(methodParameters);
-            var typeRawRequest = typeRequest.IsValueType
-                ? typeof(Box<>).MakeGenericType(typeRequest)
-                : typeRequest;
 
-            Type typeMethod;
+            Type? typeMethod = default;
+            Type[] typeMethodTypeArgs = [];
+            Type typeRequest = typeof(object);
+            Type? typeResponse = default;
             if (targetMethod.ReturnType == typeof(UnaryResult))
             {
                 // UnaryResult: The method has no return value.
-                typeMethod = typeof(MagicOnionUnaryMethod<,,>).MakeGenericType(typeServiceImplementation, typeRequest, typeRawRequest);
+                typeRequest = CreateRequestType(methodParameters);
+                typeMethod = typeof(MagicOnionUnaryMethod<,,>);
+            }
+            else if (targetMethod.ReturnType is { IsGenericType: true })
+            {
+                var returnTypeOpen = targetMethod.ReturnType.GetGenericTypeDefinition();
+                if (returnTypeOpen == typeof(UnaryResult<>))
+                {
+                    // UnaryResult<T>
+                    typeRequest = CreateRequestType(methodParameters);
+                    typeResponse = targetMethod.ReturnType.GetGenericArguments()[0];
+                    typeMethod = typeof(MagicOnionUnaryMethod<,,,,>);
+                }
+                else if (returnTypeOpen == typeof(Task<>))
+                {
+                    var returnType2 = targetMethod.ReturnType.GetGenericArguments()[0];
+                    var returnTypeOpen2 = returnType2.GetGenericTypeDefinition();
+                    if (returnTypeOpen2 == typeof(ClientStreamingResult<,>))
+                    {
+                        // ClientStreamingResult<TRequest, TResponse>
+                        typeRequest = returnType2.GetGenericArguments()[0];
+                        typeResponse = returnType2.GetGenericArguments()[1];
+                        typeMethod = typeof(MagicOnionClientStreamingMethod<,,,,>);
+                    }
+                    else if (returnTypeOpen2 == typeof(ServerStreamingResult<>))
+                    {
+                        // ServerStreamingResult<TResponse>
+                        typeRequest = CreateRequestType(methodParameters);
+                        typeResponse = returnType2.GetGenericArguments()[0];
+                        typeMethod = typeof(MagicOnionServerStreamingMethod<,,,,>);
+                    }
+                    else if (returnTypeOpen2 == typeof(DuplexStreamingResult<,>))
+                    {
+                        // DuplexStreamingResult<TRequest, TResponse>
+                        typeRequest = returnType2.GetGenericArguments()[0];
+                        typeResponse = returnType2.GetGenericArguments()[1];
+                        typeMethod = typeof(MagicOnionDuplexStreamingMethod<,,,,>);
+                    }
+                }
+            }
+
+            if (typeMethod is null)
+            {
+                throw new InvalidOperationException("The return type of the service method must be one of 'UnaryResult', 'ClientStreaming', 'ServerStreaming' or 'DuplexStreaming'.");
+            }
+
+            // ***Result<> --> ***Result<Response>
+            var typeRawRequest = typeRequest.IsValueType
+                ? typeof(Box<>).MakeGenericType(typeRequest)
+                : typeRequest;
+            var typeRawResponse = typeResponse is { IsValueType: true }
+                ? typeof(Box<>).MakeGenericType(typeResponse)
+                : typeResponse;
+            if (typeResponse is null || typeRawResponse is null)
+            {
+                typeMethodTypeArgs = [typeServiceImplementation, typeRequest, typeRawRequest];
             }
             else
             {
-                // UnaryResult<T>
-                var typeResponse = targetMethod.ReturnType.GetGenericArguments()[0];
-                var typeRawResponse = typeResponse.IsValueType
-                    ? typeof(Box<>).MakeGenericType(typeResponse)
-                    : typeResponse;
-                typeMethod = typeof(MagicOnionUnaryMethod<,,,,>).MakeGenericType(typeServiceImplementation, typeRequest, typeResponse, typeRawRequest, typeRawResponse);
+                typeMethodTypeArgs = [typeServiceImplementation, typeRequest, typeResponse, typeRawRequest, typeRawResponse];
             }
 
-            // (instance, context, request) => instance.Foo(request.Item1, request.Item2...);
-            var exprParamInstance = Expression.Parameter(typeServiceImplementation);
-            var exprParamServiceContext = Expression.Parameter(typeof(ServiceContext));
-            var exprParamRequest = Expression.Parameter(typeRequest);
-            var exprArguments = methodParameters.Length == 1
-                ? [exprParamRequest]
-                : methodParameters
-                    .Select((x, i) => Expression.Field(exprParamRequest, "Item" + (i + 1)))
-                    .Cast<Expression>()
-                    .ToArray();
+            Delegate invoker;
+            if (typeMethod == typeof(MagicOnionUnaryMethod<,,>) || typeMethod == typeof(MagicOnionUnaryMethod<,,,,>) || typeMethod == typeof(MagicOnionServerStreamingMethod<,,,,>))
+            {
+                // Unary, ServerStreaming
+                // (instance, context, request) => instance.Foo(request.Item1, request.Item2...);
+                var exprParamInstance = Expression.Parameter(typeServiceImplementation);
+                var exprParamServiceContext = Expression.Parameter(typeof(ServiceContext));
+                var exprParamRequest = Expression.Parameter(typeRequest);
+                var exprArguments = methodParameters.Length == 1
+                    ? [exprParamRequest]
+                    : methodParameters
+                        .Select((x, i) => Expression.Field(exprParamRequest, "Item" + (i + 1)))
+                        .Cast<Expression>()
+                        .ToArray();
 
-            var exprCall = Expression.Call(exprParamInstance, targetMethod, exprArguments);
-            var invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamServiceContext, exprParamRequest]).Compile();
+                var exprCall = Expression.Call(exprParamInstance, targetMethod, exprArguments);
+                invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamServiceContext, exprParamRequest]).Compile();
+            }
+            else
+            {
+                // ClientStreaming, DuplexStreaming
+                // (instance, context) => instance.Foo();
+                var exprParamInstance = Expression.Parameter(typeServiceImplementation);
+                var exprParamServiceContext = Expression.Parameter(typeof(ServiceContext));
+                var exprCall = Expression.Call(exprParamInstance, targetMethod, []);
+                invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamServiceContext]).Compile();
+            }
 
-            var serviceMethod = Activator.CreateInstance(typeMethod, [typeServiceInterface.Name, targetMethod.Name, invoker])!;
+            var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [typeServiceInterface.Name, targetMethod.Name, invoker])!;
             yield return (IMagicOnionGrpcMethod)serviceMethod;
         }
     }

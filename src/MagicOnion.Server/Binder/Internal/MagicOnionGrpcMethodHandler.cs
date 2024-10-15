@@ -126,7 +126,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
     {
         var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
         var filters = FilterHelper.GetFilters(globalFilters, typeof(TService), method.MethodInfo);
-        var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, (TRequest)serviceContext.Request!, serviceContext));
+        var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;
 
@@ -137,7 +137,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
             var request = GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(rawRequest);
             var responseStream = new MagicOnionServerStreamWriter<TResponse, TRawResponse>(rawResponseStream);
-            var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
+            var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
                 instance,
                 method,
                 attributeLookup,

@@ -9,7 +9,7 @@ public class MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRaw
     where TRawResponse : class
 {
 
-    readonly Func<TService, TRequest, ServiceContext, ValueTask> invoker;
+    readonly Func<TService, ServiceContext, TRequest, ValueTask> invoker;
 
     public MethodType MethodType => MethodType.ServerStreaming;
     public Type ServiceType => typeof(TService);
@@ -18,40 +18,40 @@ public class MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRaw
 
     public MethodInfo MethodInfo { get; }
 
-    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, TRequest, ServiceContext, ServerStreamingResult<TResponse>> invoker)
+    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, ServerStreamingResult<TResponse>> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
         MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
-        this.invoker = (service, request, context) =>
+        this.invoker = (service, context, request) =>
         {
-            invoker(service, request, context);
+            invoker(service, context, request);
             return default;
         };
     }
 
-    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, TRequest, ServiceContext, Task<ServerStreamingResult<TResponse>>> invoker)
+    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
         MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
-        this.invoker = (service, request, context) => new ValueTask(invoker(service, request, context));
+        this.invoker = (service, context, request) => new ValueTask(invoker(service, context, request));
     }
 
-    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, TRequest, ServiceContext, ValueTask<ServerStreamingResult<TResponse>>> invoker)
+    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, ValueTask<ServerStreamingResult<TResponse>>> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
         MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
-        this.invoker = async (service, request, context) => await invoker(service, request, context);
+        this.invoker = async (service, context, request) => await invoker(service, context, request);
     }
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
         => binder.BindServerStreaming(this);
 
-    public ValueTask InvokeAsync(TService service, TRequest request, ServiceContext context)
-        => invoker(service, request, context);
+    public ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request)
+        => invoker(service, context, request);
 }

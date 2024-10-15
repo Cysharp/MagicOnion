@@ -38,7 +38,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
     {
         var messageSerializer = messageSerializerProvider.Create(MethodType.Unary, default);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
-        var attrs = GetMetadataFromHandler(method.MethodInfo);
+        var attrs = GetMetadataFromHandler(method);
 
         providerContext.AddUnaryMethod(grpcMethod, attrs, handlerBuilder.BuildUnaryMethod(method, messageSerializer, attrs));
     }
@@ -49,7 +49,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
     {
         var messageSerializer = messageSerializerProvider.Create(MethodType.ClientStreaming, default);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, method.ServiceName, method.MethodName, messageSerializer);
-        var attrs = GetMetadataFromHandler(method.MethodInfo);
+        var attrs = GetMetadataFromHandler(method);
 
         providerContext.AddClientStreamingMethod(grpcMethod, attrs, handlerBuilder.BuildClientStreamingMethod(method, messageSerializer, attrs));
     }
@@ -60,9 +60,9 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
     {
         var messageSerializer = messageSerializerProvider.Create(MethodType.ServerStreaming, default);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, method.ServiceName, method.MethodName, messageSerializer);
-        var attrs = GetMetadataFromHandler(method.MethodInfo);
+        var attrs = GetMetadataFromHandler(method);
 
-        providerContext.AddServerStreamingMethod<TRawRequest, TRawResponse>(grpcMethod, attrs, handlerBuilder.BuildServerStreamingMethod(method, messageSerializer, attrs));
+        providerContext.AddServerStreamingMethod(grpcMethod, attrs, handlerBuilder.BuildServerStreamingMethod(method, messageSerializer, attrs));
     }
 
     public void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method)
@@ -71,7 +71,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
     {
         var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, default);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, method.ServiceName, method.MethodName, messageSerializer);
-        var attrs = GetMetadataFromHandler(method.MethodInfo);
+        var attrs = GetMetadataFromHandler(method);
 
         providerContext.AddDuplexStreamingMethod(grpcMethod, attrs, handlerBuilder.BuildDuplexStreamingMethod(method, messageSerializer, attrs));
     }
@@ -88,7 +88,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
             MagicOnionMarshallers.StreamingHubMarshaller,
             MagicOnionMarshallers.StreamingHubMarshaller
         );
-        var attrs = GetMetadataFromHandler(method.MethodInfo);
+        var attrs = GetMetadataFromHandler(method);
 
         var duplexMethod = new MagicOnionDuplexStreamingMethod<TService, StreamingHubPayload, StreamingHubPayload, StreamingHubPayload, StreamingHubPayload>(
             method,
@@ -100,13 +100,13 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         providerContext.AddDuplexStreamingMethod(grpcMethod, attrs, handlerBuilder.BuildDuplexStreamingMethod(duplexMethod, messageSerializer, attrs));
     }
 
-    IList<object> GetMetadataFromHandler(MethodInfo methodInfo)
+    IList<object> GetMetadataFromHandler(IMagicOnionGrpcMethod magicOnionGrpcMethod)
     {
         // NOTE: We need to collect Attributes for Endpoint metadata. ([Authorize], [AllowAnonymous] ...)
         // https://github.com/grpc/grpc-dotnet/blob/7ef184f3c4cd62fbc3cde55e4bb3e16b58258ca1/src/Grpc.AspNetCore.Server/Model/Internal/ProviderServiceBinder.cs#L89-L98
         var metadata = new List<object>();
-        metadata.AddRange(methodInfo.DeclaringType!.GetCustomAttributes(inherit: true));
-        metadata.AddRange(methodInfo.GetCustomAttributes(inherit: true));
+        metadata.AddRange(magicOnionGrpcMethod.ServiceType.GetCustomAttributes(inherit: true));
+        metadata.AddRange(magicOnionGrpcMethod.MethodInfo.GetCustomAttributes(inherit: true));
 
         metadata.Add(new HttpMethodMetadata(["POST"], acceptCorsPreflight: true));
         return metadata;
