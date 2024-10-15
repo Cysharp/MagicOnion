@@ -41,23 +41,37 @@ static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutServerBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
     {
-        var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, applicationInfo), static x => [
-            $"legend:{x.TagLegend}{x.TagStreams}",
-            $"branch:{x.TagBranch}",
-            $"streams:{x.TagStreams}",
-            $"protocol:{x.TagProtocol}",
-            $"process_arch:{x.applicationInfo.ProcessArchitecture}",
-            $"process_count:{x.applicationInfo.ProcessorCount}",
-            $"serialization:{x.TagSerialization}",
-        ]);
+        if (string.IsNullOrEmpty(recorder.TagMagicOnion))
+            return;
 
-        // Don't want to await each put. Let's send it to queue and await when benchmark ends.
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
-        recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        Post(recorder, applicationInfo, result, false);
+        if (DatadogMetricsRecorder.EnableLatestTag)
+        {
+            Post(recorder, applicationInfo, result, true);
+        }
 
         // wait until send complete
         await recorder.WaitSaveAsync();
+
+        static void Post(DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result, bool isMagicOnionLatest)
+        {
+            var magicOnionTag = isMagicOnionLatest ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
+            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo), static x => [
+                $"legend:{x.TagLegend}{x.TagStreams}",
+                $"branch:{x.TagBranch}",
+                $"magiconion:{x.magicOnionTag}",
+                $"protocol:{x.TagProtocol}",
+                $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                $"process_count:{x.applicationInfo.ProcessorCount}",
+                $"serialization:{x.TagSerialization}",
+                $"streams:{x.TagStreams}",
+            ]);
+
+            // Don't want to await each put. Let's send it to queue and await when benchmark ends.
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        }
     }
 }

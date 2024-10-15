@@ -9,13 +9,20 @@ public class ApplicationInformation
 {
     public static ApplicationInformation Current { get; } = new ApplicationInformation();
 
+    public bool IsLatestMagicOnion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<MagicOnionIsLatestAttirbute>()?.IsLatest ?? true; // set from csproj
+
+    public string? BenchmarkerVersion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
 #if SERVER
+    public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.Server.MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
     public string? MagicOnionVersion { get; } = typeof(MagicOnion.Server.MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public string? GrpcNetVersion { get; } = typeof(Grpc.AspNetCore.Server.GrpcServiceOptions).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 #elif CLIENT
+    public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.Client.MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
     public string? MagicOnionVersion { get; } = typeof(MagicOnion.Client.MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public string? GrpcNetVersion { get; } = typeof(Grpc.Net.Client.GrpcChannel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 #else
+    public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.UnaryResult).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
     public string? MagicOnionVersion { get; } = typeof(MagicOnion.UnaryResult).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public string? GrpcNetVersion { get; } = default;
 #endif
@@ -37,6 +44,21 @@ public class ApplicationInformation
     public bool IsServerGC { get; } = GCSettings.IsServerGC;
     public int ProcessorCount { get; } = Environment.ProcessorCount;
     public bool IsAttached { get; } = Debugger.IsAttached;
+
+    /// <summary>
+    /// Reduct `+HASH` suffix from InformationalVersion.
+    /// <br/> Example1: 1.0.0+1234567890abcdefg -> 1.0.0
+    /// <br/> Example2: 1.0.0 -> 1.0.0
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    private static string? RemoveHashFromVersion(string? version)
+    {
+        if (string.IsNullOrEmpty(version)) return version;
+        var span = version.AsSpan();
+        var position = span.IndexOf('+');
+        return position == -1 ? version : span[..position].ToString();
+    }
 
     public class CpuInformation
     {
