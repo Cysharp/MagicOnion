@@ -3,6 +3,13 @@ using Microsoft.AspNetCore.Routing;
 
 namespace MagicOnion.Server.Binder;
 
+public interface IMagicOnionGrpcMethodProvider
+{
+    void MapAllSupportedServiceTypes(MagicOnionGrpcServiceMappingContext context);
+    IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class;
+    IEnumerable<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class;
+}
+
 public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) : IEndpointConventionBuilder
 {
     readonly List<MagicOnionServiceEndpointConventionBuilder> innerBuilders = new();
@@ -54,11 +61,4 @@ public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) 
             innerBuilder.Add(convention);
         }
     }
-}
-
-public interface IMagicOnionGrpcMethodProvider
-{
-    void MapAllSupportedServiceTypes(MagicOnionGrpcServiceMappingContext context);
-    IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class;
-    IEnumerable<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class;
 }
