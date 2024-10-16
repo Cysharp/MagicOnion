@@ -100,7 +100,10 @@ async Task Main(
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
     }
+    WriteLog($"All scenario complete...");
 
+
+    WriteLog($"Saving metrics...");
     foreach (var (s, results) in resultsByScenario)
     {
         await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, results);
@@ -166,6 +169,8 @@ async Task Main(
             writer.WriteLine($"{s}\t{string.Join("\t", results.Select(x => x.RequestsPerSecond.ToString("0.000")))}\t{results.Average(x => x.RequestsPerSecond):0.000}");
         }
     }
+
+    WriteLog($"Benchmark completed!...");
 }
 
 async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IReadOnlyList<GrpcChannel> channels, IPerfTestControlService controlService)
