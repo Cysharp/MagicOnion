@@ -16,7 +16,7 @@ on:
         description: "reuse_runid: Use this run id for benchmark name for reuse"
         required: false
         type: string
-        default: "wf"
+        default: "reuse"
       benchmark-config-name:
         description: "benchmark-config-name: Select benchmark config name"
         required: false
