@@ -10,7 +10,7 @@ public class ApplicationInformation
     public static ApplicationInformation Current { get; } = new ApplicationInformation();
 
 #if SERVER
-    public string? MagicOnionVersion { get; } = typeof(MagicOnion.Server.MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+    public string? MagicOnionVersion { get; } = typeof(MagicOnion.Server.ServiceContext).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public string? GrpcNetVersion { get; } = typeof(Grpc.AspNetCore.Server.GrpcServiceOptions).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 #elif CLIENT
     public string? MagicOnionVersion { get; } = typeof(MagicOnion.Client.MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
