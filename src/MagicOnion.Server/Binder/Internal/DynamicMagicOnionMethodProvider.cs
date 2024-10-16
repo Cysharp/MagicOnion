@@ -8,18 +8,11 @@ namespace MagicOnion.Server.Binder.Internal;
 
 internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 {
-    readonly MagicOnionServiceDefinition definition;
-
-    public DynamicMagicOnionMethodProvider(MagicOnionServiceDefinition definition)
+    public void MapAllSupportedServiceTypes(MagicOnionGrpcServiceMappingContext context)
     {
-        this.definition = definition;
-    }
-
-    public void OnRegisterGrpcServices(MagicOnionGrpcServiceRegistrationContext context)
-    {
-        foreach (var serviceType in this.definition.TargetTypes.Distinct())
+        foreach (var serviceType in MagicOnionServicesDiscoverer.GetTypesFromAssemblies(MagicOnionServicesDiscoverer.GetSearchAssemblies()))
         {
-            context.Register(serviceType);
+            context.Map(serviceType);
         }
     }
 
@@ -52,7 +45,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             var methodParameters = targetMethod.GetParameters();
 
             Type? typeMethod = default;
-            Type[] typeMethodTypeArgs = [];
+            Type[] typeMethodTypeArgs;
             Type typeRequest = typeof(object);
             Type? typeResponse = default;
             if (targetMethod.ReturnType == typeof(UnaryResult))

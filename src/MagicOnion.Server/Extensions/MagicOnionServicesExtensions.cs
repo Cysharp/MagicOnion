@@ -11,7 +11,6 @@ using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Hubs.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,25 +18,15 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class MagicOnionServicesExtensions
 {
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => services.AddMagicOnionCore(configureOptions);
 
+    [Obsolete("Use MapMagicOnionService(Assembly[]) instead.", error: true)]
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, Assembly[] searchAssemblies, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchAssemblies, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => throw new NotSupportedException();
 
+    [Obsolete("Use MapMagicOnionService(Type[]) instead.", error: true)]
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, IEnumerable<Type> searchTypes, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchTypes, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => throw new NotSupportedException();
 
     // NOTE: `internal` is required for unit tests.
     internal static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
@@ -50,9 +39,9 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
-        services.TryAddSingleton(typeof(StreamingHubRegistry<>));
+        services.AddSingleton(typeof(StreamingHubRegistry<>));
         services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
-        services.AddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
+        services.TryAddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();

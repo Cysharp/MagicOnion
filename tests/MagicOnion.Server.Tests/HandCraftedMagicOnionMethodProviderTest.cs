@@ -129,11 +129,11 @@ class HandCraftedMagicOnionMethodProviderTest_MyFilter : MagicOnionFilterAttribu
 
 internal class HandCraftedMagicOnionMethodProviderTest_GeneratedMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 {
-    public void OnRegisterGrpcServices(MagicOnionGrpcServiceRegistrationContext context)
+    public void MapAllSupportedServiceTypes(MagicOnionGrpcServiceMappingContext context)
     {
-        context.Register<HandCraftedMagicOnionMethodProviderTest_GreeterService>();
-        context.Register<HandCraftedMagicOnionMethodProviderTest_GreeterService2>();
-        context.Register<HandCraftedMagicOnionMethodProviderTest_GreeterHub>();
+        context.Map<HandCraftedMagicOnionMethodProviderTest_GreeterService>();
+        context.Map<HandCraftedMagicOnionMethodProviderTest_GreeterService2>();
+        context.Map<HandCraftedMagicOnionMethodProviderTest_GreeterHub>();
     }
 
     public IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class
