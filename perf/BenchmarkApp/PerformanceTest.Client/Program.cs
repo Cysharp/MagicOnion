@@ -100,7 +100,7 @@ async Task Main(
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
     }
-    WriteLog($"All scenario complete...");
+    WriteLog($"All scenario complete");
 
 
     WriteLog($"Saving metrics...");
@@ -170,7 +170,7 @@ async Task Main(
         }
     }
 
-    WriteLog($"Benchmark completed!...");
+    WriteLog($"Benchmark completed");
 }
 
 async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IReadOnlyList<GrpcChannel> channels, IPerfTestControlService controlService)
@@ -205,8 +205,9 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
     using var cts = new CancellationTokenSource();
     var cleanIndex = 0;
+    var threadBefore = ThreadPool.ThreadCount;
 
-    WriteLog($"Starting scenario '{scenario}'...");
+    WriteLog($"Starting scenario '{scenario}'");
     var tasks = new List<Task>();
     var scenarios = new List<IScenario>();
     for (var i = 0; i < config.Channels; i++)
@@ -226,8 +227,6 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
     }
 
-    WriteLog($"Thread Count Current... {ThreadPool.ThreadCount}");
-
     await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
     WriteLog($"Warming up...");
     await Task.Delay(TimeSpan.FromSeconds(config.Warmup));
@@ -239,8 +238,10 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
     ctx.Complete();
-    WriteLog("Completed.");
+    WriteLog("Completed");
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
+
+    var threadAfter = ThreadPool.ThreadCount;
 
     WriteLog("Cleaning up...");
     foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
@@ -273,7 +274,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
     WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
 
-    WriteLog($"Thread Count: {ThreadPool.ThreadCount}");
+    WriteLog($"Threads (diff): {threadAfter} ({(threadAfter - threadBefore):+#;-#;0})");
 
     return result;
 }
