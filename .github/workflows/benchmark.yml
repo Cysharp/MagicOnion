@@ -3,8 +3,9 @@ name: Benchmark
 on:
   issue_comment:
     types: [created]
-  schedule:
-    - cron: "0 23 * * *"
+  # TODO: benchmark environment broken, stop for a while.
+  # schedule:
+  #   - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       reuse:
