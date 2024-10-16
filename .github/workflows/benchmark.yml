@@ -12,8 +12,8 @@ on:
         required: false
         default: true
         type: boolean
-      run_id:
-        description: "run_id: Use this run id for benchmark name"
+      reuse_runid:
+        description: "reuse_runid: Use this run id for benchmark name for reuse"
         required: false
         type: string
         default: "wf"
@@ -48,7 +48,7 @@ jobs:
   benchmark:
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
-      benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.run_id || github.run_number) }}"
+      benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.reuse_runid || github.run_number) }}"
       benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
     secrets: inherit
 
