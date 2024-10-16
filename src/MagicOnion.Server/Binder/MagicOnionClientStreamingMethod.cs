@@ -9,7 +9,7 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
     where TRawResponse : class
 {
 
-    readonly Func<TService, ServiceContext, ValueTask<ClientStreamingResult<TRequest, TResponse>>> invoker;
+    readonly Func<TService, ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>> invoker;
 
     public MethodType MethodType => MethodType.ClientStreaming;
     public Type ServiceType => typeof(TService);
@@ -18,25 +18,7 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
 
     public MethodInfo MethodInfo { get; }
 
-    public MagicOnionClientStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, ClientStreamingResult<TRequest, TResponse>> invoker)
-    {
-        ServiceName = serviceName;
-        MethodName = methodName;
-        MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
-
-        this.invoker = (service, context) => ValueTask.FromResult(invoker(service, context));
-    }
-
     public MagicOnionClientStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>> invoker)
-    {
-        ServiceName = serviceName;
-        MethodName = methodName;
-        MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
-
-        this.invoker = (service, context) => new ValueTask<ClientStreamingResult<TRequest, TResponse>>(invoker(service, context));
-    }
-
-    public MagicOnionClientStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, ValueTask<ClientStreamingResult<TRequest, TResponse>>> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
@@ -51,7 +33,7 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
     public ValueTask InvokeAsync(TService service, ServiceContext context)
         => SerializeValueTaskClientStreamingResult(invoker(service, context), context);
 
-    static ValueTask SerializeValueTaskClientStreamingResult(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+    static ValueTask SerializeValueTaskClientStreamingResult(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
     {
         if (taskResult.IsCompletedSuccessfully)
         {
@@ -64,7 +46,7 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
 
         return Await(taskResult, context);
 
-        static async ValueTask Await(ValueTask<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+        static async ValueTask Await(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
         {
             var result = await taskResult.ConfigureAwait(false);
             if (result.hasRawValue)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 
 namespace MagicOnion.Server.Tests;
 
@@ -34,7 +35,15 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Magic
         builder.ConfigureServices(services =>
         {
             services.AddKeyedSingleton<ConcurrentDictionary<string, object>>(ItemsKey);
-            services.AddMagicOnion(GetServiceImplementationTypes());
+            services.AddMagicOnion();
+        });
+        builder.Configure(app =>
+        {
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapMagicOnionService([..GetServiceImplementationTypes()]);
+            });
         });
     }
 

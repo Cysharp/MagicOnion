@@ -94,7 +94,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             if (typeMethod is null)
             {
-                throw new InvalidOperationException("The return type of the service method must be one of 'UnaryResult', 'ClientStreaming', 'ServerStreaming' or 'DuplexStreaming'.");
+                throw new InvalidOperationException("The return type of the service method must be one of 'UnaryResult', 'Task<ClientStreamingResult<T>>', 'Task<ServerStreamingResult<T>>' or 'Task<DuplexStreamingResult<>>'.");
             }
 
             // ***Result<> --> ***Result<Response>
