@@ -16,7 +16,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
         }
     }
 
-    public IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class
+    public IReadOnlyList<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class
     {
         var typeServiceImplementation = typeof(TService);
         var typeServiceInterface = typeServiceImplementation.GetInterfaces()
@@ -26,11 +26,11 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
         // StreamingHub
         if (typeof(TService).IsAssignableTo(typeof(IStreamingHubBase)))
         {
-            yield return new MagicOnionStreamingHubConnectMethod<TService>(typeServiceInterface.Name);
-            yield break;
+            return [new MagicOnionStreamingHubConnectMethod<TService>(typeServiceInterface.Name)];
         }
 
         // Unary, ClientStreaming, ServerStreaming, DuplexStreaming
+        var methods = new List<IMagicOnionGrpcMethod>();
         var interfaceMap = typeServiceImplementation.GetInterfaceMapWithParents(typeServiceInterface);
         for (var i = 0; i < interfaceMap.TargetMethods.Length; i++)
         {
@@ -94,7 +94,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             if (typeMethod is null)
             {
-                throw new InvalidOperationException("The return type of the service method must be one of 'UnaryResult', 'Task<ClientStreamingResult<T>>', 'Task<ServerStreamingResult<T>>' or 'Task<DuplexStreamingResult<>>'.");
+                throw new InvalidOperationException($"The return type of the service method must be one of 'UnaryResult', 'Task<ClientStreamingResult<T>>', 'Task<ServerStreamingResult<T>>' or 'Task<DuplexStreamingResult<T>>'. (TargetMethod={targetMethod})");
             }
 
             // ***Result<> --> ***Result<Response>
@@ -142,17 +142,20 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             }
 
             var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [typeServiceInterface.Name, targetMethod.Name, invoker])!;
-            yield return (IMagicOnionGrpcMethod)serviceMethod;
+            methods.Add((IMagicOnionGrpcMethod)serviceMethod);
         }
+
+        return methods;
     }
 
-    public IEnumerable<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class
+    public IReadOnlyList<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class
     {
         if (!typeof(TService).IsAssignableTo(typeof(IStreamingHubMarker)))
         {
-            yield break;
+            return [];
         }
 
+        var methods = new List<IMagicOnionStreamingHubMethod>();
         var typeServiceImplementation = typeof(TService);
         var typeServiceInterface = typeServiceImplementation.GetInterfaces()
             .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))
@@ -204,8 +207,10 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             var invoker = Expression.Lambda(exprCallHubMethod, [exprParamService, exprParamContext, exprParamRequest]).Compile();
 
             var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, invoker])!;
-            yield return hubMethod;
+            methods.Add(hubMethod);
         }
+
+        return methods;
     }
 
     static Type CreateRequestType(ParameterInfo[] parameters)

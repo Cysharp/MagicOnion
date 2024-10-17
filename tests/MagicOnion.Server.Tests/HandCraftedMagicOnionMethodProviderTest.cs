@@ -4,6 +4,7 @@ using MagicOnion.Client;
 using MagicOnion.Internal;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Hubs;
+using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
@@ -60,6 +61,23 @@ public class HandCraftedMagicOnionMethodProviderTest(HandCraftedMagicOnionMethod
         // Act & Assert
         await client.PingAsync();
     }
+
+    [Fact]
+    public async Task StreamingHub()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var receiver = Substitute.For<IHandCraftedMagicOnionMethodProviderTest_GreeterHubReceiver>();
+        var client = await StreamingHubClient.ConnectAsync<IHandCraftedMagicOnionMethodProviderTest_GreeterHub, IHandCraftedMagicOnionMethodProviderTest_GreeterHubReceiver>(
+            GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), receiver);
+
+        // Act
+        await client.JoinAsync("Alice", "Room-A");
+        var users = await client.GetMembersAsync();
+
+        // Assert
+        Assert.Equal(["User-1", "User-2"], users);
+    }
 }
 
 
@@ -105,17 +123,17 @@ class HandCraftedMagicOnionMethodProviderTest_GreeterHub : StreamingHubBase<IHan
 {
     public Task JoinAsync(string name, string channel)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public ValueTask SendMessageAsync(string message)
     {
-        throw new NotImplementedException();
+        return default;
     }
 
     public ValueTask<IReadOnlyList<string>> GetMembersAsync()
     {
-        throw new NotImplementedException();
+        return new(["User-1", "User-2"]);
     }
 }
 
@@ -136,39 +154,55 @@ internal class HandCraftedMagicOnionMethodProviderTest_GeneratedMagicOnionMethod
         context.Map<HandCraftedMagicOnionMethodProviderTest_GreeterHub>();
     }
 
-    public IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class
+    public IReadOnlyList<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class
     {
         if (typeof(TService) == typeof(HandCraftedMagicOnionMethodProviderTest_GreeterService))
         {
-            yield return new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService, DynamicArgumentTuple<string, int>, string, Box<DynamicArgumentTuple<string, int>>, string>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService.HelloAsync), static (instance, context, request) => instance.HelloAsync(request.Item1, request.Item2));
-            yield return new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService, MessagePack.Nil, Box<MessagePack.Nil>>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService.PingAsync), static (instance, context, request) => instance.PingAsync());
+            return
+            [
+                new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService, DynamicArgumentTuple<string, int>, string, Box<DynamicArgumentTuple<string, int>>, string>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService.HelloAsync),
+                    static (instance, context, request) => instance.HelloAsync(request.Item1, request.Item2)),
+                new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService, MessagePack.Nil, Box<MessagePack.Nil>>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService.PingAsync), static (instance, context, request) => instance.PingAsync()),
+            ];
         }
         if (typeof(TService) == typeof(HandCraftedMagicOnionMethodProviderTest_GreeterService2))
         {
-            yield return new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService2, DynamicArgumentTuple<string, int>, string, Box<DynamicArgumentTuple<string, int>>, string>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2.GoodByeAsync), static (instance, context, request) => instance.GoodByeAsync(request.Item1, request.Item2));
-            yield return new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService2, MessagePack.Nil, Box<MessagePack.Nil>>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2.PingAsync), static (instance, context, request) => instance.PingAsync());
+            return
+            [
+                new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService2, DynamicArgumentTuple<string, int>, string, Box<DynamicArgumentTuple<string, int>>, string>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2.GoodByeAsync),
+                    static (instance, context, request) => instance.GoodByeAsync(request.Item1, request.Item2)),
+                new MagicOnionUnaryMethod<HandCraftedMagicOnionMethodProviderTest_GreeterService2, MessagePack.Nil, Box<MessagePack.Nil>>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterService2.PingAsync), static (instance, context, request) => instance.PingAsync()),
+            ];
         }
 
         if (typeof(TService) == typeof(HandCraftedMagicOnionMethodProviderTest_GreeterHub))
         {
-            yield return new MagicOnionStreamingHubConnectMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub>(nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub));
+            return
+            [
+                new MagicOnionStreamingHubConnectMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub>(nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub)),
+            ];
         }
+
+        return [];
     }
 
-    public IEnumerable<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class
+    public IReadOnlyList<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class
     {
         if (typeof(TService) == typeof(HandCraftedMagicOnionMethodProviderTest_GreeterHub))
         {
-            yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, DynamicArgumentTuple<string, string>>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.JoinAsync), static (instance, context, request) => instance.JoinAsync(request.Item1, request.Item2));
-            yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, string>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.SendMessageAsync), static (instance, context, request) => instance.SendMessageAsync(request));
-            yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, MessagePack.Nil, IReadOnlyList<string>>(
-                nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.GetMembersAsync), static (instance, context, request) => instance.GetMembersAsync());
+            return
+            [
+                new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, DynamicArgumentTuple<string, string>>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.JoinAsync), static (instance, context, request) => instance.JoinAsync(request.Item1, request.Item2)),
+                new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, string>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.SendMessageAsync), static (instance, context, request) => instance.SendMessageAsync(request)),
+                new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, MessagePack.Nil, IReadOnlyList<string>>(
+                    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.GetMembersAsync), static (instance, context, request) => instance.GetMembersAsync()),
+            ];
             //yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, DynamicArgumentTuple<string, string>>(
             //    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.JoinAsync), typeof(HandCraftedMagicOnionMethodProviderTest_GreeterHub).GetMethod(nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.JoinAsync))!);
             //yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, string>(
@@ -176,5 +210,7 @@ internal class HandCraftedMagicOnionMethodProviderTest_GeneratedMagicOnionMethod
             //yield return new MagicOnionStreamingHubMethod<HandCraftedMagicOnionMethodProviderTest_GreeterHub, MessagePack.Nil, IReadOnlyList<string>>(
             //    nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub), nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.GetMembersAsync), typeof(HandCraftedMagicOnionMethodProviderTest_GreeterHub).GetMethod(nameof(IHandCraftedMagicOnionMethodProviderTest_GreeterHub.GetMembersAsync))!);
         }
+
+        return [];
     }
 }

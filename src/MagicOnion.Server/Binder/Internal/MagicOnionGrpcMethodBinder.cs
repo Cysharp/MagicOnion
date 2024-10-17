@@ -105,7 +105,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         // NOTE: We need to collect Attributes for Endpoint metadata. ([Authorize], [AllowAnonymous] ...)
         // https://github.com/grpc/grpc-dotnet/blob/7ef184f3c4cd62fbc3cde55e4bb3e16b58258ca1/src/Grpc.AspNetCore.Server/Model/Internal/ProviderServiceBinder.cs#L89-L98
         var metadata = new List<object>();
-        metadata.AddRange(magicOnionGrpcMethod.ServiceType.GetCustomAttributes(inherit: true));
+        metadata.AddRange(magicOnionGrpcMethod.ServiceImplementationType.GetCustomAttributes(inherit: true));
         metadata.AddRange(magicOnionGrpcMethod.MethodInfo.GetCustomAttributes(inherit: true));
 
         metadata.Add(new HttpMethodMetadata(["POST"], acceptCorsPreflight: true));

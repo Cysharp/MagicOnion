@@ -6,8 +6,8 @@ namespace MagicOnion.Server.Binder;
 public interface IMagicOnionGrpcMethodProvider
 {
     void MapAllSupportedServiceTypes(MagicOnionGrpcServiceMappingContext context);
-    IEnumerable<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class;
-    IEnumerable<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class;
+    IReadOnlyList<IMagicOnionGrpcMethod> GetGrpcMethods<TService>() where TService : class;
+    IReadOnlyList<IMagicOnionStreamingHubMethod> GetStreamingHubMethods<TService>() where TService : class;
 }
 
 public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) : IEndpointConventionBuilder

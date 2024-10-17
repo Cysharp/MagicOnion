@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Internal;
@@ -22,7 +23,7 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
     static readonly object BoxedNil = Nil.Default;
 
     public MethodType MethodType => MethodType.Unary;
-    public Type ServiceType => typeof(TService);
+    public Type ServiceImplementationType => typeof(TService);
     public string ServiceName => serviceName;
     public string MethodName => methodName;
 
@@ -83,6 +84,7 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
     }
 }
 
+[DebuggerDisplay("MagicOnionUnaryMethod: {ServiceName,nq}.{MethodName,nq}; Implementation={typeof(TService).ToString(),nq}; Request={typeof(TRequest).ToString(),nq}; RawRequest={typeof(TRawRequest).ToString(),nq}; Response={typeof(TResponse).ToString(),nq}; RawResponse={typeof(TRawResponse).ToString(),nq}")]
 public sealed class MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult<TResponse>> invoker)
     : MagicOnionUnaryMethodBase<TService, TRequest, TResponse, TRawRequest, TRawResponse>(serviceName, methodName)
     where TService : class
@@ -93,6 +95,7 @@ public sealed class MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawReq
         => SetUnaryResult(invoker(service, context, request), context);
 }
 
+[DebuggerDisplay("MagicOnionUnaryMethod: {ServiceName,nq}.{MethodName,nq}; Implementation={typeof(TService).ToString(),nq}; Request={typeof(TRequest).ToString(),nq}; RawRequest={typeof(TRawRequest).ToString(),nq}")]
 public sealed class MagicOnionUnaryMethod<TService, TRequest, TRawRequest>(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult> invoker)
     : MagicOnionUnaryMethodBase<TService, TRequest, MessagePack.Nil, TRawRequest, Box<MessagePack.Nil>>(serviceName, methodName)
     where TService : class

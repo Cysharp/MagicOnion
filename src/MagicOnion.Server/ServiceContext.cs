@@ -64,7 +64,7 @@ public class ServiceContext : IServiceContext
 
     public DateTime Timestamp { get; }
 
-    public Type ServiceType => Method.ServiceType;
+    public Type ServiceType => Method.ServiceImplementationType;
 
     public string ServiceName => Method.ServiceName;
     public string MethodName => MethodInfo.Name;

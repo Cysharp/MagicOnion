@@ -6,7 +6,7 @@ namespace MagicOnion.Server.Binder;
 public interface IMagicOnionGrpcMethod
 {
     MethodType MethodType { get; }
-    Type ServiceType { get; }
+    Type ServiceImplementationType { get; }
     string ServiceName { get; }
     string MethodName { get; }
     MethodInfo MethodInfo { get; }
