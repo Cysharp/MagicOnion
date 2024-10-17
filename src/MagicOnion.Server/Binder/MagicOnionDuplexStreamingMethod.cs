@@ -20,7 +20,7 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
 
     public MethodInfo MethodInfo { get; }
 
-    public MagicOnionDuplexStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>> invoker)
+    public MagicOnionDuplexStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, Task> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
@@ -29,7 +29,7 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
         this.invoker = invoker;
     }
 
-    public MagicOnionDuplexStreamingMethod(MagicOnionStreamingHubConnectMethod<TService> hubConnectMethod, Func<TService, ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>> invoker)
+    public MagicOnionDuplexStreamingMethod(MagicOnionStreamingHubConnectMethod<TService> hubConnectMethod, Func<TService, ServiceContext, Task> invoker)
     {
         ServiceName = hubConnectMethod.ServiceName;
         MethodName = hubConnectMethod.MethodName;

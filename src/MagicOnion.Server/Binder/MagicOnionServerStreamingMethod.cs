@@ -20,7 +20,7 @@ public class MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRaw
 
     public MethodInfo MethodInfo { get; }
 
-    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>> invoker)
+    public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, Task> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;

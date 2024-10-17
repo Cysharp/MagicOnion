@@ -81,7 +81,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         return CompletedTask;
     }
 
-    async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> IStreamingHubBase.Connect()
+    async Task IStreamingHubBase.Connect()
     {
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.ServiceName);
 
@@ -145,8 +145,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             heartbeatHandle.Dispose();
             remoteClientResultPendingTasks.Dispose();
         }
-
-        return streamingContext.Result();
     }
 
     async Task HandleMessageAsync()

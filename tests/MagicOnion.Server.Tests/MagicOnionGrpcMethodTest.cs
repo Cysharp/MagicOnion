@@ -211,8 +211,6 @@ public class MagicOnionGrpcMethodTest
             await streamingContext.WriteAsync(12345);
             var request = await streamingContext.MoveNext();
             requestCurrentFirst = streamingContext.Current;
-
-            return default;
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
