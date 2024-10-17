@@ -59,6 +59,8 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var isCompletedSuccessfully = false;
             var requestBeginTimestamp = TimeProvider.System.GetTimestamp();
 
+            var requestServiceProvider = context.GetHttpContext().RequestServices;
+            var metrics = requestServiceProvider.GetRequiredService<MagicOnionMetrics>();
             var requestStream = new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(rawRequestStream);
             var serviceContext = new StreamingServiceContext<TRequest, Nil /* Dummy */>(
                 instance,
@@ -66,8 +68,9 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
                 attributeLookup,
                 context,
                 messageSerializer,
+                metrics,
                 logger,
-                context.GetHttpContext().RequestServices,
+                requestServiceProvider,
                 requestStream,
                 default
             );
@@ -135,6 +138,8 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var requestBeginTimestamp = TimeProvider.System.GetTimestamp();
             var isCompletedSuccessfully = false;
 
+            var requestServiceProvider = context.GetHttpContext().RequestServices;
+            var metrics = requestServiceProvider.GetRequiredService<MagicOnionMetrics>();
             var request = GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(rawRequest);
             var responseStream = new MagicOnionServerStreamWriter<TResponse, TRawResponse>(rawResponseStream);
             var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
@@ -143,8 +148,9 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
                 attributeLookup,
                 context,
                 messageSerializer,
+                metrics,
                 logger,
-                context.GetHttpContext().RequestServices,
+                requestServiceProvider,
                 default,
                 responseStream
             );
@@ -205,6 +211,8 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var requestBeginTimestamp = TimeProvider.System.GetTimestamp();
             var isCompletedSuccessfully = false;
 
+            var requestServiceProvider = context.GetHttpContext().RequestServices;
+            var metrics = requestServiceProvider.GetRequiredService<MagicOnionMetrics>();
             var requestStream = new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(rawRequestStream);
             var responseStream = new MagicOnionServerStreamWriter<TResponse, TRawResponse>(rawResponseStream);
             var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
@@ -213,8 +221,9 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
                 attributeLookup,
                 context,
                 messageSerializer,
+                metrics,
                 logger,
-                context.GetHttpContext().RequestServices,
+                requestServiceProvider,
                 requestStream,
                 responseStream
             );
@@ -278,7 +287,9 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var requestBeginTimestamp = TimeProvider.System.GetTimestamp();
             var isCompletedSuccessfully = false;
 
-            var serviceContext = new ServiceContext(instance, method, attributeLookup, context, messageSerializer, logger, context.GetHttpContext().RequestServices);
+            var requestServiceProvider = context.GetHttpContext().RequestServices;
+            var metrics = requestServiceProvider.GetRequiredService<MagicOnionMetrics>();
+            var serviceContext = new ServiceContext(instance, method, attributeLookup, context, messageSerializer, metrics, logger, requestServiceProvider);
             var request = GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(requestRaw);
 
             serviceContext.SetRawRequest(request);

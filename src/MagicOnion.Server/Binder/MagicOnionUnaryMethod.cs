@@ -36,14 +36,11 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
 
     protected static ValueTask SetUnaryResultNonGeneric(UnaryResult result, ServiceContext context)
     {
-        if (result.hasRawValue)
+        if (result is { hasRawValue: true, rawTaskValue.IsCompletedSuccessfully: true })
         {
-            if (result.rawTaskValue is { IsCompletedSuccessfully: true })
-            {
-                return Await(result.rawTaskValue, context);
-            }
-            context.Result = BoxedNil;
+            return Await(result.rawTaskValue, context);
         }
+        context.Result = BoxedNil;
 
         return default;
 

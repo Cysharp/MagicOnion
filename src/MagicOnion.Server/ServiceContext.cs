@@ -90,12 +90,13 @@ public class ServiceContext : IServiceContext
     internal IMagicOnionGrpcMethod Method { get; }
     internal MetricsContext Metrics { get; }
 
-    public ServiceContext(
+    internal ServiceContext(
         object instance,
         IMagicOnionGrpcMethod method,
         ILookup<Type, Attribute> attributeLookup,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
+        MagicOnionMetrics metrics,
         ILogger logger,
         IServiceProvider serviceProvider
     )
@@ -109,8 +110,7 @@ public class ServiceContext : IServiceContext
         this.Logger = logger;
         this.Method = method;
         this.ServiceProvider = serviceProvider;
-
-        this.Metrics = serviceProvider.GetRequiredService<MagicOnionMetrics>().CreateContext();
+        this.Metrics = metrics.CreateContext();
     }
 
     /// <summary>Gets a request object.</summary>

@@ -4,6 +4,7 @@ using MagicOnion.Server.Binder;
 using MagicOnion.Server.Binder.Internal;
 using System.Reflection.Metadata;
 using MagicOnion.Serialization;
+using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -30,6 +31,144 @@ public class DynamicMagicOnionMethodProviderTest
         public interface IServiceDef : IService<IServiceDef>
         {
         }
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterZero_NoReturnValue()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, MessagePack.Nil, MessagePack.Nil, Box<MessagePack.Nil>, Box<MessagePack.Nil>>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_NoReturnValue));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, Nil.Default);
+
+        // Assert
+        Assert.Equal(MessagePack.Nil.Default, serviceContext.Result);
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterZero_ReturnValueValueType()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, MessagePack.Nil, int, Box<MessagePack.Nil>, Box<int>>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_ReturnValueValueType));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, Nil.Default);
+
+        // Assert
+        Assert.Equal(12345, serviceContext.Result);
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterZero_ReturnValueRefType()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, MessagePack.Nil, string, Box<MessagePack.Nil>, string>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_ReturnValueRefType));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, Nil.Default);
+
+        // Assert
+        Assert.Equal("Hello", serviceContext.Result);
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterMany_NoReturnValue()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, DynamicArgumentTuple<string, int, bool>, MessagePack.Nil, Box<DynamicArgumentTuple<string, int, bool>>, Box<MessagePack.Nil>>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_NoReturnValue));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));
+
+        // Assert
+        Assert.Equal(MessagePack.Nil.Default, serviceContext.Result);
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterMany_ReturnValueValueType()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, DynamicArgumentTuple<string, int, bool>, int, Box<DynamicArgumentTuple<string, int, bool>>, Box<int>>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_ReturnValueValueType));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));
+
+        // Assert
+        Assert.Equal(HashCode.Combine("Hello", 12345, true), serviceContext.Result);
+    }
+
+    [Fact]
+    public async Task Service_Unary_Invoker_ParameterMany_ReturnValueRefType()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+        var methods = provider.GetGrpcMethods<Service_MethodsImpl>();
+        var method = (IMagicOnionUnaryMethod<Service_MethodsImpl, DynamicArgumentTuple<string, int, bool>, string, Box<DynamicArgumentTuple<string, int, bool>>, string>)
+            methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_ReturnValueRefType));
+        var instance = new Service_MethodsImpl();
+        var serverCallContext = Substitute.For<ServerCallContext>();
+        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
+        var serializer = Substitute.For<IMagicOnionSerializer>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        var metrics = new MagicOnionMetrics(new TestMeterFactory());
+        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+
+        // Act
+        await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));
+
+        // Assert
+        Assert.Equal("Hello;12345;True", serviceContext.Result);
     }
 
     [Fact]
@@ -253,21 +392,21 @@ public class DynamicMagicOnionMethodProviderTest
     {
         public interface IServiceDef : IService<IServiceDef>
         {
-            UnaryResult Unary_ParameterZero_NoReturnValue() => throw new NotImplementedException();
-            UnaryResult<int> Unary_ParameterZero_ReturnValueValueType() => throw new NotImplementedException();
-            UnaryResult<string> Unary_ParameterZero_ReturnValueRefType() => throw new NotImplementedException();
+            UnaryResult Unary_ParameterZero_NoReturnValue() => default;
+            UnaryResult<int> Unary_ParameterZero_ReturnValueValueType() => UnaryResult.FromResult(12345);
+            UnaryResult<string> Unary_ParameterZero_ReturnValueRefType() => UnaryResult.FromResult("Hello");
 
-            UnaryResult Unary_ParameterOneValueType_NoReturnValue(int arg0) => throw new NotImplementedException();
-            UnaryResult<int> Unary_ParameterOneValueType_ReturnValueValueType(int arg0) => throw new NotImplementedException();
-            UnaryResult<string> Unary_ParameterOneValueType_ReturnValueRefType(int arg0) => throw new NotImplementedException();
+            UnaryResult Unary_ParameterOneValueType_NoReturnValue(int arg0) => default;
+            UnaryResult<int> Unary_ParameterOneValueType_ReturnValueValueType(int arg0) => UnaryResult.FromResult(arg0);
+            UnaryResult<string> Unary_ParameterOneValueType_ReturnValueRefType(int arg0) => UnaryResult.FromResult($"{arg0}");
 
-            UnaryResult Unary_ParameterOneRefType_NoReturnValue(string arg0) => throw new NotImplementedException();
-            UnaryResult<int> Unary_ParameterOneRefType_ReturnValueValueType(string arg0) => throw new NotImplementedException();
-            UnaryResult<string> Unary_ParameterOneRefType_ReturnValueRefType(string arg0) => throw new NotImplementedException();
+            UnaryResult Unary_ParameterOneRefType_NoReturnValue(string arg0) => default;
+            UnaryResult<int> Unary_ParameterOneRefType_ReturnValueValueType(string arg0) => UnaryResult.FromResult(int.Parse(arg0));
+            UnaryResult<string> Unary_ParameterOneRefType_ReturnValueRefType(string arg0) => UnaryResult.FromResult($"{arg0}");
 
-            UnaryResult Unary_ParameterMany_NoReturnValue(string arg0, int arg1, bool arg2) => throw new NotImplementedException();
-            UnaryResult<int> Unary_ParameterMany_ReturnValueValueType(string arg0, int arg1, bool arg2) => throw new NotImplementedException();
-            UnaryResult<string> Unary_ParameterMany_ReturnValueRefType(string arg0, int arg1, bool arg2) => throw new NotImplementedException();
+            UnaryResult Unary_ParameterMany_NoReturnValue(string arg0, int arg1, bool arg2) => default;
+            UnaryResult<int> Unary_ParameterMany_ReturnValueValueType(string arg0, int arg1, bool arg2) => UnaryResult.FromResult(HashCode.Combine(arg0, arg1, arg2));
+            UnaryResult<string> Unary_ParameterMany_ReturnValueRefType(string arg0, int arg1, bool arg2) => UnaryResult.FromResult($"{arg0};{arg1};{arg2}");
 
             Task<ClientStreamingResult<int, int>> ClientStreaming_RequestTypeValueType_ResponseTypeValueType() => throw new NotImplementedException();
             Task<ClientStreamingResult<string, int>> ClientStreaming_RequestTypeRefType_ResponseTypeValueType() => throw new NotImplementedException();
