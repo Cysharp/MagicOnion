@@ -26,11 +26,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -55,11 +54,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -84,11 +82,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -115,11 +112,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, 12345);
@@ -147,11 +143,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, 12345);
@@ -179,11 +174,10 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, 12345);

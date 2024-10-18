@@ -43,11 +43,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_NoReturnValue));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -66,11 +65,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_ReturnValueValueType));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -89,11 +87,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterZero_ReturnValueRefType));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, Nil.Default);
@@ -112,11 +109,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_NoReturnValue));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));
@@ -135,11 +131,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_ReturnValueValueType));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));
@@ -158,11 +153,10 @@ public class DynamicMagicOnionMethodProviderTest
             methods.Single(x => x.MethodName == nameof(Service_MethodsImpl.IServiceDef.Unary_ParameterMany_ReturnValueRefType));
         var instance = new Service_MethodsImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
-        var serviceContext = new ServiceContext(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
+        var serviceContext = new ServiceContext(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider);
 
         // Act
         await method.InvokeAsync(instance, serviceContext, new DynamicArgumentTuple<string, int, bool>("Hello", 12345, true));

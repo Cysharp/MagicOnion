@@ -42,7 +42,6 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
     public StreamingServiceContext(
         object instance,
         IMagicOnionGrpcMethod method,
-        ILookup<Type, Attribute> attributeLookup,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
         MagicOnionMetrics metrics,
@@ -50,7 +49,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         IServiceProvider serviceProvider,
         IAsyncStreamReader<TRequest>? requestStream,
         IServerStreamWriter<TResponse>? responseStream
-    ) : base(instance, method, attributeLookup, context, messageSerializer, metrics, logger, serviceProvider)
+    ) : base(instance, method, context, messageSerializer, metrics, logger, serviceProvider)
     {
         RequestStream = requestStream;
         ResponseStream = responseStream;

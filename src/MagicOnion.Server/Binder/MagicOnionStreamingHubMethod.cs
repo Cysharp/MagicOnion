@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Reflection;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Binder;
 
@@ -9,7 +10,7 @@ public interface IMagicOnionStreamingHubMethod
 {
     string ServiceName { get; }
     string MethodName { get; }
-    MethodInfo MethodInfo { get; }
+    StreamingHubMethodHandlerMetadata Metadata { get; }
 
     ValueTask InvokeAsync(StreamingHubContext context);
 }
@@ -18,7 +19,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
 {
     public string ServiceName { get; }
     public string MethodName { get; }
-    public MethodInfo MethodInfo { get; }
+    public StreamingHubMethodHandlerMetadata Metadata { get; }
 
     readonly Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>> invoker;
 
@@ -29,7 +30,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
 
         this.ServiceName = serviceName;
         this.MethodName  = methodName;
-        this.MethodInfo = typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException();
+        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException());
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invokerTask)
         {
@@ -64,7 +65,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
 {
     public string ServiceName { get; }
     public string MethodName { get; }
-    public MethodInfo MethodInfo { get; }
+    public StreamingHubMethodHandlerMetadata Metadata { get; }
 
     readonly Func<TService, StreamingHubContext, TRequest, ValueTask> invoker;
 
@@ -75,7 +76,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
 
         this.ServiceName = serviceName;
         this.MethodName = methodName;
-        this.MethodInfo = typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException();
+        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException());
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task> invokerTask)
         {

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Internal;
+using MagicOnion.Server.Internal;
 using MessagePack;
 
 namespace MagicOnion.Server.Binder;
@@ -27,6 +28,7 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
     public string ServiceName => serviceName;
     public string MethodName => methodName;
 
+    public abstract MethodHandlerMetadata Metadata { get; }
     public MethodInfo MethodInfo { get; } = typeof(TService).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
@@ -88,6 +90,8 @@ public sealed class MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawReq
     where TRawRequest : class
     where TRawResponse : class
 {
+    public override MethodHandlerMetadata Metadata { get; } = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(methodName)!);
+
     public override ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request)
         => SetUnaryResult(invoker(service, context, request), context);
 }
@@ -98,6 +102,8 @@ public sealed class MagicOnionUnaryMethod<TService, TRequest, TRawRequest>(strin
     where TService : class
     where TRawRequest : class
 {
+    public override MethodHandlerMetadata Metadata { get; } = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(methodName)!);
+
     public override ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request)
         => SetUnaryResultNonGeneric(invoker(service, context, request), context);
 }

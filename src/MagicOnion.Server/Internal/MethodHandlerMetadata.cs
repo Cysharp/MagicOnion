@@ -5,7 +5,7 @@ using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Server.Internal;
 
-public readonly struct MethodHandlerMetadata
+public class MethodHandlerMetadata
 {
     public Type ServiceImplementationType { get; }
     public MethodInfo ServiceMethod { get; }
@@ -15,6 +15,7 @@ public readonly struct MethodHandlerMetadata
     public Type RequestType { get; }
     public IReadOnlyList<ParameterInfo> Parameters { get; }
     public Type ServiceInterface { get; }
+    public IReadOnlyList<Attribute> Attributes { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
     public bool IsResultTypeTask { get; }
 
@@ -26,7 +27,7 @@ public readonly struct MethodHandlerMetadata
         Type requestType,
         IReadOnlyList<ParameterInfo> parameters,
         Type serviceInterface,
-        ILookup<Type, Attribute> attributeLookup,
+        IReadOnlyList<Attribute> attributes,
         bool isResultTypeTask
     )
     {
@@ -38,12 +39,13 @@ public readonly struct MethodHandlerMetadata
         RequestType = requestType;
         Parameters = parameters;
         ServiceInterface = serviceInterface;
-        AttributeLookup = attributeLookup;
+        Attributes = attributes;
+        AttributeLookup = attributes.ToLookup(x => x.GetType());
         IsResultTypeTask = isResultTypeTask;
     }
 }
 
-public readonly struct StreamingHubMethodHandlerMetadata
+public class StreamingHubMethodHandlerMetadata
 {
     public int MethodId { get; }
     public Type StreamingHubImplementationType { get; }
@@ -54,8 +56,9 @@ public readonly struct StreamingHubMethodHandlerMetadata
     public Type RequestType { get; }
     public IReadOnlyList<ParameterInfo> Parameters { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
+    public IReadOnlyList<Attribute> Attributes { get; }
 
-    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, ILookup<Type, Attribute> attributeLookup)
+    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, IReadOnlyList<Attribute> attributes)
     {
         MethodId = methodId;
         StreamingHubImplementationType = streamingHubImplementationType;
@@ -65,7 +68,8 @@ public readonly struct StreamingHubMethodHandlerMetadata
         RequestType = requestType;
         Parameters = parameters;
         StreamingHubInterfaceType = streamingHubInterfaceType;
-        AttributeLookup = attributeLookup;
+        AttributeLookup = attributes.ToLookup(x => x.GetType());
+        Attributes = attributes;
     }
 }
 
@@ -78,17 +82,17 @@ internal class MethodHandlerMetadataFactory
         var responseType = UnwrapUnaryResponseType(methodInfo, out var methodType, out var responseIsTask, out var requestTypeIfExists);
         var requestType = requestTypeIfExists ?? GetRequestTypeFromMethod(methodInfo, parameters);
 
-        var attributeLookup = serviceClass.GetCustomAttributes(true)
+        var attributes = serviceClass.GetCustomAttributes(true)
             .Concat(methodInfo.GetCustomAttributes(true))
             .Cast<Attribute>()
-            .ToLookup(x => x.GetType());
+            .ToArray();
 
         if (parameters.Any() && methodType is MethodType.ClientStreaming or MethodType.DuplexStreaming)
         {
             throw new InvalidOperationException($"{methodType} does not support method parameters. If you need to send some arguments, use request headers instead. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
-        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributeLookup, responseIsTask);
+        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributes, responseIsTask);
     }
 
     public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)
@@ -98,10 +102,10 @@ internal class MethodHandlerMetadataFactory
         var responseType = UnwrapStreamingHubResponseType(methodInfo, out var responseIsTaskOrValueTask);
         var requestType = GetRequestTypeFromMethod(methodInfo, parameters);
 
-        var attributeLookup = serviceClass.GetCustomAttributes(true)
+        var attributes = serviceClass.GetCustomAttributes(true)
             .Concat(methodInfo.GetCustomAttributes(true))
             .Cast<Attribute>()
-            .ToLookup(x => x.GetType());
+            .ToArray();
 
         var interfaceMethodInfo = ResolveInterfaceMethod(serviceClass, hubInterface, methodInfo.Name);
 
@@ -116,7 +120,7 @@ internal class MethodHandlerMetadataFactory
             throw new InvalidOperationException($"The '{serviceClass.Name}.{methodInfo.Name}' cannot have MethodId attribute. MethodId attribute must be annotated to a hub interface instead.");
         }
 
-        return new StreamingHubMethodHandlerMetadata(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, parameters, hubInterface, attributeLookup);
+        return new StreamingHubMethodHandlerMetadata(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, parameters, hubInterface, attributes);
     }
 
     static MethodInfo ResolveInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)

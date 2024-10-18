@@ -49,7 +49,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawResponse : class
     {
         var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
-        var filters = FilterHelper.GetFilters(globalFilters, typeof(TService), method.MethodInfo);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
         return InvokeAsync;
@@ -65,7 +65,6 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var serviceContext = new StreamingServiceContext<TRequest, Nil /* Dummy */>(
                 instance,
                 method,
-                attributeLookup,
                 context,
                 messageSerializer,
                 metrics,
@@ -128,7 +127,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawResponse : class
     {
         var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
-        var filters = FilterHelper.GetFilters(globalFilters, typeof(TService), method.MethodInfo);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;
@@ -145,7 +144,6 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
                 instance,
                 method,
-                attributeLookup,
                 context,
                 messageSerializer,
                 metrics,
@@ -201,7 +199,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawResponse : class
     {
         var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
-        var filters = FilterHelper.GetFilters(globalFilters, typeof(TService), method.MethodInfo);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
         return InvokeAsync;
@@ -218,7 +216,6 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
             var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
                 instance,
                 method,
-                attributeLookup,
                 context,
                 messageSerializer,
                 metrics,
@@ -276,8 +273,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawRequest : class
         where TRawResponse : class
     {
-        var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
-        var filters = FilterHelper.GetFilters(globalFilters, method.ServiceImplementationType, method.MethodInfo);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;
@@ -289,7 +285,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
             var requestServiceProvider = context.GetHttpContext().RequestServices;
             var metrics = requestServiceProvider.GetRequiredService<MagicOnionMetrics>();
-            var serviceContext = new ServiceContext(instance, method, attributeLookup, context, messageSerializer, metrics, logger, requestServiceProvider);
+            var serviceContext = new ServiceContext(instance, method, context, messageSerializer, metrics, logger, requestServiceProvider);
             var request = GrpcMethodHelper.FromRaw<TRawRequest, TRequest>(requestRaw);
 
             serviceContext.SetRawRequest(request);

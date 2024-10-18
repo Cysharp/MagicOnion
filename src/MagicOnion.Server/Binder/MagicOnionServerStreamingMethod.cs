@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Binder;
 
@@ -17,14 +17,13 @@ public class MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRaw
     public Type ServiceImplementationType => typeof(TService);
     public string ServiceName { get; }
     public string MethodName { get; }
-
-    public MethodInfo MethodInfo { get; }
+    public MethodHandlerMetadata Metadata { get; }
 
     public MagicOnionServerStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, Task> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
-        MethodInfo = typeof(TService).GetMethod(MethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
+        Metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(methodName)!);
 
         this.invoker = invoker;
     }

@@ -28,7 +28,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -66,7 +66,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -103,7 +103,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -141,7 +141,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -179,7 +179,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -217,7 +217,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -254,7 +254,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -291,7 +291,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         for (var i = 0; i < 3; i++)
         {
             var ctx = new StreamingHubContext();
@@ -336,7 +336,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -374,7 +374,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -412,7 +412,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
@@ -450,7 +450,7 @@ public class StreamingHubHandlerTest
         var fakeStreamingHubContext = new FakeStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hubType, hubMethodInfo, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null), serviceProvider);
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
         ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, -1 /* The client requires no response */);
         await handler.MethodBody.Invoke(ctx);
@@ -478,7 +478,7 @@ public class StreamingHubHandlerTest
         serializer.Serialize(bufferWriter, new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true));
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()
         {
             MessageSerializer = XorMessagePackMagicOnionSerializerProvider.Instance,
         }), serviceProvider);
@@ -516,7 +516,7 @@ public class StreamingHubHandlerTest
             static (instance, context, _) => instance.Method_Attribute());
 
         // Act
-        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
 
         // Assert
         Assert.NotEmpty(handler.AttributeLookup);

@@ -69,10 +69,10 @@ public class ServiceContext : IServiceContext
     public string ServiceName => Method.ServiceName;
     public string MethodName => MethodInfo.Name;
 
-    public MethodInfo MethodInfo => Method.MethodInfo;
+    public MethodInfo MethodInfo => Method.Metadata.ServiceMethod;
 
     /// <summary>Cached Attributes both service and method.</summary>
-    public ILookup<Type, Attribute> AttributeLookup { get; }
+    public ILookup<Type, Attribute> AttributeLookup => Method.Metadata.AttributeLookup;
 
     public MethodType MethodType => Method.MethodType;
 
@@ -93,7 +93,6 @@ public class ServiceContext : IServiceContext
     internal ServiceContext(
         object instance,
         IMagicOnionGrpcMethod method,
-        ILookup<Type, Attribute> attributeLookup,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
         MagicOnionMetrics metrics,
@@ -103,7 +102,6 @@ public class ServiceContext : IServiceContext
     {
         this.ContextId = Guid.NewGuid();
         this.Instance = instance;
-        this.AttributeLookup = attributeLookup;
         this.CallContext = context;
         this.Timestamp = DateTime.UtcNow;
         this.MessageSerializer = messageSerializer;

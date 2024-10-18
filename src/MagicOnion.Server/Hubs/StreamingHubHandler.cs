@@ -1,7 +1,6 @@
 using System.Reflection;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
-using MagicOnion.Server.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Binder;
 
@@ -9,29 +8,29 @@ namespace MagicOnion.Server.Hubs;
 
 public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 {
-    readonly StreamingHubMethodHandlerMetadata metadata;
+    readonly IMagicOnionStreamingHubMethod hubMethod;
     readonly string toStringCache;
     readonly int getHashCodeCache;
 
-    public string HubName => metadata.StreamingHubInterfaceType.Name;
-    public Type HubType => metadata.StreamingHubImplementationType;
-    public MethodInfo MethodInfo => metadata.ImplementationMethod;
-    public int MethodId => metadata.MethodId;
+    public string HubName => hubMethod.Metadata.StreamingHubInterfaceType.Name;
+    public Type HubType => hubMethod.Metadata.StreamingHubImplementationType;
+    public MethodInfo MethodInfo => hubMethod.Metadata.ImplementationMethod;
+    public int MethodId => hubMethod.Metadata.MethodId;
 
-    public ILookup<Type, Attribute> AttributeLookup => metadata.AttributeLookup;
+    public ILookup<Type, Attribute> AttributeLookup => hubMethod.Metadata.AttributeLookup;
 
-    internal Type RequestType => metadata.RequestType;
+    internal Type RequestType => hubMethod.Metadata.RequestType;
     internal Func<StreamingHubContext, ValueTask> MethodBody { get; }
 
-    public StreamingHubHandler(Type implementationType, IMagicOnionStreamingHubMethod hubMethod, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)
+    public StreamingHubHandler(IMagicOnionStreamingHubMethod hubMethod, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)
     {
-        this.metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(implementationType, hubMethod.MethodInfo);
+        this.hubMethod = hubMethod;
         this.toStringCache = HubName + "/" + MethodInfo.Name;
         this.getHashCodeCache = HashCode.Combine(HubName, MethodInfo.Name);
 
         try
         {
-            var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, implementationType, hubMethod.MethodInfo);
+            var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, hubMethod.Metadata.Attributes);
             this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, hubMethod.InvokeAsync);
         }
         catch (Exception ex)
