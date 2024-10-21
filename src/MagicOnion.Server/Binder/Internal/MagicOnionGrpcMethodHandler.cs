@@ -42,13 +42,11 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
     public ClientStreamingServerMethod<TService, TRawRequest, TRawResponse> BuildClientStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(
         MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method,
-        IMagicOnionSerializer messageSerializer,
-        IList<object> metadata
+        IMagicOnionSerializer messageSerializer
     )
         where TRawRequest : class
         where TRawResponse : class
     {
-        var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
         var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
@@ -120,13 +118,11 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
     public ServerStreamingServerMethod<TService, TRawRequest, TRawResponse> BuildServerStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(
         MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method,
-        IMagicOnionSerializer messageSerializer,
-        IList<object> metadata
+        IMagicOnionSerializer messageSerializer
     )
         where TRawRequest : class
         where TRawResponse : class
     {
-        var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
         var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
@@ -192,13 +188,11 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
     public DuplexStreamingServerMethod<TService, TRawRequest, TRawResponse> BuildDuplexStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(
         MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method,
-        IMagicOnionSerializer messageSerializer,
-        IList<object> metadata
+        IMagicOnionSerializer messageSerializer
     )
         where TRawRequest : class
         where TRawResponse : class
     {
-        var attributeLookup = metadata.OfType<Attribute>().ToLookup(k => k.GetType());
         var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
@@ -267,8 +261,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
 
     public UnaryServerMethod<TService, TRawRequest, TRawResponse> BuildUnaryMethod<TRequest, TResponse, TRawRequest, TRawResponse>(
         IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method,
-        IMagicOnionSerializer messageSerializer,
-        IList<object> metadata
+        IMagicOnionSerializer messageSerializer
     )
         where TRawRequest : class
         where TRawResponse : class

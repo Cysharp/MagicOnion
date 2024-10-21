@@ -10,8 +10,8 @@ public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterfac
 {
     // NOTE: Properties `Context` and `Metrics` are set by an internal setter during instance activation of the service.
     //       For details, please refer to `ServiceProviderHelper.CreateService`.
-    public ServiceContext Context { get; internal set; }
-    internal MagicOnionMetrics Metrics { get; set; }
+    public ServiceContext Context { get; private set; }
+    internal MagicOnionMetrics Metrics { get; private set; }
 
     ServiceContext IServiceBase.Context
     {

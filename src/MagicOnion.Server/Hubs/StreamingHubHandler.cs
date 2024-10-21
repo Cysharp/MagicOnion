@@ -1,7 +1,6 @@
 using System.Reflection;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
-using MagicOnion.Serialization;
 using MagicOnion.Server.Binder;
 
 namespace MagicOnion.Server.Hubs;
@@ -55,13 +54,9 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 public class StreamingHubHandlerOptions
 {
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
-
-    public IMagicOnionSerializerProvider MessageSerializer { get; }
-
     public StreamingHubHandlerOptions(MagicOnionOptions options)
     {
         GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
-        MessageSerializer = options.MessageSerializer;
     }
 }
 

@@ -1,4 +1,3 @@
-using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Server.Internal;
 

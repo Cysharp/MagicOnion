@@ -78,7 +78,7 @@ internal static class MagicOnionServicesDiscoverer
                     return x.GetTypes()
                         .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
                         .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
-                        .Where(x => x.IsPublic && !x.IsAbstract && !x.IsGenericTypeDefinition);
+                        .Where(x => x is { IsPublic: true, IsAbstract: false, IsGenericTypeDefinition: false });
                 }
                 catch (ReflectionTypeLoadException)
                 {
