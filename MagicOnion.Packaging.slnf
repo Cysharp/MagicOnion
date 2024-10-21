@@ -6,7 +6,6 @@
       "src\\MagicOnion.Client\\MagicOnion.Client.csproj",
       "src\\MagicOnion.Serialization.MessagePack\\MagicOnion.Serialization.MessagePack.csproj",
       "src\\MagicOnion.Serialization.MemoryPack\\MagicOnion.Serialization.MemoryPack.csproj",
-      "src\\MagicOnion.Server.HttpGateway\\MagicOnion.Server.HttpGateway.csproj",
       "src\\MagicOnion.Server.Redis\\MagicOnion.Server.Redis.csproj",
       "src\\MagicOnion.Server\\MagicOnion.Server.csproj",
       "src\\MagicOnion.Shared\\MagicOnion.Shared.csproj",
