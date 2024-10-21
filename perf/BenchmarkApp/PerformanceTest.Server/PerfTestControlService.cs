@@ -2,6 +2,7 @@ using JetBrains.Profiler.Api;
 using MagicOnion;
 using MagicOnion.Server;
 using PerformanceTest.Shared;
+using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
@@ -11,6 +12,8 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
     {
         return UnaryResult.FromResult(new ServerInformation(
             Environment.MachineName,
+            ApplicationInformation.Current.BenchmarkerVersion,
+            ApplicationInformation.Current.IsLatestMagicOnion,
             ApplicationInformation.Current.MagicOnionVersion,
             ApplicationInformation.Current.GrpcNetVersion,
             ApplicationInformation.Current.MessagePackVersion,
@@ -24,6 +27,18 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
             ApplicationInformation.Current.IsServerGC,
             ApplicationInformation.Current.ProcessorCount,
             ApplicationInformation.Current.IsAttached));
+    }
+
+    public UnaryResult<(string serverMagicOnionVersion, bool enableLatestTag)> ExchangeMagicOnionVersionTagAsync(string? clientMagicOnionVersion, bool isLatestMagicOnionVersion)
+    {
+        var versionTag = $"{clientMagicOnionVersion}x{ApplicationInformation.Current.TagMagicOnionVersion}";
+        // Both Server and Client is latest
+        var isLatestTagEnabled = ApplicationInformation.Current.IsLatestMagicOnion && isLatestMagicOnionVersion;
+
+        // keep in server
+        DatadogMetricsRecorder.MagicOnionVersions = versionTag;
+        DatadogMetricsRecorder.EnableLatestTag = isLatestTagEnabled;
+        return UnaryResult.FromResult((versionTag, isLatestTagEnabled));
     }
 
     public UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable)

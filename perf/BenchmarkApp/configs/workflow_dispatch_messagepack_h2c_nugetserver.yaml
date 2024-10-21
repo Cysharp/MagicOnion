@@ -1,6 +1,6 @@
 # template: https://github.com/Cysharp/Actions/tree/main/.github/scripts/_template_benchmark_config.yaml
 # config2args script: https://github.com/Cysharp/Actions/tree/main/.github/scripts/benchmark_config2args.sh
-apt-tools: "libmsquic"
+apt-tools: ""
 dotnet-version: 8.0
 benchmark-expire-min: 15
 benchmark-timeout-min: 10
@@ -11,23 +11,27 @@ benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   # h2c
-  - tags: legend:memorypack-h3-linux,streams:1x1,protocol:h3,serialization:memorypack
-    protocol: h3
+  - tags: legend:messagepack-h2c-linux,streams:1x1,protocol:h2c,serialization:messagepack
+    protocol: h2c
     channels: 1
     streams: 1
-    serialization: memorypack
-  - tags: legend:memorypack-h3-linux,streams:1x28,protocol:h3,serialization:memorypack
-    protocol: h3
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h2c-linux,streams:1x28,protocol:h2c,serialization:messagepack
+    protocol: h2c
     channels: 28
     streams: 1
-    serialization: memorypack
-  - tags: legend:memorypack-h3-linux,streams:70x1,protocol:h3,serialization:memorypack
-    protocol: h3
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h2c-linux,streams:70x1,protocol:h2c,serialization:messagepack
+    protocol: h2c
     channels: 1
     streams: 70
-    serialization: memorypack
-  - tags: legend:memorypack-h3-linux,streams:70x28,protocol:h3,serialization:memorypack
-    protocol: h3
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4
+  - tags: legend:messagepack-h2c-linux,streams:70x28,protocol:h2c,serialization:messagepack
+    protocol: h2c
     channels: 28
     streams: 70
-    serialization: memorypack
+    serialization: messagepack
+    buildArgsServer: --p:UseNuGetServer=6.1.4

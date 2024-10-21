@@ -8,114 +8,136 @@ set -euo pipefail
 # $ echo $?
 
 function usage {
-    echo "usage: $(basename $0) [options]"
-    echo "Required:"
-    echo "  --args          string      Arguments to pass when running the built binary (default: \"\")"
-    echo "Options:"
-    echo "  --help                      Show this help message"
+  cat <<EOF
+usage: $(basename $0) --run-args <string> [options]
+Required:
+  --run-args          string      Arguments to pass when running the built binary (default: \"\")
+Options:
+  --build-args        string      Arguments to pass when building the project (default: \"\")
+  --help                          Show this help message
+EOF
 }
 
 while [ $# -gt 0 ]; do
   case $1 in
     # required
-    --args) _ARGS=$2; shift 2; ;;
+    --run-args) _RUN_ARGS=$2; shift 2; ;;
     # optional
+    --build-args) _BUILD_ARGS=$2; shift 2; ;;
     --help) usage; exit 1; ;;
     *) shift ;;
   esac
 done
 
-function print() {
-  echo ""
-  echo "$*"
+function print {
+  echo "$(date "+%Y-%m-%d %H:%M:%S") INFO(${FUNCNAME[1]:-unknown}): $*"
 }
-
+function title {
+  echo ""
+  echo "$(date "+%Y-%m-%d %H:%M:%S") INFO(${FUNCNAME[1]:-unknown}): # $*"
+}
+function error {
+  echo "$(date "+%Y-%m-%d %H:%M:%S") ERROR(${FUNCNAME[1]:-unknown}): # $*" >&2
+}
 # parameter setup
-repo="MagicOnion"
-build_config="Release"
-args="${_ARGS:=""}"
-build_csproj="perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"
-env_settings=""
+title "Arguments:"
+print "--run-args=${_RUN_ARGS:=""}"
+print "--build-args=${_BUILD_ARGS:=""}"
 
-binary_name=$(basename "$(dirname "$build_csproj")")
-publish_dir="artifacts/$binary_name"
-clone_path="$HOME/github/$repo"
-output_dir="$clone_path/$publish_dir"
-full_process_path="$output_dir/$binary_name"
+title "Constants:"
+print "  * repo=${repo:="MagicOnion"}"
+print "  * build_config=${build_config:="Release"}"
+print "  * build_csproj=${build_csproj:="perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj"}"
+print "  * env_settings=${env_settings:=""}"
+print "  * binary_name=${binary_name:=$(basename "$(dirname "$build_csproj")")}"
+print "  * publish_dir=${publish_dir:="artifacts/$binary_name"}"
+print "  * clone_path=${clone_path:="$HOME/github/$repo"}"
+print "  * output_dir=${output_dir:="$clone_path/$publish_dir"}"
+print "  * full_process_path=${full_process_path:="$output_dir/$binary_name"}"
+print "  * stdoutfile=${stdoutfile:="stdout.log"}"
+print "  * stderrfile=${stderrfile:="stderr.log"}"
 
-stdoutfile="stdout.log"
-stderrfile="stderr.log"
-
-# show machine name
-print "MACHINE_NAME: $(hostname)"
+# machine name
+title "Show this machine name"
+print "  * MACHINE_NAME=$(hostname)"
 
 # is dotnet installed?
-print "# Show installed dotnet sdk versions"
-echo "dotnet sdk versions (list): $(dotnet --list-sdks)"
-echo "dotnet sdk version (default): $(dotnet --version)"
+title "Show installed dotnet sdk versions"
+print "  * dotnet sdk versions (list): $(dotnet --list-sdks)"
+print "  * dotnet sdk version (default): $(dotnet --version)"
 
-# is already clones?
-print "# Check if already cloned $repo"
-if [[ ! -d "$clone_path" ]]; then
-  echop "Failed to find $clone_path, not yet git cloned?"
-  exit 1
-fi
-
-# get branch name and set to environment variables
-print "# Set branch name as Environment variable"
-pushd "$clone_path"
-  print "  ## get current git branch name"
-  git_branch=$(git rev-parse --abbrev-ref HEAD)
-  if [ -z "$git_branch" ]; then
-    echo "Failed to get branch name, exiting..."
+echo "::group::Is already cloned?"
+  title "Check if already cloned $repo"
+  if [[ ! -d "$clone_path" ]]; then
+    error "Failed to find $clone_path, not yet git cloned?"
     exit 1
   fi
+echo "::endgroup::"
 
-  print "  ## set branch name to environment variables $git_branch"
-  export BRANCH_NAME="$git_branch"
-popd
+echo "::group::Get branch name and set to environment variables"
+  title "Set branch name as Environment variable"
+  pushd "$clone_path" > /dev/null
+    print "Get current git branch name"
+    git_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [ -z "$git_branch" ]; then
+      error "Failed to get branch name, exiting..."
+      exit 1
+    fi
 
-# setup env
-print "# Setup environment"
-IFS=';' read -ra env_array <<< "$env_settings"
-for item in "${env_array[@]}"; do
-  if [ -n "$item" ]; then
-    export "$item"
-  fi
-done
+    print "Set branch name to environment variables $git_branch"
+    export BRANCH_NAME="$git_branch"
+  popd > /dev/null
+echo "::endgroup::"
 
-# process check
-print "# Checking process $binary_name already runnning, kill if exists"
-ps -eo pid,cmd | while read -r pid cmd; do
-  if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
-    echo "Found & killing process $pid ($cmd)"
-    kill "$pid"
-  fi
-done
+echo "::group::Setup environment variables"
+  title "Setup environment"
+  IFS=';' read -ra env_array <<< "$env_settings"
+  for item in "${env_array[@]}"; do
+    if [ -n "$item" ]; then
+      export "$item"
+    fi
+  done
+echo "::endgroup::"
 
-# dotnet publish
-print "# dotnet publish $build_csproj"
-pushd "$clone_path"
-  print "  ## list current files under $(pwd)"
-  ls -l
+echo "::group::Kill existing process"
+  title "Checking process $binary_name already runnning, kill if exists"
+  ps -eo pid,cmd | while read -r pid cmd; do
+    if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
+      print "Found & killing process $pid ($cmd)"
+      kill "$pid"
+    fi
+  done
+echo "::endgroup::"
 
-  print "  ## dotnet publish $build_csproj"
-  dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir"
+echo "::group::dotnet publish"
+  title "dotnet publish $build_csproj"
+  pushd "$clone_path" > /dev/null
+    print "List current files under $(pwd)"
+    ls -l
 
-  print "  ## list published files under $publish_dir"
-  ls "$publish_dir"
+    print "Remove all files under $publish_dir"
+    if [[ -d "./$publish_dir" ]]; then
+      rm -rf "./$publish_dir"
+    fi
 
-  print "  ## add +x permission to published file $full_process_path"
-  chmod +x "$full_process_path"
-popd
+    print "dotnet publish $build_csproj $_BUILD_ARGS"
+    dotnet publish -c "$build_config" -p:PublishSingleFile=true --runtime linux-x64 --self-contained false "$build_csproj" -o "$publish_dir" $_BUILD_ARGS
+
+    print "List published files under $publish_dir"
+    ls "$publish_dir"
+
+    print "Add +x permission to published file $full_process_path"
+    chmod +x "$full_process_path"
+  popd > /dev/null
+echo "::endgroup::"
 
 # run dotnet app
-print "# Run $full_process_path $args"
-pushd "$output_dir"
+title "Run $full_process_path $_RUN_ARGS"
+pushd "$output_dir" > /dev/null
   touch "${stdoutfile}"
   # use nohup to run background https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
   # shellcheck disable=SC2086
-  nohup "./$binary_name" $args > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
+  nohup "./$binary_name" $_RUN_ARGS > "${stdoutfile}" 2> "${stderrfile}" < /dev/null &
 
   # wait 10s will be enough to start the server or not
   sleep 10s
@@ -125,8 +147,8 @@ pushd "$output_dir"
 
   # output stderr
   if [[ "$(stat -c%s "$stderrfile")" -ne "0" ]]; then
-    echo "Error found when running the server."
+    error "Error found when running the server."
     cat "${stderrfile}"
     exit 1
   fi
-popd
+popd > /dev/null
