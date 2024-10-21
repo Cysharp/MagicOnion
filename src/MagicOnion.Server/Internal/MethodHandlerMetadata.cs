@@ -8,7 +8,7 @@ namespace MagicOnion.Server.Internal;
 public class MethodHandlerMetadata
 {
     public Type ServiceImplementationType { get; }
-    public MethodInfo ServiceMethod { get; }
+    public MethodInfo ServiceImplementationMethod { get; }
 
     public MethodType MethodType { get; }
     public Type ResponseType { get; }
@@ -17,7 +17,6 @@ public class MethodHandlerMetadata
     public Type ServiceInterface { get; }
     public IReadOnlyList<Attribute> Attributes { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
-    public bool IsResultTypeTask { get; }
 
     public MethodHandlerMetadata(
         Type serviceImplementationType,
@@ -27,12 +26,11 @@ public class MethodHandlerMetadata
         Type requestType,
         IReadOnlyList<ParameterInfo> parameters,
         Type serviceInterface,
-        IReadOnlyList<Attribute> attributes,
-        bool isResultTypeTask
+        IReadOnlyList<Attribute> attributes
     )
     {
         ServiceImplementationType = serviceImplementationType;
-        ServiceMethod = serviceMethod;
+        ServiceImplementationMethod = serviceMethod;
 
         MethodType = methodType;
         ResponseType = responseType;
@@ -41,7 +39,6 @@ public class MethodHandlerMetadata
         ServiceInterface = serviceInterface;
         Attributes = attributes;
         AttributeLookup = attributes.ToLookup(x => x.GetType());
-        IsResultTypeTask = isResultTypeTask;
     }
 }
 
@@ -92,7 +89,7 @@ internal class MethodHandlerMetadataFactory
             throw new InvalidOperationException($"{methodType} does not support method parameters. If you need to send some arguments, use request headers instead. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
-        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributes, responseIsTask);
+        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributes);
     }
 
     public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)

@@ -36,7 +36,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         where TRawRequest : class
         where TRawResponse : class
     {
-        var messageSerializer = messageSerializerProvider.Create(MethodType.Unary, method.Metadata.ServiceMethod);
+        var messageSerializer = messageSerializerProvider.Create(MethodType.Unary, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
         var attrs = GetMetadataFromHandler(method);
 
@@ -47,7 +47,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         where TRawRequest : class
         where TRawResponse : class
     {
-        var messageSerializer = messageSerializerProvider.Create(MethodType.ClientStreaming, method.Metadata.ServiceMethod);
+        var messageSerializer = messageSerializerProvider.Create(MethodType.ClientStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, method.ServiceName, method.MethodName, messageSerializer);
         var attrs = GetMetadataFromHandler(method);
 
@@ -58,7 +58,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         where TRawRequest : class
         where TRawResponse : class
     {
-        var messageSerializer = messageSerializerProvider.Create(MethodType.ServerStreaming, method.Metadata.ServiceMethod);
+        var messageSerializer = messageSerializerProvider.Create(MethodType.ServerStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, method.ServiceName, method.MethodName, messageSerializer);
         var attrs = GetMetadataFromHandler(method);
 
@@ -69,7 +69,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         where TRawRequest : class
         where TRawResponse : class
     {
-        var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, method.Metadata.ServiceMethod);
+        var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, method.ServiceName, method.MethodName, messageSerializer);
         var attrs = GetMetadataFromHandler(method);
 
@@ -78,7 +78,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
 
     public void BindStreamingHub(MagicOnionStreamingHubConnectMethod<TService> method)
     {
-        var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, method.Metadata.ServiceMethod);
+        var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, method.Metadata.ServiceImplementationMethod);
         // StreamingHub uses the special marshallers for streaming messages serialization.
         // TODO: Currently, MagicOnion expects TRawRequest/TRawResponse to be raw-byte array (`StreamingHubPayload`).
         var grpcMethod = new Method<StreamingHubPayload, StreamingHubPayload>(

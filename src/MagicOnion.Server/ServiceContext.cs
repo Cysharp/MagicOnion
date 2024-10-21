@@ -69,7 +69,7 @@ public class ServiceContext : IServiceContext
     public string ServiceName => Method.ServiceName;
     public string MethodName => MethodInfo.Name;
 
-    public MethodInfo MethodInfo => Method.Metadata.ServiceMethod;
+    public MethodInfo MethodInfo => Method.Metadata.ServiceImplementationMethod;
 
     /// <summary>Cached Attributes both service and method.</summary>
     public ILookup<Type, Attribute> AttributeLookup => Method.Metadata.AttributeLookup;
