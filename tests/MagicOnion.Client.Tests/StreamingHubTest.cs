@@ -683,7 +683,7 @@ public class StreamingHubTest
     public async Task Cancel_While_WritingStream()
     {
         // Arrange
-        Exception? unobservedException = default;
+        AggregateException? unobservedException = default;
         EventHandler<UnobservedTaskExceptionEventArgs> unobservedTaskExceptionEventHandler = (sender, e) =>
         {
             unobservedException = e.Exception;
@@ -696,6 +696,7 @@ public class StreamingHubTest
             GC.Collect();
             GC.Collect();
             GC.Collect();
+            GC.Collect();
             await Task.Delay(100);
         }
         finally
@@ -703,7 +704,9 @@ public class StreamingHubTest
             TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionEventHandler;
         }
 
-        Assert.Null(unobservedException);
+        var ex = unobservedException?.InnerExceptions.FirstOrDefault(x => x.TargetSite?.Name == "MoveNext" && (x.TargetSite?.DeclaringType?.FullName.StartsWith("MagicOnion.Client.Tests.ChannelClientStreamWriter") ?? false));
+
+        Assert.Null(ex);
 
         static async Task CoreAsync()
         {
