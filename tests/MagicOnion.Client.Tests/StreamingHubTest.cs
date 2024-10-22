@@ -704,7 +704,7 @@ public class StreamingHubTest
             TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionEventHandler;
         }
 
-        var ex = unobservedException?.InnerExceptions.FirstOrDefault(x => x.TargetSite?.Name == "MoveNext" && (x.TargetSite?.DeclaringType?.FullName.StartsWith("MagicOnion.Client.Tests.ChannelClientStreamWriter") ?? false));
+        var ex = unobservedException?.InnerExceptions.FirstOrDefault(x => x.TargetSite?.Name == "MoveNext" && (x.TargetSite?.DeclaringType?.FullName?.StartsWith("MagicOnion.Client.Tests.ChannelClientStreamWriter") ?? false));
 
         Assert.Null(ex);
 
