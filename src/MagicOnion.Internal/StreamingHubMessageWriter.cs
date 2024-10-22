@@ -236,14 +236,14 @@ namespace MagicOnion.Internal
         /// Writes a client heartbeat message for sending from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessage(IBufferWriter<byte> bufferWriter, short sequence, DateTimeOffset clientSentAt)
+        public static void WriteClientHeartbeatMessage(IBufferWriter<byte> bufferWriter, short sequence, long clientSentAtElapsedFromOriginMs)
         {
-            // Array(4)[0x7e(126), Sequence(int8), ClientSentAt(long; UnixTimeMs), <Extra>]
+            // Array(4)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), <Extra>]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(4);
             writer.Write(0x7e);                                  // 0:Type = 0x7e / 126 (ClientHeartbeat)
             writer.Write(sequence);                              // 1:Sequence
-            writer.Write(clientSentAt.ToUnixTimeMilliseconds()); // 2:ClientSentAt
+            writer.Write(clientSentAtElapsedFromOriginMs);       // 2:ClientSentAtElapsedFromOrigin
             writer.WriteNil();                                   // 3:Reserved
             writer.Flush();
         }
@@ -254,12 +254,12 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteClientHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence, long clientSentAt)
         {
-            // Array(5)[0x7e(126), Sequence(int8), ClientSentAt(long; UnixTimeMs), Nil, <Extra>]
+            // Array(5)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), Nil, <Extra>]
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(5);
             writer.Write(0x7e);         // 0:Type = 0x7e / 126 (Heartbeat)
             writer.Write(sequence);     // 1:Sequence
-            writer.Write(clientSentAt); // 2:ClientSentAt
+            writer.Write(clientSentAt); // 2:ClientSentAtElapsedFromOrigin
             writer.WriteNil();          // 3:Reserved
             writer.WriteNil();          // 4:Reserved
             writer.Flush();
