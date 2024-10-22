@@ -462,13 +462,13 @@ public class StreamingHubTest
         var request1 = await helper.ReadRequestRawAsync();
         var request2 = await helper.ReadRequestRawAsync();
         var request3 = await helper.ReadRequestRawAsync();
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x00 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddMilliseconds(100)) /* ServerSentAt */, 0xc0 /* Nil */], request1.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x01 /* Sequence(1) */, .. ToMessagePackBytes(origin.AddMilliseconds(200)) /* ServerSentAt */, 0xc0 /* Nil */], request2.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x02 /* Sequence(2) */, .. ToMessagePackBytes(origin.AddMilliseconds(300)) /* ServerSentAt */, 0xc0 /* Nil */], request3.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x00 /* Sequence(0) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(100)) /* ClientSentAt */, 0xc0 /* Nil */], request1.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x01 /* Sequence(1) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(200)) /* CliSentAt */, 0xc0 /* Nil */], request2.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x02 /* Sequence(2) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(300)) /* CliSentAt */, 0xc0 /* Nil */], request3.ToArray());
 
-        static byte[] ToMessagePackBytes(DateTimeOffset dt)
+        static byte[] ToMessagePackBytes(TimeSpan ts)
         {
-            var ms = dt.ToUnixTimeMilliseconds();
+            var ms = (long)ts.TotalMilliseconds;
 
             var arrayBufferWriter = new ArrayBufferWriter<byte>();
             var writer = new MessagePackWriter(arrayBufferWriter);
