@@ -30,7 +30,7 @@ namespace MagicOnion.Client.Internal
         bool isTimeoutTimerRunning;
         bool disposed;
 
-        long ElapsedMillisecondsFromOrigin => (long)timeProvider.GetElapsedTime(timestampOrigin, timeProvider.GetTimestamp()).TotalMilliseconds;
+        long ElapsedMillisecondsFromOrigin => (long)timeProvider.GetElapsedTime(timestampOrigin).TotalMilliseconds;
 
         public CancellationToken TimeoutToken => timeoutTokenSource.Token;
 
@@ -144,7 +144,7 @@ namespace MagicOnion.Client.Internal
                 var payload = (StreamingHubPayload)state!;
                 var reader = new StreamingHubClientMessageReader(payload.Memory);
                 _ = reader.ReadMessageType();
-                var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
+                var (sentSequence, clientSentAtElapsedMsFromOrigin) = reader.ReadClientHeartbeatResponse();
 
                 if (sentSequence == sequence - 1/* NOTE: Sequence already 1 advanced.*/)
                 {
@@ -153,7 +153,7 @@ namespace MagicOnion.Client.Internal
                     isTimeoutTimerRunning = false;
                 }
 
-                var elapsed = ElapsedMillisecondsFromOrigin - clientSentAt;
+                var elapsed = ElapsedMillisecondsFromOrigin - clientSentAtElapsedMsFromOrigin;
 
                 clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
                 StreamingHubPayloadPool.Shared.Return(payload);
