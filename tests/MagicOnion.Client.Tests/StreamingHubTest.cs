@@ -1,6 +1,7 @@
 using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
+using System.Reflection;
 
 namespace MagicOnion.Client.Tests;
 
@@ -676,6 +677,57 @@ public class StreamingHubTest
         var ode = Assert.IsType<ObjectDisposedException>(ex);
         Assert.Equal(nameof(StreamingHubClient), ode.ObjectName);
         Assert.Contains("StreamingHubClient has already been disconnected from the server.", ex.Message);
+    }
+
+    [Fact]
+    public async Task Cancel_While_WritingStream()
+    {
+        // Arrange
+        Exception? unobservedException = default;
+        EventHandler<UnobservedTaskExceptionEventArgs> unobservedTaskExceptionEventHandler = (sender, e) =>
+        {
+            unobservedException = e.Exception;
+        };
+        try
+        {
+            TaskScheduler.UnobservedTaskException += unobservedTaskExceptionEventHandler;
+            await CoreAsync();
+            await Task.Delay(100);
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            await Task.Delay(100);
+        }
+        finally
+        {
+            TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionEventHandler;
+        }
+
+        Assert.Null(unobservedException);
+
+        static async Task CoreAsync()
+        {
+            var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+            var client = await helper.ConnectAsync(timeout.Token);
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        _ = client.Parameter_One(0);
+                    }
+                }
+                catch
+                {
+                    // Ignore exception
+                }
+            });
+            await Task.Delay(100);
+            await client.DisposeAsync();
+        }
     }
 }
 
