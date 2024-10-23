@@ -3,6 +3,7 @@ using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
+using MagicOnionEngineTest;
 using MessagePack;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -18,7 +19,7 @@ public class MagicOnionGrpcMethodTest
         // Arrange
         var called = false;
         var invokerArgInstance = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, Box<MessagePack.Nil>>("IMyService", "MethodName", (instance, context, _) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, Box<MessagePack.Nil>>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary), (instance, context, _) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -46,7 +47,7 @@ public class MagicOnionGrpcMethodTest
         // Arrange
         var called = false;
         var invokerArgInstance = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, int, Box<MessagePack.Nil>, Box<int>>("IMyService", "MethodName", (instance, context, _) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, int, Box<MessagePack.Nil>, Box<int>>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary_Parameterless_Int), (instance, context, _) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -74,7 +75,7 @@ public class MagicOnionGrpcMethodTest
         // Arrange
         var called = false;
         var invokerArgInstance = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, string, Box<MessagePack.Nil>, string>("IMyService", "MethodName", (instance, context, _) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, MessagePack.Nil, string, Box<MessagePack.Nil>, string>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary_Parameterless_String), (instance, context, _) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -103,7 +104,7 @@ public class MagicOnionGrpcMethodTest
         var called = false;
         var invokerArgInstance = default(object);
         var invokerArgRequest = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, int, Box<int>>("IMyService", "MethodName", (instance, context, request) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, int, Box<int>>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary_Int), (instance, context, request) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -134,7 +135,7 @@ public class MagicOnionGrpcMethodTest
         var called = false;
         var invokerArgInstance = default(object);
         var invokerArgRequest = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, int, int, Box<int>, Box<int>>("IMyService", "MethodName", (instance, context, request) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, int, int, Box<int>, Box<int>>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary_Int_Int), (instance, context, request) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -165,7 +166,7 @@ public class MagicOnionGrpcMethodTest
         var called = false;
         var invokerArgInstance = default(object);
         var invokerArgRequest = default(object);
-        var method = new MagicOnionUnaryMethod<ServiceImpl, int, string, Box<int>, string>("IMyService", "MethodName", (instance, context, request) =>
+        var method = new MagicOnionUnaryMethod<ServiceImpl, int, string, Box<int>, string>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Unary_Int_String), (instance, context, request) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -196,7 +197,7 @@ public class MagicOnionGrpcMethodTest
         var called = false;
         var invokerArgInstance = default(object);
         var requestCurrentFirst = default(object);
-        var method = new MagicOnionDuplexStreamingMethod<ServiceImpl, int, int, Box<int>, Box<int>>("IMyService", "MethodName", async (instance, context) =>
+        var method = new MagicOnionDuplexStreamingMethod<ServiceImpl, int, int, Box<int>, Box<int>>(nameof(ServiceImpl.IMyService), nameof(ServiceImpl.IMyService.Duplex), async (instance, context) =>
         {
             called = true;
             invokerArgInstance = instance;
@@ -230,5 +231,29 @@ public class MagicOnionGrpcMethodTest
     }
 
 
-    class ServiceImpl;
+    class ServiceImpl : ServiceBase<ServiceImpl.IMyService>, ServiceImpl.IMyService
+    {
+        public interface IMyService : IService<IMyService>
+        {
+            UnaryResult Unary();
+            UnaryResult Unary_Int(int arg0);
+            UnaryResult Unary_String(string arg0);
+            UnaryResult<int> Unary_Parameterless_Int();
+            UnaryResult<string> Unary_Parameterless_String();
+            UnaryResult<int> Unary_Int_Int(int arg0);
+            UnaryResult<string> Unary_Int_String(int arg0);
+            UnaryResult<string> Unary_String_String(string arg0);
+            Task<DuplexStreamingResult<int, int>> Duplex();
+        }
+
+        public UnaryResult Unary() => default;
+        public UnaryResult Unary_Int(int arg0) => default;
+        public UnaryResult Unary_String(string arg0) => default;
+        public UnaryResult<int> Unary_Parameterless_Int() => default;
+        public UnaryResult<string> Unary_Parameterless_String() => default;
+        public UnaryResult<int> Unary_Int_Int(int arg0) => UnaryResult.FromResult(0);
+        public UnaryResult<string> Unary_Int_String(int arg0) => UnaryResult.FromResult("");
+        public UnaryResult<string> Unary_String_String(string arg0) => UnaryResult.FromResult("");
+        public Task<DuplexStreamingResult<int, int>> Duplex() => Task.FromResult(default(DuplexStreamingResult<int, int>));
+    }
 }

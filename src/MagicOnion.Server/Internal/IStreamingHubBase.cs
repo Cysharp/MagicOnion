@@ -1,3 +1,5 @@
+using MagicOnion.Internal;
+
 namespace MagicOnion.Server.Internal;
 
 internal interface IStreamingHubBase
@@ -7,5 +9,5 @@ internal interface IStreamingHubBase
     /// DO NOT change this name, as it is used as the name to be exposed as gRPC DuplexStreaming.
     /// </summary>
     /// <returns></returns>
-    Task Connect();
+    Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> Connect();
 }

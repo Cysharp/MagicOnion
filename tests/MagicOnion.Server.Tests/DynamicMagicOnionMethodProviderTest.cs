@@ -384,6 +384,41 @@ public class DynamicMagicOnionMethodProviderTest
 
     class Service_MethodsImpl : ServiceBase<Service_MethodsImpl.IServiceDef>, Service_MethodsImpl.IServiceDef
     {
+        public UnaryResult Unary_ParameterZero_NoReturnValue() => default;
+        public UnaryResult<int> Unary_ParameterZero_ReturnValueValueType() => UnaryResult.FromResult(12345);
+        public UnaryResult<string> Unary_ParameterZero_ReturnValueRefType() => UnaryResult.FromResult("Hello");
+
+        public UnaryResult Unary_ParameterOneValueType_NoReturnValue(int arg0) => default;
+        public UnaryResult<int> Unary_ParameterOneValueType_ReturnValueValueType(int arg0) => UnaryResult.FromResult(arg0);
+        public UnaryResult<string> Unary_ParameterOneValueType_ReturnValueRefType(int arg0) => UnaryResult.FromResult($"{arg0}");
+
+        public UnaryResult Unary_ParameterOneRefType_NoReturnValue(string arg0) => default;
+        public UnaryResult<int> Unary_ParameterOneRefType_ReturnValueValueType(string arg0) => UnaryResult.FromResult(int.Parse(arg0));
+        public UnaryResult<string> Unary_ParameterOneRefType_ReturnValueRefType(string arg0) => UnaryResult.FromResult($"{arg0}");
+
+        public UnaryResult Unary_ParameterMany_NoReturnValue(string arg0, int arg1, bool arg2) => default;
+        public UnaryResult<int> Unary_ParameterMany_ReturnValueValueType(string arg0, int arg1, bool arg2) => UnaryResult.FromResult(HashCode.Combine(arg0, arg1, arg2));
+        public UnaryResult<string> Unary_ParameterMany_ReturnValueRefType(string arg0, int arg1, bool arg2) => UnaryResult.FromResult($"{arg0};{arg1};{arg2}");
+
+        public Task<ClientStreamingResult<int, int>> ClientStreaming_RequestTypeValueType_ResponseTypeValueType() => throw new NotImplementedException();
+        public Task<ClientStreamingResult<string, int>> ClientStreaming_RequestTypeRefType_ResponseTypeValueType() => throw new NotImplementedException();
+        public Task<ClientStreamingResult<int, string>> ClientStreaming_RequestTypeValueType_ResponseTypeRefType() => throw new NotImplementedException();
+        public Task<ClientStreamingResult<string, string>> ClientStreaming_RequestTypeRefType_ResponseTypeRefType() => throw new NotImplementedException();
+
+        public Task<ServerStreamingResult<int>> ServerStreaming_ParameterZero_ResponseTypeValueType() => throw new NotImplementedException();
+        public Task<ServerStreamingResult<string>> ServerStreaming_ParameterZero_ResponseTypeRefType() => throw new NotImplementedException();
+        public Task<ServerStreamingResult<int>> ServerStreaming_ParameterOneValueType_ResponseTypeValueType(int arg0) => throw new NotImplementedException();
+        public Task<ServerStreamingResult<string>> ServerStreaming_ParameterOneValueType_ResponseTypeRefType(int arg0) => throw new NotImplementedException();
+        public Task<ServerStreamingResult<int>> ServerStreaming_ParameterOneRefType_ResponseTypeValueType(string arg0) => throw new NotImplementedException();
+        public Task<ServerStreamingResult<string>> ServerStreaming_ParameterOneRefType_ResponseTypeRefType(string arg0) => throw new NotImplementedException();
+        public Task<ServerStreamingResult<int>> ServerStreaming_ParameterMany_ResponseTypeValueType(string arg0, int arg1, bool arg2) => throw new NotImplementedException();
+        public Task<ServerStreamingResult<string>> ServerStreaming_ParameterMany_ResponseTypeRefType(string arg0, int arg1, bool arg2) => throw new NotImplementedException();
+
+        public Task<DuplexStreamingResult<int, int>> DuplexStreaming_RequestTypeValueType_ResponseTypeValueType() => throw new NotImplementedException();
+        public Task<DuplexStreamingResult<string, int>> DuplexStreaming_RequestTypeRefType_ResponseTypeValueType() => throw new NotImplementedException();
+        public Task<DuplexStreamingResult<int, string>> DuplexStreaming_RequestTypeValueType_ResponseTypeRefType() => throw new NotImplementedException();
+        public Task<DuplexStreamingResult<string, string>> DuplexStreaming_RequestTypeRefType_ResponseTypeRefType() => throw new NotImplementedException();
+
         public interface IServiceDef : IService<IServiceDef>
         {
             UnaryResult Unary_ParameterZero_NoReturnValue() => default;
