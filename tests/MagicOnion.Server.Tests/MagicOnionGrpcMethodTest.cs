@@ -208,7 +208,6 @@ public class MagicOnionGrpcMethodTest
         });
         var instance = new ServiceImpl();
         var serverCallContext = Substitute.For<ServerCallContext>();
-        var attributeLookup = Array.Empty<(Type, Attribute)>().ToLookup(k => k.Item1, v => v.Item2);
         var serializer = Substitute.For<IMagicOnionSerializer>();
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
@@ -217,7 +216,7 @@ public class MagicOnionGrpcMethodTest
         requestStream.Current.Returns(54321);
 
         var responseStream = Substitute.For<IServerStreamWriter<int>>();
-        var serviceContext = new StreamingServiceContext<int, int>(instance, method, attributeLookup, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider, requestStream, responseStream);
+        var serviceContext = new StreamingServiceContext<int, int>(instance, method, serverCallContext, serializer, metrics, NullLogger.Instance, serviceProvider, requestStream, responseStream);
 
         // Act
         await method.InvokeAsync(instance, serviceContext);

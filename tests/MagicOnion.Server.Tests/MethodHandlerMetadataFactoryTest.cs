@@ -285,7 +285,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.IsResultTypeTask.Should().BeFalse();
         metadata.RequestType.Should().Be<MessagePack.Nil>();
         metadata.ResponseType.Should().Be<int>();
     }
@@ -305,7 +304,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.IsResultTypeTask.Should().BeFalse();
         metadata.RequestType.Should().Be<int>();
         metadata.ResponseType.Should().Be<int>();
     }
@@ -325,7 +323,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.IsResultTypeTask.Should().BeFalse();
         metadata.RequestType.Should().Be<DynamicArgumentTuple<int, string>>();
         metadata.ResponseType.Should().Be<int>();
     }
@@ -345,7 +342,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.ClientStreaming);
-        metadata.IsResultTypeTask.Should().BeTrue();
         metadata.RequestType.Should().Be<int>();
         metadata.ResponseType.Should().Be<string>();
     }
@@ -380,7 +376,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.ClientStreaming);
-        metadata.IsResultTypeTask.Should().BeFalse();
         metadata.RequestType.Should().Be<int>();
         metadata.ResponseType.Should().Be<string>();
     }
@@ -415,7 +410,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.DuplexStreaming);
-        metadata.IsResultTypeTask.Should().BeTrue();
         metadata.RequestType.Should().Be<int>();
         metadata.ResponseType.Should().Be<string>();
     }
@@ -450,7 +444,6 @@ public class MethodHandlerMetadataFactoryTest
         metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
         metadata.ServiceInterface.Should().Be<IMyService>();
         metadata.MethodType.Should().Be(MethodType.DuplexStreaming);
-        metadata.IsResultTypeTask.Should().BeFalse();
         metadata.RequestType.Should().Be<int>();
         metadata.ResponseType.Should().Be<string>();
     }
