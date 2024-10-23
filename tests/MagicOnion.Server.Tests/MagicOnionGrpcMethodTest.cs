@@ -3,10 +3,8 @@ using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
-using MagicOnionEngineTest;
 using MessagePack;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
