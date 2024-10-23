@@ -3,9 +3,8 @@ name: Benchmark
 on:
   issue_comment:
     types: [created]
-  # TODO: benchmark environment broken, stop for a while.
-  # schedule:
-  #   - cron: "0 23 * * *"
+  schedule:
+    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       reuse:
@@ -30,6 +29,7 @@ on:
           - workflow_dispatch_messagepack_h2
           - workflow_dispatch_messagepack_h2c
           - workflow_dispatch_messagepack_h3
+          - workflow_dispatch_messagepack_h2c_eastus
           - workflow_dispatch_messagepack_h2_nugetclient
           - workflow_dispatch_messagepack_h2_nugetserver
           - workflow_dispatch_messagepack_h2c_nugetclient
