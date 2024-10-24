@@ -5,7 +5,7 @@
 
     <LangVersion>$(_LangVersionUnityBaseline)</LangVersion>
     <Nullable>enable</Nullable>
-    <IsTrimmable>true</IsTrimmable>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Client</PackageId>
