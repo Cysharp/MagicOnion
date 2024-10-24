@@ -745,6 +745,39 @@ public class FilterHelperTest
         results.Should().Equal(1, 2, 0, 200, 100);
     }
 
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Surround_Service_ThrowStackTrace()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var callStack = default(string);
+        var filters = new[]
+        {
+            new MagicOnionServiceFilterDescriptor(new DelegateServiceFilter(async (context, next) =>
+            {
+                await next(context);
+            })),
+            new MagicOnionServiceFilterDescriptor(new DelegateServiceFilter(async (context, next) =>
+            {
+                await next(context);
+            })),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            callStack = Environment.StackTrace;
+            throw new InvalidOperationException();
+        });
+        var ex = await Record.ExceptionAsync(async () => await body(default));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.StackTrace.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
+        callStack.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
+    }
+
     class DelegateServiceFilter : IMagicOnionServiceFilter
     {
         readonly Func<ServiceContext, Func<ServiceContext, ValueTask>, ValueTask> func;
@@ -791,6 +824,39 @@ public class FilterHelperTest
 
         // Assert
         results.Should().Equal(1, 2, 0, 200, 100);
+    }
+
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Surround_StreamingHub_ThrowStackTrace()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var callStack = default(string);
+        var filters = new[]
+        {
+            new StreamingHubFilterDescriptor(new DelegateHubFilter(async (context, next) =>
+            {
+                await next(context);
+            })),
+            new StreamingHubFilterDescriptor(new DelegateHubFilter(async (context, next) =>
+            {
+                await next(context);
+            })),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            callStack = Environment.StackTrace;
+            throw new InvalidOperationException();
+        });
+        var ex = await Record.ExceptionAsync(async () => await body(default));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.StackTrace.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
+        callStack.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
     }
 
     class DelegateHubFilter : IStreamingHubFilter
