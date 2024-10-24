@@ -295,6 +295,24 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
     }
 
     [Fact]
+    public void Attribute_Class_Order()
+    {
+        // Arrange
+        var serviceType = typeof(MyHub_AttributeLookupWithClassAttriubte);
+        var methodInfo = serviceType.GetMethod(nameof(MyHub_AttributeLookupWithClassAttriubte.Attribute_Many_Multiple))!;
+
+        // Act
+        var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
+
+        // Assert
+        metadata.Attributes.Should().HaveCount(5);
+        metadata.Attributes.Select(x => x.GetType().Name).Should().Equal([ /* Class */ nameof(MyThirdAttribute),  /* Method */ nameof(MyFirstAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute)]);
+        metadata.Attributes[2].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(0);
+        metadata.Attributes[3].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(1);
+        metadata.Attributes[4].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(2);
+    }
+
+    [Fact]
     public void ValueTask()
     {
         // Arrange

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Serialization;
+using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
@@ -39,24 +40,22 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
     public bool IsDisconnected { get; private set; }
 
     public StreamingServiceContext(
-        Type serviceType,
-        MethodInfo methodInfo,
-        ILookup<Type, Attribute> attributeLookup,
-        MethodType methodType,
+        object instance,
+        IMagicOnionGrpcMethod method,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
+        MagicOnionMetrics metrics,
         ILogger logger,
-        MethodHandler methodHandler,
         IServiceProvider serviceProvider,
         IAsyncStreamReader<TRequest>? requestStream,
         IServerStreamWriter<TResponse>? responseStream
-    ) : base(serviceType, methodInfo, attributeLookup, methodType, context, messageSerializer, logger, methodHandler, serviceProvider)
+    ) : base(instance, method, context, messageSerializer, metrics, logger, serviceProvider)
     {
         RequestStream = requestStream;
         ResponseStream = responseStream;
 
         // streaming hub
-        if (methodType == MethodType.DuplexStreaming)
+        if (MethodType == MethodType.DuplexStreaming)
         {
             this.streamingResponseWriter = new Lazy<QueuedResponseWriter<TResponse>>(() => new QueuedResponseWriter<TResponse>(this));
         }

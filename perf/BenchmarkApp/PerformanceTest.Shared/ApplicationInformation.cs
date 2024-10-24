@@ -14,8 +14,8 @@ public class ApplicationInformation
     public string? BenchmarkerVersion { get; } = typeof(ApplicationInformation).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
 #if SERVER
-    public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.Server.MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
-    public string? MagicOnionVersion { get; } = typeof(MagicOnion.Server.MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+    public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.Server.ServiceContext).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+    public string? MagicOnionVersion { get; } = typeof(MagicOnion.Server.ServiceContext).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     public string? GrpcNetVersion { get; } = typeof(Grpc.AspNetCore.Server.GrpcServiceOptions).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 #elif CLIENT
     public string? TagMagicOnionVersion { get; } = RemoveHashFromVersion(typeof(MagicOnion.Client.MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);

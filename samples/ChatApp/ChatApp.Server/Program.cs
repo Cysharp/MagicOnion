@@ -12,7 +12,6 @@ builder.WebHost.ConfigureKestrel(options =>
         endpointOptions.Protocols = HttpProtocols.Http2;
     });
 });
-builder.Services.AddGrpc();  // MagicOnion depends on ASP.NET Core gRPC service.
 builder.Services.AddMagicOnion();
 
 var app = builder.Build();

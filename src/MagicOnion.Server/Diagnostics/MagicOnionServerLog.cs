@@ -79,6 +79,15 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 13, Level = LogLevel.Debug, EventName = nameof(SendHeartbeat), Message = nameof(SendHeartbeat) + " method:{method}")]
     public static partial void SendHeartbeat(ILogger logger, string method);
 
+    [LoggerMessage(EventId = 14, Level = LogLevel.Trace, EventName = nameof(AddStreamingHubMethod), Message = "Added StreamingHub method '{methodName}' to StreamingHub '{hubName}'. Method Id: {methodId}")]
+    public static partial void AddStreamingHubMethod(ILogger logger, string hubName, string methodName, int methodId);
+
+    [LoggerMessage(EventId = 15, Level = LogLevel.Trace, EventName = nameof(ServiceMethodDiscovered), Message = "Discovered gRPC and StreamingHub methods for '{serviceName}' by '{methodProviderName}'")]
+    public static partial void ServiceMethodDiscovered(ILogger logger, string serviceName, string methodProviderName);
+
+    [LoggerMessage(EventId = 16, Level = LogLevel.Trace, EventName = nameof(ServiceMethodNotDiscovered), Message = "Could not found gRPC and StreamingHub methods for '{serviceName}'")]
+    public static partial void ServiceMethodNotDiscovered(ILogger logger, string serviceName);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 
