@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Serialization.MemoryPack.Tests;
 
-public abstract class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
+public class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
 {
     protected override IEnumerable<Type> GetServiceImplementationTypes() => [typeof(TServiceImplementation)];
 }

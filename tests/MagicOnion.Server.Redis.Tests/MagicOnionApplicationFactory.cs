@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace MagicOnion.Server.Redis.Tests;
 
-public abstract class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
+public class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
 {
     protected override IEnumerable<Type> GetServiceImplementationTypes() => [typeof(TServiceImplementation)];
 }
