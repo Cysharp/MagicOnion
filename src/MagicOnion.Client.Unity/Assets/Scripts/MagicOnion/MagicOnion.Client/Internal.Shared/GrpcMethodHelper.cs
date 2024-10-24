@@ -24,11 +24,6 @@ namespace MagicOnion.Internal
         public static Method<Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
             where TRawResponse : class
         {
-            return CreateMethod<TResponse, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
-        }
-        public static Method<Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
-            where TRawResponse : class
-        {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
             //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
             //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
@@ -47,12 +42,6 @@ namespace MagicOnion.Internal
         }
 
         public static Method<TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
-            where TRawRequest : class
-            where TRawResponse : class
-        {
-            return CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
-        }
-        public static Method<TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
             where TRawRequest : class
             where TRawResponse : class
         {

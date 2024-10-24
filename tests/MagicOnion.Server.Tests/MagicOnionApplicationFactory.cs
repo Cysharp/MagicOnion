@@ -3,11 +3,20 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 
 namespace MagicOnion.Server.Tests;
 
 #pragma warning disable CS1998
-public class MagicOnionApplicationFactory<TServiceImplementation> : WebApplicationFactory<MagicOnionTestServer.Program>
+public class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionApplicationFactory
+{
+    protected override IEnumerable<Type> GetServiceImplementationTypes()
+    {
+        yield return typeof(TServiceImplementation);
+    }
+}
+
+public abstract class MagicOnionApplicationFactory : WebApplicationFactory<MagicOnionTestServer.Program>
 {
     public const string ItemsKey = "MagicOnionApplicationFactory.Items";
     public ConcurrentDictionary<string, object> Items => Services.GetRequiredKeyedService<ConcurrentDictionary<string, object>>(ItemsKey);
@@ -26,9 +35,19 @@ public class MagicOnionApplicationFactory<TServiceImplementation> : WebApplicati
         builder.ConfigureServices(services =>
         {
             services.AddKeyedSingleton<ConcurrentDictionary<string, object>>(ItemsKey);
-            services.AddMagicOnion(new[] { typeof(TServiceImplementation) });
+            services.AddMagicOnion();
+        });
+        builder.Configure(app =>
+        {
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapMagicOnionService([..GetServiceImplementationTypes()]);
+            });
         });
     }
+
+    protected abstract IEnumerable<Type> GetServiceImplementationTypes();
 
     public WebApplicationFactory<MagicOnionTestServer.Program> WithMagicOnionOptions(Action<MagicOnionOptions> configure)
     {

@@ -7,11 +7,14 @@ namespace MagicOnion.Server.Filters.Internal;
 internal class FilterHelper
 {
     public static IReadOnlyList<MagicOnionServiceFilterDescriptor> GetFilters(IEnumerable<MagicOnionServiceFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
+        => GetFilters(globalFilters, classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true)).OfType<Attribute>());
+
+    public static IReadOnlyList<MagicOnionServiceFilterDescriptor> GetFilters(IEnumerable<MagicOnionServiceFilterDescriptor> globalFilters, IEnumerable<Attribute> attributes)
     {
         // Filters are sorted in the following order:
         // [Manually ordered filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
         // The filters has `int.MaxValue` as order by default. If the user specifies an order, it will take precedence.
-        var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
+        var attributedFilters = attributes
             .OfType<IMagicOnionFilterMetadata>()
             .Where(x => x is IMagicOnionServiceFilter or IMagicOnionFilterFactory<IMagicOnionServiceFilter>)
             .Select(x =>
@@ -35,11 +38,14 @@ internal class FilterHelper
     }
 
     public static IReadOnlyList<StreamingHubFilterDescriptor> GetFilters(IEnumerable<StreamingHubFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
+        => GetFilters(globalFilters, classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true)).OfType<Attribute>());
+
+    public static IReadOnlyList<StreamingHubFilterDescriptor> GetFilters(IEnumerable<StreamingHubFilterDescriptor> globalFilters, IEnumerable<Attribute> attributes)
     {
         // Filters are sorted in the following order:
         // [Manually ordered filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
         // The filters has `int.MaxValue` as order by default. If the user specifies an order, it will take precedence.
-        var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
+        var attributedFilters = attributes
             .OfType<IMagicOnionFilterMetadata>()
             .Where(x => x is IStreamingHubFilter or IMagicOnionFilterFactory<IStreamingHubFilter>)
             .Select(x =>

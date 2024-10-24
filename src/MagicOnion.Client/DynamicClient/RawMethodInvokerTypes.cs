@@ -1,10 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Grpc.Core;
 using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client.DynamicClient
 {
+    [RequiresUnreferencedCode(nameof(RawMethodInvokerTypes) + " is incompatible with trimming and Native AOT.")]
     internal static class RawMethodInvokerTypes
     {
         static readonly MethodInfo create_RefType_RefType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_RefType_RefType), BindingFlags.Static | BindingFlags.Public)!;

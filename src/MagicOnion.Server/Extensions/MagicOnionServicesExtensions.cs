@@ -5,11 +5,13 @@ using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
 using MagicOnion.Server.Binder;
+using MagicOnion.Server.Binder.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
+using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -17,29 +19,25 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class MagicOnionServicesExtensions
 {
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => services.AddMagicOnionCore(configureOptions);
 
+    [Obsolete("Use MapMagicOnionService(Assembly[]) instead.", error: true)]
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, Assembly[] searchAssemblies, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchAssemblies, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => throw new NotSupportedException();
 
+    [Obsolete("Use MapMagicOnionService(Type[]) instead.", error: true)]
     public static IMagicOnionServerBuilder AddMagicOnion(this IServiceCollection services, IEnumerable<Type> searchTypes, Action<MagicOnionOptions>? configureOptions = null)
-    {
-        var configName = Options.Options.DefaultName;
-        services.TryAddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchTypes, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-        return services.AddMagicOnionCore(configureOptions);
-    }
+        => throw new NotSupportedException();
 
     // NOTE: `internal` is required for unit tests.
     internal static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
     {
+        // Return if the services are already registered.
+        if (services.Any(x => x.ServiceType == typeof(MagicOnionServiceMarker)))
+        {
+            return new MagicOnionServerBuilder(services);
+        }
+
         var configName = Options.Options.DefaultName;
 
         // Required services (ASP.NET Core, gRPC)
@@ -48,8 +46,10 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
-        services.TryAddSingleton<StreamingHubHandlerRepository>();
-        services.TryAddSingleton<IServiceMethodProvider<MagicOnionService>, MagicOnionServiceMethodProvider<MagicOnionService>>();
+        services.AddSingleton<MagicOnionServiceMarker>();
+        services.AddSingleton(typeof(StreamingHubRegistry<>));
+        services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
+        services.TryAddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();
@@ -69,6 +69,7 @@ public static class MagicOnionServicesExtensions
         services.TryAddSingleton<IRemoteClientResultPendingTaskRegistry, RemoteClientResultPendingTaskRegistry>();
         services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
         services.TryAddSingleton<MagicOnionManagedGroupProvider>();
+
 
         return new MagicOnionServerBuilder(services);
     }

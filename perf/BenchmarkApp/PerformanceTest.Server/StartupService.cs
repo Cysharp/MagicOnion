@@ -20,10 +20,12 @@ class StartupService : IHostedService
 
     private void PrintStartupInformation()
     {
+        Console.WriteLine($"Benchmarker {ApplicationInformation.Current.BenchmarkerVersion}");
         Console.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
         Console.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
         Console.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
         Console.WriteLine($"MemoryPack {ApplicationInformation.Current.MemoryPackVersion}");
+        Console.WriteLine($"IsLatestMagicOnion {ApplicationInformation.Current.IsLatestMagicOnion}");
         Console.WriteLine();
 
         Console.WriteLine($"Listening on:");

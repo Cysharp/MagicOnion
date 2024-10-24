@@ -90,7 +90,7 @@ MagicOnion.IgnoreAttribute
 MagicOnion.IgnoreAttribute.IgnoreAttribute() -> void
 MagicOnion.Internal.Box
 MagicOnion.Internal.Box<T>
-MagicOnion.Internal.Box<T>.Equals(MagicOnion.Internal.Box<T>! other) -> bool
+MagicOnion.Internal.Box<T>.Equals(MagicOnion.Internal.Box<T>? other) -> bool
 MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>
 MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>.RequestStream.get -> Grpc.Core.IClientStreamWriter<TRequest>!
 MagicOnion.Internal.IAsyncClientStreamingCallWrapper<TRequest, TResponse>.ResponseAsync.get -> System.Threading.Tasks.Task<TResponse>!
@@ -155,7 +155,7 @@ MagicOnion.UnaryResult<TResponse>.UnaryResult() -> void
 MagicOnion.UnaryResult<TResponse>.UnaryResult(System.Threading.Tasks.Task<MagicOnion.Client.IResponseContext<TResponse>!>! response) -> void
 MagicOnion.UnaryResult<TResponse>.UnaryResult(System.Threading.Tasks.Task<TResponse>! rawTaskValue) -> void
 MagicOnion.UnaryResult<TResponse>.UnaryResult(TResponse rawValue) -> void
-override MagicOnion.Internal.Box<T>.Equals(object! obj) -> bool
+override MagicOnion.Internal.Box<T>.Equals(object? obj) -> bool
 override MagicOnion.Internal.Box<T>.GetHashCode() -> int
 readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item1 -> T1
 readonly MagicOnion.DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.Item10 -> T10

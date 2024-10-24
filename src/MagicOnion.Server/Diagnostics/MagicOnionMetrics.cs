@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using MagicOnion.Server.Hubs;
-using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Diagnostics;
 
@@ -93,8 +92,9 @@ internal class MagicOnionMetrics : IDisposable
         meter.Dispose();
     }
 
+    // NOTE: A context needs to be created for each request. An instance of MagicOnionMetrics is registered as a singleton.
     public MetricsContext CreateContext()
-        => new MetricsContext(
+        => new(
             streamingHubConnections.Enabled,
             streamingHubMethodDuration.Enabled,
             streamingHubMethodCompletedCounter.Enabled,

@@ -7,6 +7,7 @@ using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Features;
+using MagicOnion.Server.Features.Internal;
 using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
@@ -16,13 +17,14 @@ using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.Hubs;
 
-public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
+public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>, IStreamingHubBase
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
+    IStreamingHubFeature streamingHubFeature = default!;
     IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = default!;
     StreamingHubHeartbeatHandle heartbeatHandle = default!;
     TimeProvider timeProvider = default!;
-    UniqueHashDictionary<StreamingHubHandler> handlers = default!;
+    bool isReturnExceptionStackTraceInErrorDetail = false;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -80,30 +82,27 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         return CompletedTask;
     }
 
-    internal async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> Connect()
+    async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> IStreamingHubBase.Connect()
     {
-        Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
+        Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.ServiceName);
 
         var streamingContext = GetDuplexStreamingContext<StreamingHubPayload, StreamingHubPayload>();
         var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
         var features = this.Context.CallContext.GetHttpContext().Features;
+        streamingHubFeature = features.Get<IStreamingHubFeature>()!; // TODO: GetRequiredFeature
         var magicOnionOptions = serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value;
         timeProvider = magicOnionOptions.TimeProvider ?? TimeProvider.System;
+        isReturnExceptionStackTraceInErrorDetail = magicOnionOptions.IsReturnExceptionStackTraceInErrorDetail;
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
         this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(magicOnionOptions.ClientResultsDefaultTimeout, timeProvider);
         this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
-        var handlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
-        this.handlers = handlerRepository.GetHandlers(Context.MethodHandler);
+        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, streamingHubFeature.GroupProvider);
 
-        var groupProvider = handlerRepository.GetGroupProvider(Context.MethodHandler);
-        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
-
-        var heartbeatManager = handlerRepository.GetHeartbeatManager(Context.MethodHandler);
-        heartbeatHandle = heartbeatManager.Register(StreamingServiceContext);
+        heartbeatHandle = streamingHubFeature.HeartbeatManager.Register(StreamingServiceContext);
         features.Set<IMagicOnionHeartbeatFeature>(new MagicOnionHeartbeatFeature(heartbeatHandle));
 
         try
@@ -136,7 +135,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         finally
         {
-            Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.MethodHandler.ServiceName);
+            Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.ServiceName);
 
             requests.Writer.Complete();
             StreamingServiceContext.CompleteStreamingHub();
@@ -149,7 +148,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             remoteClientResultPendingTasks.Dispose();
         }
 
-        return streamingContext.Result();
+        return default;
     }
 
     async Task HandleMessageAsync()
@@ -170,6 +169,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // The server can send messages or broadcast to client after OnConnected.
         // eg: Send the current game state to the client.
         await OnConnected();
+
+        var handlers = streamingHubFeature.Handlers;
 
         // Starts a loop that consumes the request queue.
         var consumeRequestsTask = ConsumeRequestQueueAsync();
@@ -267,14 +268,14 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     handler: handler,
                     streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
                     hubInstance: this,
-                    request: request.Body,
-                    messageId: request.MessageId,
+                    request: body,
+                    messageId: messageId,
                     timestamp: timeProvider.GetUtcNow().UtcDateTime
                 );
 
                 var isErrorOrInterrupted = false;
                 var methodStartingTimestamp = timeProvider.GetTimestamp();
-                MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, hubContext, hubContext.Request, handler.RequestType);
+                MagicOnionServerLog.BeginInvokeHubMethod(Context.Logger, context, context.Request, handler.RequestType);
 
                 try
                 {
@@ -332,7 +333,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     {
         var methodEndingTimestamp = timeProvider.GetTimestamp();
         var elapsed = timeProvider.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp);
-        MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, hubContext, hubContext.ResponseSize, hubContext.ResponseType, elapsed.TotalMilliseconds, isErrorOrInterrupted);
+        MagicOnionServerLog.EndInvokeHubMethod(Context.Logger, hubContext, hubContext.ResponseSize, hubContext.ResponseType, elapsed.TotalMilliseconds, isErrorOrInterrupted);
         Metrics.StreamingHubMethodCompleted(Context.Metrics, hubContext.Handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
         hubContext.Uninitialize();
     }

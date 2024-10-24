@@ -7,9 +7,30 @@
     <DefineConstants>SERVER;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="'$(UseNuGetServer)' != ''">
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseNuGetServer)' != ''">
+    <PackageReference Include="Grpc.AspNetCore" Version="$(GrpcVersion)"/>
+    <PackageReference Include="JetBrains.Profiler.Api" Version="$(JetBrainsProfilerApiVersion)"/>
+    <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="$(UseNuGetServer)-preview" />
+    <PackageReference Include="MagicOnion.Server" Version="$(UseNuGetServer)" />
+    <PackageReference Include="Multicaster" Version="$(MulticasterVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseNuGetServer)' == ''">
     <PackageReference Include="Grpc.AspNetCore" />
     <PackageReference Include="JetBrains.Profiler.Api" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseNuGetServer)' == ''">
+    <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="PerformanceTest.Shared.MagicOnionIsLatestAttirbute">
+      <_Parameter1>$(UseNuGetServer)</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
@@ -17,11 +38,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="..\PerformanceTest.Shared\**\*.cs" Exclude="**\obj\**;**\bin\**" LinkBase="Shared" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
-    <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
   </ItemGroup>
 
 </Project>

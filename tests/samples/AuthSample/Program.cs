@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -30,7 +31,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddGrpc();
-        services.AddMagicOnion(new [] { typeof(Startup).Assembly });
+        services.AddMagicOnion();
 
         services.AddAuthentication("Fake")
             .AddScheme<FakeAuthenticationHandlerOptions, FakeAuthenticationHandler>("Fake", options => { });
@@ -45,7 +46,7 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMagicOnionService();
+            endpoints.MapMagicOnionService(typeof(Startup).Assembly);
         });
     }
 }

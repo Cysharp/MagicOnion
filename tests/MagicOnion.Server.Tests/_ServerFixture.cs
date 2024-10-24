@@ -88,11 +88,12 @@ public abstract class ServerFixture : IDisposable
             })
             .ConfigureServices(services =>
             {
-                services.AddMagicOnion(GetServiceTypes(), ConfigureMagicOnion);
+                services.AddMagicOnion(ConfigureMagicOnion);
                 services.AddKeyedSingleton(ItemsServiceKey, Items);
 
                 services.AddKeyedSingleton(HostStartupService.WaiterKey, serverStartupWaiter);
                 services.AddHostedService<HostStartupService>();
+                services.AddSingleton(this);
             })
             .ConfigureServices(ConfigureServices)
             .Build()
@@ -140,7 +141,7 @@ public abstract class ServerFixture : IDisposable
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapMagicOnionService();
+                endpoints.MapMagicOnionService([..app.ApplicationServices.GetRequiredService<ServerFixture>().GetServiceTypes()]);
             });
         }
     }

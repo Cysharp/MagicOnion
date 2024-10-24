@@ -1,6 +1,7 @@
 using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
+using System.Reflection;
 
 namespace MagicOnion.Client.Tests;
 
@@ -461,13 +462,13 @@ public class StreamingHubTest
         var request1 = await helper.ReadRequestRawAsync();
         var request2 = await helper.ReadRequestRawAsync();
         var request3 = await helper.ReadRequestRawAsync();
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x00 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddMilliseconds(100)) /* ServerSentAt */, 0xc0 /* Nil */], request1.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x01 /* Sequence(1) */, .. ToMessagePackBytes(origin.AddMilliseconds(200)) /* ServerSentAt */, 0xc0 /* Nil */], request2.ToArray());
-        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x02 /* Sequence(2) */, .. ToMessagePackBytes(origin.AddMilliseconds(300)) /* ServerSentAt */, 0xc0 /* Nil */], request3.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x00 /* Sequence(0) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(100)) /* ClientSentAt */, 0xc0 /* Nil */], request1.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x01 /* Sequence(1) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(200)) /* CliSentAt */, 0xc0 /* Nil */], request2.ToArray());
+        Assert.Equal((byte[])[0x94 /* Array(4) */, 0x7e /* 0x7e(127) */, 0x02 /* Sequence(2) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(300)) /* CliSentAt */, 0xc0 /* Nil */], request3.ToArray());
 
-        static byte[] ToMessagePackBytes(DateTimeOffset dt)
+        static byte[] ToMessagePackBytes(TimeSpan ts)
         {
-            var ms = dt.ToUnixTimeMilliseconds();
+            var ms = (long)ts.TotalMilliseconds;
 
             var arrayBufferWriter = new ArrayBufferWriter<byte>();
             var writer = new MessagePackWriter(arrayBufferWriter);
@@ -676,6 +677,60 @@ public class StreamingHubTest
         var ode = Assert.IsType<ObjectDisposedException>(ex);
         Assert.Equal(nameof(StreamingHubClient), ode.ObjectName);
         Assert.Contains("StreamingHubClient has already been disconnected from the server.", ex.Message);
+    }
+
+    [Fact]
+    public async Task Cancel_While_WritingStream()
+    {
+        // Arrange
+        AggregateException? unobservedException = default;
+        EventHandler<UnobservedTaskExceptionEventArgs> unobservedTaskExceptionEventHandler = (sender, e) =>
+        {
+            unobservedException = e.Exception;
+        };
+        try
+        {
+            TaskScheduler.UnobservedTaskException += unobservedTaskExceptionEventHandler;
+            await CoreAsync();
+            await Task.Delay(100);
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            await Task.Delay(100);
+        }
+        finally
+        {
+            TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionEventHandler;
+        }
+
+        var ex = unobservedException?.InnerExceptions.FirstOrDefault(x => x.TargetSite?.Name == "MoveNext" && (x.TargetSite?.DeclaringType?.FullName?.StartsWith("MagicOnion.Client.Tests.ChannelClientStreamWriter") ?? false));
+
+        Assert.Null(ex);
+
+        static async Task CoreAsync()
+        {
+            var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+            var client = await helper.ConnectAsync(timeout.Token);
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        _ = client.Parameter_One(0);
+                    }
+                }
+                catch
+                {
+                    // Ignore exception
+                }
+            });
+            await Task.Delay(100);
+            await client.DisposeAsync();
+        }
     }
 }
 

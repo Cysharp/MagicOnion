@@ -1,16 +1,28 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 using MessagePack;
 
 namespace MagicOnion.Server;
 
-public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>
+public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>, IServiceBase
     where TServiceInterface : IServiceMarker
 {
     // NOTE: Properties `Context` and `Metrics` are set by an internal setter during instance activation of the service.
     //       For details, please refer to `ServiceProviderHelper.CreateService`.
-    public ServiceContext Context { get; internal set; }
-    internal MagicOnionMetrics Metrics { get; set; }
+    public ServiceContext Context { get; private set; }
+    internal MagicOnionMetrics Metrics { get; private set; }
+
+    ServiceContext IServiceBase.Context
+    {
+        get => this.Context;
+        set => this.Context = value;
+    }
+    MagicOnionMetrics IServiceBase.Metrics
+    {
+        get => this.Metrics;
+        set => this.Metrics = value;
+    }
 
     public ServiceBase()
     {
@@ -36,15 +48,15 @@ public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterfac
 
     [Ignore]
     public ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>()
-        => new ClientStreamingContext<TRequest, TResponse>((StreamingServiceContext<TRequest, Nil /* Dummy */>)Context);
+        => new((StreamingServiceContext<TRequest, Nil /* Dummy */>)Context);
 
     [Ignore]
     public ServerStreamingContext<TResponse> GetServerStreamingContext<TResponse>()
-        => new ServerStreamingContext<TResponse>((StreamingServiceContext<Nil /* Dummy */, TResponse>)Context);
+        => new((StreamingServiceContext<Nil /* Dummy */, TResponse>)Context);
 
     [Ignore]
     public DuplexStreamingContext<TRequest, TResponse> GetDuplexStreamingContext<TRequest, TResponse>()
-        => new DuplexStreamingContext<TRequest, TResponse>((StreamingServiceContext<TRequest, TResponse>)Context);
+        => new((StreamingServiceContext<TRequest, TResponse>)Context);
 
     // Interface methods for Client
 

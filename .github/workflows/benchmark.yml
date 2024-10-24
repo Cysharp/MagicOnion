@@ -12,6 +12,11 @@ on:
         required: false
         default: true
         type: boolean
+      reuse_runid:
+        description: "reuse_runid: Use this run id for benchmark name for reuse"
+        required: false
+        type: string
+        default: "wf"
       benchmark-config-name:
         description: "benchmark-config-name: Select benchmark config name"
         required: false
@@ -24,6 +29,13 @@ on:
           - workflow_dispatch_messagepack_h2
           - workflow_dispatch_messagepack_h2c
           - workflow_dispatch_messagepack_h3
+          - workflow_dispatch_messagepack_h2c_eastus
+          - workflow_dispatch_messagepack_h2_nugetclient
+          - workflow_dispatch_messagepack_h2_nugetserver
+          - workflow_dispatch_messagepack_h2c_nugetclient
+          - workflow_dispatch_messagepack_h2c_nugetserver
+          - workflow_dispatch_messagepack_h3_nugetclient
+          - workflow_dispatch_messagepack_h3_nugetserver
           - issue
           - schedule
 
@@ -37,7 +49,7 @@ jobs:
   benchmark:
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
-      benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && 'wf' || github.run_number) }}"
+      benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.reuse_runid || github.run_number) }}"
       benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
     secrets: inherit
 
