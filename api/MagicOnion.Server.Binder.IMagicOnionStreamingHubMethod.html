@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>MethodHandler.UniqueEqualityComparer Class
+    <title>IMagicOnionStreamingHubMethod Interface
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="MethodHandler.UniqueEqualityComparer Class
+    <meta name="title" content="IMagicOnionStreamingHubMethod Interface
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,25 +71,20 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod">
   
-  <h1 id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer" class="text-break">MethodHandler.UniqueEqualityComparer Class
+  <h1 id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod" class="text-break">IMagicOnionStreamingHubMethod Interface
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Binder.html">MagicOnion.Server.Binder</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class UniqueEqualityComparer : IEqualityComparer&lt;MethodHandler&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IMagicOnionStreamingHubMethod</code></pre>
   </div>
 
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">MethodHandler.UniqueEqualityComparer</span>
-  </div>
   
   
   
@@ -110,7 +105,19 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html#MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Instance">Instance</a>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.html#MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_Metadata">Metadata</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.html#MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_MethodName">MethodName</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.html#MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_ServiceName">ServiceName</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -128,13 +135,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html#MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Equals_MagicOnion_Server_MethodHandler_MagicOnion_Server_MethodHandler_">Equals(MethodHandler, MethodHandler)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html#MagicOnion_Server_MethodHandler_UniqueEqualityComparer_GetHashCode_MagicOnion_Server_MethodHandler_">GetHashCode(MethodHandler)</a>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.html#MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_InvokeAsync_MagicOnion_Server_Hubs_StreamingHubContext_">InvokeAsync(StreamingHubContext)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -144,13 +145,13 @@
   <h3 id="properties">Properties
   </h3>
   <section>
-  <a id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Instance_" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.Instance*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Instance" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.Instance">Instance</h4>
+  <a id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_Metadata_" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.Metadata*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_Metadata" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.Metadata">Metadata</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static MethodHandler.UniqueEqualityComparer Instance { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">StreamingHubMethodHandlerMetadata Metadata { get; }</code></pre>
   </div>
 
   
@@ -160,7 +161,67 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html">MethodHandler.UniqueEqualityComparer</a></dt>
+    <dt><a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html">StreamingHubMethodHandlerMetadata</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_MethodName_" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.MethodName*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_MethodName" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.MethodName">MethodName</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string MethodName { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_ServiceName_" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.ServiceName*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_ServiceName" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.ServiceName">ServiceName</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string ServiceName { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -176,21 +237,19 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Equals_" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.Equals*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_Equals_MagicOnion_Server_MethodHandler_MagicOnion_Server_MethodHandler_" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.Equals(MagicOnion.Server.MethodHandler,MagicOnion.Server.MethodHandler)">Equals(MethodHandler, MethodHandler)</h4>
+  <a id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_InvokeAsync_" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.InvokeAsync*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionStreamingHubMethod_InvokeAsync_MagicOnion_Server_Hubs_StreamingHubContext_" data-uid="MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod.InvokeAsync(MagicOnion.Server.Hubs.StreamingHubContext)">InvokeAsync(StreamingHubContext)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool Equals(MethodHandler x, MethodHandler y)</code></pre>
+    <pre><code class="lang-csharp hljs">ValueTask InvokeAsync(StreamingHubContext context)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>x</code></span> <a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>y</code></span> <a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a></dt>
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html">StreamingHubContext</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -198,44 +257,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Boolean</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_GetHashCode_" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.GetHashCode*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler_UniqueEqualityComparer_GetHashCode_MagicOnion_Server_MethodHandler_" data-uid="MagicOnion.Server.MethodHandler.UniqueEqualityComparer.GetHashCode(MagicOnion.Server.MethodHandler)">GetHashCode(MethodHandler)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int GetHashCode(MethodHandler obj)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>obj</code></span> <a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Int32</span></dt>
+    <dt><span class="xref">ValueTask</span></dt>
     <dd></dd>
   </dl>
   </section>

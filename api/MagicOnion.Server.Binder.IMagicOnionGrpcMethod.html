@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>MagicOnionServiceDefinition Class
+    <title>IMagicOnionGrpcMethod Interface
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="MagicOnionServiceDefinition Class
+    <meta name="title" content="IMagicOnionGrpcMethod Interface
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,25 +71,20 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.MagicOnionServiceDefinition">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod">
   
-  <h1 id="MagicOnion_Server_MagicOnionServiceDefinition" data-uid="MagicOnion.Server.MagicOnionServiceDefinition" class="text-break">MagicOnionServiceDefinition Class
+  <h1 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod" class="text-break">IMagicOnionGrpcMethod Interface
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Binder.html">MagicOnion.Server.Binder</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MagicOnionServiceDefinition : object</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IMagicOnionGrpcMethod</code></pre>
   </div>
 
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">MagicOnionServiceDefinition</span>
-  </div>
   
   
   
@@ -98,24 +93,6 @@
   
   
   <h3 id="members">Members</h3>
-  <h4>Constructors
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition__ctor_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__">MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
   <h4>Properties
   </h4>
   <table class="table table-condensed">
@@ -128,63 +105,47 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition_MethodHandlers">MethodHandlers</a>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.html#MagicOnion_Server_Binder_IMagicOnionGrpcMethod_Metadata">Metadata</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers">StreamingHubHandlers</a>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.html#MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodName">MethodName</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.html#MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodType">MethodType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.html#MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceImplementationType">ServiceImplementationType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.html#MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceName">ServiceName</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="constructors">Constructors
-  </h3>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionServiceDefinition__ctor_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.#ctor*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition__ctor_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.#ctor(IReadOnlyList{MagicOnion.Server.MethodHandler},IReadOnlyList{MagicOnion.Server.Hubs.StreamingHubHandler})">MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt; handlers, IReadOnlyList&lt;StreamingHubHandler&gt; streamingHubHandlers)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>handlers</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a>&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>streamingHubHandlers</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandler.html">StreamingHubHandler</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <h3 id="properties">Properties
   </h3>
   <section>
-  <a id="MagicOnion_Server_MagicOnionServiceDefinition_MethodHandlers_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.MethodHandlers*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition_MethodHandlers" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.MethodHandlers">MethodHandlers</h4>
+  <a id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_Metadata_" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.Metadata*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_Metadata" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.Metadata">Metadata</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;MethodHandler&gt; MethodHandlers { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">MethodHandlerMetadata Metadata { get; }</code></pre>
   </div>
 
   
@@ -194,7 +155,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a>&gt;</dt>
+    <dt><a class="xref" href="MagicOnion.Server.Internal.MethodHandlerMetadata.html">MethodHandlerMetadata</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -208,13 +169,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.StreamingHubHandlers*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.StreamingHubHandlers">StreamingHubHandlers</h4>
+  <a id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodName_" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.MethodName*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodName" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.MethodName">MethodName</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;StreamingHubHandler&gt; StreamingHubHandlers { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">string MethodName { get; }</code></pre>
   </div>
 
   
@@ -224,7 +185,97 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandler.html">StreamingHubHandler</a>&gt;</dt>
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodType_" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.MethodType*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_MethodType" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.MethodType">MethodType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">MethodType MethodType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">MethodType</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceImplementationType_" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.ServiceImplementationType*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceImplementationType" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.ServiceImplementationType">ServiceImplementationType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Type ServiceImplementationType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Type</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceName_" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.ServiceName*"></a>
+  <h4 id="MagicOnion_Server_Binder_IMagicOnionGrpcMethod_ServiceName" data-uid="MagicOnion.Server.Binder.IMagicOnionGrpcMethod.ServiceName">ServiceName</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string ServiceName { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>

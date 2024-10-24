@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>StreamingHubMethodHandlerMetadata Struct
+    <title>StreamingHubMethodHandlerMetadata Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="StreamingHubMethodHandlerMetadata Struct
+    <meta name="title" content="StreamingHubMethodHandlerMetadata Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -73,7 +73,7 @@
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata">
   
-  <h1 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata" class="text-break">StreamingHubMethodHandlerMetadata Struct
+  <h1 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata" class="text-break">StreamingHubMethodHandlerMetadata Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Internal.html">MagicOnion.Server.Internal</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
@@ -82,9 +82,14 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly struct StreamingHubMethodHandlerMetadata</code></pre>
+    <pre><code class="lang-csharp hljs">public class StreamingHubMethodHandlerMetadata : object</code></pre>
   </div>
 
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">StreamingHubMethodHandlerMetadata</span>
+  </div>
   
   
   
@@ -105,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_ILookup_Type_Attribute__">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, ILookup&lt;Type, Attribute&gt;)</a>
+          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -124,6 +129,12 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_AttributeLookup">AttributeLookup</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes">Attributes</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -182,12 +193,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_ILookup_Type_Attribute__" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,ILookup{Type,Attribute})">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, ILookup&lt;Type, Attribute&gt;)</h4>
+  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type streamingHubInterfaceType, ILookup&lt;Type, Attribute&gt; attributeLookup)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type streamingHubInterfaceType, IReadOnlyList&lt;Attribute&gt; attributes)</code></pre>
   </div>
 
   <section>
@@ -209,7 +220,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>streamingHubInterfaceType</code></span> <span class="xref">Type</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>attributeLookup</code></span> <span class="xref">ILookup</span>&lt;<span class="xref">Type</span>, <span class="xref">Attribute</span>&gt;</dt>
+    <dt><span class="parametername"><code>attributes</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -235,7 +246,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly ILookup&lt;Type, Attribute&gt; AttributeLookup { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public ILookup&lt;Type, Attribute&gt; AttributeLookup { get; }</code></pre>
   </div>
 
   
@@ -259,13 +270,43 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes*"></a>
+  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes">Attributes</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Attribute&gt; Attributes { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_ImplementationMethod_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.ImplementationMethod*"></a>
   <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_ImplementationMethod" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.ImplementationMethod">ImplementationMethod</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly MethodInfo ImplementationMethod { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public MethodInfo ImplementationMethod { get; }</code></pre>
   </div>
 
   
@@ -295,7 +336,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly MethodInfo InterfaceMethod { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public MethodInfo InterfaceMethod { get; }</code></pre>
   </div>
 
   
@@ -325,7 +366,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly int MethodId { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int MethodId { get; }</code></pre>
   </div>
 
   
@@ -355,7 +396,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly IReadOnlyList&lt;ParameterInfo&gt; Parameters { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;ParameterInfo&gt; Parameters { get; }</code></pre>
   </div>
 
   
@@ -385,7 +426,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type RequestType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Type RequestType { get; }</code></pre>
   </div>
 
   
@@ -415,7 +456,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type? ResponseType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Type? ResponseType { get; }</code></pre>
   </div>
 
   
@@ -445,7 +486,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type StreamingHubImplementationType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Type StreamingHubImplementationType { get; }</code></pre>
   </div>
 
   
@@ -475,7 +516,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type StreamingHubInterfaceType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Type StreamingHubInterfaceType { get; }</code></pre>
   </div>
 
   

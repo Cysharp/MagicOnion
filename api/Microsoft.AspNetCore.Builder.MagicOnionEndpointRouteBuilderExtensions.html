@@ -112,7 +112,29 @@
         <td>
           <a class="xref" href="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_">MapMagicOnionService(IEndpointRouteBuilder)</a>
         </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Maps MagicOnion Unary and StreamingHub services in the loaded assemblies to the route builder.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_Assembly___">MapMagicOnionService(IEndpointRouteBuilder, Assembly[])</a>
+        </td>
+        <td class="markdown level1 summary"><p>Maps MagicOnion Unary and StreamingHub services in the target assemblies to the route builder.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_Type___">MapMagicOnionService(IEndpointRouteBuilder, Type[])</a>
+        </td>
+        <td class="markdown level1 summary"><p>Maps specified types as MagicOnion Unary and StreamingHub services to the route builder.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService__1_IEndpointRouteBuilder_">MapMagicOnionService&lt;T&gt;(IEndpointRouteBuilder)</a>
+        </td>
+        <td class="markdown level1 summary"><p>Maps specified type as a MagicOnion Unary or StreamingHub service to the route builder.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -122,11 +144,12 @@
   <section>
   <a id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*"></a>
   <h4 id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)">MapMagicOnionService(IEndpointRouteBuilder)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Maps MagicOnion Unary and StreamingHub services in the loaded assemblies to the route builder.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static GrpcServiceEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder)</code></pre>
+    <pre><code class="lang-csharp hljs">public static IEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder)</code></pre>
   </div>
 
   <section>
@@ -140,11 +163,137 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">GrpcServiceEndpointConventionBuilder</span></dt>
+    <dt><span class="xref">IEndpointConventionBuilder</span></dt>
     <dd></dd>
   </dl>
   </section>
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*"></a>
+  <h4 id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_Assembly___" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder,Assembly[])">MapMagicOnionService(IEndpointRouteBuilder, Assembly[])</h4>
+  <div class="markdown level1 summary"><p>Maps MagicOnion Unary and StreamingHub services in the target assemblies to the route builder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder, params Assembly[] searchAssemblies)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>builder</code></span> <span class="xref">IEndpointRouteBuilder</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>searchAssemblies</code></span> <span class="xref">Assembly</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IEndpointConventionBuilder</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*"></a>
+  <h4 id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_Type___" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder,Type[])">MapMagicOnionService(IEndpointRouteBuilder, Type[])</h4>
+  <div class="markdown level1 summary"><p>Maps specified types as MagicOnion Unary and StreamingHub services to the route builder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder, params Type[] serviceTypes)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>builder</code></span> <span class="xref">IEndpointRouteBuilder</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serviceTypes</code></span> <span class="xref">Type</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IEndpointConventionBuilder</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*"></a>
+  <h4 id="Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService__1_IEndpointRouteBuilder_" data-uid="Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService``1(IEndpointRouteBuilder)">MapMagicOnionService&lt;T&gt;(IEndpointRouteBuilder)</h4>
+  <div class="markdown level1 summary"><p>Maps specified type as a MagicOnion Unary or StreamingHub service to the route builder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IEndpointConventionBuilder MapMagicOnionService&lt;T&gt;(this IEndpointRouteBuilder builder)
+    where T : class, IServiceMarker</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>builder</code></span> <span class="xref">IEndpointRouteBuilder</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IEndpointConventionBuilder</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   
   
