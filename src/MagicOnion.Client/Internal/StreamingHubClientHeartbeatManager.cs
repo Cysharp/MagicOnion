@@ -21,6 +21,7 @@ namespace MagicOnion.Client.Internal
         readonly SynchronizationContext? synchronizationContext;
         readonly ChannelWriter<StreamingHubPayload> writer;
         readonly TimeProvider timeProvider;
+        readonly long timestampOrigin;
 
         SendOrPostCallback? processServerHeartbeatCoreCache;
         SendOrPostCallback? processClientHeartbeatResponseCoreCache;
@@ -28,6 +29,8 @@ namespace MagicOnion.Client.Internal
         short sequence;
         bool isTimeoutTimerRunning;
         bool disposed;
+
+        long ElapsedMillisecondsFromOrigin => (long)timeProvider.GetElapsedTime(timestampOrigin).TotalMilliseconds;
 
         public CancellationToken TimeoutToken => timeoutTokenSource.Token;
 
@@ -56,6 +59,7 @@ namespace MagicOnion.Client.Internal
             this.synchronizationContext = synchronizationContext;
             this.shutdownTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutTokenSource.Token);
             this.timeProvider = timeProvider;
+            this.timestampOrigin = timeProvider.GetTimestamp();
         }
 
         public void StartClientHeartbeatLoop()
@@ -99,7 +103,6 @@ namespace MagicOnion.Client.Internal
             }
         }
 
-
         public void ProcessClientHeartbeatResponse(StreamingHubPayload payload)
         {
             if (IsDisposed) return;
@@ -141,7 +144,7 @@ namespace MagicOnion.Client.Internal
                 var payload = (StreamingHubPayload)state!;
                 var reader = new StreamingHubClientMessageReader(payload.Memory);
                 _ = reader.ReadMessageType();
-                var (sentSequence, clientSentAt) = reader.ReadClientHeartbeatResponse();
+                var (sentSequence, clientSentAtElapsedMsFromOrigin) = reader.ReadClientHeartbeatResponse();
 
                 if (sentSequence == sequence - 1/* NOTE: Sequence already 1 advanced.*/)
                 {
@@ -150,8 +153,7 @@ namespace MagicOnion.Client.Internal
                     isTimeoutTimerRunning = false;
                 }
 
-                var now = timeProvider.GetUtcNow();
-                var elapsed = now.ToUnixTimeMilliseconds() - clientSentAt;
+                var elapsed = ElapsedMillisecondsFromOrigin - clientSentAtElapsedMsFromOrigin;
 
                 clientHeartbeatReceivedAction?.Invoke(new ClientHeartbeatEvent(elapsed));
                 StreamingHubPayloadPool.Shared.Return(payload);
@@ -189,9 +191,7 @@ namespace MagicOnion.Client.Internal
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
 
-            var now = timeProvider.GetUtcNow();
-
-            StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, now);
+            StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, ElapsedMillisecondsFromOrigin);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
 

@@ -3,6 +3,7 @@
 apt-tools: ""
 dotnet-version: 8.0
 benchmark-expire-min: 15
+benchmark-location: "japaneast"
 benchmark-timeout-min: 10
 benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
 benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s CI --rounds 3 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'

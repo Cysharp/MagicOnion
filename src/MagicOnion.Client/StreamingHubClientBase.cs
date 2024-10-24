@@ -473,16 +473,21 @@ namespace MagicOnion.Client
 
         async Task RunWriterLoopAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                if (await writerQueue.Reader.WaitToReadAsync(default).ConfigureAwait(false))
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    while (writerQueue.Reader.TryRead(out var payload))
+                    if (await writerQueue.Reader.WaitToReadAsync(default).ConfigureAwait(false))
                     {
-                        await writer.WriteAsync(payload).ConfigureAwait(false);
+                        while (writerQueue.Reader.TryRead(out var payload))
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            await writer.WriteAsync(payload).ConfigureAwait(false);
+                        }
                     }
                 }
             }
+            catch { /* Ignore */ }
         }
 
         protected Task<TResponse> WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
