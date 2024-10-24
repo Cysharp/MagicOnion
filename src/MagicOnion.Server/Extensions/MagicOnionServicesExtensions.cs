@@ -9,6 +9,7 @@ using MagicOnion.Server.Binder.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Hubs.Internal;
+using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -31,6 +32,12 @@ public static class MagicOnionServicesExtensions
     // NOTE: `internal` is required for unit tests.
     internal static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
     {
+        // Return if the services are already registered.
+        if (services.Any(x => x.ServiceType == typeof(MagicOnionServiceMarker)))
+        {
+            return new MagicOnionServerBuilder(services);
+        }
+
         var configName = Options.Options.DefaultName;
 
         // Required services (ASP.NET Core, gRPC)
@@ -39,6 +46,7 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
 
         // MagicOnion: Core services
+        services.AddSingleton<MagicOnionServiceMarker>();
         services.AddSingleton(typeof(StreamingHubRegistry<>));
         services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
         services.TryAddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();

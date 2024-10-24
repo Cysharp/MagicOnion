@@ -9,6 +9,24 @@ namespace MagicOnion.Server.Tests;
 public class MagicOnionGrpcServiceMappingContextTest
 {
     [Fact]
+    public void Throw_NoMagicOnionServicesAreRegistered()
+    {
+        // Arrange
+        var builder = WebApplication.CreateBuilder();
+        var app = builder.Build();
+
+        // Act
+        var ex1 = Record.Exception(() => app.MapMagicOnionService());
+        var ex2 = Record.Exception(() => app.MapMagicOnionService<GreeterService>());
+        var ex3 = Record.Exception(() => app.MapMagicOnionService([typeof(GreeterService), typeof(GreeterHub)]));
+
+        // Assert
+        Assert.NotNull(ex1);
+        Assert.NotNull(ex2);
+        Assert.NotNull(ex3);
+    }
+
+    [Fact]
     public void MapMagicOnionService_ValidServiceType()
     {
         // Arrange
