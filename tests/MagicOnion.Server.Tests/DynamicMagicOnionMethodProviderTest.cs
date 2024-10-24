@@ -5,6 +5,7 @@ using MagicOnion.Server.Binder.Internal;
 using System.Reflection.Metadata;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Hubs;
 using MessagePack;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -511,5 +512,60 @@ public class DynamicMagicOnionMethodProviderTest
         {
             ValueTask<int> MethodAsync() => throw new NotImplementedException();
         }
+    }
+
+    [Fact]
+    public void Service_Invalid_Overload()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+
+        // Act
+        var ex = Record.Exception(() => provider.GetGrpcMethods<Service_Invalid_Overload_Impl>());
+
+        // Assert
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+
+    class Service_Invalid_Overload_Impl : ServiceBase<Service_Invalid_Overload_Impl.IServiceDef>, Service_Invalid_Overload_Impl.IServiceDef
+    {
+        public UnaryResult MethodAsync() => throw new NotImplementedException();
+        public UnaryResult MethodAsync(int arg0) => throw new NotImplementedException();
+
+        public interface IServiceDef : IService<IServiceDef>
+        {
+            UnaryResult MethodAsync();
+            UnaryResult MethodAsync(int arg0);
+        }
+    }
+
+    [Fact]
+    public void StreamingHub_Invalid_Overload()
+    {
+        // Arrange
+        var provider = new DynamicMagicOnionMethodProvider();
+
+        // Act
+        var ex = Record.Exception(() => provider.GetStreamingHubMethods<StreamingHub_Invalid_Overload_Impl>());
+
+        // Assert
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    class StreamingHub_Invalid_Overload_Impl : StreamingHubBase<StreamingHub_Invalid_Overload_Impl.IStreamingHub_Invalid_Overload, StreamingHub_Invalid_Overload_Impl.IStreamingHub_Invalid_Overload_Receiver>, StreamingHub_Invalid_Overload_Impl.IStreamingHub_Invalid_Overload
+    {
+        public interface IStreamingHub_Invalid_Overload : IStreamingHub<IStreamingHub_Invalid_Overload, IStreamingHub_Invalid_Overload_Receiver>
+        {
+            ValueTask MethodAsync();
+            ValueTask MethodAsync(int arg0);
+        }
+
+        public interface IStreamingHub_Invalid_Overload_Receiver;
+
+        public ValueTask MethodAsync() => throw new NotImplementedException();
+        public ValueTask MethodAsync(int arg0) => throw new NotImplementedException();
     }
 }

@@ -72,6 +72,18 @@ public class StreamingHubMethodHandlerMetadata
 
 internal class MethodHandlerMetadataFactory
 {
+
+    public static MethodHandlerMetadata CreateServiceMethodHandlerMetadata<T>(string methodName)
+    {
+        var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Where(x => x.Name == methodName).ToArray();
+        switch (methods.Length)
+        {
+            case 0: throw new InvalidOperationException($"The method '{methodName}' was not found in the Service '{typeof(T).Name}'");
+            case 1: return CreateServiceMethodHandlerMetadata(typeof(T), methods[0]);
+            default: throw new InvalidOperationException($"There are two or more methods with the same name in the Service '{typeof(T).Name}' (Method: {methodName}). Service does not support method overloading.");
+        }
+    }
+
     public static MethodHandlerMetadata CreateServiceMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)
     {
         var serviceInterfaceType = serviceClass.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0];
@@ -90,6 +102,17 @@ internal class MethodHandlerMetadataFactory
         }
 
         return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributes);
+    }
+
+    public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata<T>(string methodName)
+    {
+        var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Where(x => x.Name == methodName).ToArray();
+        switch (methods.Length)
+        {
+            case 0: throw new InvalidOperationException($"The method '{methodName}' was not found in the StreamingHub '{typeof(T).Name}'");
+            case 1: return CreateStreamingHubMethodHandlerMetadata(typeof(T), methods[0]);
+            default: throw new InvalidOperationException($"There are two or more methods with the same name in the StreamingHub '{typeof(T).Name}'. StreamingHub does not support method overloading.");
+        }
     }
 
     public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)

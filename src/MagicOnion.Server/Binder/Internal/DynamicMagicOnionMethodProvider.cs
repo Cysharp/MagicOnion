@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using MagicOnion.Internal;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Internal;
@@ -141,8 +142,15 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
                 invoker = Expression.Lambda(exprCall, [exprParamInstance, exprParamServiceContext]).Compile();
             }
 
-            var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [typeServiceInterface.Name, targetMethod.Name, invoker])!;
-            methods.Add((IMagicOnionGrpcMethod)serviceMethod);
+            try
+            {
+                var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [typeServiceInterface.Name, targetMethod.Name, invoker])!;
+                methods.Add((IMagicOnionGrpcMethod)serviceMethod);
+            }
+            catch (TargetInvocationException e)
+            {
+                ExceptionDispatchInfo.Throw(e.InnerException!);
+            }
         }
 
         return methods;
@@ -206,8 +214,15 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             var exprCallHubMethod = Expression.Call(exprParamService, methodInfo, exprArguments);
             var invoker = Expression.Lambda(exprCallHubMethod, [exprParamService, exprParamContext, exprParamRequest]).Compile();
 
-            var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, invoker])!;
-            methods.Add(hubMethod);
+            try
+            {
+                var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, invoker])!;
+                methods.Add(hubMethod);
+            }
+            catch (TargetInvocationException e)
+            {
+                ExceptionDispatchInfo.Throw(e.InnerException!);
+            }
         }
 
         return methods;

@@ -24,7 +24,7 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
     {
         ServiceName = serviceName;
         MethodName = methodName;
-        Metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(methodName)!);
+        Metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName);
 
         this.invoker = invoker;
     }

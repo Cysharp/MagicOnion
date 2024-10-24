@@ -30,7 +30,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
 
         this.ServiceName = serviceName;
         this.MethodName  = methodName;
-        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException());
+        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(MethodName);
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invokerTask)
         {
@@ -76,7 +76,7 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
 
         this.ServiceName = serviceName;
         this.MethodName = methodName;
-        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(typeof(TService), typeof(TService).GetMethod(MethodName) ?? throw new InvalidOperationException());
+        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(MethodName);
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task> invokerTask)
         {
