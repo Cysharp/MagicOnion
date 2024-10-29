@@ -25,9 +25,9 @@ public abstract class UnaryLargePayloadScenarioBase : IScenario
 
         while (!cancellationToken.IsCancellationRequested)
         {
+            ctx.Increment();
             var begin = timeProvider.GetTimestamp();
             _ = await client.UnaryLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
-            ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }

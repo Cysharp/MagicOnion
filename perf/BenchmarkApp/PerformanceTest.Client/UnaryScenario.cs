@@ -17,9 +17,9 @@ public class UnaryScenario : IScenario
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            ctx.Increment();
             var begin = timeProvider.GetTimestamp();
             await client.UnaryArgDynamicArgumentTupleReturnValue("FooBarBaz🚀こんにちは世界", 123, 4567, 891011);
-            ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
@@ -45,9 +45,9 @@ public class UnaryComplexScenario : IScenario
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            ctx.Increment();
             var begin = timeProvider.GetTimestamp();
             await client.UnaryComplexAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011);
-            ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }
