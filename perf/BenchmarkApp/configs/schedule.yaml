@@ -4,4 +4,4 @@ branch-configs:
     config: ./perf/BenchmarkApp/configs/schedule_config.yaml
   - suffix: "-1"
     branch: feature/ImprovePerformance
-    config: ./perf/BenchmarkApp/configs/schedule.yaml
+    config: ./perf/BenchmarkApp/configs/schedule_config.yaml
