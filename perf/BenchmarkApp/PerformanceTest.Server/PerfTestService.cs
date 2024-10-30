@@ -57,4 +57,17 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
     {
         return UnaryResult.FromResult(ComplexResponse.Cached);
     }
+
+    public async Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync()
+    {
+        var response = SimpleResponse.Cached;
+        var stream = GetServerStreamingContext<SimpleResponse>();
+
+        while(!stream.ServiceContext.CallContext.CancellationToken.IsCancellationRequested)
+        {
+            await stream.WriteAsync(response);
+        }
+
+        return stream.Result();
+    }
 }
