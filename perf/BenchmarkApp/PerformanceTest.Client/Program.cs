@@ -313,7 +313,7 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
 {
     return scenario switch
     {
-        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI && x != ScenarioType.CIFull),
+        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI),
         ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.ServerStreaming),
         _ => [scenario],
     };

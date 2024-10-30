@@ -1,8 +1,7 @@
 public enum ScenarioType
 {
     All,
-    CI, // Run Unary, StreamingHub
-    CIFull, // Run Unary, StreamingHub, PingpongStreamingHub
+    CI, // Run Unary, StreamingHub, ServerStreaming
 
     Unary,
     UnaryComplex,
