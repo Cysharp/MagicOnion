@@ -59,7 +59,7 @@ jobs:
     strategy:
       max-parallel: 3 # 3 parallel max
       fail-fast: true # stop if fail
-      matrix: ${{ needs.loader.outputs.matrix }}
+      matrix: ${{ fromJson(needs.loader.outputs.matrix) }}
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
       benchmark-name: "${{ matrix.benchmarkName }}"
