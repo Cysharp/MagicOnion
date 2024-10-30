@@ -46,11 +46,25 @@ permissions:
   pull-requests: write
 
 jobs:
+  loader:
+    uses: Cysharp/Actions/.github/workflows/benchmark-loader.yaml@main
+    with:
+      benchmark-name-prefix: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.reuse_runid || github.run_number) }}"
+      benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
+    secrets: inherit
+
   benchmark:
+    needs: [loader]
+    if: ${{ needs.loader.outputs.is-benchmarkable }}
+    strategy:
+      max-parallel: 3 # 3 parallel max
+      fail-fast: true # stop if fail
+      matrix: ${{ needs.loader.outputs.matrix }}
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
-      benchmark-name: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.reuse_runid || github.run_number) }}"
-      benchmark-config-path: "perf/BenchmarkApp/configs/${{ inputs.benchmark-config-name || github.event_name }}.yaml"
+      benchmark-name: "${{ matrix.benchmarkName }}"
+      benchmark-config-path: "${{ matrix.config }}"
+      branch: "${{ matrix.branch }}"
     secrets: inherit
 
   cleanup-failed:
