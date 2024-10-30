@@ -15,6 +15,8 @@ public class ServerStreamingScenario : IScenario
         return ValueTask.CompletedTask;
     }
 
+    // Follow what the grpc-dotnet benchmark does, but this ServerStreaming benchmark seems meaningless as MoveNext may concatenate multiple responses from the server.
+    // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
         var stream = await client.ServerStreamingAsync();
@@ -22,7 +24,6 @@ public class ServerStreamingScenario : IScenario
         {
             ctx.Increment();
             var begin = timeProvider.GetTimestamp();
-            //_ = stream.ResponseStream.Current;
             await stream.ResponseStream.MoveNext(cancellationToken);
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
