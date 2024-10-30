@@ -1,3 +1,4 @@
+type: loader
 branch-configs:
   - suffix: ""
     branch: main
