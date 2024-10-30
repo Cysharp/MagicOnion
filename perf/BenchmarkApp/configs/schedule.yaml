@@ -5,4 +5,4 @@ branch-configs:
     config: ./perf/BenchmarkApp/configs/schedule_config.yaml
   - suffix: "-1"
     branch: feature/ImprovePerformance
-    config: ./perf/BenchmarkApp/configs/schedule_config.yaml
+    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
