@@ -24,9 +24,9 @@ public abstract class StreamingHubLargePayloadScenarioBase : IScenario, IPerfTes
 
         while (!cancellationToken.IsCancellationRequested)
         {
+            ctx.Increment();
             var begin = timeProvider.GetTimestamp();
             _ = await client.CallMethodLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
-            ctx.Increment();
             ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
         }
     }

@@ -6,6 +6,7 @@ using MagicOnion.Client;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Serialization.MessagePack;
+using PerformanceTest.Client;
 using PerformanceTest.Shared;
 using PerformanceTest.Shared.Reporting;
 
@@ -197,8 +198,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload16K => () => new StreamingHubLargePayload16KScenario(),
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
-        ScenarioType.PingpongStreamingHub => () => new PingpongStreamingHubScenario(),
-        ScenarioType.PingpongCachedStreamingHub => () => new PingpongCachedStreamingHubScenario(),
+        ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
@@ -313,9 +313,8 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
 {
     return scenario switch
     {
-        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI && x != ScenarioType.CIFull),
-        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub),
-        ScenarioType.CIFull => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.PingpongStreamingHub),
+        ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI),
+        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.ServerStreaming),
         _ => [scenario],
     };
 }
