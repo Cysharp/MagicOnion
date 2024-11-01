@@ -100,12 +100,15 @@ echo "::group::Setup environment variables"
 echo "::endgroup::"
 
 echo "::group::Kill existing process"
-  title "Checking process $binary_name already runnning, kill if exists"
-  ps -eo pid,cmd | while read -r pid cmd; do
-    if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
-      print "Found & killing process $pid ($cmd)"
-      kill "$pid"
-    fi
+  title "Checking process $binary_name already runnning, kill if exists. try 10 times until no process found"
+  for i in {1..10}; do
+    ps -eo pid,cmd | while read -r pid cmd; do
+      if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
+        print "($i/10) Found & killing process $pid ($cmd)"
+        kill "$pid"
+      fi
+    done
+    sleep 0.2
   done
 echo "::endgroup::"
 
