@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Grpc.Net.Client;
+using MagicOnion;
 using MagicOnion.Client;
 using PerformanceTest.Shared;
 
@@ -8,6 +9,7 @@ namespace PerformanceTest.Client;
 public class ServerStreamingScenario : IScenario
 {
     IPerfTestService client = default!;
+    ServerStreamingResult<SimpleResponse> stream = default!;
     readonly TimeProvider timeProvider = TimeProvider.System;
 
     public ValueTask PrepareAsync(GrpcChannel channel)
@@ -20,7 +22,7 @@ public class ServerStreamingScenario : IScenario
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        using var stream = await client.ServerStreamingAsync();
+        this.stream = await client.ServerStreamingAsync(ctx.Timeout);
         while (!cancellationToken.IsCancellationRequested)
         {
             ctx.Increment();
@@ -43,8 +45,17 @@ public class ServerStreamingScenario : IScenario
         }
     }
 
-    public Task CompleteAsync()
+    public async Task CompleteAsync()
     {
-        return Task.CompletedTask;
+        try
+        {
+            // wait for server complete
+            await foreach (var _ in stream.ResponseStream.ReadAllAsync()) { };
+        }
+        catch (Exception)
+        {
+            // do nothing.
+        }
+        stream.Dispose();
     }
 }

@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Runtime;
-using System.Runtime.InteropServices;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization;
@@ -9,6 +6,9 @@ using MagicOnion.Serialization.MessagePack;
 using PerformanceTest.Client;
 using PerformanceTest.Shared;
 using PerformanceTest.Shared.Reporting;
+using System.Diagnostics;
+using System.Runtime;
+using System.Runtime.InteropServices;
 
 var app = ConsoleApp.Create(args);
 app.AddRootCommand(Main);
@@ -202,7 +202,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
-    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels);
+    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration));
     using var cts = new CancellationTokenSource();
     var cleanIndex = 0;
     var threadBefore = ThreadPool.ThreadCount;
@@ -238,10 +238,8 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
     ctx.Complete();
-    WriteLog("Completed");
-    await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
-
     var threadAfter = ThreadPool.ThreadCount;
+    WriteLog("Completed");
 
     WriteLog("Cleaning up...");
     foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
@@ -256,6 +254,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
             // ignore
         }
     }
+    await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
     WriteLog("Cleanup completed");
 
     var result = ctx.GetResult();

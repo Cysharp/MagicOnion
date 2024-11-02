@@ -14,5 +14,5 @@ public interface IPerfTestService : IService<IPerfTestService>
     UnaryResult<ComplexResponse> UnaryComplexAsync(string arg1, int arg2, int arg3, int arg4);
 
     // ServerStreaming
-    Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync();
+    Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync(TimeSpan timeout);
 }
