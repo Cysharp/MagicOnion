@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using PerformanceTest.Shared;
@@ -19,13 +20,21 @@ public class ServerStreamingScenario : IScenario
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        var stream = await client.ServerStreamingAsync();
-        while(!cancellationToken.IsCancellationRequested)
+        using var stream = await client.ServerStreamingAsync();
+        while (!cancellationToken.IsCancellationRequested)
         {
             ctx.Increment();
             var begin = timeProvider.GetTimestamp();
-            await stream.ResponseStream.MoveNext(cancellationToken);
-            ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
+            try
+            {
+                await stream.ResponseStream.MoveNext(cancellationToken);
+                ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && cancellationToken.IsCancellationRequested)
+            {
+                // canceling call is expected behavior.
+                break;
+            }
         }
     }
 
