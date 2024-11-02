@@ -24,13 +24,18 @@ public class ServerStreamingScenario : IScenario
         while (!cancellationToken.IsCancellationRequested)
         {
             ctx.Increment();
-            var begin = timeProvider.GetTimestamp();
             try
             {
+                var begin = timeProvider.GetTimestamp();
                 await stream.ResponseStream.MoveNext(cancellationToken);
                 ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && cancellationToken.IsCancellationRequested)
+            {
+                // canceling call is expected behavior.
+                break;
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable && ex.InnerException is IOException)
             {
                 // canceling call is expected behavior.
                 break;

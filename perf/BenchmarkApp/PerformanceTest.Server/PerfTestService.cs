@@ -62,8 +62,8 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
     {
         var response = SimpleResponse.Cached;
         var stream = GetServerStreamingContext<SimpleResponse>();
-
-        while(!stream.ServiceContext.CallContext.CancellationToken.IsCancellationRequested)
+        var ct = stream.ServiceContext.CallContext.CancellationToken;
+        while (!ct.IsCancellationRequested)
         {
             await stream.WriteAsync(response);
         }
