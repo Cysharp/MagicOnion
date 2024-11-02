@@ -105,7 +105,7 @@ echo "::group::Kill existing process"
     ps -eo pid,cmd | while read -r pid cmd; do
       if echo "$cmd" | grep -E "^./$binary_name" >/dev/null 2>&1; then
         print "($i/10) Found & killing process $pid ($cmd)"
-        kill "$pid"
+        kill -9 "$pid"
       fi
     done
     sleep 0.2
