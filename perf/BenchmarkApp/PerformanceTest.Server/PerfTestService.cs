@@ -58,14 +58,23 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
         return UnaryResult.FromResult(ComplexResponse.Cached);
     }
 
-    public async Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync()
+    public async Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync(TimeSpan timeout)
     {
         var response = SimpleResponse.Cached;
         var stream = GetServerStreamingContext<SimpleResponse>();
+
         var ct = stream.ServiceContext.CallContext.CancellationToken;
-        while (!ct.IsCancellationRequested)
+        var start = TimeProvider.System.GetTimestamp();
+        try
         {
-            await stream.WriteAsync(response);
+            while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+            {
+                await stream.WriteAsync(response);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // do nothing.
         }
 
         return stream.Result();

@@ -10,12 +10,15 @@ public class PerformanceTestRunningContext
     List<List<double>> latencyPerConnection;
     List<object> locks;
 
-    public PerformanceTestRunningContext(int connectionCount)
+    public TimeSpan Timeout { get; }
+
+    public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout)
     {
+        Timeout = TimeSpan.FromSeconds(serverTimeout.WarmupSec + serverTimeout.RunSec + 3); // add some sec for safely complete serverstreaming
         stopwatch = new Stopwatch();
         hardwarePerformanceReporter = new HardwarePerformanceReporter();
-        latencyPerConnection = new (connectionCount);
-        locks = new (connectionCount);
+        latencyPerConnection = new(connectionCount);
+        locks = new(connectionCount);
         for (var i = 0; i < connectionCount; i++)
         {
             latencyPerConnection.Add([]);
