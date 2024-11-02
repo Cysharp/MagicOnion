@@ -58,7 +58,7 @@ jobs:
     if: ${{ needs.loader.outputs.is-benchmarkable }}
     strategy:
       max-parallel: 3 # 3 parallel max
-      fail-fast: true # stop if fail
+      fail-fast: false # no care about other benchmark
       matrix: ${{ fromJson(needs.loader.outputs.matrix) }}
     uses: Cysharp/Actions/.github/workflows/benchmark-execute.yaml@main
     with:
