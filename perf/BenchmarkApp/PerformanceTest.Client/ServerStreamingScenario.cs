@@ -30,7 +30,7 @@ public class ServerStreamingScenario : IScenario
             {
                 var begin = timeProvider.GetTimestamp();
                 await stream.ResponseStream.MoveNext(cancellationToken);
-                ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
+                ctx.LatencyThrottled(connectionId, timeProvider.GetElapsedTime(begin), 100); // avoid OOM
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && cancellationToken.IsCancellationRequested)
             {
@@ -40,6 +40,11 @@ public class ServerStreamingScenario : IScenario
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable && ex.InnerException is IOException)
             {
                 // canceling call is expected behavior.
+                break;
+            }
+            catch (Exception)
+            {
+                ctx.Error();
                 break;
             }
         }

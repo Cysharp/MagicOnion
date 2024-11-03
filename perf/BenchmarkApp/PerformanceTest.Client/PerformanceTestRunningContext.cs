@@ -8,6 +8,7 @@ public class PerformanceTestRunningContext
     Stopwatch stopwatch;
     HardwarePerformanceReporter hardwarePerformanceReporter;
     List<List<double>> latencyPerConnection;
+    int errorsPerConnection;
     List<object> locks;
 
     public TimeSpan Timeout { get; }
@@ -18,6 +19,7 @@ public class PerformanceTestRunningContext
         stopwatch = new Stopwatch();
         hardwarePerformanceReporter = new HardwarePerformanceReporter();
         latencyPerConnection = new(connectionCount);
+        errorsPerConnection = 0;
         locks = new(connectionCount);
         for (var i = 0; i < connectionCount; i++)
         {
@@ -49,6 +51,17 @@ public class PerformanceTestRunningContext
         }
     }
 
+    public void LatencyThrottled(int connectionId, TimeSpan duration, int per)
+    {
+        if (count % per != 0) return;
+        Latency(connectionId, duration);
+    }
+
+    public void Error()
+    {
+        Interlocked.Increment(ref errorsPerConnection);
+    }
+
     public void Complete()
     {
         isRunning = false;
@@ -59,9 +72,8 @@ public class PerformanceTestRunningContext
     public PerformanceResult GetResult()
     {
         var latency = MeasureLatency(latencyPerConnection);
-        latencyPerConnection.Clear();
-        locks.Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResultAndClear());
+        Clear();
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, errorsPerConnection, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResultAndClear());
 
         static Latency MeasureLatency(List<List<double>> latencyPerConnection)
         {
@@ -105,8 +117,18 @@ public class PerformanceTestRunningContext
 
             return (1.0 - fractionPart) * sortedData[(int)Math.Truncate(i) - 1] + fractionPart * sortedData[(int)Math.Ceiling(i) - 1];
         }
+
+        void Clear()
+        {
+            foreach (var list in latencyPerConnection)
+            {
+                list.Clear();
+            }
+            latencyPerConnection.Clear();
+            locks.Clear();
+        }
     }
 }
 
-public record PerformanceResult(int TotalRequests, double RequestsPerSecond, TimeSpan Duration, Latency Latency, HardwarePerformanceResult hardware);
+public record PerformanceResult(int TotalRequests, double RequestsPerSecond, int errors, TimeSpan Duration, Latency Latency, HardwarePerformanceResult hardware);
 public record Latency(double Mean, double P50, double P75, double P90, double P99, double Max);

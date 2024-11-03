@@ -261,6 +261,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
     WriteLog($"Duration: {result.Duration.TotalSeconds} s");
     WriteLog($"Total Requests: {result.TotalRequests} requests");
+    WriteLog($"Total Errors: {result.errors} errors");
     WriteLog($"Mean latency: {result.Latency.Mean:0.###} ms");
     WriteLog($"Max latency: {result.Latency.Max:0.###} ms");
     WriteLog($"p50 latency: {result.Latency.P50:0.###} ms");
