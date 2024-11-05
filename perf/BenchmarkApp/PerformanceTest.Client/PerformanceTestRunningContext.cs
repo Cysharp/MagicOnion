@@ -35,6 +35,13 @@ public class PerformanceTestRunningContext
         hardwarePerformanceReporter.Start();
     }
 
+    public void Complete()
+    {
+        isRunning = false;
+        stopwatch.Stop();
+        hardwarePerformanceReporter.Stop();
+    }
+
     public void Increment()
     {
         if (isRunning)
@@ -60,13 +67,6 @@ public class PerformanceTestRunningContext
     public void Error()
     {
         Interlocked.Increment(ref errorsPerConnection);
-    }
-
-    public void Complete()
-    {
-        isRunning = false;
-        stopwatch.Stop();
-        hardwarePerformanceReporter.Stop();
     }
 
     public PerformanceResult GetResult()
