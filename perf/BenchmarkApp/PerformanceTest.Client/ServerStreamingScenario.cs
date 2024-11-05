@@ -22,8 +22,9 @@ public class ServerStreamingScenario : IScenario
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
+        var start = TimeProvider.System.GetTimestamp();
         this.stream = await client.ServerStreamingAsync(ctx.Timeout);
-        while (!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
         {
             ctx.Increment();
             try
