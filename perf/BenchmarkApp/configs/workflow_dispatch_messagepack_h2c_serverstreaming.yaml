@@ -6,7 +6,7 @@ benchmark-expire-min: 15
 benchmark-location: "japaneast"
 benchmark-timeout-min: 10
 benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s ServerStreaming --rounds 10 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
+benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s ServerStreaming --rounds 3 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
 benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
