@@ -1,7 +1,7 @@
   {
     "name": "com.cysharp.magiconion",
     "displayName": "MagicOnion",
-    "version": "6.1.5",
+    "version": "6.1.6",
     "unity": "2018.4",
     "description": "Unified Realtime/API framework for .NET platform and Unity.",
     "keywords": [
