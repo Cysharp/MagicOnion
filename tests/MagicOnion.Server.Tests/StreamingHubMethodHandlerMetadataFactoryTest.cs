@@ -305,11 +305,11 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.Attributes.Should().HaveCount(5);
-        metadata.Attributes.Select(x => x.GetType().Name).Should().Equal([ /* Class */ nameof(MyThirdAttribute),  /* Method */ nameof(MyFirstAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute)]);
-        metadata.Attributes[2].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(0);
-        metadata.Attributes[3].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(1);
-        metadata.Attributes[4].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(2);
+        metadata.Metadata.Should().HaveCount(5);
+        metadata.Metadata.Select(x => x.GetType().Name).Should().Equal([ /* Class */ nameof(MyThirdAttribute),  /* Method */ nameof(MyFirstAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute)]);
+        metadata.Metadata[2].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(0);
+        metadata.Metadata[3].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(1);
+        metadata.Metadata[4].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(2);
     }
 
     [Fact]

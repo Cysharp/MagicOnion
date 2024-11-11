@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server.JsonTranscoding\MagicOnion.Server.JsonTranscoding.csproj" />
     <ProjectReference Include="..\ChatApp.Shared\ChatApp.Shared.csproj" />
   </ItemGroup>
 

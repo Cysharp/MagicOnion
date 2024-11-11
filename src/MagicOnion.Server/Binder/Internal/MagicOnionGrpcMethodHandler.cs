@@ -15,7 +15,7 @@ using System.Runtime.ExceptionServices;
 
 namespace MagicOnion.Server.Binder.Internal;
 
-internal class MagicOnionGrpcMethodHandler<TService> where TService : class
+public class MagicOnionGrpcMethodHandler<TService> where TService : class
 {
     readonly IList<MagicOnionServiceFilterDescriptor> globalFilters;
     readonly IServiceProvider serviceProvider;
@@ -47,7 +47,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawRequest : class
         where TRawResponse : class
     {
-        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Metadata.OfType<Attribute>());
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
         return InvokeAsync;
@@ -123,7 +123,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawRequest : class
         where TRawResponse : class
     {
-        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Metadata.OfType<Attribute>());
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;
@@ -193,7 +193,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawRequest : class
         where TRawResponse : class
     {
-        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Metadata.OfType<Attribute>());
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext));
 
         return InvokeAsync;
@@ -266,7 +266,7 @@ internal class MagicOnionGrpcMethodHandler<TService> where TService : class
         where TRawRequest : class
         where TRawResponse : class
     {
-        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Attributes);
+        var filters = FilterHelper.GetFilters(globalFilters, method.Metadata.Metadata.OfType<Attribute>());
         var wrappedBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (serviceContext) => method.InvokeAsync((TService)serviceContext.Instance, serviceContext, (TRequest)serviceContext.Request!));
 
         return InvokeAsync;

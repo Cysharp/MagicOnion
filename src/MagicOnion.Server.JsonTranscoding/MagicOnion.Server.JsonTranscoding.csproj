@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Server.JsonTranscoding</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MagicOnion.Internal\Buffers\ArrayPoolBufferWriter.cs" LinkBase="Internal\Buffers" />
+    <Compile Include="..\MagicOnion.Internal\GrpcMethodHelper.cs;..\MagicOnion.Internal\DangerousDummyNull.cs" LinkBase="Internal" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
+  </ItemGroup>
+
+</Project>

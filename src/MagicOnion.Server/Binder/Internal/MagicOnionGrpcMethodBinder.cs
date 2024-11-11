@@ -5,7 +5,6 @@ using MagicOnion.Serialization;
 using MagicOnion.Server.Features.Internal;
 using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -39,7 +38,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         var messageSerializer = messageSerializerProvider.Create(MethodType.Unary, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
 
-        providerContext.AddUnaryMethod(grpcMethod, method.Metadata.Attributes.OfType<object>().ToArray(), handlerBuilder.BuildUnaryMethod(method, messageSerializer));
+        providerContext.AddUnaryMethod(grpcMethod, method.Metadata.Metadata.ToArray(), handlerBuilder.BuildUnaryMethod(method, messageSerializer));
     }
 
     public void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method)
@@ -49,7 +48,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         var messageSerializer = messageSerializerProvider.Create(MethodType.ClientStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, method.ServiceName, method.MethodName, messageSerializer);
 
-        providerContext.AddClientStreamingMethod(grpcMethod, method.Metadata.Attributes.OfType<object>().ToArray(), handlerBuilder.BuildClientStreamingMethod(method, messageSerializer));
+        providerContext.AddClientStreamingMethod(grpcMethod, method.Metadata.Metadata.ToArray(), handlerBuilder.BuildClientStreamingMethod(method, messageSerializer));
     }
 
     public void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method)
@@ -59,7 +58,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         var messageSerializer = messageSerializerProvider.Create(MethodType.ServerStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, method.ServiceName, method.MethodName, messageSerializer);
 
-        providerContext.AddServerStreamingMethod(grpcMethod, method.Metadata.Attributes.OfType<object>().ToArray(), handlerBuilder.BuildServerStreamingMethod(method, messageSerializer));
+        providerContext.AddServerStreamingMethod(grpcMethod, method.Metadata.Metadata.ToArray(), handlerBuilder.BuildServerStreamingMethod(method, messageSerializer));
     }
 
     public void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method)
@@ -69,7 +68,7 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
         var messageSerializer = messageSerializerProvider.Create(MethodType.DuplexStreaming, method.Metadata.ServiceImplementationMethod);
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, method.ServiceName, method.MethodName, messageSerializer);
 
-        providerContext.AddDuplexStreamingMethod(grpcMethod, method.Metadata.Attributes.OfType<object>().ToArray(), handlerBuilder.BuildDuplexStreamingMethod(method, messageSerializer));
+        providerContext.AddDuplexStreamingMethod(grpcMethod, method.Metadata.Metadata.ToArray(), handlerBuilder.BuildDuplexStreamingMethod(method, messageSerializer));
     }
 
     public void BindStreamingHub(MagicOnionStreamingHubConnectMethod<TService> method)
@@ -92,6 +91,6 @@ internal class MagicOnionGrpcMethodBinder<TService> : IMagicOnionGrpcMethodBinde
                 context.CallContext.GetHttpContext().Features.Set<IStreamingHubFeature>(context.ServiceProvider.GetRequiredService<StreamingHubRegistry<TService>>());
                 return ((IStreamingHubBase)instance).Connect();
             });
-        providerContext.AddDuplexStreamingMethod(grpcMethod, method.Metadata.Attributes.OfType<object>().ToArray(), handlerBuilder.BuildDuplexStreamingMethod(duplexMethod, messageSerializer));
+        providerContext.AddDuplexStreamingMethod(grpcMethod, method.Metadata.Metadata.ToArray(), handlerBuilder.BuildDuplexStreamingMethod(duplexMethod, messageSerializer));
     }
 }

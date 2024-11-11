@@ -29,7 +29,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 
         try
         {
-            var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, hubMethod.Metadata.Attributes);
+            var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, hubMethod.Metadata.Metadata.OfType<Attribute>());
             this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, hubMethod.InvokeAsync);
         }
         catch (Exception ex)

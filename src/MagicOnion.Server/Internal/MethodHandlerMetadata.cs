@@ -2,6 +2,7 @@ using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Server.Hubs;
+using Microsoft.AspNetCore.Routing;
 
 namespace MagicOnion.Server.Internal;
 
@@ -15,7 +16,7 @@ public class MethodHandlerMetadata
     public Type RequestType { get; }
     public IReadOnlyList<ParameterInfo> Parameters { get; }
     public Type ServiceInterface { get; }
-    public IReadOnlyList<Attribute> Attributes { get; }
+    public IReadOnlyList<object> Metadata { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
 
     public MethodHandlerMetadata(
@@ -26,7 +27,7 @@ public class MethodHandlerMetadata
         Type requestType,
         IReadOnlyList<ParameterInfo> parameters,
         Type serviceInterface,
-        IReadOnlyList<Attribute> attributes
+        IReadOnlyList<object> metadata
     )
     {
         ServiceImplementationType = serviceImplementationType;
@@ -37,8 +38,8 @@ public class MethodHandlerMetadata
         RequestType = requestType;
         Parameters = parameters;
         ServiceInterface = serviceInterface;
-        Attributes = attributes;
-        AttributeLookup = attributes.ToLookup(x => x.GetType());
+        Metadata = metadata;
+        AttributeLookup = metadata.OfType<Attribute>().ToLookup(x => x.GetType());
     }
 }
 
@@ -53,9 +54,9 @@ public class StreamingHubMethodHandlerMetadata
     public Type RequestType { get; }
     public IReadOnlyList<ParameterInfo> Parameters { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
-    public IReadOnlyList<Attribute> Attributes { get; }
+    public IReadOnlyList<object> Metadata { get; }
 
-    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, IReadOnlyList<Attribute> attributes)
+    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, IReadOnlyList<object> metadata)
     {
         MethodId = methodId;
         StreamingHubImplementationType = streamingHubImplementationType;
@@ -65,8 +66,8 @@ public class StreamingHubMethodHandlerMetadata
         RequestType = requestType;
         Parameters = parameters;
         StreamingHubInterfaceType = streamingHubInterfaceType;
-        AttributeLookup = attributes.ToLookup(x => x.GetType());
-        Attributes = attributes;
+        AttributeLookup = metadata.OfType<Attribute>().ToLookup(x => x.GetType());
+        Metadata = metadata;
     }
 }
 
@@ -91,17 +92,22 @@ internal class MethodHandlerMetadataFactory
         var responseType = UnwrapUnaryResponseType(methodInfo, out var methodType, out var responseIsTask, out var requestTypeIfExists);
         var requestType = requestTypeIfExists ?? GetRequestTypeFromMethod(methodInfo, parameters);
 
-        var attributes = serviceClass.GetCustomAttributes(true)
-            .Concat(methodInfo.GetCustomAttributes(true))
-            .Cast<Attribute>()
-            .ToArray();
-
         if (parameters.Any() && methodType is MethodType.ClientStreaming or MethodType.DuplexStreaming)
         {
             throw new InvalidOperationException($"{methodType} does not support method parameters. If you need to send some arguments, use request headers instead. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
-        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributes);
+        var metadata = serviceClass.GetCustomAttributes(true)
+            .Concat(methodInfo.GetCustomAttributes(true))
+            .ToList();
+
+        // from https://github.com/grpc/grpc-dotnet/blob/1732f28dc6ad74da33b2758f11cbdfabb2dcbc86/src/Grpc.AspNetCore.Server/Model/Internal/ProviderServiceBinder.cs#L91
+        // Accepting CORS preflight means gRPC will allow requests with OPTIONS + preflight headers.
+        // If CORS middleware hasn't been configured then the request will reach gRPC handler.
+        // gRPC will return 405 response and log that CORS has not been configured.
+        metadata.Add(new HttpMethodMetadata(new[] { "POST" }, acceptCorsPreflight: true));
+
+        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, metadata);
     }
 
     public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata<T>(string methodName)
