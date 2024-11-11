@@ -91,7 +91,7 @@ async Task Main(
         {
             if (!resultsByScenario.TryGetValue(scenario2, out var results))
             {
-                results = new List<PerformanceResult>();
+                results = new List<PerformanceResult>(10000);
                 resultsByScenario[scenario2] = results;
             }
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient);
@@ -102,7 +102,6 @@ async Task Main(
         }
     }
     WriteLog($"All scenario complete");
-
 
     WriteLog($"Saving metrics...");
     foreach (var (s, results) in resultsByScenario)
@@ -261,6 +260,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
     WriteLog($"Duration: {result.Duration.TotalSeconds} s");
     WriteLog($"Total Requests: {result.TotalRequests} requests");
+    WriteLog($"Total Errors: {result.errors} errors");
     WriteLog($"Mean latency: {result.Latency.Mean:0.###} ms");
     WriteLog($"Max latency: {result.Latency.Max:0.###} ms");
     WriteLog($"p50 latency: {result.Latency.P50:0.###} ms");
@@ -313,7 +313,8 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
     return scenario switch
     {
         ScenarioType.All => Enum.GetValues<ScenarioType>().Where(x => x != ScenarioType.All && x != ScenarioType.CI),
-        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub || x == ScenarioType.ServerStreaming),
+        // Do not include ServerStreaming to CI. ServerStreaming consume a lot of resource and will impact later scenarios.
+        ScenarioType.CI => Enum.GetValues<ScenarioType>().Where(x => x == ScenarioType.Unary || x == ScenarioType.StreamingHub),
         _ => [scenario],
     };
 }

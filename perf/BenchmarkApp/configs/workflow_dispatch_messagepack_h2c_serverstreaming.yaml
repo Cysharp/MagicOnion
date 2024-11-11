@@ -1,0 +1,34 @@
+# template: https://github.com/Cysharp/Actions/tree/main/.github/scripts/_template_benchmark_config.yaml
+# config2args script: https://github.com/Cysharp/Actions/tree/main/.github/scripts/benchmark_config2args.sh
+apt-tools: ""
+dotnet-version: 8.0
+benchmark-expire-min: 15
+benchmark-location: "japaneast"
+benchmark-timeout-min: 10
+benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
+benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s ServerStreaming --rounds 3 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
+benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
+benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
+benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
+jobs:
+  # h2c
+  - tags: legend:messagepack-h2c-linux,streams:1x1,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 1
+    streams: 1
+    serialization: messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x28,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 28
+    streams: 1
+    serialization: messagepack
+  - tags: legend:messagepack-h2c-linux,streams:70x1,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 1
+    streams: 70
+    serialization: messagepack
+  - tags: legend:messagepack-h2c-linux,streams:70x28,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 28
+    streams: 70
+    serialization: messagepack

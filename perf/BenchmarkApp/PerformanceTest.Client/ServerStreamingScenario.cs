@@ -22,15 +22,16 @@ public class ServerStreamingScenario : IScenario
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
+        var start = TimeProvider.System.GetTimestamp();
         this.stream = await client.ServerStreamingAsync(ctx.Timeout);
-        while (!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
         {
             ctx.Increment();
             try
             {
                 var begin = timeProvider.GetTimestamp();
                 await stream.ResponseStream.MoveNext(cancellationToken);
-                ctx.Latency(connectionId, timeProvider.GetElapsedTime(begin));
+                ctx.LatencyThrottled(connectionId, timeProvider.GetElapsedTime(begin), 100); // avoid OOM
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && cancellationToken.IsCancellationRequested)
             {
@@ -40,6 +41,11 @@ public class ServerStreamingScenario : IScenario
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable && ex.InnerException is IOException)
             {
                 // canceling call is expected behavior.
+                break;
+            }
+            catch (Exception)
+            {
+                ctx.Error();
                 break;
             }
         }
