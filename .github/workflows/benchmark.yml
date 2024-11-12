@@ -73,3 +73,8 @@ jobs:
     needs: [benchmark]
     uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
     secrets: inherit
+
+  actions-timeline:
+    needs: [loader, benchmark, cleanup-failed]
+    uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
+    secrets: inherit
