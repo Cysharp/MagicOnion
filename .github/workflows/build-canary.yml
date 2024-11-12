@@ -59,3 +59,8 @@ jobs:
           FEED_ENDPOINTS: ${{ steps.op-load-secret.outputs.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS_PUBLIC_CANARY }}
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/Public/_packaging/Canary-Build/nuget/v2 -k AzureDevOps
+
+  actions-timeline:
+    needs: [canary-build, canary-push]
+    uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
+    secrets: inherit
