@@ -41,6 +41,7 @@ on:
           - schedule
 
 permissions:
+  actions: read
   contents: read
   id-token: write
   issues: write
