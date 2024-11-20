@@ -1077,7 +1077,7 @@ public static void OnRuntimeInitialize()
 }
 ```
 
-GrpcChannelProviderHost will be created as DontDestroyOnLoad and keeps existing while the application is running. DO NOT destory it.
+GrpcChannelProviderHost will be created as DontDestroyOnLoad and keeps existing while the application is running. DO NOT destroy it.
 
 ![image](https://user-images.githubusercontent.com/9012/111586444-2eb82980-8804-11eb-8a4f-a898c86e5a60.png)
 
