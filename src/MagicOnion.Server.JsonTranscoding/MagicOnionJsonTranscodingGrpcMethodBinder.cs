@@ -44,7 +44,11 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
                 var memStream = new MemoryStream();
                 await context.Request.BodyReader.CopyToAsync(memStream);
 
-                var request = grpcMethod.RequestMarshaller.ContextualDeserializer(new DeserializationContextImpl(memStream.ToArray()));
+                // If the request type is `Nil` (parameter-less method), we always ignore the request body.
+                TRawRequest request = (typeof(TRequest) == typeof(Nil))
+                    ? (TRawRequest)(object)Box.Create(Nil.Default)
+                    : grpcMethod.RequestMarshaller.ContextualDeserializer(new DeserializationContextImpl(memStream.ToArray()));
+
                 var response = await unaryMethodHandler(handle.Instance, request, serverCallContext);
 
                 context.Response.ContentType = "application/json";

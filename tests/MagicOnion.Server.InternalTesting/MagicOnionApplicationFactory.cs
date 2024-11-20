@@ -35,7 +35,7 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Progr
         builder.ConfigureServices(services =>
         {
             services.AddKeyedSingleton<ConcurrentDictionary<string, object>>(ItemsKey);
-            services.AddMagicOnion();
+            OnConfigureMagicOnionBuilder(services.AddMagicOnion());
         });
         builder.Configure(app =>
         {
@@ -46,6 +46,8 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Progr
             });
         });
     }
+
+    protected virtual void OnConfigureMagicOnionBuilder(IMagicOnionServerBuilder builder){}
 
     protected abstract IEnumerable<Type> GetServiceImplementationTypes();
 
