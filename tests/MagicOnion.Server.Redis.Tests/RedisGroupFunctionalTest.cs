@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Server.InternalTesting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using NSubstitute;
 
@@ -12,8 +13,8 @@ namespace MagicOnion.Server.Redis.Tests;
 
 public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFactory<RedisGroupFunctionalTestHub>>, IClassFixture<TemporaryRedisServerFixture>
 {
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory;
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory2;
+    readonly WebApplicationFactory<Program> factory;
+    readonly WebApplicationFactory<Program> factory2;
     readonly TemporaryRedisServerFixture redisServer;
 
     public RedisGroupFunctionalTest(MagicOnionApplicationFactory<RedisGroupFunctionalTestHub> factory, TemporaryRedisServerFixture redisServer)

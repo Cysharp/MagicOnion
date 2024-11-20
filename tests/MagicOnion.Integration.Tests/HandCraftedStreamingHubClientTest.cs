@@ -4,7 +4,6 @@ using MagicOnion.Client;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
-using MagicOnionTestServer;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace MagicOnion.Integration.Tests;

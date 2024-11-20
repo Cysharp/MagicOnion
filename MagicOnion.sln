@@ -125,6 +125,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.JsonTrans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.JsonTranscoding.Tests", "tests\MagicOnion.Server.JsonTranscoding.Tests\MagicOnion.Server.JsonTranscoding.Tests.csproj", "{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.InternalTesting", "tests\MagicOnion.Server.InternalTesting\MagicOnion.Server.InternalTesting.csproj", "{1A958468-D9B8-42B0-99CF-0F9358CD0434}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -279,6 +281,10 @@ Global
 		{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -328,6 +334,7 @@ Global
 		{CDBB141A-E0A9-4FD8-8260-1FB1E95C4E80} = {F1FD52DD-E8A4-4CF0-A857-1A22443A0324}
 		{8A84D0D5-5AD5-4A76-895A-737AEBBDAA27} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{1A958468-D9B8-42B0-99CF-0F9358CD0434} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

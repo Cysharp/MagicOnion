@@ -10,7 +10,7 @@ namespace MagicOnion.Server.Tests;
 
 public class RawBytesResponseTest : IClassFixture<MagicOnionApplicationFactory<RawBytesResponseTestService>>
 {
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory;
+    readonly WebApplicationFactory<Program> factory;
 
     public RawBytesResponseTest(MagicOnionApplicationFactory<RawBytesResponseTestService> factory)
     {

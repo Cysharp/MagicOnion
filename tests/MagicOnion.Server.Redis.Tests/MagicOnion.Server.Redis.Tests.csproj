@@ -29,6 +29,7 @@
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server.Redis\MagicOnion.Server.Redis.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
+    <ProjectReference Include="..\MagicOnion.Server.InternalTesting\MagicOnion.Server.InternalTesting.csproj" />
     <ProjectReference Include="..\samples\MagicOnionTestServer\MagicOnionTestServer.csproj" />
   </ItemGroup>
 

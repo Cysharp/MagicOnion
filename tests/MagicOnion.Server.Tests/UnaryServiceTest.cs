@@ -9,7 +9,7 @@ namespace MagicOnion.Server.Tests;
 public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
     readonly List<string> logs;
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory;
+    readonly WebApplicationFactory<Program> factory;
 
     public UnaryServiceTest_ReturnExceptionStackTrace(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
@@ -77,7 +77,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
     readonly List<string> logs;
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory;
+    readonly WebApplicationFactory<Program> factory;
 
     public UnaryServiceTest(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
