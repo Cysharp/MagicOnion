@@ -127,6 +127,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.JsonTrans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.InternalTesting", "tests\MagicOnion.Server.InternalTesting\MagicOnion.Server.InternalTesting.csproj", "{1A958468-D9B8-42B0-99CF-0F9358CD0434}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.JsonTranscoding.Swagger", "src\MagicOnion.Server.JsonTranscoding.Swagger\MagicOnion.Server.JsonTranscoding.Swagger.csproj", "{B425F5C5-6411-4461-87C3-07F3048A1724}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JsonTranscoding", "JsonTranscoding", "{57E6F117-1138-4899-81A2-CC87B20525E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonTranscodingSample.Server", "samples\JsonTranscoding\JsonTranscodingSample.Server\JsonTranscodingSample.Server.csproj", "{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonTranscodingSample.Shared", "samples\JsonTranscoding\JsonTranscodingSample.Shared\JsonTranscodingSample.Shared.csproj", "{50871ADE-4513-4AC1-8964-740AB6505B31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +293,18 @@ Global
 		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A958468-D9B8-42B0-99CF-0F9358CD0434}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B425F5C5-6411-4461-87C3-07F3048A1724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B425F5C5-6411-4461-87C3-07F3048A1724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B425F5C5-6411-4461-87C3-07F3048A1724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B425F5C5-6411-4461-87C3-07F3048A1724}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50871ADE-4513-4AC1-8964-740AB6505B31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50871ADE-4513-4AC1-8964-740AB6505B31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50871ADE-4513-4AC1-8964-740AB6505B31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50871ADE-4513-4AC1-8964-740AB6505B31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -335,6 +355,10 @@ Global
 		{8A84D0D5-5AD5-4A76-895A-737AEBBDAA27} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{3FE94073-95E0-4006-ADD6-BBE1FAFBAE75} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{1A958468-D9B8-42B0-99CF-0F9358CD0434} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{B425F5C5-6411-4461-87C3-07F3048A1724} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{57E6F117-1138-4899-81A2-CC87B20525E4} = {5A3F5158-7B17-4586-9885-9E60C1393185}
+		{24A21CDA-C3A5-49F2-A1B8-1A93E2E64335} = {57E6F117-1138-4899-81A2-CC87B20525E4}
+		{50871ADE-4513-4AC1-8964-740AB6505B31} = {57E6F117-1138-4899-81A2-CC87B20525E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

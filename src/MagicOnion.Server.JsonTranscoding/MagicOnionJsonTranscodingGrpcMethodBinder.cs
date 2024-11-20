@@ -30,7 +30,10 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
         var handlerBuilder = new MagicOnionGrpcMethodHandler<TService>(enableCurrentContext: false, isReturnExceptionStackTraceInErrorDetail: false, serviceProvider, [], loggerFactory.CreateLogger<MagicOnionGrpcMethodHandler<TService>>());
         var unaryMethodHandler = handlerBuilder.BuildUnaryMethod(method, messageSerializer);
 
-        context.AddMethod(grpcMethod, RoutePatternFactory.Parse($"/_/{method.ServiceName}/{method.MethodName}"), method.Metadata.Metadata.ToArray(), async (context) =>
+        var routePath = $"/_/{method.ServiceName}/{method.MethodName}";
+        var metadata = method.Metadata.Metadata.Append(new MagicOnionJsonTranscodingMetadata(routePath, typeof(TRequest), typeof(TResponse), method)).ToArray();
+
+        context.AddMethod(grpcMethod, RoutePatternFactory.Parse(routePath), metadata, async (context) =>
         {
             var serverCallContext = new MagicOnionJsonTranscodingServerCallContext(method);
             serverCallContext.UserState["__HttpContext"] = context;

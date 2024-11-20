@@ -29,6 +29,7 @@
     <PackageVersion Include="Multicaster" Version="$(MulticasterVersion)" />
     <PackageVersion Include="Multicaster.Distributed.Redis" Version="$(MulticasterVersion)" />
     <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.0" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
