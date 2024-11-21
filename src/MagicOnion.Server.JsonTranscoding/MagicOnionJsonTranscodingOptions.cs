@@ -1,8 +1,8 @@
-using MessagePack;
+using System.Text.Json;
 
 namespace MagicOnion.Server.JsonTranscoding;
 
 public class MagicOnionJsonTranscodingOptions
 {
-    public MessagePackSerializerOptions? MessagePackSerializerOptions { get; set; }
+    public JsonSerializerOptions? JsonSerializerOptions { get; set; }
 }

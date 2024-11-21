@@ -23,7 +23,7 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
 {
     public void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
-        var messageSerializer = new MessagePackJsonMessageSerializer(options.MessagePackSerializerOptions ?? MessagePackSerializer.DefaultOptions);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options.JsonSerializerOptions ?? JsonSerializerOptions.Default);
 
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
 
@@ -36,6 +36,9 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
         context.AddMethod(grpcMethod, RoutePatternFactory.Parse(routePath), metadata, async (context) =>
         {
             var serverCallContext = new MagicOnionJsonTranscodingServerCallContext(method);
+
+            // Grpc.AspNetCore.Server expects that UserState has the key "__HttpContext" and that HttpContext is set to it.
+            // https://github.com/grpc/grpc-dotnet/blob/5a58c24efc1d0b7c5ff88e7b0582ea891b90b17f/src/Grpc.AspNetCore.Server/ServerCallContextExtensions.cs#L30
             serverCallContext.UserState["__HttpContext"] = context;
             context.Features.Set<IServerCallContextFeature>(serverCallContext);
 

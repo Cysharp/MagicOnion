@@ -68,9 +68,75 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        object[] result = [1234, "Alice", true, new object[] { 98765432100, "Hello!" }];
+        Assert.Equivalent(new TestResponse()
+        {
+            A = 1234,
+            B = "Alice",
+            C = true,
+            Inner = new TestResponse.InnerResponse()
+            {
+                D = 98765432100,
+                E = "Hello!",
+            },
+        }, JsonSerializer.Deserialize<TestResponse>(content));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(JsonSerializer.Serialize(result), JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(content)));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task Method_OneParameter_NoResult()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          "Alice"
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_OneParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Alice", JsonSerializer.Deserialize<string>(content));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task Method_TwoParameter_NoResult()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          ["Alice", 18]
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Alice;18", JsonSerializer.Deserialize<string>(content));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task Method_ManyParameter_NoResult()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          ["Alice", 18, true, 128, 3.14, null]
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Alice;18;True;128;3.14;null", JsonSerializer.Deserialize<string>(content));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
 }
@@ -80,6 +146,10 @@ public interface ITestService : IService<ITestService>
     UnaryResult Method_NoParameter_NoResult();
     UnaryResult<string> Method_NoParameter_ResultRefType();
     UnaryResult<TestResponse> Method_NoParameter_ResultComplexType();
+
+    UnaryResult<string> Method_OneParameter_NoResult(string name);
+    UnaryResult<string> Method_TwoParameter_NoResult(string name, int age);
+    UnaryResult<string> Method_ManyParameter_NoResult(string arg1, int arg2, bool arg3, byte arg4, float arg5, string arg6);
 }
 
 [MessagePackObject]
@@ -112,7 +182,7 @@ public class TestService([FromKeyedServices(MagicOnionApplicationFactory.ItemsKe
         return default;
     }
 
-public UnaryResult<string> Method_NoParameter_ResultRefType()
+    public UnaryResult<string> Method_NoParameter_ResultRefType()
         => UnaryResult.FromResult(nameof(Method_NoParameter_ResultRefType));
 
     public UnaryResult<TestResponse> Method_NoParameter_ResultComplexType()
@@ -127,4 +197,13 @@ public UnaryResult<string> Method_NoParameter_ResultRefType()
                 E = "Hello!",
             },
         });
+
+
+    public UnaryResult<string> Method_OneParameter_NoResult(string name)
+        => UnaryResult.FromResult($"{name}");
+    public UnaryResult<string> Method_TwoParameter_NoResult(string name, int age)
+        => UnaryResult.FromResult($"{name};{age}");
+    public UnaryResult<string> Method_ManyParameter_NoResult(string arg1, int arg2, bool arg3, byte arg4, float arg5, string arg6)
+        => UnaryResult.FromResult($"{arg1};{arg2};{arg3};{arg4};{arg5};{arg6 ?? "null"}");
+
 }

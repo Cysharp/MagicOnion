@@ -3,7 +3,7 @@ using MessagePack;
 
 namespace JsonTranscodingSample.Shared;
 
-public interface IMyFirstService
+public interface IMyFirstService : IService<IMyFirstService>
 {
     UnaryResult<string> SayHelloAsync(string name, int age);
     UnaryResult<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request);
