@@ -2,8 +2,10 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Grpc.Core;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit.Sdk;
 
 namespace MagicOnion.Server.JsonTranscoding.Tests;
 
@@ -30,6 +32,25 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
 
         // Act
         var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_NoParameter_NoResult", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        var result = default(object); // null
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(result, JsonSerializer.Deserialize<object>(content));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+        Assert.True((bool)factory.Items.GetValueOrDefault($"{nameof(Method_NoParameter_NoResult)}.Called", false));
+    }
+
+    [Fact]
+    public async Task Method_NoParameter_NoResult_IgnoreBody()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = "{}";
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_NoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
         var content = await response.Content.ReadAsStringAsync();
 
         // Assert
@@ -139,6 +160,84 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         Assert.Equal("Alice;18;True;128;3.14;null", JsonSerializer.Deserialize<string>(content));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
+
+    [Fact]
+    public async Task Method_TwoParameter_NoResult_Keyed()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          { "name": "Alice", "age": 18 }
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Alice;18", JsonSerializer.Deserialize<string>(content));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task Method_ManyParameter_NoResult_Keyed()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          { "arg1": "Alice", "arg2": 18, "arg3": true, "arg4": 128, "arg5": 3.14, "arg6": null }
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Alice;18;True;128;3.14;null", JsonSerializer.Deserialize<string>(content));
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+    [Fact]
+    public async Task Throw()
+    {
+        throw new SkipException("NotImplemented");
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          {}
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/ThrowAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
+
+    [Fact]
+    public async Task ThrowWithReturnStatusCode()
+    {
+        throw new SkipException("NotImplemented");
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          { "statusCode": 1234, "detail": "DetailMessage" }
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/ThrowWithReturnStatusCodeAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
+    }
+
 }
 
 public interface ITestService : IService<ITestService>
@@ -150,6 +249,9 @@ public interface ITestService : IService<ITestService>
     UnaryResult<string> Method_OneParameter_NoResult(string name);
     UnaryResult<string> Method_TwoParameter_NoResult(string name, int age);
     UnaryResult<string> Method_ManyParameter_NoResult(string arg1, int arg2, bool arg3, byte arg4, float arg5, string arg6);
+
+    UnaryResult ThrowAsync();
+    UnaryResult ThrowWithReturnStatusCodeAsync(int statusCode, string detail);
 }
 
 [MessagePackObject]
@@ -206,4 +308,13 @@ public class TestService([FromKeyedServices(MagicOnionApplicationFactory.ItemsKe
     public UnaryResult<string> Method_ManyParameter_NoResult(string arg1, int arg2, bool arg3, byte arg4, float arg5, string arg6)
         => UnaryResult.FromResult($"{arg1};{arg2};{arg3};{arg4};{arg5};{arg6 ?? "null"}");
 
+    public UnaryResult ThrowAsync()
+    {
+        throw new InvalidOperationException("Something went wrong.");
+    }
+
+    public UnaryResult ThrowWithReturnStatusCodeAsync(int statusCode, string detail)
+    {
+        throw new ReturnStatusException((StatusCode)statusCode, detail);
+    }
 }

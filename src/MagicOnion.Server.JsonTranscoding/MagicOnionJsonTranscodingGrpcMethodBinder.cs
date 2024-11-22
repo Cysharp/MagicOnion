@@ -15,7 +15,8 @@ namespace MagicOnion.Server.JsonTranscoding;
 public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     ServiceMethodProviderContext<TService> context,
     IGrpcServiceActivator<TService> serviceActivator,
-    MagicOnionJsonTranscodingOptions options,
+    MagicOnionJsonTranscodingOptions transcodingOptions,
+    MagicOnionOptions options,
     IServiceProvider serviceProvider,
     ILoggerFactory loggerFactory
 ) : IMagicOnionGrpcMethodBinder<TService>
@@ -23,14 +24,21 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
 {
     public void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
-        var messageSerializer = new SystemTextJsonMessageSerializer(options.JsonSerializerOptions ?? JsonSerializerOptions.Default);
+        var parameterNames = method.Metadata.Parameters.Select(x => x.Name!).ToArray();
+        var messageSerializer = new SystemTextJsonMessageSerializer(transcodingOptions.JsonSerializerOptions ?? JsonSerializerOptions.Default, parameterNames);
 
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
 
-        var handlerBuilder = new MagicOnionGrpcMethodHandler<TService>(enableCurrentContext: false, isReturnExceptionStackTraceInErrorDetail: false, serviceProvider, [], loggerFactory.CreateLogger<MagicOnionGrpcMethodHandler<TService>>());
+        var handlerBuilder = new MagicOnionGrpcMethodHandler<TService>(
+            options.EnableCurrentContext,
+            options.IsReturnExceptionStackTraceInErrorDetail,
+            serviceProvider,
+            options.GlobalFilters,
+            loggerFactory.CreateLogger<MagicOnionGrpcMethodHandler<TService>>()
+        );
         var unaryMethodHandler = handlerBuilder.BuildUnaryMethod(method, messageSerializer);
 
-        var routePath = $"/_/{method.ServiceName}/{method.MethodName}";
+        var routePath = $"{transcodingOptions.RoutePathPrefix.TrimEnd('/')}/{method.ServiceName}/{method.MethodName}";
         var metadata = method.Metadata.Metadata.Append(new MagicOnionJsonTranscodingMetadata(routePath, typeof(TRequest), typeof(TResponse), method)).ToArray();
 
         context.AddMethod(grpcMethod, RoutePatternFactory.Parse(routePath), metadata, async (context) =>

@@ -12,7 +12,8 @@ public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplemen
 {
     readonly IMagicOnionGrpcMethodProvider[] methodProviders;
     readonly IGrpcServiceActivator<TServiceImplementation> serviceActivator;
-    readonly MagicOnionJsonTranscodingOptions options;
+    readonly MagicOnionJsonTranscodingOptions transcodingOptions;
+    readonly MagicOnionOptions options;
     readonly IServiceProvider serviceProvider;
     readonly ILogger logger;
     readonly ILoggerFactory loggerFactory;
@@ -20,7 +21,8 @@ public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplemen
     public MagicOnionJsonTranscodingGrpcServiceMethodProvider(
         IEnumerable<IMagicOnionGrpcMethodProvider> methodProviders,
         IGrpcServiceActivator<TServiceImplementation> serviceActivator,
-        IOptions<MagicOnionJsonTranscodingOptions> options,
+        IOptions<MagicOnionJsonTranscodingOptions> transcodingOptions,
+        IOptions<MagicOnionOptions> options,
         IServiceProvider serviceProvider,
         ILogger<MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>> logger,
         ILoggerFactory loggerFactory
@@ -28,6 +30,7 @@ public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplemen
     {
         this.methodProviders = methodProviders.ToArray();
         this.serviceActivator = serviceActivator;
+        this.transcodingOptions = transcodingOptions.Value;
         this.options = options.Value;
         this.serviceProvider = serviceProvider;
         this.logger = logger;
@@ -37,7 +40,7 @@ public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplemen
     public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TServiceImplementation> context)
     {
         if (!typeof(TServiceImplementation).IsAssignableTo(typeof(IServiceMarker))) return;
-        var binder = new MagicOnionJsonTranscodingGrpcMethodBinder<TServiceImplementation>(context, serviceActivator, options, serviceProvider, loggerFactory);
+        var binder = new MagicOnionJsonTranscodingGrpcMethodBinder<TServiceImplementation>(context, serviceActivator, transcodingOptions, options, serviceProvider, loggerFactory);
 
         var registered = false;
         foreach (var methodProvider in methodProviders.OrderBy(x => x.GetType().Name == "DynamicMagicOnionMethodProvider" ? 1 : 0)) // DynamicMagicOnionMethodProvider is always last.

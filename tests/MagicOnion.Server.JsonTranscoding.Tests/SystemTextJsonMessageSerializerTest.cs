@@ -12,7 +12,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -27,7 +27,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -42,7 +42,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -57,7 +57,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -72,7 +72,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["name", "age"]);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -82,12 +82,13 @@ public class SystemTextJsonMessageSerializerTest
         Assert.Equal("""["Alice",18]""", Encoding.UTF8.GetString(writer.WrittenMemory.Span));
     }
 
+
     [Fact]
     public void Serialize_DynamicArgumentTuple_15()
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["arg1","arg2","arg3","arg4","arg5","arg6","arg7","arg8","arg9","arg10","arg11","arg12","arg13","arg14"]);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -99,11 +100,26 @@ public class SystemTextJsonMessageSerializerTest
     }
 
     [Fact]
+    public void Serialize_KeyedDynamicArgumentTuple_2()
+    {
+        // Arrange
+        var options = JsonSerializerOptions.Default;
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["name","age"], serializeAsKeyedObject: true);
+        var writer = new ArrayBufferWriter<byte>();
+
+        // Act
+        messageSerializer.Serialize(writer, new DynamicArgumentTuple<string, int>("Alice", 18));
+
+        // Assert
+        Assert.Equal("""{"name":"Alice","age":18}""", Encoding.UTF8.GetString(writer.WrittenMemory.Span));
+    }
+
+    [Fact]
     public void Serialize_Complex()
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
@@ -128,7 +144,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
 
         // Act
         var value = messageSerializer.Deserialize<string>(new ReadOnlySequence<byte>("\"FooBar\""u8.ToArray()));
@@ -142,7 +158,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
 
         // Act
         var value = messageSerializer.Deserialize<long>(new ReadOnlySequence<byte>("""123456789"""u8.ToArray()));
@@ -156,7 +172,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
 
         // Act
         var value = messageSerializer.Deserialize<object>(new ReadOnlySequence<byte>("""null"""u8.ToArray()));
@@ -170,7 +186,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
 
         // Act
         var value = messageSerializer.Deserialize<Nil>(new ReadOnlySequence<byte>("""null"""u8.ToArray()));
@@ -184,7 +200,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["name", "age"]);
 
         // Act
         var value = messageSerializer.Deserialize<DynamicArgumentTuple<string, int>>(new ReadOnlySequence<byte>("""["Alice",18]"""u8.ToArray()));
@@ -199,7 +215,7 @@ public class SystemTextJsonMessageSerializerTest
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8", "arg9", "arg10", "arg11", "arg12", "arg13", "arg14"]);
 
         // Act
         var value = messageSerializer.Deserialize<DynamicArgumentTuple<string, int, bool, long, char, int, string, bool, Guid, byte, string, int, long, float>>(new ReadOnlySequence<byte>(
@@ -223,11 +239,72 @@ public class SystemTextJsonMessageSerializerTest
     }
 
     [Fact]
+    public void Deserialize_KeyedDynamicArgumentTuple_2()
+    {
+        // Arrange
+        var options = JsonSerializerOptions.Default;
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["name", "age"]);
+
+        // Act
+        var value = messageSerializer.Deserialize<DynamicArgumentTuple<string, int>>(new ReadOnlySequence<byte>("""{"name": "Alice", "age": 18 }"""u8.ToArray()));
+
+        // Assert
+        Assert.Equal("Alice", value.Item1);
+        Assert.Equal(18, value.Item2);
+    }
+
+
+    [Fact]
+    public void Deserialize_KeyedDynamicArgumentTuple_15()
+    {
+        // Arrange
+        var options = JsonSerializerOptions.Default;
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, ["arg1", "arg2", "arg3", "arg4", "arg5", "arg6", "arg7", "arg8", "arg9", "arg10", "arg11", "arg12", "arg13", "arg14"]);
+
+        // Act
+        var value = messageSerializer.Deserialize<DynamicArgumentTuple<string, int, bool, long, char, int, string, bool, Guid, byte, string, int, long, float>>(new ReadOnlySequence<byte>(
+            """
+            {
+                "arg1": "Alice",
+                "arg2": 18,
+                "arg3": true,
+                "arg4": 9223372036854775807,
+                "arg5": "X",
+                "arg6": 2147483647,
+                "arg7": "Foo",
+                "arg8": false,
+                "arg9": "4dfa3247-0686-4b07-9772-cfb7ef30c22c",
+                "arg10": 255,
+                "arg11": "Bar",
+                "arg12": 12345,
+                "arg13": -12345,
+                "arg14": 3.14
+            }
+            """u8.ToArray()));
+
+        // Assert
+        Assert.Equal("Alice", value.Item1);
+        Assert.Equal(18, value.Item2);
+        Assert.True(value.Item3);
+        Assert.Equal(long.MaxValue, value.Item4);
+        Assert.Equal('X', value.Item5);
+        Assert.Equal(int.MaxValue, value.Item6);
+        Assert.Equal("Foo", value.Item7);
+        Assert.False(value.Item8);
+        Assert.Equal(Guid.Parse("{4dfa3247-0686-4b07-9772-cfb7ef30c22c}"), value.Item9);
+        Assert.Equal(255, value.Item10);
+        Assert.Equal("Bar", value.Item11);
+        Assert.Equal(12345, value.Item12);
+        Assert.Equal(-12345, value.Item13);
+        Assert.Equal(3.14, value.Item14, precision: 5);
+    }
+
+    [Fact]
     public void Deserialize_Complex()
     {
         // Arrange
         var options = JsonSerializerOptions.Default;
-        var messageSerializer = new SystemTextJsonMessageSerializer(options);
+        var messageSerializer = new SystemTextJsonMessageSerializer(options, []);
         var writer = new ArrayBufferWriter<byte>();
 
         // Act
