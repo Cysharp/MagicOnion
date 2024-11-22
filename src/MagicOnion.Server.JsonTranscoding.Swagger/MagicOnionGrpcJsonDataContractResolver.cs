@@ -1,3 +1,4 @@
+using MessagePack;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MagicOnion.Server.JsonTranscoding.Swagger;
