@@ -3,43 +3,30 @@ using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.JsonTranscoding;
 
-public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation> : IServiceMethodProvider<TServiceImplementation>
+public class MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>(
+    IEnumerable<IMagicOnionGrpcMethodProvider> methodProviders,
+    IGrpcServiceActivator<TServiceImplementation> serviceActivator,
+    IOptions<JsonOptions> jsonOptions,
+    IOptions<MagicOnionJsonTranscodingOptions> transcodingOptions,
+    IOptions<MagicOnionOptions> options,
+    IServiceProvider serviceProvider,
+    ILogger<MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>> logger,
+    ILoggerFactory loggerFactory
+)
+    : IServiceMethodProvider<TServiceImplementation>
     where TServiceImplementation : class
 {
-    readonly IMagicOnionGrpcMethodProvider[] methodProviders;
-    readonly IGrpcServiceActivator<TServiceImplementation> serviceActivator;
-    readonly JsonOptions jsonOptions;
-    readonly MagicOnionJsonTranscodingOptions transcodingOptions;
-    readonly MagicOnionOptions options;
-    readonly IServiceProvider serviceProvider;
-    readonly ILogger logger;
-    readonly ILoggerFactory loggerFactory;
-
-    public MagicOnionJsonTranscodingGrpcServiceMethodProvider(
-        IEnumerable<IMagicOnionGrpcMethodProvider> methodProviders,
-        IGrpcServiceActivator<TServiceImplementation> serviceActivator,
-        IOptions<JsonOptions> jsonOptions,
-        IOptions<MagicOnionJsonTranscodingOptions> transcodingOptions,
-        IOptions<MagicOnionOptions> options,
-        IServiceProvider serviceProvider,
-        ILogger<MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>> logger,
-        ILoggerFactory loggerFactory
-    )
-    {
-        this.methodProviders = methodProviders.ToArray();
-        this.serviceActivator = serviceActivator;
-        this.jsonOptions = jsonOptions.Value;
-        this.transcodingOptions = transcodingOptions.Value;
-        this.options = options.Value;
-        this.serviceProvider = serviceProvider;
-        this.logger = logger;
-        this.loggerFactory = loggerFactory;
-    }
+    readonly IMagicOnionGrpcMethodProvider[] methodProviders = methodProviders.ToArray();
+    readonly JsonOptions jsonOptions = jsonOptions.Value;
+    readonly MagicOnionJsonTranscodingOptions transcodingOptions = transcodingOptions.Value;
+    readonly MagicOnionOptions options = options.Value;
+    readonly ILogger logger = logger;
 
     public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TServiceImplementation> context)
     {

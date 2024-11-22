@@ -17,6 +17,8 @@ public static class MagicOnionJsonTranscodingBuilderExtensions
             builder.Services.PostConfigure(configureOptions);
         }
 
+        builder.Services.AddHostedService<NonDevelopmentEnvironmentGuard>();
+
         return builder;
     }
 }
