@@ -35,9 +35,11 @@ public static class MagicOnionServerJsonTranscodingSwaggerBuilderExtension
     {
         public void Apply(OpenApiRequestBody requestBody, RequestBodyFilterContext context)
         {
-            if (context.BodyParameterDescription.ModelMetadata.ModelType is { IsGenericType: true } modelType &&
-                modelType.GetGenericTypeDefinition() == typeof(DynamicArgumentTuple<,>) &&
-                requestBody.Content.TryGetValue("application/json", out var mediaType) &&
+            // Dynamically generate a schema for DynamicArgumentTuple that matches the argument name
+            if (requestBody.Content.TryGetValue("application/json", out var mediaType) &&
+                context.BodyParameterDescription.ModelMetadata.ModelType is { IsGenericType: true } modelType &&
+                modelType.GetGenericTypeDefinition() is { FullName: not null} modelOpenType &&
+                modelOpenType.FullName.StartsWith("MagicOnion.DynamicArgumentTuple`") &&
                 context.BodyParameterDescription.ModelMetadata is MagicOnionJsonRequestResponseModelMetadata modelMetadata &&
                 context.SchemaRepository.TryLookupByType(modelType, out var origSchema)
             )
@@ -61,7 +63,6 @@ public static class MagicOnionServerJsonTranscodingSwaggerBuilderExtension
                     var newSchemaRef = context.SchemaRepository.AddDefinition(idWithParamNames, newSchema);
                     mediaType.Schema = newSchemaRef;
                 }
-                _ = mediaType;
             }
         }
     }
