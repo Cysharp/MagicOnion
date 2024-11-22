@@ -5,7 +5,6 @@ using System.Text.Json;
 using Grpc.Core;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Sdk;
 
 namespace MagicOnion.Server.JsonTranscoding.Tests;
 

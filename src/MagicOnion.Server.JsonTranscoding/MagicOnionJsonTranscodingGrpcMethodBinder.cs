@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Net;
 using System.Text.Json;
 using Grpc.AspNetCore.Server;
 using Grpc.AspNetCore.Server.Model;
@@ -155,7 +156,6 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
         public override void Complete(byte[] payload) => throw new NotSupportedException();
     }
 
-
     class DeserializationContextImpl(ReadOnlyMemory<byte> bytes) : DeserializationContext
     {
         public override int PayloadLength => bytes.Length;
@@ -165,24 +165,45 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     public void BindClientStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
         // Ignore (Currently, not supported)
-        throw new NotSupportedException("JsonTranscoding does not support ClientStreaming, ServerStreaming and DuplexStreaming.");
+        var routePath = $"{transcodingOptions.RoutePathPrefix.TrimEnd('/')}/{method.ServiceName}/{method.MethodName}";
+        BindNotImplemented(routePath, MethodType.ClientStreaming, method.ServiceName, method.MethodName);
     }
 
     public void BindServerStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
         // Ignore (Currently, not supported)
-        throw new NotSupportedException("JsonTranscoding does not support ClientStreaming, ServerStreaming and DuplexStreaming.");
+        var routePath = $"{transcodingOptions.RoutePathPrefix.TrimEnd('/')}/{method.ServiceName}/{method.MethodName}";
+        BindNotImplemented(routePath, MethodType.ServerStreaming, method.ServiceName, method.MethodName);
     }
 
     public void BindDuplexStreaming<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
         // Ignore (Currently, not supported)
-        throw new NotSupportedException("JsonTranscoding does not support ClientStreaming, ServerStreaming and DuplexStreaming.");
+        var routePath = $"{transcodingOptions.RoutePathPrefix.TrimEnd('/')}/{method.ServiceName}/{method.MethodName}";
+        BindNotImplemented(routePath, MethodType.DuplexStreaming, method.ServiceName, method.MethodName);
     }
 
     public void BindStreamingHub(MagicOnionStreamingHubConnectMethod<TService> method)
     {
         // Ignore (Currently, not supported)
-        throw new NotSupportedException("JsonTranscoding does not support ClientStreaming, ServerStreaming and DuplexStreaming.");
+        var routePath = $"{transcodingOptions.RoutePathPrefix.TrimEnd('/')}/{method.ServiceName}/{method.MethodName}";
+        BindNotImplemented(routePath, MethodType.DuplexStreaming, method.ServiceName, method.MethodName);
+    }
+
+    void BindNotImplemented(string routePath, MethodType methodType, string serviceName, string methodName)
+    {
+        var grpcMethod = new Method<object, object>(
+            methodType,
+            serviceName,
+            methodName,
+            new Marshaller<object>(_ => throw new NotSupportedException(), _ => throw new NotSupportedException()),
+            new Marshaller<object>(_ => throw new NotSupportedException(), _ => throw new NotSupportedException())
+        );
+        context.AddMethod(grpcMethod, RoutePatternFactory.Parse(routePath), [], async (context) =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
+            context.Response.ContentType = "application/json";
+            await JsonSerializer.SerializeAsync(context.Response.Body, new { Code = (int)StatusCode.Unimplemented, Detail = $"JsonTranscoding does not support {methodType}." });
+        });
     }
 }

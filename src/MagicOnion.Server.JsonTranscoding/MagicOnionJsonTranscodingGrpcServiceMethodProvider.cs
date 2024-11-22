@@ -3,7 +3,6 @@ using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
