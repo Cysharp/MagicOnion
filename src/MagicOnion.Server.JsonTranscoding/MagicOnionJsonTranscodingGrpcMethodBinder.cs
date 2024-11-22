@@ -7,6 +7,7 @@ using MagicOnion.Internal;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Binder.Internal;
 using MessagePack;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
 
@@ -70,19 +71,9 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
 
                 grpcMethod.ResponseMarshaller.ContextualSerializer(response, new SerializationContextImpl(context.Response.BodyWriter));
             }
-            catch (RpcException ex)
-            {
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 500;
-                var status = ex.Status;
-                await context.Response.BodyWriter.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(new { Code = status.StatusCode, Detail = status.Detail }));
-            }
             catch (Exception ex)
             {
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 500;
-                var status = new Status(StatusCode.Internal, $"{ex.GetType().FullName}: {ex.Message}");
-                await context.Response.BodyWriter.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(new { Code = status.StatusCode, Detail = status.Detail }));
+                await WriteErrorResponseAsync(context, ex);
             }
             finally
             {
@@ -94,6 +85,65 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
 
         });
     }
+
+    async ValueTask WriteErrorResponseAsync(HttpContext context, Exception ex)
+    {
+        var status = (ex is RpcException rpcException)
+            ? rpcException.Status
+            : new Status(StatusCode.Internal, options.IsReturnExceptionStackTraceInErrorDetail ? $"{ex.GetType().FullName}: {ex.Message}\n{ex.StackTrace}" : "The service handler has exception thrown.");
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = MapStatusCodeToHttpStatus(status.StatusCode);
+
+        await JsonSerializer.SerializeAsync(context.Response.Body, new { Code = (int)status.StatusCode, Detail = status.Detail });
+    }
+
+
+    // from https://github.com/dotnet/aspnetcore/blob/8d0f798cc4de54a2851748be635a58eadbf79593/src/Grpc/JsonTranscoding/src/Microsoft.AspNetCore.Grpc.JsonTranscoding/Internal/JsonRequestHelpers.cs#L87
+    static int MapStatusCodeToHttpStatus(StatusCode statusCode)
+    {
+        switch (statusCode)
+        {
+            case StatusCode.OK:
+                return StatusCodes.Status200OK;
+            case StatusCode.Cancelled:
+                return StatusCodes.Status408RequestTimeout;
+            case StatusCode.Unknown:
+                return StatusCodes.Status500InternalServerError;
+            case StatusCode.InvalidArgument:
+                return StatusCodes.Status400BadRequest;
+            case StatusCode.DeadlineExceeded:
+                return StatusCodes.Status504GatewayTimeout;
+            case StatusCode.NotFound:
+                return StatusCodes.Status404NotFound;
+            case StatusCode.AlreadyExists:
+                return StatusCodes.Status409Conflict;
+            case StatusCode.PermissionDenied:
+                return StatusCodes.Status403Forbidden;
+            case StatusCode.Unauthenticated:
+                return StatusCodes.Status401Unauthorized;
+            case StatusCode.ResourceExhausted:
+                return StatusCodes.Status429TooManyRequests;
+            case StatusCode.FailedPrecondition:
+                // Note, this deliberately doesn't translate to the similarly named '412 Precondition Failed' HTTP response status.
+                return StatusCodes.Status400BadRequest;
+            case StatusCode.Aborted:
+                return StatusCodes.Status409Conflict;
+            case StatusCode.OutOfRange:
+                return StatusCodes.Status400BadRequest;
+            case StatusCode.Unimplemented:
+                return StatusCodes.Status501NotImplemented;
+            case StatusCode.Internal:
+                return StatusCodes.Status500InternalServerError;
+            case StatusCode.Unavailable:
+                return StatusCodes.Status503ServiceUnavailable;
+            case StatusCode.DataLoss:
+                return StatusCodes.Status500InternalServerError;
+        }
+
+        return StatusCodes.Status500InternalServerError;
+    }
+
 
     class SerializationContextImpl(IBufferWriter<byte> writer) : SerializationContext
     {

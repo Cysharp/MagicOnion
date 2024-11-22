@@ -202,7 +202,6 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
     [Fact]
     public async Task Throw()
     {
-        throw new SkipException("NotImplemented");
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var requestBody = """
@@ -214,30 +213,31 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
-
 
     [Fact]
     public async Task ThrowWithReturnStatusCode()
     {
-        throw new SkipException("NotImplemented");
         // Arrange
         var httpClient = factory.CreateDefaultClient();
+        // StatusCode.Unavailable = 14
         var requestBody = """
-                          { "statusCode": 1234, "detail": "DetailMessage" }
+                          { "statusCode": 14, "detail": "DetailMessage" }
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/_/ITestService/ThrowWithReturnStatusCodeAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/ThrowWithReturnStatusCodeAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
         var content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal(new ErrorResponse(14, "DetailMessage"), JsonSerializer.Deserialize<ErrorResponse>(content));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
 
+    record ErrorResponse(int Code, string Detail);
 }
 
 public interface ITestService : IService<ITestService>
