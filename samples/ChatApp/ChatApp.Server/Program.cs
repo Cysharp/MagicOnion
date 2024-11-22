@@ -1,5 +1,3 @@
-using Grpc.AspNetCore.Server.Model;
-using MagicOnion.Server.JsonTranscoding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -15,7 +13,6 @@ builder.WebHost.ConfigureKestrel(options =>
     });
 });
 builder.Services.AddMagicOnion();
-builder.Services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionJsonTranscodingGrpcServiceMethodProvider<>));
 
 var app = builder.Build();
 app.MapMagicOnionService();
