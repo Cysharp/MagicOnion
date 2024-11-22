@@ -12,6 +12,10 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class MagicOnionServerJsonTranscodingSwaggerBuilderExtension
 {
+    /// <summary>
+    /// Adds Swagger support for MagicOnion JSON transcoding.
+    /// </summary>
+    /// <param name="services"></param>
     public static void AddMagicOnionJsonTranscodingSwagger(this IServiceCollection services)
     {
         services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, MagicOnionJsonTranscodingDescriptionProvider>());

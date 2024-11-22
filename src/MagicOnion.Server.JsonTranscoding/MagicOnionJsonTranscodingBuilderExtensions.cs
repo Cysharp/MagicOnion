@@ -7,6 +7,12 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class MagicOnionJsonTranscodingBuilderExtensions
 {
+    /// <summary>
+    /// Adds JSON transcoding support to the MagicOnion server.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions"></param>
+    /// <returns></returns>
     public static IMagicOnionServerBuilder AddJsonTranscoding(this IMagicOnionServerBuilder builder, Action<MagicOnionJsonTranscodingOptions>? configureOptions = default)
     {
         builder.Services.AddOptions<MagicOnionJsonTranscodingOptions>();
