@@ -1,12 +1,11 @@
-using MagicOnion.Server.JsonTranscoding.Swagger;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
-using MagicOnion;
+using MagicOnion.Server.JsonTranscoding.Swagger;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
