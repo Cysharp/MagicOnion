@@ -8,6 +8,7 @@ using MagicOnion.Server.Binder;
 using MagicOnion.Server.Binder.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +17,7 @@ namespace MagicOnion.Server.JsonTranscoding;
 public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     ServiceMethodProviderContext<TService> context,
     IGrpcServiceActivator<TService> serviceActivator,
+    JsonOptions jsonOptions,
     MagicOnionJsonTranscodingOptions transcodingOptions,
     MagicOnionOptions options,
     IServiceProvider serviceProvider,
@@ -26,7 +28,7 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     public void BindUnary<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse> method) where TRawRequest : class where TRawResponse : class
     {
         var parameterNames = method.Metadata.Parameters.Select(x => x.Name!).ToArray();
-        var messageSerializer = new SystemTextJsonMessageSerializer(transcodingOptions.JsonSerializerOptions ?? JsonSerializerOptions.Default, parameterNames);
+        var messageSerializer = new SystemTextJsonMessageSerializer(jsonOptions.SerializerOptions ?? JsonSerializerOptions.Default, parameterNames);
 
         var grpcMethod = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, method.ServiceName, method.MethodName, messageSerializer);
 
@@ -90,7 +92,7 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     {
         var status = (ex is RpcException rpcException)
             ? rpcException.Status
-            : new Status(StatusCode.Internal, options.IsReturnExceptionStackTraceInErrorDetail ? $"{ex.GetType().FullName}: {ex.Message}\n{ex.StackTrace}" : "The service handler has exception thrown.");
+            : new Status(StatusCode.Internal, "Exception was thrown by handler." + (options.IsReturnExceptionStackTraceInErrorDetail ? $" ({ex.GetType().FullName}: {ex.Message})\n{ex.StackTrace}" : string.Empty));
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = MapStatusCodeToHttpStatus(status.StatusCode);

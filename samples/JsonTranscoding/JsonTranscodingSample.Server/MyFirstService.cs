@@ -9,12 +9,16 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
     public UnaryResult<string> SayHelloAsync(string name, int age)
     {
-        throw new NotImplementedException();
+        return UnaryResult.FromResult($"Hello {name} ({age})!");
     }
 
     public UnaryResult<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request)
     {
-        throw new NotImplementedException();
+        return new UnaryResult<RegisterUserResponse>(new RegisterUserResponse()
+        {
+            Success = true,
+            Message = $"Welcome {request.Name}!"
+        });
     }
 
     public UnaryResult ThrowAsync()

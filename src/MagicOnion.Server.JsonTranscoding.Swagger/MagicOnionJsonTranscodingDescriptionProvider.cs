@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -38,14 +39,23 @@ internal class MagicOnionJsonTranscodingDescriptionProvider(EndpointDataSource e
                             {
                                 new ApiResponseFormat() { MediaType = "application/json" },
                             },
-                            ModelMetadata = new MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity.ForType(metadata.ResponseType)),
+                            ModelMetadata = new MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity.ForType(metadata.ResponseType), metadata.Method.Metadata.Parameters),
                             StatusCode = 200,
+                        },
+                        new ApiResponseType()
+                        {
+                            ApiResponseFormats =
+                            {
+                                new ApiResponseFormat() { MediaType = "application/json" },
+                            },
+                            ModelMetadata = new MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity.ForType(new { Code = default(int), Detail = default(string) }.GetType()), metadata.Method.Metadata.Parameters),
+                            StatusCode = 500,
                         }
                     },
                     RelativePath = metadata.RoutePath,
                     ParameterDescriptions =
                     {
-                        new ApiParameterDescription() { Source = BindingSource.Body, ModelMetadata = new MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity.ForType(metadata.RequestType))},
+                        new ApiParameterDescription() { Source = BindingSource.Body, ModelMetadata = new MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity.ForType(metadata.RequestType), metadata.Method.Metadata.Parameters)},
                     }
                 });
 
@@ -64,8 +74,11 @@ internal class MagicOnionJsonTranscodingDescriptionProvider(EndpointDataSource e
 
 internal class MagicOnionJsonRequestResponseModelMetadata : ModelMetadata
 {
-    public MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity identity) : base(identity)
+    public IReadOnlyList<ParameterInfo> Parameters { get; }
+
+    public MagicOnionJsonRequestResponseModelMetadata(ModelMetadataIdentity identity, IReadOnlyList<ParameterInfo> parameters) : base(identity)
     {
+        Parameters = parameters;
         IsBindingAllowed = true;
         Properties = new ModelPropertyCollection(Array.Empty<ModelMetadata>());
         ModelBindingMessageProvider = new DefaultModelBindingMessageProvider();
