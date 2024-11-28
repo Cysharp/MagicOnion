@@ -110,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__">MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</a>
+          <a class="xref" href="MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__">MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Object&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -134,7 +134,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Attributes">Attributes</a>
+          <a class="xref" href="MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Metadata">Metadata</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -187,12 +187,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})">MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</h4>
+  <h4 id="MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})">MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Object&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MethodHandlerMetadata(Type serviceImplementationType, MethodInfo serviceMethod, MethodType methodType, Type responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type serviceInterface, IReadOnlyList&lt;Attribute&gt; attributes)</code></pre>
+    <pre><code class="lang-csharp hljs">public MethodHandlerMetadata(Type serviceImplementationType, MethodInfo serviceMethod, MethodType methodType, Type responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type serviceInterface, IReadOnlyList&lt;object&gt; metadata)</code></pre>
   </div>
 
   <section>
@@ -212,7 +212,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>serviceInterface</code></span> <span class="xref">Type</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>attributes</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
+    <dt><span class="parametername"><code>metadata</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.Object</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -262,13 +262,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Internal_MethodHandlerMetadata_Attributes_" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes*"></a>
-  <h4 id="MagicOnion_Server_Internal_MethodHandlerMetadata_Attributes" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes">Attributes</h4>
+  <a id="MagicOnion_Server_Internal_MethodHandlerMetadata_Metadata_" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata*"></a>
+  <h4 id="MagicOnion_Server_Internal_MethodHandlerMetadata_Metadata" data-uid="MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata">Metadata</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Attribute&gt; Attributes { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;object&gt; Metadata { get; }</code></pre>
   </div>
 
   
@@ -278,7 +278,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
+    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.Object</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>

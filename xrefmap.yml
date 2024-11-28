@@ -8271,12 +8271,15 @@ references:
   commentId: T:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   nameWithType: MemoryPackMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
-  name: Create(MethodType, MethodInfo)
-  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Reflection_MethodInfo_
-  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
-  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Reflection.MethodInfo)
-  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
+- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name: Create(MethodType, Nullable<MethodInfo>)
+  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
+  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name.vb: Create(MethodType, Nullable(Of MethodInfo))
+  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
+  fullName.vb: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
+  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
+  nameWithType.vb: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
 - uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_
@@ -9796,6 +9799,111 @@ references:
   fullName.vb: MagicOnion.Server.Binder.IMagicOnionUnaryMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse).InvokeAsync
   nameWithType: IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>.InvokeAsync
   nameWithType.vb: IMagicOnionUnaryMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse).InvokeAsync
+- uid: MagicOnion.Server.Binder.Internal
+  name: MagicOnion.Server.Binder.Internal
+  href: api/MagicOnion.Server.Binder.Internal.html
+  commentId: N:MagicOnion.Server.Binder.Internal
+  fullName: MagicOnion.Server.Binder.Internal
+  nameWithType: MagicOnion.Server.Binder.Internal
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1
+  name: MagicOnionGrpcMethodHandler<TService>
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html
+  commentId: T:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1
+  name.vb: MagicOnionGrpcMethodHandler(Of TService)
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService)
+  nameWithType: MagicOnionGrpcMethodHandler<TService>
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService)
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.#ctor(System.Boolean,System.Boolean,IServiceProvider,IList{MagicOnion.Server.Filters.MagicOnionServiceFilterDescriptor},ILogger{MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler{`0}})
+  name: MagicOnionGrpcMethodHandler(Boolean, Boolean, IServiceProvider, IList<MagicOnionServiceFilterDescriptor>, ILogger<MagicOnionGrpcMethodHandler<TService>>)
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1__ctor_System_Boolean_System_Boolean_IServiceProvider_IList_MagicOnion_Server_Filters_MagicOnionServiceFilterDescriptor__ILogger_MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler__0___
+  commentId: M:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.#ctor(System.Boolean,System.Boolean,IServiceProvider,IList{MagicOnion.Server.Filters.MagicOnionServiceFilterDescriptor},ILogger{MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler{`0}})
+  name.vb: MagicOnionGrpcMethodHandler(Boolean, Boolean, IServiceProvider, IList(Of MagicOnionServiceFilterDescriptor), ILogger(Of MagicOnionGrpcMethodHandler(Of TService)))
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.MagicOnionGrpcMethodHandler(System.Boolean, System.Boolean, IServiceProvider, IList<MagicOnion.Server.Filters.MagicOnionServiceFilterDescriptor>, ILogger<MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>>)
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).MagicOnionGrpcMethodHandler(System.Boolean, System.Boolean, IServiceProvider, IList(Of MagicOnion.Server.Filters.MagicOnionServiceFilterDescriptor), ILogger(Of MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService)))
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.MagicOnionGrpcMethodHandler(Boolean, Boolean, IServiceProvider, IList<MagicOnionServiceFilterDescriptor>, ILogger<MagicOnionGrpcMethodHandler<TService>>)
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).MagicOnionGrpcMethodHandler(Boolean, Boolean, IServiceProvider, IList(Of MagicOnionServiceFilterDescriptor), ILogger(Of MagicOnionGrpcMethodHandler(Of TService)))
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.#ctor*
+  name: MagicOnionGrpcMethodHandler
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1__ctor_
+  commentId: Overload:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.MagicOnionGrpcMethodHandler
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).MagicOnionGrpcMethodHandler
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.MagicOnionGrpcMethodHandler
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).MagicOnionGrpcMethodHandler
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildClientStreamingMethod*
+  name: BuildClientStreamingMethod
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildClientStreamingMethod_
+  commentId: Overload:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildClientStreamingMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildClientStreamingMethod
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildClientStreamingMethod
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildClientStreamingMethod
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildClientStreamingMethod
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildClientStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionClientStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: BuildClientStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildClientStreamingMethod__4_MagicOnion_Server_Binder_MagicOnionClientStreamingMethod__0___0___1___2___3__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildClientStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionClientStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: BuildClientStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionClientStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildClientStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnion.Server.Binder.MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildClientStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnion.Server.Binder.MagicOnionClientStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildClientStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildClientStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionClientStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildDuplexStreamingMethod*
+  name: BuildDuplexStreamingMethod
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildDuplexStreamingMethod_
+  commentId: Overload:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildDuplexStreamingMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildDuplexStreamingMethod
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildDuplexStreamingMethod
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildDuplexStreamingMethod
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildDuplexStreamingMethod
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildDuplexStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: BuildDuplexStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildDuplexStreamingMethod__4_MagicOnion_Server_Binder_MagicOnionDuplexStreamingMethod__0___0___1___2___3__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildDuplexStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: BuildDuplexStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionDuplexStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildDuplexStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildDuplexStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildDuplexStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildDuplexStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionDuplexStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildServerStreamingMethod*
+  name: BuildServerStreamingMethod
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildServerStreamingMethod_
+  commentId: Overload:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildServerStreamingMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildServerStreamingMethod
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildServerStreamingMethod
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildServerStreamingMethod
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildServerStreamingMethod
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildServerStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionServerStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: BuildServerStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildServerStreamingMethod__4_MagicOnion_Server_Binder_MagicOnionServerStreamingMethod__0___0___1___2___3__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildServerStreamingMethod``4(MagicOnion.Server.Binder.MagicOnionServerStreamingMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: BuildServerStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionServerStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildServerStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnion.Server.Binder.MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildServerStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnion.Server.Binder.MagicOnionServerStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildServerStreamingMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildServerStreamingMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnionServerStreamingMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildUnaryMethod*
+  name: BuildUnaryMethod
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildUnaryMethod_
+  commentId: Overload:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildUnaryMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildUnaryMethod
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildUnaryMethod
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildUnaryMethod
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildUnaryMethod
+- uid: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildUnaryMethod``4(MagicOnion.Server.Binder.IMagicOnionUnaryMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: BuildUnaryMethod<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html#MagicOnion_Server_Binder_Internal_MagicOnionGrpcMethodHandler_1_BuildUnaryMethod__4_MagicOnion_Server_Binder_IMagicOnionUnaryMethod__0___0___1___2___3__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler`1.BuildUnaryMethod``4(MagicOnion.Server.Binder.IMagicOnionUnaryMethod{`0,``0,``1,``2,``3},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: BuildUnaryMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(IMagicOnionUnaryMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler<TService>.BuildUnaryMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MagicOnion.Server.Binder.IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler(Of TService).BuildUnaryMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MagicOnion.Server.Binder.IMagicOnionUnaryMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: MagicOnionGrpcMethodHandler<TService>.BuildUnaryMethod<TRequest, TResponse, TRawRequest, TRawResponse>(IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>, IMagicOnionSerializer)
+  nameWithType.vb: MagicOnionGrpcMethodHandler(Of TService).BuildUnaryMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(IMagicOnionUnaryMethod(Of TService, TRequest, TResponse, TRawRequest, TRawResponse), IMagicOnionSerializer)
 - uid: MagicOnion.Server.Binder.MagicOnionClientStreamingMethod`5
   name: MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
   href: api/MagicOnion.Server.Binder.MagicOnionClientStreamingMethod-5.html
@@ -12477,15 +12585,15 @@ references:
   commentId: T:MagicOnion.Server.Internal.MethodHandlerMetadata
   fullName: MagicOnion.Server.Internal.MethodHandlerMetadata
   nameWithType: MethodHandlerMetadata
-- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})
-  name: MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__
-  commentId: M:MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})
-  name.vb: MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
-  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  fullName.vb: MagicOnion.Server.Internal.MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
-  nameWithType: MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  nameWithType.vb: MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
+- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})
+  name: MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Object>)
+  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_Type_MethodInfo_MethodType_Type_Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__
+  commentId: M:MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor(Type,MethodInfo,MethodType,Type,Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})
+  name.vb: MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Object))
+  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<System.Object>)
+  fullName.vb: MagicOnion.Server.Internal.MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of System.Object))
+  nameWithType: MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Object>)
+  nameWithType.vb: MethodHandlerMetadata.MethodHandlerMetadata(Type, MethodInfo, MethodType, Type, Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Object))
 - uid: MagicOnion.Server.Internal.MethodHandlerMetadata.#ctor*
   name: MethodHandlerMetadata
   href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata__ctor_
@@ -12506,19 +12614,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.AttributeLookup
   nameWithType: MethodHandlerMetadata.AttributeLookup
-- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes
-  name: Attributes
-  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Attributes
-  commentId: P:MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes
-  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes
-  nameWithType: MethodHandlerMetadata.Attributes
-- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes*
-  name: Attributes
-  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Attributes_
-  commentId: Overload:MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes
+- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata
+  name: Metadata
+  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Metadata
+  commentId: P:MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata
+  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata
+  nameWithType: MethodHandlerMetadata.Metadata
+- uid: MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata*
+  name: Metadata
+  href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_Metadata_
+  commentId: Overload:MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata
   isSpec: "True"
-  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.Attributes
-  nameWithType: MethodHandlerMetadata.Attributes
+  fullName: MagicOnion.Server.Internal.MethodHandlerMetadata.Metadata
+  nameWithType: MethodHandlerMetadata.Metadata
 - uid: MagicOnion.Server.Internal.MethodHandlerMetadata.MethodType
   name: MethodType
   href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html#MagicOnion_Server_Internal_MethodHandlerMetadata_MethodType
@@ -12616,15 +12724,15 @@ references:
   commentId: T:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata
   fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata
   nameWithType: StreamingHubMethodHandlerMetadata
-- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})
-  name: StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__
-  commentId: M:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})
-  name.vb: StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
-  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(System.Int32, Type, MethodInfo, MethodInfo, System.Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  fullName.vb: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(System.Int32, Type, MethodInfo, MethodInfo, System.Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
-  nameWithType: StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Attribute>)
-  nameWithType.vb: StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Attribute))
+- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})
+  name: StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Object>)
+  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__
+  commentId: M:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})
+  name.vb: StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Object))
+  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(System.Int32, Type, MethodInfo, MethodInfo, System.Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<System.Object>)
+  fullName.vb: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(System.Int32, Type, MethodInfo, MethodInfo, System.Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of System.Object))
+  nameWithType: StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable<Type>, Type, IReadOnlyList<ParameterInfo>, Type, IReadOnlyList<Object>)
+  nameWithType.vb: StreamingHubMethodHandlerMetadata.StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable(Of Type), Type, IReadOnlyList(Of ParameterInfo), Type, IReadOnlyList(Of Object))
 - uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor*
   name: StreamingHubMethodHandlerMetadata
   href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_
@@ -12645,19 +12753,6 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.AttributeLookup
   nameWithType: StreamingHubMethodHandlerMetadata.AttributeLookup
-- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes
-  name: Attributes
-  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes
-  commentId: P:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes
-  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes
-  nameWithType: StreamingHubMethodHandlerMetadata.Attributes
-- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes*
-  name: Attributes
-  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes_
-  commentId: Overload:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes
-  isSpec: "True"
-  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes
-  nameWithType: StreamingHubMethodHandlerMetadata.Attributes
 - uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.ImplementationMethod
   name: ImplementationMethod
   href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_ImplementationMethod
@@ -12684,6 +12779,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.InterfaceMethod
   nameWithType: StreamingHubMethodHandlerMetadata.InterfaceMethod
+- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata
+  name: Metadata
+  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Metadata
+  commentId: P:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata
+  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata
+  nameWithType: StreamingHubMethodHandlerMetadata.Metadata
+- uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata*
+  name: Metadata
+  href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Metadata_
+  commentId: Overload:MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata
+  nameWithType: StreamingHubMethodHandlerMetadata.Metadata
 - uid: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.MethodId
   name: MethodId
   href: api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_MethodId
@@ -13122,6 +13230,139 @@ references:
   fullName.vb: MagicOnion.Server.IStreamingServiceContext(Of TRequest, TResponse)
   nameWithType: IStreamingServiceContext<TRequest, TResponse>
   nameWithType.vb: IStreamingServiceContext(Of TRequest, TResponse)
+- uid: MagicOnion.Server.JsonTranscoding
+  name: MagicOnion.Server.JsonTranscoding
+  href: api/MagicOnion.Server.JsonTranscoding.html
+  commentId: N:MagicOnion.Server.JsonTranscoding
+  fullName: MagicOnion.Server.JsonTranscoding
+  nameWithType: MagicOnion.Server.JsonTranscoding
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder`1
+  name: MagicOnionJsonTranscodingGrpcMethodBinder<TService>
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder-1.html
+  commentId: T:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder`1
+  name.vb: MagicOnionJsonTranscodingGrpcMethodBinder(Of TService)
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder<TService>
+  fullName.vb: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder(Of TService)
+  nameWithType: MagicOnionJsonTranscodingGrpcMethodBinder<TService>
+  nameWithType.vb: MagicOnionJsonTranscodingGrpcMethodBinder(Of TService)
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider`1
+  name: MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider-1.html
+  commentId: T:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider`1
+  name.vb: MagicOnionJsonTranscodingGrpcServiceMethodProvider(Of TServiceImplementation)
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>
+  fullName.vb: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider(Of TServiceImplementation)
+  nameWithType: MagicOnionJsonTranscodingGrpcServiceMethodProvider<TServiceImplementation>
+  nameWithType.vb: MagicOnionJsonTranscodingGrpcServiceMethodProvider(Of TServiceImplementation)
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata
+  name: MagicOnionJsonTranscodingMetadata
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html
+  commentId: T:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata
+  nameWithType: MagicOnionJsonTranscodingMetadata
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.#ctor(System.String,Type,Type,MagicOnion.Server.Binder.IMagicOnionGrpcMethod)
+  name: MagicOnionJsonTranscodingMetadata(String, Type, Type, IMagicOnionGrpcMethod)
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata__ctor_System_String_Type_Type_MagicOnion_Server_Binder_IMagicOnionGrpcMethod_
+  commentId: M:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.#ctor(System.String,Type,Type,MagicOnion.Server.Binder.IMagicOnionGrpcMethod)
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.MagicOnionJsonTranscodingMetadata(System.String, Type, Type, MagicOnion.Server.Binder.IMagicOnionGrpcMethod)
+  nameWithType: MagicOnionJsonTranscodingMetadata.MagicOnionJsonTranscodingMetadata(String, Type, Type, IMagicOnionGrpcMethod)
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.#ctor*
+  name: MagicOnionJsonTranscodingMetadata
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata__ctor_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.MagicOnionJsonTranscodingMetadata
+  nameWithType: MagicOnionJsonTranscodingMetadata.MagicOnionJsonTranscodingMetadata
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method
+  name: Method
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_Method
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method
+  nameWithType: MagicOnionJsonTranscodingMetadata.Method
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method*
+  name: Method
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_Method_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.Method
+  nameWithType: MagicOnionJsonTranscodingMetadata.Method
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType
+  name: RequestType
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_RequestType
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType
+  nameWithType: MagicOnionJsonTranscodingMetadata.RequestType
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType*
+  name: RequestType
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_RequestType_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RequestType
+  nameWithType: MagicOnionJsonTranscodingMetadata.RequestType
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType
+  name: ResponseType
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_ResponseType
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType
+  nameWithType: MagicOnionJsonTranscodingMetadata.ResponseType
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType*
+  name: ResponseType
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_ResponseType_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.ResponseType
+  nameWithType: MagicOnionJsonTranscodingMetadata.ResponseType
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath
+  name: RoutePath
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_RoutePath
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath
+  nameWithType: MagicOnionJsonTranscodingMetadata.RoutePath
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath*
+  name: RoutePath
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingMetadata_RoutePath_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.RoutePath
+  nameWithType: MagicOnionJsonTranscodingMetadata.RoutePath
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions
+  name: MagicOnionJsonTranscodingOptions
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html
+  commentId: T:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions
+  nameWithType: MagicOnionJsonTranscodingOptions
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+  name: AllowEnableInNonDevelopmentEnvironment
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingOptions_AllowEnableInNonDevelopmentEnvironment
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+  nameWithType: MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment*
+  name: AllowEnableInNonDevelopmentEnvironment
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingOptions_AllowEnableInNonDevelopmentEnvironment_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+  nameWithType: MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix
+  name: RoutePathPrefix
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingOptions_RoutePathPrefix
+  commentId: P:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix
+  nameWithType: MagicOnionJsonTranscodingOptions.RoutePathPrefix
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix*
+  name: RoutePathPrefix
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html#MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingOptions_RoutePathPrefix_
+  commentId: Overload:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix
+  isSpec: "True"
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.RoutePathPrefix
+  nameWithType: MagicOnionJsonTranscodingOptions.RoutePathPrefix
+- uid: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext
+  name: MagicOnionJsonTranscodingServerCallContext
+  href: api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext.html
+  commentId: T:MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext
+  fullName: MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext
+  nameWithType: MagicOnionJsonTranscodingServerCallContext
 - uid: MagicOnion.Server.MagicOnionFilterAttribute
   name: MagicOnionFilterAttribute
   href: api/MagicOnion.Server.MagicOnionFilterAttribute.html
@@ -14363,6 +14604,28 @@ references:
   commentId: N:Microsoft.Extensions.DependencyInjection
   fullName: Microsoft.Extensions.DependencyInjection
   nameWithType: Microsoft.Extensions.DependencyInjection
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions
+  name: MagicOnionJsonTranscodingBuilderExtensions
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.html
+  commentId: T:Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions
+  nameWithType: MagicOnionJsonTranscodingBuilderExtensions
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(MagicOnion.Server.IMagicOnionServerBuilder,System.Nullable{Action{MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions}})
+  name: AddJsonTranscoding(IMagicOnionServerBuilder, Nullable<Action<MagicOnionJsonTranscodingOptions>>)
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionJsonTranscodingBuilderExtensions_AddJsonTranscoding_MagicOnion_Server_IMagicOnionServerBuilder_System_Nullable_Action_MagicOnion_Server_JsonTranscoding_MagicOnionJsonTranscodingOptions___
+  commentId: M:Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(MagicOnion.Server.IMagicOnionServerBuilder,System.Nullable{Action{MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions}})
+  name.vb: AddJsonTranscoding(IMagicOnionServerBuilder, Nullable(Of Action(Of MagicOnionJsonTranscodingOptions)))
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(MagicOnion.Server.IMagicOnionServerBuilder, System.Nullable<Action<MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions>>)
+  fullName.vb: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(MagicOnion.Server.IMagicOnionServerBuilder, System.Nullable(Of Action(Of MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions)))
+  nameWithType: MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(IMagicOnionServerBuilder, Nullable<Action<MagicOnionJsonTranscodingOptions>>)
+  nameWithType.vb: MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding(IMagicOnionServerBuilder, Nullable(Of Action(Of MagicOnionJsonTranscodingOptions)))
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding*
+  name: AddJsonTranscoding
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionJsonTranscodingBuilderExtensions_AddJsonTranscoding_
+  commentId: Overload:Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding
+  isSpec: "True"
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding
+  nameWithType: MagicOnionJsonTranscodingBuilderExtensions.AddJsonTranscoding
 - uid: Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions
   name: MagicOnionServerBuilderRedisExtensions
   href: api/Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.html
@@ -14385,6 +14648,25 @@ references:
   isSpec: "True"
   fullName: Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.UseRedisGroup
   nameWithType: MagicOnionServerBuilderRedisExtensions.UseRedisGroup
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension
+  name: MagicOnionServerJsonTranscodingSwaggerBuilderExtension
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.html
+  commentId: T:Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension
+  nameWithType: MagicOnionServerJsonTranscodingSwaggerBuilderExtension
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger(IServiceCollection)
+  name: AddMagicOnionJsonTranscodingSwagger(IServiceCollection)
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.html#Microsoft_Extensions_DependencyInjection_MagicOnionServerJsonTranscodingSwaggerBuilderExtension_AddMagicOnionJsonTranscodingSwagger_IServiceCollection_
+  commentId: M:Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger(IServiceCollection)
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger(IServiceCollection)
+  nameWithType: MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger(IServiceCollection)
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger*
+  name: AddMagicOnionJsonTranscodingSwagger
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.html#Microsoft_Extensions_DependencyInjection_MagicOnionServerJsonTranscodingSwaggerBuilderExtension_AddMagicOnionJsonTranscodingSwagger_
+  commentId: Overload:Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger
+  isSpec: "True"
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger
+  nameWithType: MagicOnionServerJsonTranscodingSwaggerBuilderExtension.AddMagicOnionJsonTranscodingSwagger
 - uid: Microsoft.Extensions.DependencyInjection.MagicOnionServicesExtensions
   name: MagicOnionServicesExtensions
   href: api/Microsoft.Extensions.DependencyInjection.MagicOnionServicesExtensions.html
@@ -14425,3 +14707,28 @@ references:
   isSpec: "True"
   fullName: Microsoft.Extensions.DependencyInjection.MagicOnionServicesExtensions.AddMagicOnion
   nameWithType: MagicOnionServicesExtensions.AddMagicOnion
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions
+  name: MagicOnionSwaggerGenOptionsExtensions
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.html
+  commentId: T:Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions
+  nameWithType: MagicOnionSwaggerGenOptionsExtensions
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions,System.String)
+  name: IncludeMagicOnionXmlComments(SwaggerGenOptions, String)
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionSwaggerGenOptionsExtensions_IncludeMagicOnionXmlComments_SwaggerGenOptions_System_String_
+  commentId: M:Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions,System.String)
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions, System.String)
+  nameWithType: MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions, String)
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions,XDocument)
+  name: IncludeMagicOnionXmlComments(SwaggerGenOptions, XDocument)
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionSwaggerGenOptionsExtensions_IncludeMagicOnionXmlComments_SwaggerGenOptions_XDocument_
+  commentId: M:Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions,XDocument)
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions, XDocument)
+  nameWithType: MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments(SwaggerGenOptions, XDocument)
+- uid: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments*
+  name: IncludeMagicOnionXmlComments
+  href: api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionSwaggerGenOptionsExtensions_IncludeMagicOnionXmlComments_
+  commentId: Overload:Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments
+  isSpec: "True"
+  fullName: Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments
+  nameWithType: MagicOnionSwaggerGenOptionsExtensions.IncludeMagicOnionXmlComments

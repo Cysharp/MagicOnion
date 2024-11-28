@@ -110,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</a>
+          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Object&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -134,12 +134,6 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes">Attributes</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
           <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_ImplementationMethod">ImplementationMethod</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -147,6 +141,12 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_InterfaceMethod">InterfaceMethod</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html#MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Metadata">Metadata</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -193,12 +193,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_Attribute__" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{Attribute})">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Attribute&gt;)</h4>
+  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata__ctor_System_Int32_Type_MethodInfo_MethodInfo_System_Nullable_Type__Type_IReadOnlyList_ParameterInfo__Type_IReadOnlyList_System_Object__" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.#ctor(System.Int32,Type,MethodInfo,MethodInfo,System.Nullable{Type},Type,IReadOnlyList{ParameterInfo},Type,IReadOnlyList{System.Object})">StreamingHubMethodHandlerMetadata(Int32, Type, MethodInfo, MethodInfo, Nullable&lt;Type&gt;, Type, IReadOnlyList&lt;ParameterInfo&gt;, Type, IReadOnlyList&lt;Object&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type streamingHubInterfaceType, IReadOnlyList&lt;Attribute&gt; attributes)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList&lt;ParameterInfo&gt; parameters, Type streamingHubInterfaceType, IReadOnlyList&lt;object&gt; metadata)</code></pre>
   </div>
 
   <section>
@@ -220,7 +220,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>streamingHubInterfaceType</code></span> <span class="xref">Type</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>attributes</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
+    <dt><span class="parametername"><code>metadata</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.Object</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -257,36 +257,6 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">ILookup</span>&lt;<span class="xref">Type</span>, <span class="xref">Attribute</span>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes*"></a>
-  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Attributes" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Attributes">Attributes</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Attribute&gt; Attributes { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">Attribute</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -347,6 +317,36 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">MethodInfo</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Metadata_" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata*"></a>
+  <h4 id="MagicOnion_Server_Internal_StreamingHubMethodHandlerMetadata_Metadata" data-uid="MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.Metadata">Metadata</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;object&gt; Metadata { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.Object</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>

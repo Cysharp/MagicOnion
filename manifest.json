@@ -1629,7 +1629,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter.html",
-          "hash": "SFVeqAbWU+RKCP47TpQveLsg3tkDcNh56WcpSZnXDMk="
+          "hash": "10HBqf1A3wOA2eUtyyWA3FGzrdPkPddkpeHkgUlJlnk="
         }
       },
       "is_incremental": false,
@@ -1641,7 +1641,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html",
-          "hash": "Mz/OR6pH3brUntPfUxGFdbLwDwD0dvtbO9vz0ZnaiBE="
+          "hash": "mrTtdqRlP/mzcSFQeBeeV9f1U4nuEU8tNP+uFeLmZZU="
         }
       },
       "is_incremental": false,
@@ -1966,6 +1966,30 @@
         ".html": {
           "relative_path": "api/MagicOnion.Server.Binder.IMagicOnionUnaryMethod-5.html",
           "hash": "8MRkqTH6AWGjHwCAmte81mQlnkmiME2EeN+HEC1k+Pc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Binder.Internal.MagicOnionGrpcMethodHandler-1.html",
+          "hash": "ExWpW/YpK1xPHJFVHEDfCj6106zoge8e53TfqT9CX6s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Binder.Internal.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Binder.Internal.html",
+          "hash": "2veAridIS0b7+py0jzuYKyFA6fp/89CZW9qgZ/JEiAU="
         }
       },
       "is_incremental": false,
@@ -2433,7 +2457,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IMagicOnionServerBuilder.html",
-          "hash": "y6AXAY8EJYlm7E7+aaz0IkzSrIAyxeG8bOQ1PddcSg4="
+          "hash": "Ls43j/usrOKyxgpYt/fIJL2lGCFGIxqGa8RobPyew0E="
         }
       },
       "is_incremental": false,
@@ -2517,7 +2541,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Internal.MethodHandlerMetadata.html",
-          "hash": "peEhIeuSxDyLZ5hPd76vRY6XW5asp/8r/cgab9aHyz4="
+          "hash": "b03SRhL4vuNWVWMDP9Bd7Jf1SCYUDCjUVQKX/aOFYWw="
         }
       },
       "is_incremental": false,
@@ -2529,7 +2553,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.html",
-          "hash": "2D7K5tIKN2yfo7y4UxUsFLgpixAqZcEiGUZp+EtrCic="
+          "hash": "+UzFvAdUIS9NiTTa3nTE1dePrN5ELJpGS2cEHMPruoE="
         }
       },
       "is_incremental": false,
@@ -2554,6 +2578,78 @@
         ".html": {
           "relative_path": "api/MagicOnion.Server.Internal.html",
           "hash": "DCeYtmOPpq7R/QPoco/tPvIEmJF2/nUGB83oLma4WOw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcMethodBinder-1.html",
+          "hash": "c64mK3zIxMmHp9jxt8f77xCigjN86Ab3ywQJEZhpt70="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingGrpcServiceMethodProvider-1.html",
+          "hash": "aDHAbW6VAEHbgTj0v+SxIUrqfpDQdBOgV8ucpTl8LhI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingMetadata.html",
+          "hash": "JfA7Tv+oLBnyuOYOKZj/zmsvgxohW65yLEjkoYGjjXE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingOptions.html",
+          "hash": "vS+xnI8od6HiDV28CzDHI2re+KXaEl8P3evyGniVX0o="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.MagicOnionJsonTranscodingServerCallContext.html",
+          "hash": "BPpu0640LRc4fcGCkxl920VfuzuZSBnIW2iYGxyppjA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.JsonTranscoding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.JsonTranscoding.html",
+          "hash": "oj6/Z6JJyrl1Z1QzFLN8EkMz03RwCcgXBqpR3qRnKqc="
         }
       },
       "is_incremental": false,
@@ -2729,11 +2825,35 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionJsonTranscodingBuilderExtensions.html",
+          "hash": "U0vyyR0IwJrklAa0s7v7SnHCP0lGKwTz3jG0RNzNuyc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.yml",
       "output": {
         ".html": {
           "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.html",
           "hash": "jdngxyjVsixsNP3TZpBYY4QIMWn2lsQV5Ht9KkWTg1w="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerJsonTranscodingSwaggerBuilderExtension.html",
+          "hash": "CEDWAfTEq++AQL0JSAXdP9sw2qQyvP0qey1HRHtNs7c="
         }
       },
       "is_incremental": false,
@@ -2753,11 +2873,23 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionSwaggerGenOptionsExtensions.html",
+          "hash": "/fMdTRMDXKqAe6YN+RFtie9nC0sPrvIaVRG3BFriNaI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.yml",
       "output": {
         ".html": {
           "relative_path": "api/Microsoft.Extensions.DependencyInjection.html",
-          "hash": "LIcZsenvBOD7FSdeviTthgN9N73wr12vUeBCT9O3tOM="
+          "hash": "91Y1yruOR4Pbm0JglYcFSZxV17DGfGEA2VLOX7tcEkQ="
         }
       },
       "is_incremental": false,
@@ -2769,7 +2901,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "SRGLAfeckjpLGck0F6Qs0s5plDlRlBJ7WLPEIDzd2uI="
+          "hash": "iTkO05U8d+Q9iSIeCgxIuxbZ1fhXdeFaGzVMDFfV+I0="
         }
       },
       "is_incremental": false,
@@ -2856,7 +2988,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 230,
+          "total_file_count": 241,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
