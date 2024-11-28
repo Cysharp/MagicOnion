@@ -14,7 +14,6 @@ internal class MagicOnionJsonTranscodingDescriptionProvider(EndpointDataSource e
         {
             if (endpoint.Metadata.SingleOrDefault(x => x is MagicOnionJsonTranscodingMetadata) is MagicOnionJsonTranscodingMetadata metadata)
             {
-
                 context.Results.Add(new ApiDescription()
                 {
                     HttpMethod = "POST",
@@ -24,7 +23,7 @@ internal class MagicOnionJsonTranscodingDescriptionProvider(EndpointDataSource e
                         {
                             ["controller"] = metadata.Method.ServiceName,
                         },
-                        EndpointMetadata = [],
+                        EndpointMetadata = [ metadata ],
                     },
                     SupportedRequestFormats =
                     {

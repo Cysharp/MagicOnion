@@ -5,7 +5,10 @@ builder.Services.AddGrpc();
 
 builder.Services.AddMagicOnion().AddJsonTranscoding();
 builder.Services.AddMagicOnionJsonTranscodingSwagger();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.IncludeMagicOnionXmlComments(Path.Combine(AppContext.BaseDirectory, "JsonTranscodingSample.Shared.xml"));
+});
 
 var app = builder.Build();
 
