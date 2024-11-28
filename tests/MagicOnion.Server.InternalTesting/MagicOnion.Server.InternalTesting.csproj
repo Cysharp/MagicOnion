@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\src\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
