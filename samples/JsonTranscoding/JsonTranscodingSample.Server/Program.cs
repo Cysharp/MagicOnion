@@ -3,16 +3,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddGrpc();
 
+// Add MagicOnion services to the container and enable JSON transcoding feature.
 builder.Services.AddMagicOnion().AddJsonTranscoding();
+// Add MagicOnion JSON transcoding Swagger support.
 builder.Services.AddMagicOnionJsonTranscodingSwagger();
+// Add Swagger generator services.
 builder.Services.AddSwaggerGen(options =>
 {
+    // Reflect the XML documentation comments of the service definition in Swagger.
     options.IncludeMagicOnionXmlComments(Path.Combine(AppContext.BaseDirectory, "JsonTranscodingSample.Shared.xml"));
 });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
 app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
