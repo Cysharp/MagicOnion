@@ -17,7 +17,18 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
         return new UnaryResult<RegisterUserResponse>(new RegisterUserResponse()
         {
             Success = true,
-            Message = $"Welcome {request.Name}!"
+            Message = $"Welcome {request.Name}!",
+            RegisteredUser = request,
+        });
+    }
+
+    public UnaryResult<RegisterUserResponse> RegisterUserWithRoleAsync(RegisterUserRequest request, string role)
+    {
+        return new UnaryResult<RegisterUserResponse>(new RegisterUserResponse()
+        {
+            Success = true,
+            Message = $"Welcome {request.Name}! You are registered as '{role}'.",
+            RegisteredUser = request,
         });
     }
 

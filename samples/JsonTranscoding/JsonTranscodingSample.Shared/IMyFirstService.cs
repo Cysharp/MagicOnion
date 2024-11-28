@@ -13,15 +13,23 @@ public interface IMyFirstService : IService<IMyFirstService>
     /// </summary>
     /// <param name="name"> A name to say hello. </param>
     /// <param name="age">An age of the person to say hello.</param>
-    /// <returns></returns>
+    /// <returns>Returns a message to the specified name.</returns>
     UnaryResult<string> SayHelloAsync(string name, int age);
 
     /// <summary>
     /// Register a user with the specified request.
     /// </summary>
     /// <param name="request">The request to register a user.</param>
-    /// <returns></returns>
+    /// <returns>Returns a response to the user registration request.</returns>
     UnaryResult<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request);
+
+    /// <summary>
+    /// Register a user with the specified request and role.
+    /// </summary>
+    /// <param name="request">The request to register a user.</param>
+    /// <param name="role">A role to assign to the user.</param>
+    /// <returns>Returns a response to the user registration request.</returns>
+    UnaryResult<RegisterUserResponse> RegisterUserWithRoleAsync(RegisterUserRequest request, string role);
 
     /// <summary>
     /// Throw an exception.
@@ -73,4 +81,10 @@ public class RegisterUserResponse
     /// </summary>
     [Key(1)]
     public required string Message { get; init; }
+
+    /// <summary>
+    /// Gets or sets the registered user.
+    /// </summary>
+    [Key(2)]
+    public required RegisterUserRequest RegisteredUser { get; init; }
 }
