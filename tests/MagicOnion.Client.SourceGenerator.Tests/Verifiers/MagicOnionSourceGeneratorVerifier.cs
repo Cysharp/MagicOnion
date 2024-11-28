@@ -11,7 +11,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using VerifyCS = MagicOnion.Client.SourceGenerator.Tests.Verifiers.MagicOnionSourceGeneratorVerifier;
 
@@ -78,7 +77,7 @@ internal class MagicOnionSourceGeneratorVerifier
         await test.RunAsync();
     }
 
-    internal class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, XUnitVerifier>
+    internal class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, DefaultVerifier>
     {
         readonly string testFile;
         readonly string testMethod;

@@ -55,7 +55,7 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         // Assert
         var result = default(object); // null
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(result, JsonSerializer.Deserialize<object>(content, JsonSerializerOptions.Web));
+        Assert.Equal(result, JsonSerializer.Deserialize<object>(content, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
         Assert.True((bool)factory.Items.GetValueOrDefault($"{nameof(Method_NoParameter_NoResult)}.Called", false));
     }
@@ -73,7 +73,7 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         // Assert
         var result = nameof(Method_NoParameter_ResultRefType); // string
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(result, JsonSerializer.Deserialize<string>(content, JsonSerializerOptions.Web));
+        Assert.Equal(result, JsonSerializer.Deserialize<string>(content, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
 
@@ -98,7 +98,7 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                 D = 98765432100,
                 E = "Hello!",
             },
-        }, JsonSerializer.Deserialize<TestResponse>(content, JsonSerializerOptions.Web));
+        }, JsonSerializer.Deserialize<TestResponse>(content, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
@@ -118,7 +118,7 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal("Alice", JsonSerializer.Deserialize<string>(content, JsonSerializerOptions.Web));
+        Assert.Equal("Alice", JsonSerializer.Deserialize<string>(content, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
         Assert.Equal("application/json", response.Content.Headers.ContentType?.ToString());
     }
 
