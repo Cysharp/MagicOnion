@@ -3,3 +3,4 @@ global using FluentAssertions;
 
 global using Grpc.Core;
 global using MessagePack;
+global using MagicOnion.Server.InternalTesting;

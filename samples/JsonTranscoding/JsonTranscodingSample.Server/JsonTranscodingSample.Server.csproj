@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server.JsonTranscoding.Swagger\MagicOnion.Server.JsonTranscoding.Swagger.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server.JsonTranscoding\MagicOnion.Server.JsonTranscoding.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
+    <ProjectReference Include="..\JsonTranscodingSample.Shared\JsonTranscodingSample.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

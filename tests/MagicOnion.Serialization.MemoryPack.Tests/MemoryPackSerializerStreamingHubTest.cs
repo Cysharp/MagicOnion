@@ -2,7 +2,6 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using MagicOnionTestServer;
 using MemoryPack;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
