@@ -47,7 +47,7 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
 
         context.AddMethod(grpcMethod, RoutePatternFactory.Parse(routePath), metadata, async (context) =>
         {
-            var serverCallContext = new MagicOnionJsonTranscodingServerCallContext(method);
+            var serverCallContext = new MagicOnionJsonTranscodingServerCallContext(context, method);
 
             // Grpc.AspNetCore.Server expects that UserState has the key "__HttpContext" and that HttpContext is set to it.
             // https://github.com/grpc/grpc-dotnet/blob/5a58c24efc1d0b7c5ff88e7b0582ea891b90b17f/src/Grpc.AspNetCore.Server/ServerCallContextExtensions.cs#L30
