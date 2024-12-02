@@ -237,6 +237,42 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
     }
 
     record ErrorResponse(int Code, string Detail);
+
+    [Fact]
+    public async Task CallContextInfo()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContextInfo", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content) ?? throw new InvalidOperationException("Failed to deserialize a response.");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("localhost", dict["Host"]);
+        Assert.Equal("unknown", dict["Peer"]);
+        Assert.Equal("ITestService/CallContextInfo", dict["Method"]);
+    }
+
+    [Fact]
+    public async Task CallContext_WriteResponseHeader()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var requestBody = """
+                          { "key": "x-test-header", "value": "12345" }
+                          """;
+
+        // Act
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContext_WriteResponseHeader", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("12345", response.Headers.TryGetValues("x-test-header", out var values) ? string.Join(",", values) : null);
+    }
 }
 
 public interface ITestService : IService<ITestService>
@@ -251,6 +287,9 @@ public interface ITestService : IService<ITestService>
 
     UnaryResult ThrowAsync();
     UnaryResult ThrowWithReturnStatusCodeAsync(int statusCode, string detail);
+
+    UnaryResult<Dictionary<string, string>> CallContextInfo();
+    UnaryResult CallContext_WriteResponseHeader(string key, string value);
 }
 
 [MessagePackObject]
@@ -315,5 +354,24 @@ public class TestService([FromKeyedServices(MagicOnionApplicationFactory.ItemsKe
     public UnaryResult ThrowWithReturnStatusCodeAsync(int statusCode, string detail)
     {
         throw new ReturnStatusException((StatusCode)statusCode, detail);
+    }
+
+    public UnaryResult<Dictionary<string, string>> CallContextInfo()
+    {
+        return UnaryResult.FromResult(new Dictionary<string, string>()
+        {
+            ["Method"] = this.Context.CallContext.Method,
+            ["Peer"] = this.Context.CallContext.Peer,
+            ["Host"] = this.Context.CallContext.Host,
+            ["Deadline.Ticks"] = this.Context.CallContext.Deadline.Ticks.ToString(),
+            ["RequestHeaders"] = JsonSerializer.Serialize(this.Context.CallContext.RequestHeaders),
+        });
+    }
+
+    public async UnaryResult CallContext_WriteResponseHeader(string key, string value)
+    {
+        var metadata = new Metadata();
+        metadata.Add(key, value);
+        await Context.CallContext.WriteResponseHeadersAsync(metadata);
     }
 }
