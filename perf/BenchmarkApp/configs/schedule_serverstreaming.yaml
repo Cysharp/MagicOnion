@@ -1,7 +1,7 @@
 # template: https://github.com/Cysharp/Actions/tree/main/.github/scripts/_template_benchmark_config.yaml
 # config2args script: https://github.com/Cysharp/Actions/tree/main/.github/scripts/benchmark_config2args.sh
 apt-tools: "libmsquic"
-dotnet-version: 8.0
+dotnet-version: 9.0
 benchmark-expire-min: 15
 #benchmark-location: "japaneast"
 benchmark-location: "eastus"
