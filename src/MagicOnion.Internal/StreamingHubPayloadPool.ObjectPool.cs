@@ -6,7 +6,7 @@ namespace MagicOnion.Internal;
 
 internal class StreamingHubPayloadPool
 {
-    const int MaximumRetained = 2 << 7;
+    const int MaximumRetained = 2 << 10;
 
     readonly ObjectPool<StreamingHubPayloadCore> pool = new DefaultObjectPool<StreamingHubPayloadCore>(new Policy(), MaximumRetained);
 
@@ -27,17 +27,6 @@ internal class StreamingHubPayloadPool
     {
         var payload = pool.Get();
         payload.Initialize(data);
-#if DEBUG
-        return new StreamingHubPayload(payload);
-#else
-        return (StreamingHubPayload)payload;
-#endif
-    }
-
-    public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data, bool holdReference)
-    {
-        var payload = pool.Get();
-        payload.Initialize(data, holdReference);
 #if DEBUG
         return new StreamingHubPayload(payload);
 #else

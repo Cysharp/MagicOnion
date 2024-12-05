@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using MagicOnion.Server.Hubs;
 
@@ -69,28 +70,30 @@ internal class FilterHelper
 
     public static Func<ServiceContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<MagicOnionServiceFilterDescriptor> filters, Func<ServiceContext, ValueTask> methodBody)
     {
-        Func<ServiceContext, ValueTask> next = methodBody;
+        Func<ServiceContext, ValueTask> outer = methodBody;
 
         foreach (var filterDescriptor in filters.Reverse())
         {
             var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
-            next = new InvokeHelper<ServiceContext, Func<ServiceContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
+            var inner = outer;
+            outer = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, inner);
         }
 
-        return next;
+        return outer;
     }
 
     public static Func<StreamingHubContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<StreamingHubFilterDescriptor> filters, Func<StreamingHubContext, ValueTask> methodBody)
     {
-        Func<StreamingHubContext, ValueTask> next = methodBody;
+        Func<StreamingHubContext, ValueTask> outer = methodBody;
 
         foreach (var filterDescriptor in filters.Reverse())
         {
             var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
-            next = new InvokeHelper<StreamingHubContext, Func<StreamingHubContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
+            var inner = outer;
+            outer = [StackTraceHidden] (ctx) => newFilter.Invoke(ctx, inner);
         }
 
-        return next;
+        return outer;
     }
 
     public static TFilter CreateOrGetInstance<TFilter>(IServiceProvider serviceProvider, MagicOnionFilterDescriptor<TFilter> descriptor)
