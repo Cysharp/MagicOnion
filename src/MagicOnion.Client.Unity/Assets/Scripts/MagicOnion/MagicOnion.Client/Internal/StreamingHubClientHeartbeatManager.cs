@@ -182,17 +182,16 @@ namespace MagicOnion.Client.Internal
 
         StreamingHubPayload BuildServerHeartbeatMessage(short serverSequence, long serverSentAt)
         {
-            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-            StreamingHubMessageWriter.WriteServerHeartbeatMessageResponse(buffer, serverSequence, serverSentAt);
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+            Span<byte> buffer = stackalloc byte[32];
+            StreamingHubMessageWriter.WriteServerHeartbeatMessageResponse(buffer, serverSequence, serverSentAt, out var written);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.Slice(0, written));
         }
 
         StreamingHubPayload BuildClientHeartbeatMessage(short clientSequence)
         {
-            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-
-            StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, ElapsedMillisecondsFromOrigin);
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+            Span<byte> buffer = stackalloc byte[32];
+            StreamingHubMessageWriter.WriteClientHeartbeatMessage(buffer, clientSequence, ElapsedMillisecondsFromOrigin, out var written);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.Slice(0, written));
         }
 
         public async ValueTask DisposeAsync()

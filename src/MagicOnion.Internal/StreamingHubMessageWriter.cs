@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using MagicOnion.Serialization;
 using MessagePack;
@@ -70,10 +71,13 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteBroadcastMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, T value, IMagicOnionSerializer messageSerializer)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(2);
-            writer.Write(methodId);
-            writer.Flush();
+            var bytesWritten = 0;
+            var written = 0;
+            Span<byte> header = bufferWriter.GetSpan(16);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 2, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+            bufferWriter.Advance(bytesWritten);
+
             messageSerializer.Serialize(bufferWriter, value);
         }
 
@@ -82,10 +86,13 @@ namespace MagicOnion.Internal
         /// </summary>
         public static void WriteRequestMessageVoid<T>(IBufferWriter<byte> bufferWriter, int methodId, T value, IMagicOnionSerializer messageSerializer)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(2);
-            writer.Write(methodId);
-            writer.Flush();
+            var bytesWritten = 0;
+            var written = 0;
+            Span<byte> header = bufferWriter.GetSpan(16);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 2, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+            bufferWriter.Advance(bytesWritten);
+
             messageSerializer.Serialize(bufferWriter, value);
         }
 
@@ -94,11 +101,14 @@ namespace MagicOnion.Internal
         /// </summary>
         public static void WriteRequestMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, int messageId, T value, IMagicOnionSerializer messageSerializer)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(3);
-            writer.Write(messageId);
-            writer.Write(methodId);
-            writer.Flush();
+            var bytesWritten = 0;
+            var written = 0;
+            Span<byte> header = bufferWriter.GetSpan(16);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+            bufferWriter.Advance(bytesWritten);
+
             messageSerializer.Serialize(bufferWriter, value);
         }
 
@@ -108,12 +118,15 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteResponseMessage(IBufferWriter<byte> bufferWriter, int methodId, int messageId)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(3);
-            writer.Write(messageId);
-            writer.Write(methodId);
-            writer.WriteNil();
-            writer.Flush();
+            var bytesWritten = 0;
+            var written = 0;
+            Span<byte> header = bufferWriter.GetSpan(16);
+
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(header.Slice(bytesWritten), out written), written, ref bytesWritten);
+            bufferWriter.Advance(bytesWritten);
         }
 
         /// <summary>
@@ -122,11 +135,14 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteResponseMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, int messageId, T v, IMagicOnionSerializer messageSerializer)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(3);
-            writer.Write(messageId);
-            writer.Write(methodId);
-            writer.Flush();
+            var bytesWritten = 0;
+            var written = 0;
+            Span<byte> header = bufferWriter.GetSpan(16);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+            bufferWriter.Advance(bytesWritten);
+
             messageSerializer.Serialize(bufferWriter, v);
         }
 
@@ -205,47 +221,64 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteServerHeartbeatMessageHeader(IBufferWriter<byte> bufferWriter, short sequence, DateTimeOffset serverSentAt)
         {
+            var written = 0;
+            var bytesWritten = 0;
+            var buffer = bufferWriter.GetSpan(32);
+
             // Array(5)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil, <Metadata>]
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(5);
-            writer.Write(0x7f);                                  // Type = 0x7f / 127 (Heartbeat)
-            writer.Write(sequence);                              // Sequence
-            writer.Write(serverSentAt.ToUnixTimeMilliseconds()); // ServerSentAt
-            writer.WriteNil();                                   // Dummy
-            writer.Flush();
-            //                                                   // <Metadata>
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 5, out written), written, ref bytesWritten);
+            // Type = 0x7f / 127 (Heartbeat)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
+            // 1:Sequence
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+            // 2:ServerSentAt
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), serverSentAt.ToUnixTimeMilliseconds(), out written), written, ref bytesWritten);
+            // 3:Reserved (Nil)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
+
+            bufferWriter.Advance(bytesWritten);
         }
 
         /// <summary>
         /// Writes a server heartbeat message for sending response from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteServerHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence, long serverSentAt)
+        public static void WriteServerHeartbeatMessageResponse(Span<byte> buffer, short sequence, long serverSentAt, out int bytesWritten)
         {
+            Debug.Assert(buffer.Length >= 5 + 5 + 5 + 5 + 9);
+            var written = bytesWritten = 0;
+
             // Array(4)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil]
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(4);
-            writer.Write(0x7f);         // Type = 0x7f / 127 (Heartbeat)
-            writer.Write(sequence);     // Sequence
-            writer.Write(serverSentAt); // ServerSentAt
-            writer.WriteNil();          // Dummy
-            writer.Flush();
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 4, out written), written, ref bytesWritten);
+            // Type = 0x7f / 127 (Heartbeat)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
+            // 1:Sequence
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+            // 2:ServerSentAt
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), serverSentAt, out written), written, ref bytesWritten);
+            // 3:Reserved (Nil)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
         }
 
         /// <summary>
         /// Writes a client heartbeat message for sending from the client.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteClientHeartbeatMessage(IBufferWriter<byte> bufferWriter, short sequence, long clientSentAtElapsedFromOriginMs)
+        public static void WriteClientHeartbeatMessage(Span<byte> buffer, short sequence, long clientSentAtElapsedFromOriginMs, out int bytesWritten)
         {
+            Debug.Assert(buffer.Length >= 5 + 5 + 5 + 5 + 9);
+            var written = bytesWritten = 0;
+
             // Array(4)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), <Extra>]
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(4);
-            writer.Write(0x7e);                                  // 0:Type = 0x7e / 126 (ClientHeartbeat)
-            writer.Write(sequence);                              // 1:Sequence
-            writer.Write(clientSentAtElapsedFromOriginMs);       // 2:ClientSentAtElapsedFromOrigin
-            writer.WriteNil();                                   // 3:Reserved
-            writer.Flush();
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 4, out written), written, ref bytesWritten);
+            // 0:Type = 0x7e / 126 (ClientHeartbeat)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
+            // 1:Sequence
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+            // 2:ClientSentAtElapsedFromOrigin
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), clientSentAtElapsedFromOriginMs, out written), written, ref bytesWritten);
+            // 3:Reserved (Nil)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
         }
 
         /// <summary>
@@ -254,15 +287,34 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteClientHeartbeatMessageResponse(IBufferWriter<byte> bufferWriter, short sequence, long clientSentAt)
         {
+            var written = 0;
+            var bytesWritten = 0;
+            var buffer = bufferWriter.GetSpan(32);
+
             // Array(5)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), Nil, <Extra>]
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(5);
-            writer.Write(0x7e);         // 0:Type = 0x7e / 126 (Heartbeat)
-            writer.Write(sequence);     // 1:Sequence
-            writer.Write(clientSentAt); // 2:ClientSentAtElapsedFromOrigin
-            writer.WriteNil();          // 3:Reserved
-            writer.WriteNil();          // 4:Reserved
-            writer.Flush();
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 5, out written), written, ref bytesWritten);
+            // 0:Type = 0x7e / 126 (Heartbeat)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
+            // 1:Sequence
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+            // 2:ClientSentAtElapsedFromOrigin
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), clientSentAt, out written), written, ref bytesWritten);
+            // 3:Reserved (Nil)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
+            // 4:Reserved (Nil)
+            VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
+
+            bufferWriter.Advance(bytesWritten);
+        }
+
+        static void VerifyResultAndAdvance(bool result, int written, ref int bytesWrittenTotal)
+        {
+            if (!result)
+            {
+                throw new InvalidOperationException($"Insufficient buffer size.");
+            }
+
+            bytesWrittenTotal += written;
         }
     }
 
