@@ -12,7 +12,8 @@
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup Condition="'$(UseNuGetClient)' != ''">
-    <PackageReference Include="ConsoleAppFramework" Version="$(ConsoleAppFrameworkVersion)" />
+    <!-- Follow to the Directory.Packages.props version -->
+    <PackageReference Include="ConsoleAppFramework" Version="4.2.3" />
     <PackageReference Include="MagicOnion.Client" Version="$(UseNuGetClient)" />
     <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="$(UseNuGetClient)-preview" />
   </ItemGroup>
