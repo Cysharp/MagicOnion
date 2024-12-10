@@ -10,3 +10,9 @@ branch-configs:
   - suffix: "-2"
     branch: feature/ImprovePerformance
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
+  - suffix: "-3"
+    branch: main
+    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetclient.yaml
+  - suffix: "-4"
+    branch: main
+    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetserver.yaml
