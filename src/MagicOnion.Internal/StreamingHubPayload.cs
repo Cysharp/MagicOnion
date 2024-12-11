@@ -75,23 +75,23 @@ namespace MagicOnion.Internal
     internal class StreamingHubPayloadCore
     {
         byte[]? buffer;
-        ReadOnlyMemory<byte>? memory;
+        int length = -1;
 
 #if DEBUG
         public short Version { get; private set; }
 #endif
 
-        public int Length => memory!.Value.Length;
-        public ReadOnlySpan<byte> Span => memory!.Value.Span;
-        public ReadOnlyMemory<byte> Memory => memory!.Value;
+        public int Length => length;
+        public ReadOnlySpan<byte> Span => buffer!.AsSpan(0, length);
+        public ReadOnlyMemory<byte> Memory => buffer!.AsMemory(0, length);
 
         public void Initialize(ReadOnlySpan<byte> data)
         {
             ThrowIfUsing();
 
             buffer = ArrayPool<byte>.Shared.Rent(data.Length);
+            length = data.Length;
             data.CopyTo(buffer);
-            memory = buffer.AsMemory(0, (int)data.Length);
         }
 
         public void Initialize(ReadOnlySequence<byte> data)
@@ -100,25 +100,8 @@ namespace MagicOnion.Internal
             if (data.Length > int.MaxValue) throw new InvalidOperationException("A body size of StreamingHubPayload must be less than int.MaxValue");
 
             buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
+            length = (int)data.Length;
             data.CopyTo(buffer);
-            memory = buffer.AsMemory(0, (int)data.Length);
-        }
-
-        public void Initialize(ReadOnlyMemory<byte> data, bool holdReference)
-        {
-            ThrowIfUsing();
-
-            if (holdReference)
-            {
-                buffer = null;
-                memory = data;
-            }
-            else
-            {
-                buffer = ArrayPool<byte>.Shared.Rent((int)data.Length);
-                data.CopyTo(buffer);
-                memory = buffer.AsMemory(0, (int)data.Length);
-            }
         }
 
         public void Uninitialize()
@@ -133,7 +116,7 @@ namespace MagicOnion.Internal
                 ArrayPool<byte>.Shared.Return(buffer);
             }
 
-            memory = null;
+            length = -1;
             buffer = null;
 
 #if DEBUG
@@ -141,13 +124,10 @@ namespace MagicOnion.Internal
 #endif
         }
 
-#if !UNITY_2021_1_OR_NEWER && !NETSTANDARD2_0 && !NETSTANDARD2_1
-        [MemberNotNull(nameof(memory))]
-#endif
         void ThrowIfUninitialized()
         {
             //Debug.Assert(memory is not null);
-            if (memory is null)
+            if (length == -1)
             {
                 throw new InvalidOperationException("A StreamingHubPayload has been already uninitialized.");
             }
@@ -156,7 +136,7 @@ namespace MagicOnion.Internal
         void ThrowIfUsing()
         {
             //Debug.Assert(memory is null);
-            if (memory is not null)
+            if (length != -1)
             {
                 throw new InvalidOperationException("A StreamingHubPayload is currently used by other caller.");
             }

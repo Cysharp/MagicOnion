@@ -104,17 +104,6 @@ namespace MagicOnion.Internal
             return (StreamingHubPayload)payload;
 #endif
         }
-
-        public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data, bool holdReference)
-        {
-            var payload = pool.RentOrCreateCore();
-            payload.Initialize(data, holdReference);
-#if DEBUG
-            return new StreamingHubPayload(payload);
-#else
-            return (StreamingHubPayload)payload;
-#endif
-        }
     }
 }
 #endif
