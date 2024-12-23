@@ -1,6 +1,6 @@
   {
-    "name": "com.cysharp.magiconion.unity",
-    "displayName": "MagicOnion",
+    "name": "com.cysharp.magiconion.client.unity",
+    "displayName": "MagicOnion.Client.Unity",
     "author": { "name": "Cysharp, Inc.", "url": "https://cysharp.co.jp/en/" },
     "version": "7.0.0-preview.10",
     "unity": "2021.3",

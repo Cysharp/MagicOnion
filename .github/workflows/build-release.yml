@@ -17,7 +17,7 @@ jobs:
     uses: Cysharp/Actions/.github/workflows/update-packagejson.yaml@main
     with:
       file-path: |
-        ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/package.json
+        ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity/package.json
         ./Directory.Build.props
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
