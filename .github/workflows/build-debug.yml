@@ -40,6 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      - run: dotnet tool restore
       - run: dotnet retest -- -c Debug MagicOnion.sln
       - run: dotnet retest -- -c Release MagicOnion.sln
 
@@ -103,11 +104,11 @@ jobs:
           directory: src/MagicOnion.Client.Unity
 
       # Store artifacts.
-      - uses: Cysharp/Actions/.github/actions/upload-artifact@main
-        with:
-          name: MagicOnion.Client.Unity.${{ matrix.unity }}.unitypackage
-          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
-          retention-days: 1
+      #- uses: Cysharp/Actions/.github/actions/upload-artifact@main
+      #  with:
+      #    name: MagicOnion.Client.Unity.${{ matrix.unity }}.unitypackage
+      #    path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+      #    retention-days: 1
 
   actions-timeline:
     needs: [build-dotnet, run-tests, build-unity]
