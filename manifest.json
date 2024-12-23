@@ -2357,6 +2357,30 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.Internal.StreamingHubHandlerOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.Internal.StreamingHubHandlerOptions.html",
+          "hash": "jVvdeKSwk0qnkD0W+SHjRRHr+M3YNBx9FtgD5lA0nZ4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.Internal.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.Internal.html",
+          "hash": "N3/68oCLX3YFxMBq5ye8ezl8gHEhNOgFH2Sb+12UjSE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Server.Hubs.MethodIdAttribute.yml",
       "output": {
         ".html": {
@@ -2405,35 +2429,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandler.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandler.html",
-          "hash": "2IIYzIC+E3Rbwj/YpvxZ4fQqhOvOecbx1Ip3oUiUCcg="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandlerOptions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandlerOptions.html",
-          "hash": "esBKQjpb2W9Q/kDLF4QjaJc6Fxg76Fsj/H48GNXeF/o="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Server.Hubs.yml",
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.html",
-          "hash": "eqvSXh9M0rexyiYc8ygJVIU6awaUP/Ng93Zb4WZYnEM="
+          "hash": "3niJxx1tWFqqAr5OdUlCGmxAGEHN+/RgVRc7nTU3bDk="
         }
       },
       "is_incremental": false,
@@ -2889,7 +2889,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "/KdA1YZpCoKYxTJkCShNNZQVVWNZNmTpvgKqUUCRHDA="
+          "hash": "hwK41kHW5NZxhKbJyyJW8NiAka6QKbaVlZNbNAIhvPk="
         }
       },
       "is_incremental": false,
