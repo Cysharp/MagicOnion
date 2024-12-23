@@ -40,8 +40,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - run: dotnet test -c Debug MagicOnion.sln
-      - run: dotnet test -c Release MagicOnion.sln
+      - run: dotnet retest -- -c Debug MagicOnion.sln
+      - run: dotnet retest -- -c Release MagicOnion.sln
 
   build-unity:
     name: "Build Unity package"
