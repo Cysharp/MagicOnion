@@ -3,10 +3,9 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using MagicOnion.Internal;
 using MagicOnion.Server.Diagnostics;
-using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Logging;
 
-namespace MagicOnion.Server.Hubs;
+namespace MagicOnion.Server.Hubs.Internal;
 
 internal interface IStreamingHubHeartbeatManager : IDisposable
 {
@@ -46,9 +45,9 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     public StreamingHubHeartbeatHandle(IStreamingHubHeartbeatManager manager, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, TimeSpan timeoutDuration)
     {
         this.manager = manager;
-        this.ServiceContext = serviceContext;
+        ServiceContext = serviceContext;
         this.timeoutDuration = timeoutDuration;
-        this.timeoutToken = new CancellationTokenSource(Timeout.InfiniteTimeSpan
+        timeoutToken = new CancellationTokenSource(Timeout.InfiniteTimeSpan
 #if NET8_0_OR_GREATER
             , this.manager.TimeProvider
 #endif
@@ -95,7 +94,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
 
     public void SetAckCallback(Action<TimeSpan>? callbackAction)
     {
-        this.onAckCallback = callbackAction;
+        onAckCallback = callbackAction;
     }
 
     public void Unregister()
@@ -128,7 +127,7 @@ internal class NopStreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
 
     public TimeProvider TimeProvider => TimeProvider.System;
 
-    NopStreamingHubHeartbeatManager() {}
+    NopStreamingHubHeartbeatManager() { }
 
     public StreamingHubHeartbeatHandle Register(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext)
         => new(this, serviceContext, Timeout.InfiniteTimeSpan);
@@ -180,7 +179,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                             , TimeProvider
 #endif
                         );
-                        MagicOnionServerLog.BeginHeartbeatTimer(this.logger, method, heartbeatInterval, timeoutDuration);
+                        MagicOnionServerLog.BeginHeartbeatTimer(logger, method, heartbeatInterval, timeoutDuration);
                         _ = StartHeartbeatAsync(timer, method);
                     }
                 }
@@ -209,7 +208,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                 writer.Write(Nil);
             }
 
-            MagicOnionServerLog.SendHeartbeat(this.logger, method);
+            MagicOnionServerLog.SendHeartbeat(logger, method);
             try
             {
                 foreach (var (contextId, handle) in contexts)
@@ -235,7 +234,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                 {
                     if (Volatile.Read(ref registeredCount) == 0 && timer is not null)
                     {
-                        MagicOnionServerLog.ShutdownHeartbeatTimer(this.logger, serviceContext.CallContext.Method);
+                        MagicOnionServerLog.ShutdownHeartbeatTimer(logger, serviceContext.CallContext.Method);
                         timer.Dispose();
                         timer = null;
                     }
@@ -248,9 +247,4 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     {
         timer?.Dispose();
     }
-}
-
-public interface IStreamingHubHeartbeatMetadataProvider
-{
-    bool TryWriteMetadata(IBufferWriter<byte> writer);
 }

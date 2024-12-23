@@ -1,7 +1,6 @@
 using Cysharp.Runtime.Multicast;
-using System;
 
-namespace MagicOnion.Server.Hubs;
+namespace MagicOnion.Server.Hubs.Internal;
 
 internal class MagicOnionManagedGroupProvider
 {

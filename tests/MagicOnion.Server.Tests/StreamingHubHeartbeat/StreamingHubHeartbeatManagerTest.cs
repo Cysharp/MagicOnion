@@ -4,6 +4,7 @@ using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Testing;

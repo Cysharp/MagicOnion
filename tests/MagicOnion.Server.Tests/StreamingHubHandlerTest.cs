@@ -5,6 +5,7 @@ using MagicOnion.Serialization;
 using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;

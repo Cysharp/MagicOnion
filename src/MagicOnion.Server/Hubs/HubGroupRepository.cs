@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Cysharp.Runtime.Multicast;
 using Cysharp.Runtime.Multicast.Remoting;
 using MagicOnion.Internal;
+using MagicOnion.Server.Hubs.Internal;
 
 namespace MagicOnion.Server.Hubs;
 

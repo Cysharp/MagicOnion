@@ -3,9 +3,17 @@ using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Binder;
 
-namespace MagicOnion.Server.Hubs;
+/* Unmerged change from project 'MagicOnion.Server (net8.0)'
+Added:
+using MagicOnion;
+using MagicOnion.Server;
+using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
+*/
 
-public class StreamingHubHandler : IEquatable<StreamingHubHandler>
+namespace MagicOnion.Server.Hubs.Internal;
+
+internal class StreamingHubHandler : IEquatable<StreamingHubHandler>
 {
     readonly IMagicOnionStreamingHubMethod hubMethod;
     readonly string toStringCache;
@@ -24,13 +32,13 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
     public StreamingHubHandler(IMagicOnionStreamingHubMethod hubMethod, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)
     {
         this.hubMethod = hubMethod;
-        this.toStringCache = HubName + "/" + MethodInfo.Name;
-        this.getHashCodeCache = HashCode.Combine(HubName, MethodInfo.Name);
+        toStringCache = HubName + "/" + MethodInfo.Name;
+        getHashCodeCache = HashCode.Combine(HubName, MethodInfo.Name);
 
         try
         {
             var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, hubMethod.Metadata.Metadata.OfType<Attribute>());
-            this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, hubMethod.InvokeAsync);
+            MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, hubMethod.InvokeAsync);
         }
         catch (Exception ex)
         {

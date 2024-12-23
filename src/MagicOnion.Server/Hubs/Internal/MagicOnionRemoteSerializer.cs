@@ -6,7 +6,7 @@ using MagicOnion.Serialization;
 using MessagePack;
 using Microsoft.Extensions.Options;
 
-namespace MagicOnion.Server.Hubs;
+namespace MagicOnion.Server.Hubs.Internal;
 
 internal class MagicOnionRemoteSerializer : IRemoteSerializer
 {
@@ -14,7 +14,7 @@ internal class MagicOnionRemoteSerializer : IRemoteSerializer
 
     public MagicOnionRemoteSerializer(IOptions<MagicOnionOptions> options)
     {
-        this.serializer = options.Value.MessageSerializer.Create(MethodType.DuplexStreaming, null);
+        serializer = options.Value.MessageSerializer.Create(MethodType.DuplexStreaming, null);
     }
 
     public void SerializeInvocation(IBufferWriter<byte> bufferWriter, in Cysharp.Runtime.Multicast.Remoting.SerializationContext ctx)

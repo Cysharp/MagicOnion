@@ -8,6 +8,7 @@ using MagicOnion.Internal.Buffers;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Features;
 using MagicOnion.Server.Features.Internal;
+using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
