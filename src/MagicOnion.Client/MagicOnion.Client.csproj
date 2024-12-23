@@ -44,34 +44,14 @@
     <None Include="..\MagicOnion.Client.SourceGenerator\bin\$(Configuration)\netstandard2.0\MagicOnion.Client.SourceGenerator.dll" PackagePath="analyzers\dotnet\roslyn4.3\cs" Pack="true" Visible="false" />
   </ItemGroup>
 
-  <!-- Sync codes: MagicOnion for Unity -->
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <PropertyGroup>
-      <CodeSyncClientDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</CodeSyncClientDestinationRoot>
-      <CodeSyncInternalDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\Internal.Shared\</CodeSyncInternalDestinationRoot>
-      <CodeSyncAbstractionsDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Abstractions\</CodeSyncAbstractionsDestinationRoot>
-      <CodeSyncSharedDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Shared\</CodeSyncSharedDestinationRoot>
-      <CodeSyncSerializationMessagePackDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Serialization.MessagePack\</CodeSyncSerializationMessagePackDestinationRoot>
-      <CodeSyncSerializationMemoryPackDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Serialization.MemoryPack\</CodeSyncSerializationMemoryPackDestinationRoot>
-    </PropertyGroup>
-    <ItemGroup>
-      <CodeSyncClientTargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-      <CodeSyncInternalTargetFiles Include="$(ProjectDir)\..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-      <CodeSyncAbstractionsTargetFiles Include="$(ProjectDir)\..\MagicOnion.Abstractions\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-      <CodeSyncSharedTargetFiles Include="$(ProjectDir)\..\MagicOnion.Shared\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-      <CodeSyncSerializationMessagePackTargetFiles Include="$(ProjectDir)\..\MagicOnion.Serialization.MessagePack\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-      <CodeSyncSerializationMemoryPackTargetFiles Include="$(ProjectDir)\..\MagicOnion.Serialization.MemoryPack\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(CodeSyncClientTargetFiles)" DestinationFiles="$(CodeSyncClientDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(CodeSyncInternalTargetFiles)" DestinationFiles="$(CodeSyncInternalDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(CodeSyncAbstractionsTargetFiles)" DestinationFiles="$(CodeSyncAbstractionsDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(CodeSyncSharedTargetFiles)" DestinationFiles="$(CodeSyncSharedDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(CodeSyncSerializationMessagePackTargetFiles)" DestinationFiles="$(CodeSyncSerializationMessagePackDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(CodeSyncSerializationMemoryPackTargetFiles)" DestinationFiles="$(CodeSyncSerializationMemoryPackDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-  </Target>
-
   <ItemGroup>
     <InternalsVisibleTo Include="MagicOnion.Client.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f1ee449290a81377cf1a6d598f10a3e2de6c45ee5377140b179b7a2260007c4ba633a6f766a0b3392ae2160819d625d9d9d65a134b722fd4e637793479d6c8d72490f9992293ee53933205620245e55fcddb7ce6395d72c94365a432808fbcf1bf8ff2932a1263715f8bc73bb25b96366f118c58e24da5f2bee32223948d7bc5" />
     <InternalsVisibleTo Include="Microbenchmark.Client, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f1ee449290a81377cf1a6d598f10a3e2de6c45ee5377140b179b7a2260007c4ba633a6f766a0b3392ae2160819d625d9d9d65a134b722fd4e637793479d6c8d72490f9992293ee53933205620245e55fcddb7ce6395d72c94365a432808fbcf1bf8ff2932a1263715f8bc73bb25b96366f118c58e24da5f2bee32223948d7bc5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="packages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

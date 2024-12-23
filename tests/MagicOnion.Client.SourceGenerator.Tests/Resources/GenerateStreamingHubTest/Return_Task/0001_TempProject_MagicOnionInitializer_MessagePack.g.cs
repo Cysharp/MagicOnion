@@ -62,16 +62,5 @@ namespace TempProject
                 }
             }
         }
-        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
-        [Preserve]
-        static class TypeHints
-        {
-            [Preserve]
-            internal static void Register()
-            {
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MessagePack.Nil>();
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::TempProject.MyObject>();
-            }
-        }
     }
 }

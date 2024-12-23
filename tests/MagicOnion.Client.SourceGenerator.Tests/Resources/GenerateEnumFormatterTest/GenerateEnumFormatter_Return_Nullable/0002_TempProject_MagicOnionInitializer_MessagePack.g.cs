@@ -44,10 +44,9 @@ namespace TempProject
 
             static MessagePackGeneratedGetFormatterHelper()
             {
-                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(2)
+                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)
                 {
-                    {typeof(global::System.Nullable<global::TempProject.MyEnum>), 0},
-                    {typeof(global::TempProject.MyEnum), 1},
+                    {typeof(global::TempProject.MyEnum), 0},
                 };
             }
             internal static object GetFormatter(global::System.Type t)
@@ -60,22 +59,9 @@ namespace TempProject
             
                 switch (key)
                 {
-                    case 0: return new global::MessagePack.Formatters.NullableFormatter<global::TempProject.MyEnum>();
-                    case 1: return new MessagePackEnumFormatters.MyEnumFormatter();
+                    case 0: return new MessagePackEnumFormatters.MyEnumFormatter();
                     default: return null;
                 }
-            }
-        }
-        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
-        [Preserve]
-        static class TypeHints
-        {
-            [Preserve]
-            internal static void Register()
-            {
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MessagePack.Nil>();
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Nullable<global::TempProject.MyEnum>>();
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::TempProject.MyEnum>();
             }
         }
     }
