@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
 
 namespace MagicOnion.Server.Diagnostics;
 
