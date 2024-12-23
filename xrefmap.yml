@@ -4104,25 +4104,12 @@ references:
   commentId: T:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator
   fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator
   nameWithType: MagicOnionClientSourceGenerator
-- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute(GeneratorExecutionContext)
-  name: Execute(GeneratorExecutionContext)
-  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Execute_GeneratorExecutionContext_
-  commentId: M:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute(GeneratorExecutionContext)
-  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute(GeneratorExecutionContext)
-  nameWithType: MagicOnionClientSourceGenerator.Execute(GeneratorExecutionContext)
-- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute*
-  name: Execute
-  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Execute_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute
-  isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute
-  nameWithType: MagicOnionClientSourceGenerator.Execute
-- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(GeneratorInitializationContext)
-  name: Initialize(GeneratorInitializationContext)
-  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_GeneratorInitializationContext_
-  commentId: M:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(GeneratorInitializationContext)
-  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(GeneratorInitializationContext)
-  nameWithType: MagicOnionClientSourceGenerator.Initialize(GeneratorInitializationContext)
+- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(IncrementalGeneratorInitializationContext)
+  name: Initialize(IncrementalGeneratorInitializationContext)
+  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_IncrementalGeneratorInitializationContext_
+  commentId: M:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(IncrementalGeneratorInitializationContext)
+  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(IncrementalGeneratorInitializationContext)
+  nameWithType: MagicOnionClientSourceGenerator.Initialize(IncrementalGeneratorInitializationContext)
 - uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize*
   name: Initialize
   href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_
@@ -4154,64 +4141,6 @@ references:
   commentId: F:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.SourceGeneratorAttributesHintName
   fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.SourceGeneratorAttributesHintName
   nameWithType: MagicOnionClientSourceGenerator.SourceGeneratorAttributesHintName
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext
-  name: SourceProductionContext
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html
-  commentId: T:MagicOnion.Client.SourceGenerator.SourceProductionContext
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext
-  nameWithType: SourceProductionContext
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.#ctor(GeneratorExecutionContext)
-  name: SourceProductionContext(GeneratorExecutionContext)
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext__ctor_GeneratorExecutionContext_
-  commentId: M:MagicOnion.Client.SourceGenerator.SourceProductionContext.#ctor(GeneratorExecutionContext)
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.SourceProductionContext(GeneratorExecutionContext)
-  nameWithType: SourceProductionContext.SourceProductionContext(GeneratorExecutionContext)
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.#ctor*
-  name: SourceProductionContext
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext__ctor_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.SourceProductionContext.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.SourceProductionContext
-  nameWithType: SourceProductionContext.SourceProductionContext
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource(System.String,System.String)
-  name: AddSource(String, String)
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_AddSource_System_String_System_String_
-  commentId: M:MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource(System.String,System.String)
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource(System.String, System.String)
-  nameWithType: SourceProductionContext.AddSource(String, String)
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource*
-  name: AddSource
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_AddSource_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource
-  isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.AddSource
-  nameWithType: SourceProductionContext.AddSource
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken
-  name: CancellationToken
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_CancellationToken
-  commentId: P:MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken
-  nameWithType: SourceProductionContext.CancellationToken
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken*
-  name: CancellationToken
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_CancellationToken_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken
-  isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.CancellationToken
-  nameWithType: SourceProductionContext.CancellationToken
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic(Diagnostic)
-  name: ReportDiagnostic(Diagnostic)
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_ReportDiagnostic_Diagnostic_
-  commentId: M:MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic(Diagnostic)
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic(Diagnostic)
-  nameWithType: SourceProductionContext.ReportDiagnostic(Diagnostic)
-- uid: MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic*
-  name: ReportDiagnostic
-  href: api/MagicOnion.Client.SourceGenerator.SourceProductionContext.html#MagicOnion_Client_SourceGenerator_SourceProductionContext_ReportDiagnostic_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic
-  isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.SourceProductionContext.ReportDiagnostic
-  nameWithType: SourceProductionContext.ReportDiagnostic
 - uid: MagicOnion.Client.StreamingHubClient
   name: StreamingHubClient
   href: api/MagicOnion.Client.StreamingHubClient.html

@@ -76,13 +76,13 @@
   <h1 id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator" class="text-break">MagicOnionClientSourceGenerator Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Client.SourceGenerator.html">MagicOnion.Client.SourceGenerator</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.Client.SourceGenerator.Unity.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Client.SourceGenerator.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MagicOnionClientSourceGenerator : ISourceGenerator</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionClientSourceGenerator : IIncrementalGenerator</code></pre>
   </div>
 
   <div class="inheritance">
@@ -146,13 +146,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Execute_GeneratorExecutionContext_">Execute(GeneratorExecutionContext)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_GeneratorInitializationContext_">Initialize(GeneratorInitializationContext)</a>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_IncrementalGeneratorInitializationContext_">Initialize(IncrementalGeneratorInitializationContext)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -280,49 +274,19 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Execute_" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute*"></a>
-  <h4 id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Execute_GeneratorExecutionContext_" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Execute(GeneratorExecutionContext)">Execute(GeneratorExecutionContext)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Execute(GeneratorExecutionContext context)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>context</code></span> <span class="xref">GeneratorExecutionContext</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
   <a id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize*"></a>
-  <h4 id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_GeneratorInitializationContext_" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(GeneratorInitializationContext)">Initialize(GeneratorInitializationContext)</h4>
+  <h4 id="MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_Initialize_IncrementalGeneratorInitializationContext_" data-uid="MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.Initialize(IncrementalGeneratorInitializationContext)">Initialize(IncrementalGeneratorInitializationContext)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Initialize(GeneratorInitializationContext context)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Initialize(IncrementalGeneratorInitializationContext context)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>context</code></span> <span class="xref">GeneratorInitializationContext</span></dt>
+    <dt><span class="parametername"><code>context</code></span> <span class="xref">IncrementalGeneratorInitializationContext</span></dt>
     <dd></dd>
   </dl>
   </section>
