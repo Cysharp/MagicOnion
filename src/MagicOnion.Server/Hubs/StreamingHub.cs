@@ -312,7 +312,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         else
         {
-            throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
+            MagicOnionServerLog.HubMethodNotFound(Context.Logger, Context.ServiceName, methodId);
+            var payload = StreamingHubPayloadBuilder.BuildError(messageId, (int)StatusCode.Unimplemented, $"StreamingHub method '{methodId}' is not found in StreamingHub.", null, isReturnExceptionStackTraceInErrorDetail);
+            StreamingServiceContext.QueueResponseStreamWrite(payload);
         }
     }
 
