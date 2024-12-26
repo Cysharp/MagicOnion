@@ -11002,6 +11002,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.HeartbeatTimedOut
   nameWithType: MagicOnionServerLog.HeartbeatTimedOut
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound(ILogger,System.String,System.Int32)
+  name: HubMethodNotFound(ILogger, String, Int32)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_HubMethodNotFound_ILogger_System_String_System_Int32_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound(ILogger,System.String,System.Int32)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound(ILogger, System.String, System.Int32)
+  nameWithType: MagicOnionServerLog.HubMethodNotFound(ILogger, String, Int32)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound*
+  name: HubMethodNotFound
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_HubMethodNotFound_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound
+  isSpec: "True"
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.HubMethodNotFound
+  nameWithType: MagicOnionServerLog.HubMethodNotFound
 - uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast(ILogger,System.String,System.Int32,System.Int32)
   name: InvokeHubBroadcast(ILogger, String, Int32, Int32)
   href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_ILogger_System_String_System_Int32_System_Int32_
