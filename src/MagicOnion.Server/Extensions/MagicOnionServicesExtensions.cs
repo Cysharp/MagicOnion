@@ -7,7 +7,6 @@ using MagicOnion.Server;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Binder.Internal;
 using MagicOnion.Server.Diagnostics;
-using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Configuration;

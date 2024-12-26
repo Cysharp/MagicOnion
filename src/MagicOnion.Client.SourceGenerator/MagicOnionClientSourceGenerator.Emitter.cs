@@ -102,7 +102,7 @@ public partial class MagicOnionClientSourceGenerator
                 ),
                 SerializerType.MessagePack => (
                     Mapper: new MessagePackFormatterNameMapper(context.Options.MessagePackFormatterNamespace),
-                    Generator: new MessagePackFormatterResolverGenerator(),
+                    Generator: new MessagePackFormatterResolverGenerator(emitGenericFormatterInstantiationAndTypeHints: false),
                     EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(context, x)
                 ),
                 _ => throw new NotImplementedException(),

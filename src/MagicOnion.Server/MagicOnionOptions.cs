@@ -8,12 +8,12 @@ namespace MagicOnion.Server;
 public class MagicOnionOptions
 {
     /// <summary>
-    /// Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.
+    /// Gets and sets the serializer that serializes the message. The default serializer is <see cref="MagicOnionSerializerProvider.Default"/>.
     /// </summary>
     public IMagicOnionSerializerProvider MessageSerializer { get; set; }
 
     /// <summary>
-    /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
+    /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is <see keyword="false"/>.
     /// </summary>
     public bool IsReturnExceptionStackTraceInErrorDetail { get; set; }
 
@@ -38,7 +38,7 @@ public class MagicOnionOptions
     public TimeSpan ClientResultsDefaultTimeout { get; set; }
 
     /// <summary>
-    /// Gets or sets a value whether the heartbeat feature of StreamingHub is enabled. Default is <see keyword="true"/>.
+    /// Gets or sets a value whether the heartbeat feature of StreamingHub is enabled. Default is <see keyword="false"/>.
     /// </summary>
     public bool EnableStreamingHubHeartbeat { get; set; }
 

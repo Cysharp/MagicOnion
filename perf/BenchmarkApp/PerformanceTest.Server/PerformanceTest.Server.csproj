@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DefineConstants>SERVER;$(DefineConstants)</DefineConstants>
@@ -12,7 +12,8 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(UseNuGetServer)' != ''">
     <PackageReference Include="Grpc.AspNetCore" Version="$(GrpcVersion)"/>
-    <PackageReference Include="JetBrains.Profiler.Api" Version="$(JetBrainsProfilerApiVersion)"/>
+    <!-- Follow to the Directory.Packages.props version -->
+    <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.3"/>
     <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="$(UseNuGetServer)-preview" />
     <PackageReference Include="MagicOnion.Server" Version="$(UseNuGetServer)" />
     <PackageReference Include="Multicaster" Version="$(MulticasterVersion)" />

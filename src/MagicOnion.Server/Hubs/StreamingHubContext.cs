@@ -1,8 +1,8 @@
-using MagicOnion.Internal.Buffers;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using MagicOnion.Internal;
+using Microsoft.Extensions.ObjectPool;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -88,7 +88,7 @@ public class StreamingHubContext
         ResponseType = typeof(Nil);
         if (value.IsCompletedSuccessfully)
         {
-            WriteMessageCore(BuildMessage());
+            WriteMessageCore(StreamingHubPayloadBuilder.Build(MethodId, MessageId));
             return default;
         }
         return Await(this, value);
@@ -96,7 +96,7 @@ public class StreamingHubContext
         static async ValueTask Await(StreamingHubContext ctx, ValueTask value)
         {
             await value.ConfigureAwait(false);
-            ctx.WriteMessageCore(ctx.BuildMessage());
+            ctx.WriteMessageCore(StreamingHubPayloadBuilder.Build(ctx.MethodId, ctx.MessageId));
         }
     }
 
@@ -110,7 +110,7 @@ public class StreamingHubContext
         ResponseType = typeof(T);
         if (value.IsCompletedSuccessfully)
         {
-            WriteMessageCore(BuildMessage(value.Result));
+            WriteMessageCore(StreamingHubPayloadBuilder.Build(MethodId, MessageId, value.Result, ServiceContext.MessageSerializer));
             return default;
         }
         return Await(this, value);
@@ -118,39 +118,18 @@ public class StreamingHubContext
         static async ValueTask Await(StreamingHubContext ctx, ValueTask<T> value)
         {
             var vv = await value.ConfigureAwait(false);
-            ctx.WriteMessageCore(ctx.BuildMessage(vv));
+            ctx.WriteMessageCore(StreamingHubPayloadBuilder.Build(ctx.MethodId, ctx.MessageId, vv, ctx.ServiceContext.MessageSerializer));
         }
     }
 
     internal void WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
     {
-        WriteMessageCore(BuildMessageForError(statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail));
+        WriteMessageCore(StreamingHubPayloadBuilder.BuildError(MessageId, statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail));
     }
 
     void WriteMessageCore(StreamingHubPayload payload)
     {
         ResponseSize = payload.Length; // NOTE: We cannot use the payload after QueueResponseStreamWrite.
         streamingServiceContext.QueueResponseStreamWrite(payload);
-    }
-
-    StreamingHubPayload BuildMessage()
-    {
-        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId);
-        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-    }
-
-    StreamingHubPayload BuildMessage<T>(T v)
-    {
-        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, streamingServiceContext.MessageSerializer);
-        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-    }
-
-    StreamingHubPayload BuildMessageForError(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
-    {
-        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-        StreamingHubMessageWriter.WriteResponseMessageForError(buffer, MessageId, statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail);
-        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 }

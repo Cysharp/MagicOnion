@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-retest": {
+      "version": "0.6.3",
+      "commands": [
+        "dotnet-retest"
+      ],
+      "rollForward": false
+    }
+  }
+}

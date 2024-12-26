@@ -1,4 +1,5 @@
-namespace MagicOnionTestServer;
+// ReSharper disable once CheckNamespace
+namespace MagicOnion.Server.InternalTesting;
 
 /// <summary>
 /// This project exists to be used by test projects that uses WebApplicationFactory.

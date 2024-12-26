@@ -1,18 +1,16 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <PropertyGroup>
     <GrpcVersion>2.57.0</GrpcVersion>
     <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
     <MemoryPackVersion>1.21.1</MemoryPackVersion>
-    <MessagePackVersion>2.5.187</MessagePackVersion>
+    <MessagePackVersion>3.1.0</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
     <MulticasterVersion>0.1.12</MulticasterVersion>
-    <!-- for perf -->
-    <ConsoleAppFrameworkVersion>4.2.2</ConsoleAppFrameworkVersion>
-    <JetBrainsProfilerApiVersion>1.4.3</JetBrainsProfilerApiVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
@@ -25,28 +23,28 @@
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="8.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Multicaster" Version="$(MulticasterVersion)" />
     <PackageVersion Include="Multicaster.Distributed.Redis" Version="$(MulticasterVersion)" />
     <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
-    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
-    <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageVersion Include="PolySharp" Version="1.13.2" />
-    <PackageVersion Include="StackExchange.Redis" Version="2.0.601" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
+    <PackageVersion Include="PolySharp" Version="1.15.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
   </ItemGroup>
   <!-- for tests -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="3.1.2" />
     <PackageVersion Include="FluentAssertions" Version="6.7.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.0.0" />
-    <!-- from https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.24163.6" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="NSubstitute" Version="5.0.0" />
     <PackageVersion Include="Testcontainers" Version="2.3.0" />
     <PackageVersion Include="xunit" Version="2.4.2" />
@@ -54,8 +52,14 @@
   </ItemGroup>
   <!-- for samples/perf -->
   <ItemGroup>
-    <PackageVersion Include="ConsoleAppFramework" Version="$(ConsoleAppFrameworkVersion)" />
-    <PackageVersion Include="JetBrains.Profiler.Api" Version="$(JetBrainsProfilerApiVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+    <PackageVersion Include="ConsoleAppFramework" Version="4.2.2" />
+    <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+  </ItemGroup>
+  <!-- for transitive dependencies (legacy) -->
+  <ItemGroup>
+    <PackageVersion Include="System.Formats.Asn1" Version="9.0.0" />
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 </Project>

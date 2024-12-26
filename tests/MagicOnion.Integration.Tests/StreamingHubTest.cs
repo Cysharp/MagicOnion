@@ -6,7 +6,7 @@ using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Integration.Tests;
 
-public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubTestHub>>
+public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubTestHub>>
 {
     readonly MagicOnionApplicationFactory<StreamingHubTestHub> factory;
 

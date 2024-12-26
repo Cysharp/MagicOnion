@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Features.Internal;

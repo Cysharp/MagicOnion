@@ -12,7 +12,7 @@ namespace MagicOnion.Server.Tests;
 
 public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<MagicOnionMetricsTestHub>>
 {
-    readonly WebApplicationFactory<MagicOnionTestServer.Program> factory;
+    readonly WebApplicationFactory<Program> factory;
     readonly TestMeterFactory meterFactory;
 
     public MagicOnionMetricsTest(MagicOnionApplicationFactory<MagicOnionMetricsTestHub> fixture)

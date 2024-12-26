@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\src\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -238,7 +238,6 @@ public class RunTest
         Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
     }
 
-
     [Fact]
     public void RunAndGenerate_StreamingHub_EnableStreamingHubDiagnosticHandler()
     {
@@ -266,6 +265,50 @@ public class RunTest
             [MagicOnionClientGeneration(typeof(IMyStreamingHub), EnableStreamingHubDiagnosticHandler = true)]
             partial class MagicOnionInitializer {}
             """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+
+        Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+    }
+
+    [Fact]
+    public void RunAndGenerate_Do_Not_Generate_MessagePack_Formatter_Hint_For_v3()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+            #nullable enable
+            using System;
+            using System.Threading.Tasks;
+            using MagicOnion;
+            using MagicOnion.Client;
+
+            namespace TempProject;
+
+            // NOTE: MyResponseFormatter<T> is generated as `internal` in the another assembly.
+            //       So, we don't need to generate AOT hint in the client code.
+            [MessagePack.MessagePackObject]
+            public class MyResponse<T>
+            {
+                public T? Value { get; set; }
+            }
+            
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyResponse<int>> MethodAsync(string name, int age);
+            }
+
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+            """);
+
         var sourceGenerator = new MagicOnionClientSourceGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(

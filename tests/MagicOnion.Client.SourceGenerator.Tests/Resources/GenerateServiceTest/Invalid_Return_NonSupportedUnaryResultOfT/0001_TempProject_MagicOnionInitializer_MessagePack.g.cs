@@ -62,14 +62,5 @@ namespace TempProject
                 }
             }
         }
-        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
-        [Preserve]
-        static class TypeHints
-        {
-            [Preserve]
-            internal static void Register()
-            {
-            }
-        }
     }
 }
