@@ -264,33 +264,38 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             try
             {
-                var handler = GetOrThrowHandler(request.MethodId);
-
-                hubContext.Initialize(
-                    handler: handler,
-                    streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
-                    hubInstance: this,
-                    request: request.Body,
-                    messageId: request.MessageId,
-                    timestamp: timeProvider.GetUtcNow().UtcDateTime
-                );
-
-                var isErrorOrInterrupted = false;
-                var methodStartingTimestamp = timeProvider.GetTimestamp();
-                MagicOnionServerLog.BeginInvokeHubMethod(Context.Logger, hubContext, hubContext.Request, handler.RequestType);
-
-                try
+                if (handlers.TryGetValue(request.MethodId, out var handler))
                 {
-                    await handler.MethodBody.Invoke(hubContext);
+                    hubContext.Initialize(
+                        handler: handler,
+                        streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
+                        hubInstance: this,
+                        request: request.Body,
+                        messageId: request.MessageId,
+                        timestamp: timeProvider.GetUtcNow().UtcDateTime
+                    );
+
+                    var isErrorOrInterrupted = false;
+                    var methodStartingTimestamp = timeProvider.GetTimestamp();
+                    MagicOnionServerLog.BeginInvokeHubMethod(Context.Logger, hubContext, hubContext.Request, handler.RequestType);
+
+                    try
+                    {
+                        await handler.MethodBody.Invoke(hubContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        isErrorOrInterrupted = true;
+                        HandleException(hubContext, ex, request.HasResponse);
+                    }
+                    finally
+                    {
+                        CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    isErrorOrInterrupted = true;
-                    HandleException(hubContext, ex, request.HasResponse);
-                }
-                finally
-                {
-                    CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
+                    RespondMethodNotFound(request.MethodId, request.MessageId);
                 }
             }
             finally
@@ -298,16 +303,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 StreamingHubPayloadPool.Shared.Return(request.Payload);
             }
         }
-    }
-
-    StreamingHubHandler GetOrThrowHandler(int methodId)
-    {
-        if (!handlers.TryGetValue(methodId, out var handler))
-        {
-            throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
-        }
-
-        return handler;
     }
 
     void HandleException(StreamingHubContext hubContext, Exception ex, bool hasResponse)
@@ -338,6 +333,13 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         MagicOnionServerLog.EndInvokeHubMethod(Context.Logger, hubContext, hubContext.ResponseSize, hubContext.ResponseType, elapsed.TotalMilliseconds, isErrorOrInterrupted);
         Metrics.StreamingHubMethodCompleted(Context.Metrics, hubContext.Handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
         hubContext.Uninitialize();
+    }
+
+    void RespondMethodNotFound(int methodId, int messageId)
+    {
+        MagicOnionServerLog.HubMethodNotFound(Context.Logger, Context.ServiceName, methodId);
+        var payload = StreamingHubPayloadBuilder.BuildError(messageId, (int)StatusCode.Unimplemented, $"StreamingHub method '{methodId}' is not found in StreamingHub.", null, isReturnExceptionStackTraceInErrorDetail);
+        StreamingServiceContext.QueueResponseStreamWrite(payload);
     }
 
     // Interface methods for Client

@@ -35,14 +35,11 @@ namespace MagicOnion.Internal
                 2 => StreamingHubMessageType.RequestFireAndForget,
                 3 => StreamingHubMessageType.Request,
                 4 => ReadMessageSubType(),
-                _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
+                _ => ThrowUnknownMessageFormat(arrayLength),
             };
 
             [DoesNotReturn]
-            static StreamingHubMessageType ThrowUnknownMessageSubType(byte subType)
-                => throw new InvalidOperationException($"Unknown client response message: {subType}");
-            [DoesNotReturn]
-            static StreamingHubMessageType ThrowUnknownMessageFormat(int arrayLength)
+            static StreamingHubMessageType ThrowUnknownMessageFormat(uint arrayLength)
                 => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}");
         }
         StreamingHubMessageType ReadMessageSubType()
@@ -55,8 +52,12 @@ namespace MagicOnion.Internal
                 0x01 => StreamingHubMessageType.ClientResultResponseWithError,
                 0x7e => StreamingHubMessageType.ClientHeartbeat,
                 0x7f => StreamingHubMessageType.ServerHeartbeatResponse,
-                _ => throw new InvalidOperationException($"Unknown client response message: {subType}"),
+                _ => ThrowUnknownMessageSubType(subType),
             };
+
+            [DoesNotReturn]
+            static StreamingHubMessageType ThrowUnknownMessageSubType(byte subType)
+                => throw new InvalidOperationException($"Unknown client response message: {subType}");
         }
 
         public (int MethodId, ReadOnlyMemory<byte> Body) ReadRequestFireAndForget()

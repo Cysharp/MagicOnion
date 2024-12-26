@@ -2,6 +2,7 @@ using MessagePack;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using MagicOnion.Internal;
+using MagicOnion.Server.Hubs.Internal;
 using Microsoft.Extensions.ObjectPool;
 
 namespace MagicOnion.Server.Hubs;
