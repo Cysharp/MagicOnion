@@ -88,6 +88,9 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 16, Level = LogLevel.Trace, EventName = nameof(ServiceMethodNotDiscovered), Message = "Could not found gRPC and StreamingHub methods for '{serviceName}'")]
     public static partial void ServiceMethodNotDiscovered(ILogger logger, string serviceName);
 
+    [LoggerMessage(EventId = 17, Level = LogLevel.Information, EventName = nameof(HubMethodNotFound), Message = "StreamingHub method '{methodId}' was not found in '{hubName}'.")]
+    public static partial void HubMethodNotFound(ILogger logger, string hubName, int methodId);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 
