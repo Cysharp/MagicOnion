@@ -22,3 +22,6 @@ branch-configs:
   - suffix: "-6"
     branch: feature/ReuseStreamingHubContext
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
+  - suffix: "-7"
+    branch: experimental/NoUsePayloadPoolOnServer
+    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
