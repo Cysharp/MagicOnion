@@ -1,4 +1,7 @@
 using System;
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using MessagePack;
 
 namespace MagicOnion.Internal
@@ -32,8 +35,12 @@ namespace MagicOnion.Internal
                 2 => StreamingHubMessageType.RequestFireAndForget,
                 3 => StreamingHubMessageType.Request,
                 4 => ReadMessageSubType(),
-                _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
+                _ => ThrowUnknownMessageFormat(arrayLength),
             };
+
+            [DoesNotReturn]
+            static StreamingHubMessageType ThrowUnknownMessageFormat(uint arrayLength)
+                => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}");
         }
         StreamingHubMessageType ReadMessageSubType()
         {
@@ -45,8 +52,12 @@ namespace MagicOnion.Internal
                 0x01 => StreamingHubMessageType.ClientResultResponseWithError,
                 0x7e => StreamingHubMessageType.ClientHeartbeat,
                 0x7f => StreamingHubMessageType.ServerHeartbeatResponse,
-                _ => throw new InvalidOperationException($"Unknown client response message: {subType}"),
+                _ => ThrowUnknownMessageSubType(subType),
             };
+
+            [DoesNotReturn]
+            static StreamingHubMessageType ThrowUnknownMessageSubType(byte subType)
+                => throw new InvalidOperationException($"Unknown client response message: {subType}");
         }
 
         public (int MethodId, ReadOnlyMemory<byte> Body) ReadRequestFireAndForget()
@@ -57,6 +68,7 @@ namespace MagicOnion.Internal
             return (methodId, data.Slice(position));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (int MessageId, int MethodId, ReadOnlyMemory<byte> Body) ReadRequest()
         {
             // T: [messageId, methodId, [argument]]
@@ -66,6 +78,7 @@ namespace MagicOnion.Internal
             return (messageId, methodId, data.Slice(position));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (Guid ClientResultMessageId, int ClientMethodId, ReadOnlyMemory<byte> Body) ReadClientResultResponse()
         {
             // T: [0, clientResultMessageId, methodId, result]
@@ -77,6 +90,7 @@ namespace MagicOnion.Internal
             return (clientResultMessageId, clientMethodId, data.Slice(position));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (Guid ClientResultMessageId, int ClientMethodId, int StatusCode, string Detail, string Message) ReadClientResultResponseForError()
         {
             // T: [1, clientResultMessageId, methodId, [statusCode, detail, message]]
@@ -95,6 +109,7 @@ namespace MagicOnion.Internal
             return (clientResultMessageId, clientMethodId, statusCode, detail, message);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (short Sequence, long ClientSentAt, ReadOnlyMemory<byte> Extra) ReadClientHeartbeat()
         {
             // [Sequence(int16), ClientSentAt(long), <Extra>]
@@ -104,6 +119,7 @@ namespace MagicOnion.Internal
             return (sequence, clientSentAt, data.Slice(position));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public short ReadServerHeartbeatResponse()
         {
             // [Sequence(int16), Nil, Nil]
