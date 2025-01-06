@@ -1,35 +1,10 @@
 using MessagePack;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using MagicOnion.Internal;
-using Microsoft.Extensions.ObjectPool;
 using MagicOnion.Server.Hubs.Internal;
 
 namespace MagicOnion.Server.Hubs;
-
-internal class StreamingHubContextPool
-{
-    const int MaxRetainedCount = 16;
-    readonly ObjectPool<StreamingHubContext> pool = new DefaultObjectPool<StreamingHubContext>(new Policy(), MaxRetainedCount);
-
-    public static StreamingHubContextPool Shared { get; } = new();
-
-    public StreamingHubContext Get() => pool.Get();
-    public void Return(StreamingHubContext ctx) => pool.Return(ctx);
-
-    class Policy : IPooledObjectPolicy<StreamingHubContext>
-    {
-        public StreamingHubContext Create()
-        {
-            return new StreamingHubContext();
-        }
-
-        public bool Return(StreamingHubContext obj)
-        {
-            obj.Uninitialize();
-            return true;
-        }
-    }
-}
 
 public class StreamingHubContext
 {
@@ -62,6 +37,7 @@ public class StreamingHubContext
 
     public IServiceContext ServiceContext => streamingServiceContext;
 
+    internal StreamingHubHandler Handler => handler;
     internal int MessageId { get; private set; }
     internal int MethodId => handler.MethodId;
 
@@ -70,6 +46,11 @@ public class StreamingHubContext
 
     internal void Initialize(StreamingHubHandler handler, IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> streamingServiceContext, object hubInstance, ReadOnlyMemory<byte> request, DateTime timestamp, int messageId)
     {
+#if DEBUG
+        Debug.Assert(this.handler is null);
+        Debug.Assert(this.streamingServiceContext is null);
+        Debug.Assert(this.HubInstance is null);
+#endif
         this.handler = handler;
         this.streamingServiceContext = streamingServiceContext;
         HubInstance = hubInstance;
@@ -80,6 +61,12 @@ public class StreamingHubContext
 
     internal void Uninitialize()
     {
+#if DEBUG
+        Debug.Assert(this.handler is not null);
+        Debug.Assert(this.streamingServiceContext is not null);
+        Debug.Assert(this.HubInstance is not null);
+#endif
+
         handler = default!;
         streamingServiceContext = default!;
         HubInstance = default!;
@@ -135,10 +122,9 @@ public class StreamingHubContext
         }
     }
 
-    internal ValueTask WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
+    internal void WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
     {
         WriteMessageCore(StreamingHubPayloadBuilder.BuildError(MessageId, statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail));
-        return default;
     }
 
     void WriteMessageCore(StreamingHubPayload payload)

@@ -26,6 +26,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     StreamingHubHeartbeatHandle heartbeatHandle = default!;
     TimeProvider timeProvider = default!;
     bool isReturnExceptionStackTraceInErrorDetail = false;
+    UniqueHashDictionary<StreamingHubHandler> handlers = default!;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -45,7 +46,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.Wait,
             SingleReader = true,
-            SingleWriter = false,
+            SingleWriter = true,
         });
 
     public HubGroupRepository<TReceiver> Group { get; private set; } = default!;
@@ -90,10 +91,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
         var features = this.Context.CallContext.GetHttpContext().Features;
-        streamingHubFeature = features.Get<IStreamingHubFeature>()!; // TODO: GetRequiredFeature
+        streamingHubFeature = features.GetRequiredFeature<IStreamingHubFeature>();
         var magicOnionOptions = serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value;
         timeProvider = magicOnionOptions.TimeProvider ?? TimeProvider.System;
         isReturnExceptionStackTraceInErrorDetail = magicOnionOptions.IsReturnExceptionStackTraceInErrorDetail;
+
+        handlers = streamingHubFeature.Handlers;
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
@@ -169,10 +172,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // eg: Send the current game state to the client.
         await OnConnected();
 
-        var handlers = streamingHubFeature.Handlers;
-
         // Starts a loop that consumes the request queue.
-        var consumeRequestsTask = ConsumeRequestQueueAsync(ct);
+        _ = ConsumeRequestQueueAsync();
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
@@ -180,21 +181,57 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             var payload = reader.Current;
 
-            await ProcessMessageAsync(payload, handlers, ct);
+            await ProcessMessageAsync(payload, ct);
 
             // NOTE: DO NOT return the StreamingHubPayload to the pool here.
             //       Client requests may be pending at this point.
         }
     }
 
-    async ValueTask ConsumeRequestQueueAsync(CancellationToken cancellationToken)
+    async ValueTask ConsumeRequestQueueAsync()
     {
+        // Create and reuse a single StreamingHubContext for each hub connection.
+        var hubContext = new StreamingHubContext();
+
         // We need to process client requests sequentially.
-        await foreach (var request in requests.Reader.ReadAllAsync(cancellationToken))
+        // NOTE: Do not pass a CancellationToken to avoid allocation. We call Writer.Complete when we want to stop the consumption loop.
+        await foreach (var request in requests.Reader.ReadAllAsync(default))
         {
             try
             {
-                await ProcessRequestAsync(request.Handlers, request.MethodId, request.MessageId, request.Body, request.HasResponse);
+                if (handlers.TryGetValue(request.MethodId, out var handler))
+                {
+                    hubContext.Initialize(
+                        handler: handler,
+                        streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
+                        hubInstance: this,
+                        request: request.Body,
+                        messageId: request.MessageId,
+                        timestamp: timeProvider.GetUtcNow().UtcDateTime
+                    );
+
+                    var isErrorOrInterrupted = false;
+                    var methodStartingTimestamp = timeProvider.GetTimestamp();
+                    MagicOnionServerLog.BeginInvokeHubMethod(Context.Logger, hubContext, hubContext.Request, handler.RequestType);
+
+                    try
+                    {
+                        await handler.MethodBody.Invoke(hubContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        isErrorOrInterrupted = true;
+                        HandleException(hubContext, ex, request.HasResponse);
+                    }
+                    finally
+                    {
+                        CleanupRequest(hubContext, methodStartingTimestamp, isErrorOrInterrupted);
+                    }
+                }
+                else
+                {
+                    RespondMethodNotFound(request.MethodId, request.MessageId);
+                }
             }
             finally
             {
@@ -203,7 +240,46 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    ValueTask ProcessMessageAsync(StreamingHubPayload payload, UniqueHashDictionary<StreamingHubHandler> handlers, CancellationToken cancellationToken)
+    void HandleException(StreamingHubContext hubContext, Exception ex, bool hasResponse)
+    {
+        if (ex is ReturnStatusException rse)
+        {
+            if (hasResponse)
+            {
+                hubContext.WriteErrorMessage((int)rse.StatusCode, rse.Detail, null, false);
+            }
+        }
+        else
+        {
+            MagicOnionServerLog.Error(Context.Logger, ex, hubContext);
+            Metrics.StreamingHubException(Context.Metrics, hubContext.Handler, ex);
+
+            if (hasResponse)
+            {
+                hubContext.WriteErrorMessage((int)StatusCode.Internal, $"An error occurred while processing handler '{hubContext.Handler}'.", ex, isReturnExceptionStackTraceInErrorDetail);
+            }
+        }
+    }
+
+    void CleanupRequest(StreamingHubContext hubContext, long methodStartingTimestamp, bool isErrorOrInterrupted)
+    {
+        var methodEndingTimestamp = timeProvider.GetTimestamp();
+        var elapsed = timeProvider.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp);
+        MagicOnionServerLog.EndInvokeHubMethod(Context.Logger, hubContext, hubContext.ResponseSize, hubContext.ResponseType, elapsed.TotalMilliseconds, isErrorOrInterrupted);
+        Metrics.StreamingHubMethodCompleted(Context.Metrics, hubContext.Handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
+
+        hubContext.Uninitialize();
+    }
+
+    void RespondMethodNotFound(int methodId, int messageId)
+    {
+        MagicOnionServerLog.HubMethodNotFound(Context.Logger, Context.ServiceName, methodId);
+        var payload = StreamingHubPayloadBuilder.BuildError(messageId, (int)StatusCode.Unimplemented, $"StreamingHub method '{methodId}' is not found in StreamingHub.", null, isReturnExceptionStackTraceInErrorDetail);
+        StreamingServiceContext.QueueResponseStreamWrite(payload);
+    }
+
+
+    ValueTask ProcessMessageAsync(StreamingHubPayload payload, CancellationToken cancellationToken)
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
         var messageType = reader.ReadMessageType();
@@ -259,65 +335,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }
     }
-
-    [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder))]
-    async ValueTask ProcessRequestAsync(UniqueHashDictionary<StreamingHubHandler> handlers, int methodId, int messageId, ReadOnlyMemory<byte> body, bool hasResponse)
-    {
-        if (handlers.TryGetValue(methodId, out var handler))
-        {
-            // Create a context for each call to the hub method.
-            var context = StreamingHubContextPool.Shared.Get();
-            context.Initialize(
-                handler: handler,
-                streamingServiceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
-                hubInstance: this,
-                request: body,
-                messageId: messageId,
-                timestamp: timeProvider.GetUtcNow().UtcDateTime
-            );
-
-            var methodStartingTimestamp = timeProvider.GetTimestamp();
-            var isErrorOrInterrupted = false;
-            MagicOnionServerLog.BeginInvokeHubMethod(Context.Logger, context, context.Request, handler.RequestType);
-            try
-            {
-                await handler.MethodBody.Invoke(context);
-            }
-            catch (ReturnStatusException ex)
-            {
-                if (hasResponse)
-                {
-                    await context.WriteErrorMessage((int)ex.StatusCode, ex.Detail, null, false);
-                }
-            }
-            catch (Exception ex)
-            {
-                isErrorOrInterrupted = true;
-                MagicOnionServerLog.Error(Context.Logger, ex, context);
-                Metrics.StreamingHubException(Context.Metrics, handler, ex);
-
-                if (hasResponse)
-                {
-                    await context.WriteErrorMessage((int)StatusCode.Internal, $"An error occurred while processing handler '{handler.ToString()}'.", ex, isReturnExceptionStackTraceInErrorDetail);
-                }
-            }
-            finally
-            {
-                var methodEndingTimestamp = timeProvider.GetTimestamp();
-                MagicOnionServerLog.EndInvokeHubMethod(Context.Logger, context, context.ResponseSize, context.ResponseType, timeProvider.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
-                Metrics.StreamingHubMethodCompleted(Context.Metrics, handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
-
-                StreamingHubContextPool.Shared.Return(context);
-            }
-        }
-        else
-        {
-            MagicOnionServerLog.HubMethodNotFound(Context.Logger, Context.ServiceName, methodId);
-            var payload = StreamingHubPayloadBuilder.BuildError(messageId, (int)StatusCode.Unimplemented, $"StreamingHub method '{methodId}' is not found in StreamingHub.", null, isReturnExceptionStackTraceInErrorDetail);
-            StreamingServiceContext.QueueResponseStreamWrite(payload);
-        }
-    }
-
 
     // Interface methods for Client
 
