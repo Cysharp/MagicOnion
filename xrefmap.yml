@@ -8369,6 +8369,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`10.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-10.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_10__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`10.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`10.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-10.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_10__ctor__0__1__2__3__4__5__6__7__8__9_
@@ -8431,6 +8439,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`11.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-11.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_11__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`11.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`11.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9,`10)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-11.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_11__ctor__0__1__2__3__4__5__6__7__8__9__10_
@@ -8493,6 +8509,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`12.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-12.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_12__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`12.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`12.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9,`10,`11)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-12.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_12__ctor__0__1__2__3__4__5__6__7__8__9__10__11_
@@ -8555,6 +8579,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`13.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-13.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_13__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`13.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`13.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9,`10,`11,`12)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-13.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_13__ctor__0__1__2__3__4__5__6__7__8__9__10__11__12_
@@ -8617,6 +8649,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`14.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-14.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_14__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`14.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`14.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9,`10,`11,`12,`13)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-14.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_14__ctor__0__1__2__3__4__5__6__7__8__9__10__11__12__13_
@@ -8679,6 +8719,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`15.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-15.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_15__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`15.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`15.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8,`9,`10,`11,`12,`13,`14)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-15.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_15__ctor__0__1__2__3__4__5__6__7__8__9__10__11__12__13__14_
@@ -8741,6 +8789,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`2.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-2.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_2__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`2.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`2.#ctor(`0,`1)
   name: DynamicArgumentTupleFormatter(T1, T2)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-2.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_2__ctor__0__1_
@@ -8803,6 +8859,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`3.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-3.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_3__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`3.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`3.#ctor(`0,`1,`2)
   name: DynamicArgumentTupleFormatter(T1, T2, T3)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-3.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_3__ctor__0__1__2_
@@ -8865,6 +8929,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`4.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-4.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_4__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`4.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`4.#ctor(`0,`1,`2,`3)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-4.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_4__ctor__0__1__2__3_
@@ -8927,6 +8999,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`5.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-5.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_5__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`5.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`5.#ctor(`0,`1,`2,`3,`4)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-5.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_5__ctor__0__1__2__3__4_
@@ -8989,6 +9069,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`6.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-6.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_6__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`6.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`6.#ctor(`0,`1,`2,`3,`4,`5)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-6.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_6__ctor__0__1__2__3__4__5_
@@ -9051,6 +9139,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`7.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-7.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_7__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`7.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`7.#ctor(`0,`1,`2,`3,`4,`5,`6)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-7.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_7__ctor__0__1__2__3__4__5__6_
@@ -9113,6 +9209,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`8.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-8.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_8__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`8.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`8.#ctor(`0,`1,`2,`3,`4,`5,`6,`7)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-8.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_8__ctor__0__1__2__3__4__5__6__7_
@@ -9175,6 +9279,14 @@ references:
   fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9)
   nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9>
   nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9)
+- uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`9.#ctor
+  name: DynamicArgumentTupleFormatter()
+  href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-9.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_9__ctor
+  commentId: M:MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`9.#ctor
+  fullName: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9>.DynamicArgumentTupleFormatter()
+  fullName.vb: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9).DynamicArgumentTupleFormatter()
+  nameWithType: DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9>.DynamicArgumentTupleFormatter()
+  nameWithType.vb: DynamicArgumentTupleFormatter(Of T1, T2, T3, T4, T5, T6, T7, T8, T9).DynamicArgumentTupleFormatter()
 - uid: MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter`9.#ctor(`0,`1,`2,`3,`4,`5,`6,`7,`8)
   name: DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5, T6, T7, T8, T9)
   href: api/MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter-9.html#MagicOnion_Serialization_MessagePack_DynamicArgumentTupleFormatter_9__ctor__0__1__2__3__4__5__6__7__8_
