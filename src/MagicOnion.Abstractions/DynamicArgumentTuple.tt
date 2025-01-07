@@ -5,44 +5,39 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
-
-using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using MessagePack;
-using MessagePack.Formatters;
 
-namespace MagicOnion
-{
-    // T2 ~ T15
-    // NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.
+namespace MagicOnion;
+
+// T2 ~ T15
+// NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.
 
 <# for(var i = 2; i <= 15; i++) {
-    var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0}", x)));
-    var methodArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} item{0}", x)));
-    var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} default{0}", x)));
-    var itemArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("item{0}", x)));
+    var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"T{x}"));
+    var methodArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"T{x} item{x}"));
+    var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"T{x} default{x}"));
+    var itemArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"item{x}"));
+    var debuggerDisplayItems = string.Join(", ", Enumerable.Range(1, i).Select(x => $"{{Item{x},nq}}"));
  #>
     
-    [MessagePackObject]
-    [StructLayout(LayoutKind.Auto)]
-#if MAGICONION_USE_REFTYPE_DYNAMICARGUMENTTUPLE
-    public sealed class DynamicArgumentTuple<<#= typeArgs #>>
-#else
-    public struct DynamicArgumentTuple<<#= typeArgs #>>
-#endif
-    {
+[MessagePackObject]
+[StructLayout(LayoutKind.Auto)]
+[DebuggerDisplay("DynamicArgumentTuple`<#= i #>: (<#= debuggerDisplayItems #>)")]
+public struct DynamicArgumentTuple<<#= typeArgs #>>
+{
 <# for(var j = 1; j <= i; j++) { #>
-        [Key(<#= j - 1  #>)]
-        public readonly T<#= j#> Item<#= j #>;
+    [Key(<#= j - 1  #>)]
+    public readonly T<#= j#> Item<#= j #>;
 <# } #>
 
-        [SerializationConstructor]
-        public DynamicArgumentTuple(<#= methodArgs #>)
-        {
+    [SerializationConstructor]
+    public DynamicArgumentTuple(<#= methodArgs #>)
+    {
 <# for(var j = 1; j <= i; j++) { #>
-            Item<#= j#> = item<#= j #>;
+        Item<#= j#> = item<#= j #>;
 <# } #>
-        }
     }
-<# } #>
 }
+<# } #>
