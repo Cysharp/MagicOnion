@@ -7,7 +7,7 @@
     <GrpcVersion>2.57.0</GrpcVersion>
     <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
     <MemoryPackVersion>1.21.1</MemoryPackVersion>
-    <MessagePackVersion>3.1.0</MessagePackVersion>
+    <MessagePackVersion>3.1.1</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
     <MulticasterVersion>0.1.12</MulticasterVersion>
