@@ -4,7 +4,6 @@
   <!-- LangVersion of Client, Abstractions, Shared must match supported Unity version-->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <_LangVersionUnityBaseline>9.0</_LangVersionUnityBaseline>
   </PropertyGroup>
 
   <PropertyGroup>
