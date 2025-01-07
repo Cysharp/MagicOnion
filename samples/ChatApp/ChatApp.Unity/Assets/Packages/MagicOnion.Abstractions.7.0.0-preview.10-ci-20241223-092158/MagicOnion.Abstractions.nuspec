@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MagicOnion.Abstractions</id>
+    <version>7.0.0-preview.10-ci-20241223-092158+b2e17d</version>
+    <authors>Cysharp</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon.png</icon>
+    <projectUrl>https://github.com/Cysharp/MagicOnion</projectUrl>
+    <description>MagicOnion interfaces and abstractions for server and client.
+Commonly used types:
+MagicOnion.IService&lt;TSelf&gt;
+MagicOnion.IStreamingHub&lt;TSelf, TReceiver&gt;
+MagicOnion.UnaryResult&lt;TResult&gt;
+MagicOnion.IgnoreAttribute</description>
+    <copyright>© Cysharp, Inc.</copyright>
+    <tags>magiconion grpc http2</tags>
+    <repository type="git" url="https://github.com/Cysharp/MagicOnion" commit="b2e17dc99c3a936e02e691b947f8e3033f36f12f" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

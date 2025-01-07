@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MagicOnion.Abstractions</name>
+    </assembly>
+    <members>
+        <member name="T:MagicOnion.ClientStreamingResult`2">
+            <summary>
+            Wrapped AsyncClientStreamingCall.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.ClientStreamingResult`2.ResponseAsync">
+            <summary>
+            Asynchronous call result.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.ClientStreamingResult`2.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.ClientStreamingResult`2.RequestStream">
+            <summary>
+            Async stream to send streaming requests.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ClientStreamingResult`2.GetAwaiter">
+            <summary>
+            Allows awaiting this object directly.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.ClientStreamingResult`2.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ClientStreamingResult`2.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ClientStreamingResult`2.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:MagicOnion.DuplexStreamingResult`2">
+            <summary>
+            Wrapped AsyncDuplexStreamingCall.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.DuplexStreamingResult`2.ResponseStream">
+            <summary>
+            Async stream to read streaming responses.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.DuplexStreamingResult`2.RequestStream">
+            <summary>
+            Async stream to send streaming requests.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.DuplexStreamingResult`2.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.DuplexStreamingResult`2.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.DuplexStreamingResult`2.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.DuplexStreamingResult`2.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and response stream has been fully read), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:MagicOnion.GenerateDefineDebugAttribute">
+            <summary>
+            instruction for moc.exe, surround #if symbol with output code.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.GenerateIfDirectiveAttribute">
+            <summary>
+            instruction for moc.exe, surround #if symbol with output code.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.IgnoreAttribute">
+            <summary>
+            Don't register on MagicOnionEngine.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Serialization.IMagicOnionSerializerProvider">
+            <summary>
+            Provides a serializer for request/response of MagicOnion services and hub methods.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(Grpc.Core.MethodType,System.Reflection.MethodInfo)">
+            <summary>
+            Create a serializer for the service method.
+            </summary>
+            <param name="methodType">gRPC method type of the method.</param>
+            <param name="methodInfo">A method info for an implementation of the service method. It is a hint that handling request parameters on the server, which may be passed null on the client.</param>
+            <returns></returns>
+        </member>
+        <member name="T:MagicOnion.Serialization.IMagicOnionSerializer">
+            <summary>
+            Provides a processing for message serialization.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.ServerStreamingResult`1">
+            <summary>
+            Wrapped AsyncServerStreamingCall.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.ServerStreamingResult`1.ResponseStream">
+            <summary>
+            Async stream to read streaming responses.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.ServerStreamingResult`1.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ServerStreamingResult`1.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ServerStreamingResult`1.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.ServerStreamingResult`1.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (response stream has been fully read), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:MagicOnion.UnaryResult">
+            <summary>
+            Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.UnaryResult.ResponseAsync">
+            <summary>
+            Asynchronous call result.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.UnaryResult.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.GetAwaiter">
+            <summary>
+            Allows awaiting this object directly.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="P:MagicOnion.UnaryResult.CompletedResult">
+            <summary>
+            Gets a completed <see cref="T:MagicOnion.UnaryResult" /> with the void result.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.FromResult``1(``0)">
+            <summary>
+            Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult.FromResult``1(System.Threading.Tasks.Task{``0})">
+            <summary>
+            Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result task.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.UnaryResult.Nil">
+            <summary>
+            Gets the result that contains <see cref="F:MessagePack.Nil.Default"/> as the result value.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.UnaryResult`1">
+            <summary>
+            Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.UnaryResult`1.ResponseAsync">
+            <summary>
+            Asynchronous call result.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.UnaryResult`1.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult`1.GetAwaiter">
+            <summary>
+            Allows awaiting this object directly.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult`1.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult`1.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.UnaryResult`1.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:MessagePack.GeneratedMessagePackResolver">
+            <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary>
+        </member>
+        <member name="F:MessagePack.GeneratedMessagePackResolver.Instance">
+            <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,902 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MagicOnion.Client</name>
+    </assembly>
+    <members>
+        <member name="T:MagicOnion.Client.ClientHeartbeatEvent">
+            <summary>
+            Represents a client heartbeat received event.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.ClientHeartbeatEvent.RoundTripTime">
+            <summary>
+            Gets the round trip time (RTT) between client and server.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider">
+            <summary>
+            Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.DynamicClient.ServiceClientDefinition.GetRequestTypeFromMethod(System.Reflection.MethodInfo)">
+            <summary>
+            Gets the type of wrapped request parameters from the method parameters.
+            </summary>
+            <param name="methodInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(System.Type,MagicOnion.IStreamingHubMarker,System.Func{System.Threading.Tasks.Task},System.Threading.Tasks.Task)">
+            <summary>
+            Register the StreamingHub under the management of the channel.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs">
+            <summary>
+            Gets all StreamingHubs that depends on the channel.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker">
+            <summary>
+            Create a <see cref="T:Grpc.Core.CallInvoker"/> from the channel.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:MagicOnion.Client.IStreamingHubClient">
+            <summary>
+            An interface that indicates that the StreamingHub client is implemented.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubClient.WaitForDisconnectAsync">
+            <summary>
+            Wait for the disconnection and return the reason.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:MagicOnion.Client.DisconnectionReason">
+            <summary>
+            Provides the reason for the StreamingHub disconnection.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.DisconnectionReason.Type">
+            <summary>
+            Gets the type of StreamingHub disconnection.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.DisconnectionReason.Exception">
+            <summary>
+            Gets the exception that caused the disconnection.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.DisconnectionType">
+            <summary>
+            Defines the types of StreamingHub disconnection.
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Client.DisconnectionType.CompletedNormally">
+            <summary>
+            Disconnected after completing successfully.
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Client.DisconnectionType.Faulted">
+            <summary>
+            Disconnected due to exception while reading messages.
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Client.DisconnectionType.TimedOut">
+            <summary>
+            Disconnected due to reaching the heartbeat timeout.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.IStreamingHubDiagnosticHandler">
+            <summary>
+            [Preview] The interface of the handler for StreamingHub diagnostics. This API may change in the future.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke``3(``0,System.Int32,System.String,``1,System.Boolean,MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate{``1,``2})">
+            <summary>
+            The callback method at the beginning of a Hub method request. This API may change in the future.
+            </summary>
+            <typeparam name="THub"></typeparam>
+            <typeparam name="TRequest"></typeparam>
+            <typeparam name="TResponse"></typeparam>
+            <param name="hubInstance"></param>
+            <param name="methodId"></param>
+            <param name="methodName"></param>
+            <param name="request"></param>
+            <param name="isFireAndForget"></param>
+            <param name="invokeMethod"></param>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEventRaw``1(``0,System.Int32,System.ReadOnlyMemory{System.Byte})">
+            <summary>
+            [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
+            </summary>
+            <typeparam name="THub"></typeparam>
+            <param name="hubInstance"></param>
+            <param name="methodId"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEvent``2(``0,System.String,``1)">
+            <summary>
+            [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
+            </summary>
+            <typeparam name="THub"></typeparam>
+            <typeparam name="T"></typeparam>
+            <param name="hubInstance"></param>
+            <param name="methodName"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnResponseEvent``2(``0,System.String,System.ReadOnlyMemory{System.Byte})">
+            <summary>
+            [Preview] The callback method when the return value of a hub method call is received. This API may change in the future.
+            </summary>
+            <typeparam name="THub"></typeparam>
+            <typeparam name="T"></typeparam>
+            <param name="hubInstance"></param>
+            <param name="methodName"></param>
+            <param name="data"></param>
+        </member>
+        <member name="T:MagicOnion.Client.MagicOnionClientFactoryProvider">
+            <summary>
+            Provides to get a MagicOnionClient factory of the specified service type.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.MagicOnionClientFactoryProvider.Default">
+            <summary>
+            Gets or set the MagicOnionClient factory provider to use by default.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.IMagicOnionClientFactoryProvider">
+            <summary>
+            Provides to get a MagicOnionClient factory of the specified service type.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.IMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)">
+            <summary>
+            Gets the MagicOnionClient factory of the specified service type. A return value indicates whether a factory was found or not.
+            </summary>
+            <typeparam name="T">A MagicOnion service interface type.</typeparam>
+            <param name="factory">A MagicOnionClient factory of specified service type.</param>
+            <returns>The value indicates whether a factory was found or not.</returns>
+        </member>
+        <member name="T:MagicOnion.Client.ServerHeartbeatEvent">
+            <summary>
+            Represents a server heartbeat received event.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.ServerHeartbeatEvent.ServerTime">
+            <summary>
+            Gets the server time at when the heartbeat was sent.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.ServerHeartbeatEvent.Metadata">
+            <summary>
+            Gets the metadata data. The data is only available during event processing.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatInterval(System.Nullable{System.TimeSpan})">
+            <summary>
+            Sets a heartbeat interval. If a value is <see keyword="null"/>, the heartbeat from the client is disabled.
+            </summary>
+            <param name="interval"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatTimeout(System.Nullable{System.TimeSpan})">
+            <summary>
+            Sets a heartbeat timeout period. If a value is <see keyword="null"/>, the client does not time out.
+            </summary>
+            <param name="timeout"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientOptions.WithServerHeartbeatReceived(System.Action{MagicOnion.Client.ServerHeartbeatEvent})">
+            <summary>
+            Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.
+            </summary>
+            <param name="onServerHeartbeatReceived"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientOptions.WithClientHeartbeatResponseReceived(System.Action{MagicOnion.Client.ClientHeartbeatEvent})">
+            <summary>
+            Sets a client heartbeat response callback.
+            </summary>
+            <param name="onClientHeartbeatResponseReceived"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientOptions.WithTimeProvider(System.TimeProvider)">
+            <summary>
+            Sets a <see cref="P:MagicOnion.Client.StreamingHubClientOptions.TimeProvider"/>
+            </summary>
+            <param name="timeProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MagicOnion.Client.StreamingHubClientExtensions.WaitForDisconnectAsync``1(``0)">
+            <summary>
+            Wait for the disconnection and return the reason.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.StreamingHubClientFactoryProvider">
+            <summary>
+            Provides to get a StreamingHubClient factory of the specified service type.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Client.StreamingHubClientFactoryProvider.Default">
+            <summary>
+            Gets or set the StreamingHubClient factory provider to use by default.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Client.IStreamingHubClientFactoryProvider">
+            <summary>
+            Provides to get a StreamingHubClient factory of the specified service type.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Client.IStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)">
+            <summary>
+            Gets the StreamingHubClient factory of the specified service type. A return value indicates whether a factory was found or not.
+            </summary>
+            <typeparam name="TStreamingHub">A MagicOnion StreamingHub interface type.</typeparam>
+            <typeparam name="TReceiver">A hub receiver interface type.</typeparam>
+            <param name="factory">A StreamingHubClient factory of specified service type.</param>
+            <returns>The value indicates whether a factory was found or not.</returns>
+        </member>
+        <member name="T:MagicOnion.Internal.DangerousDummyNull">
+             <summary>
+             Provide a dummy Null object to cheat grpc-dotnet.
+             </summary>
+             <remarks>
+             <para>
+             Grpc.Net (grpc-dotnet) does not allow null values as messages.
+             However, gRPC does not need to know the contents of the message, and MagicOnion natively handles CLR objects.
+             so there is no problem if a null object is encountered between implementation and serialization.
+             </para>
+             <para>
+             See: https://github.com/grpc/grpc-dotnet/blob/51ec4d05e6b38532c959018728277f2477cc6a7e/src/Grpc.AspNetCore.Server/Internal/CallHandlers/UnaryServerCallHandler.cs#L52-L56
+             </para>
+             <para>
+             grpc-dotnet also does not care about the message content,
+             MagicOnion will replace the null value with a singleton-dummy `System.Object` instance as `T` by `Unsafe.As`.
+             When serializing or deserializing a request/response, it will replace the dummy object back to `null` or with a dummy object.
+             </para>
+             </remarks>
+             <code>
+             - Request (on server):
+                 [MagicOnion Client]
+                           |
+                           | (MessagePack binary)
+                           |
+                 [ASP.NET Core gRPC server (grpc-dotnet)]
+                           |
+                 [MessageSerializer.Deserialize&lt;T> (MagicOnion)]
+                           |
+                           | (object or null)
+                           |
+                 [DangerousDummyNull.GetObjectOrDummyNull (MagicOnion)]
+                           |
+                           | (object or DummyNull)
+                           |
+                 [CallHandler (grpc-dotnet)]
+                           |
+                 [DangerousDummyNull.GetObjectOrDefault (MagicOnion)]
+                           |
+                           | (object or null)
+                           |
+                 [Unary method (User-code)]
+            
+            
+             - Response (on server):
+                 [Unary method (User-code)]
+                           |
+                           | (object or null)
+                           |
+                 [DangerousDummyNull.GetObjectOrDummyNull (MagicOnion)]
+                           |
+                           | (object or DummyNull)
+                           |
+                 [CallHandler (grpc-dotnet)]
+                           |
+                 [DangerousDummyNull.GetObjectOrDefault (MagicOnion)]
+                           |
+                           | (object or null)
+                           |
+                 [MessageSerializer.Serialize&lt;T> (MagicOnion)]
+                           |
+                           | (MessagePack binary)
+                           |
+                 [ASP.NET Core gRPC server (grpc-dotnet)]
+                           |
+                 [MagicOnion Client]
+             </code>
+        </member>
+        <member name="T:MagicOnion.Internal.Reflection.ILGeneratorExtensions">
+            <summary>
+            Provides optimized generation code and helpers.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.Reflection.ILGeneratorExtensions.EmitLdloc(System.Reflection.Emit.ILGenerator,System.Int32)">
+            <summary>
+            Loads the local variable at a specific index onto the evaluation stack.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.Reflection.ILGeneratorExtensions.EmitStloc(System.Reflection.Emit.ILGenerator,System.Int32)">
+            <summary>
+            Pops the current value from the top of the evaluation stack and stores it in a the local variable list at a specified index.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.Reflection.ILGeneratorExtensions.EmitLdloca(System.Reflection.Emit.ILGenerator,System.Int32)">
+            <summary>
+            Loads the address of the local variable at a specific index onto the evaluation statck.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.Reflection.ILGeneratorExtensions.EmitLdc_I4(System.Reflection.Emit.ILGenerator,System.Int32)">
+            <summary>
+            Pushes a supplied value of type int32 onto the evaluation stack as an int32.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.Reflection.ILGeneratorExtensions.EmitPop(System.Reflection.Emit.ILGenerator,System.Int32)">
+            <summary>
+            Helper for Pop op.
+            </summary>
+        </member>
+        <member name="T:MagicOnion.Internal.StreamingHubMessageWriter">
+            <remarks>
+                <para>StreamingHub message formats (from Server to Client):</para>
+                <list type="bullet">
+                    <item>
+                        <term>Response: InvokeHubMethod (from server to client)</term>
+                        <description>Array(3): [MessageId(int), MethodId(int), SerializedResponse]</description>
+                    </item>
+                    <item>
+                        <term>Response: InvokeHubMethod (from server to client; with Exception)</term>
+                        <description>Array(4): [MessageId(int), StatusCode(int), Detail(string), Message(string)]</description>
+                    </item>
+                    <item>
+                        <term>Broadcast: from server to client</term>
+                        <description>Array(2): [MethodId(int), SerializedArgument]</description>
+                    </item>
+                    <item>
+                        <term>ClientInvoke/Request: InvokeClientMethod (from server to client)</term>
+                        <description>Array(5): [Type=0x00, Nil, ClientResultMessageId(Guid), MethodId(int), SerializedArguments]</description>
+                    </item>
+                    <item>
+                        <term>ServerHeartbeat/Request:</term>
+                        <description>Array(5): [Type=0x7f, Nil, Nil, Nil, Extras]</description>
+                    </item>
+                    <item>
+                        <term>ClientHeartbeat/Response:</term>
+                        <description>Array(5): [Type=0x7e, Nil, Nil, Nil, [ClientTime(long)]]</description>
+                    </item>
+                </list>
+                <para>StreamingHub message formats (from Client to Server):</para>
+                <list type="bullet">
+                    <item>
+                        <term>Request: InvokeHubMethod (from client; void; fire-and-forget)</term>
+                        <description>Array(2): [MethodId(int), SerializedArguments]</description>
+                    </item>
+                    <item>
+                        <term>Request: InvokeHubMethod (from client; non-void)</term>
+                        <description>Array(3): [MessageId(int), MethodId(int), SerializedArguments]</description>
+                    </item>
+                    <item>
+                        <term>ClientInvoke/Response: InvokeClientMethod (from client to server)</term>
+                        <description>Array(4): [Type=0x00, ClientResultMessageId(Guid), MethodId(int), SerializedResponse]</description>
+                    </item>
+                    <item>
+                        <term>ClientInvoke/Response: InvokeClientMethod (from client to server; with Exception)</term>
+                        <description>Array(4): [Type=0x01, ClientResultMessageId(Guid), MethodId(int), [StatusCode(int), Detail(string), Message(string)]]</description>
+                    </item>
+                    <item>
+                        <term>ServerHeartbeat/Response:</term>
+                        <description>Array(4): [Type=0x7f, Nil, Nil, Nil]</description>
+                    </item>
+                    <item>
+                        <term>ClientHeartbeat/Request:</term>
+                        <description>Array(4): [Type=0x7e, Nil, Nil, [ClientTime(long)]]</description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteBroadcastMessage``1(System.Buffers.IBufferWriter{System.Byte},System.Int32,``0,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes a broadcast message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteRequestMessageVoid``1(System.Buffers.IBufferWriter{System.Byte},System.Int32,``0,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes a request message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteRequestMessage``1(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Int32,``0,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes a request message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteResponseMessage(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Int32)">
+            <summary>
+            Writes an empty response message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteResponseMessage``1(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Int32,``0,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes a response message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteResponseMessageForError(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Int32,System.String,System.Exception,System.Boolean)">
+            <summary>
+            Write an error response message of Hub method.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteClientResultResponseMessage``1(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Guid,``0,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes a response message for client result.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteClientResultResponseMessageForError(System.Buffers.IBufferWriter{System.Byte},System.Int32,System.Guid,System.Int32,System.String,System.Exception,MagicOnion.Serialization.IMagicOnionSerializer)">
+            <summary>
+            Writes an error response message for client result.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteServerHeartbeatMessageHeader(System.Buffers.IBufferWriter{System.Byte},System.Int16,System.DateTimeOffset)">
+            <summary>
+            Writes a server heartbeat message for sending from the server.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteServerHeartbeatMessageResponse(System.Span{System.Byte},System.Int16,System.Int64,System.Int32@)">
+            <summary>
+            Writes a server heartbeat message for sending response from the client.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteClientHeartbeatMessage(System.Span{System.Byte},System.Int16,System.Int64,System.Int32@)">
+            <summary>
+            Writes a client heartbeat message for sending from the client.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Internal.StreamingHubMessageWriter.WriteClientHeartbeatMessageResponse(System.Buffers.IBufferWriter{System.Byte},System.Int16,System.Int64)">
+            <summary>
+            Writes a client heartbeat message for sending response from the server.
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.Request">
+            <summary>
+            Request: Client -> Server
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.RequestFireAndForget">
+            <summary>
+            Request: Client -> Server / Fire-and-Forget
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.Response">
+            <summary>
+            Request: Client -> Server -> Client
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ResponseWithError">
+            <summary>
+            Request: Client -> Server -(Error)-> Client
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.Broadcast">
+            <summary>
+            Broadcast: Server -> Client
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ClientResultRequest">
+            <summary>
+            ClientResult: Server -> Client
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ClientResultResponse">
+            <summary>
+            ClientResult: Server -> Client -> Server
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ClientResultResponseWithError">
+            <summary>
+            ClientResult: Server -> Client -(Error)-> Server
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ServerHeartbeatResponse">
+            <summary>
+            Heartbeat: Server -> Client -> Server
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ServerHeartbeat">
+            <summary>
+            Heartbeat: Server -> Client
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ClientHeartbeat">
+            <summary>
+            Heartbeat: Client -> Server
+            </summary>
+        </member>
+        <member name="F:MagicOnion.Internal.StreamingHubMessageType.ClientHeartbeatResponse">
+            <summary>
+            Heartbeat: Client -> Server -> Client
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute">
+            <summary>
+            Indicates that the specified method parameter expects a constant.
+            </summary>
+            <remarks>
+            This can be used to inform tooling that a constant should be used as an argument for the annotated parameter.
+            </remarks>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute.Min">
+            <summary>
+            Indicates the minimum bound of the expected constant, inclusive.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute.Max">
+            <summary>
+            Indicates the maximum bound of the expected constant, inclusive.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute">
+            <summary>
+            Indicates that an API is experimental and it may change in the future.
+            </summary>
+            <remarks>
+            This attribute allows call sites to be flagged with a diagnostic that indicates that an experimental
+            feature is used. Authors can use this attribute to ship preview features in their assemblies.
+            </remarks>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute"/> class,
+            specifying the ID that the compiler will use when reporting a use of the API the attribute applies to.
+            </summary>
+            <param name="diagnosticId">The ID that the compiler will use when reporting a use of the API the attribute applies to.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.DiagnosticId">
+            <summary>
+            Gets the ID that the compiler will use when reporting a use of the API the attribute applies to.
+            </summary>
+            <value>The unique diagnostic ID.</value>
+            <remarks>
+            The diagnostic ID is shown in build output for warnings and errors.
+            <para>This property represents the unique ID that can be used to suppress the warnings or errors, if needed.</para>
+            </remarks>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.UrlFormat">
+            <summary>
+            Gets or sets the URL for corresponding documentation.
+            The API accepts a format string instead of an actual URL, creating a generic URL that includes the diagnostic ID.
+            </summary>
+            <value>The format string that represents a URL to corresponding documentation.</value>
+            <remarks>An example format string is <c>https://contoso.com/obsoletion-warnings/{0}</c>.</remarks>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property members have not-null values.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with a field or property member.
+            </summary>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes the attribute with the list of field and property members.
+            </summary>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property
+            members have not-null values when returning with the specified return value condition.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>
+            Initializes the attribute with the specified return value condition and a field or property member.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>
+            Initializes the attribute with the specified return value condition and list of field and property members.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type,
+            and callers do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>
+            Specifies the syntax used in a string.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.
+            </summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.UnscopedRefAttribute">
+            <summary>
+            Used to indicate a byref escapes and is not scoped.
+            </summary>
+            <remarks>
+            <para>
+            There are several cases where the C# compiler treats a <see langword="ref"/> as implicitly
+            <see langword="scoped"/> - where the compiler does not allow the <see langword="ref"/> to escape the method.
+            </para>
+            <para>
+            For example:
+            <list type="number">
+                <item><see langword="this"/> for <see langword="struct"/> instance methods.</item>
+                <item><see langword="ref"/> parameters that refer to <see langword="ref"/> <see langword="struct"/> types.</item>
+                <item><see langword="out"/> parameters.</item>
+            </list>
+            </para>
+            <para>
+            This attribute is used in those instances where the <see langword="ref"/> should be allowed to escape.
+            </para>
+            <para>
+            Applying this attribute, in any form, has impact on consumers of the applicable API. It is necessary for
+            API authors to understand the lifetime implications of applying this attribute and how it may impact their users.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
+            <summary>
+            An attribute that allows parameters to receive the expression of other parameters.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            </summary>
+            <param name="parameterName">The condition parameter value.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+            <summary>
+            Gets the parameter name the expression is retrieved from.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CollectionBuilderAttribute.#ctor(System.Type,System.String)">
+            <summary>
+            Initialize the attribute to refer to the <paramref name="methodName"/> method on the <paramref name="builderType"/> type.
+            </summary>
+            <param name="builderType">The type of the builder to use to construct the collection.</param>
+            <param name="methodName">The name of the method on the builder to use to construct the collection.</param>
+            <remarks>
+            <paramref name="methodName"/> must refer to a static method that accepts a single parameter of
+            type <see cref="T:System.ReadOnlySpan`1"/> and returns an instance of the collection being built containing
+            a copy of the data from that span.  In future releases of .NET, additional patterns may be supported.
+            </remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CollectionBuilderAttribute.BuilderType">
+            <summary>
+            Gets the type of the builder to use to construct the collection.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CollectionBuilderAttribute.MethodName">
+            <summary>
+            Gets the name of the method on the builder to use to construct the collection.
+            </summary>
+            <remarks>
+            This should match the metadata name of the target method.
+            For example, this might be ".ctor" if targeting the type's constructor.
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute"/> type.
+            </summary>
+            <param name="featureName">The name of the feature to indicate.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>
+            Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>
+            Gets the names of the arguments that should be passed to the handler.
+            </summary>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>
+            Indicates the attributed type is to be used as an interpolated string handler.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Reserved to be used by the compiler for tracking metadata.
+            This class should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ModuleInitializerAttribute">
+             <summary>
+             Used to indicate to the compiler that a method should be called
+             in its containing module's initializer.
+             </summary>
+             <remarks>
+             When one or more valid methods
+             with this attribute are found in a compilation, the compiler will
+             emit a module initializer which calls each of the attributed methods.
+            
+             Certain requirements are imposed on any method targeted with this attribute:
+             - The method must be `static`.
+             - The method must be an ordinary member method, as opposed to a property accessor, constructor, local function, etc.
+             - The method must be parameterless.
+             - The method must return `void`.
+             - The method must not be generic or be contained in a generic type.
+             - The method's effective accessibility must be `internal` or `public`.
+            
+             The specification for module initializers in the .NET runtime can be found here:
+             https://github.com/dotnet/runtime/blob/main/docs/design/specs/Ecma-335-Augments.md#module-initializer
+             </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute">
+            <summary>
+            Specifies the priority of a member in overload resolution. When unspecified, the default priority is 0.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute"/> class.
+            </summary>
+            <param name="priority">The priority of the attributed member. Higher numbers are prioritized, lower numbers are deprioritized. 0 is the default if no attribute is present.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute.Priority">
+            <summary>
+            The priority of the member.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ParamCollectionAttribute">
+            <summary>
+            Indicates that a method will allow a variable number of arguments in its invocation.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>
+            Specifies that a type has required members or that a member is required.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiresLocationAttribute">
+            <summary>
+            Reserved for use by a compiler for tracking metadata.
+            This attribute should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.SkipLocalsInitAttribute">
+            <summary>
+            Used to indicate to the compiler that the <c>.locals init</c> flag should not be set in method headers.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class with the specified message.
+            </summary>
+            <param name="message">An optional message associated with this attribute instance.</param>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Message">
+            <summary>
+            Returns the optional message associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Url">
+            <summary>
+            Returns the optional URL associated with this attribute instance.
+            </summary>
+        </member>
+    </members>
+</doc>
