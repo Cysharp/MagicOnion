@@ -1,7 +1,3 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace MagicOnion.Client
 {
     public interface IClientFilter

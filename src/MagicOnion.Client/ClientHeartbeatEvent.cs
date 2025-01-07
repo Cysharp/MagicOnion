@@ -1,5 +1,3 @@
-using System;
-
 namespace MagicOnion.Client
 {
     /// <summary>

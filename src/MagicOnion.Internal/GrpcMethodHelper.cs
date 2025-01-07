@@ -1,5 +1,3 @@
-using System;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MagicOnion.Serialization;

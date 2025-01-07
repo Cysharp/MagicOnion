@@ -1,11 +1,5 @@
-using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 using MagicOnion.Internal;
-using MagicOnion.Internal.Buffers;
-using MessagePack;
 
 namespace MagicOnion.Client.Internal
 {

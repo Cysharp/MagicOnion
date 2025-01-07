@@ -6,8 +6,6 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 
-using System;
-using System.Runtime.InteropServices;
 using MessagePack;
 using MessagePack.Formatters;
 

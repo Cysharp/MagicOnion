@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace MagicOnion.Server.Hubs
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]

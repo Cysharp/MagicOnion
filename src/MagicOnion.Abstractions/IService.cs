@@ -1,6 +1,4 @@
-﻿using Grpc.Core;
-using System;
-using System.Threading;
+using Grpc.Core;
 
 namespace MagicOnion
 {

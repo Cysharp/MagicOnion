@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Grpc.Core;
 
 namespace MagicOnion.Internal

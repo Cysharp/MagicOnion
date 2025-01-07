@@ -1,9 +1,7 @@
 using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.CompilerServices; // require this using in AsyncMethodBuilder
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using MessagePack;
 
 namespace MagicOnion

@@ -1,5 +1,3 @@
-﻿using System.Threading.Tasks;
-
 namespace MagicOnion
 {
     public interface IStreamingHubMarker

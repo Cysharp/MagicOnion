@@ -1,7 +1,4 @@
 using Grpc.Core;
-using MessagePack;
-using System;
-using System.Threading.Tasks;
 using MagicOnion.Internal;
 
 namespace MagicOnion

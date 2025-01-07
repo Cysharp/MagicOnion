@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace MagicOnion.Client
 {
     public static class StreamingHubClientExtensions

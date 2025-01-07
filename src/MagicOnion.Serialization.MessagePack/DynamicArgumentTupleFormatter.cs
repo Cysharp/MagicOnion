@@ -1,6 +1,4 @@
 ﻿
-using System;
-using System.Runtime.InteropServices;
 using MessagePack;
 using MessagePack.Formatters;
 

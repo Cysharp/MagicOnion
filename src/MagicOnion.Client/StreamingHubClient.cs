@@ -1,8 +1,5 @@
 using Grpc.Core;
 using MagicOnion.Serialization;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
