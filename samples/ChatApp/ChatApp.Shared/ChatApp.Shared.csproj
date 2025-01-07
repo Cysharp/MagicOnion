@@ -7,16 +7,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
-
-  <Target Name="RestoreLocalTools" BeforeTargets="GenerateMessagePack">
-    <Exec Command="dotnet tool restore" />
-  </Target>
-
-  <Target Name="GenerateMessagePack" AfterTargets="Build">
-    <PropertyGroup>
-      <_MessagePackGeneratorArguments>-i ./ChatApp.Shared.csproj -o ../ChatApp.Unity/Assets/Scripts/Generated/MessagePack.Generated.cs</_MessagePackGeneratorArguments>
-    </PropertyGroup>
-    <Exec Command="dotnet tool run mpc $(_MessagePackGeneratorArguments)" />
-  </Target>
-
 </Project>

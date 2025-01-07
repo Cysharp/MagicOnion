@@ -15,7 +15,7 @@ if (!RuntimeFeature.IsDynamicCodeSupported)
         BuiltinResolver.Instance,
         PrimitiveObjectResolver.Instance,
         MagicOnionGeneratedClientInitializer.Resolver,
-        MessagePack.Resolvers.GeneratedResolver.Instance
+        StandardResolver.Instance
     );
     MessagePackSerializer.DefaultOptions = MessagePackSerializer.DefaultOptions.WithResolver(StaticCompositeResolver.Instance);
 }
