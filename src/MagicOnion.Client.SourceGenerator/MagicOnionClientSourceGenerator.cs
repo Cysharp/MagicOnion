@@ -17,8 +17,6 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             predicate: static (node, cancellationToken) => node is ClassDeclarationSyntax,
             transform: static (ctx, cancellationToken) => ((ClassDeclarationSyntax)ctx.TargetNode, ctx.Attributes, ctx.SemanticModel));
 
-        context.RegisterPostInitializationOutput(static context => Emitter.AddAttributeSources(context.AddSource));
-
         context.RegisterSourceOutput(generationAttr.Combine(referenceSymbols), static (sourceProductionContext, value) =>
         {
             var ((initializerClassDecl, attrs, semanticModel), referenceSymbols) = value;

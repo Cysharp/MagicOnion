@@ -76,6 +76,7 @@ MagicOnion.Client.MagicOnionClientBase<T>
 MagicOnion.Client.MagicOnionClientBase<T>.MagicOnionClientBase(MagicOnion.Client.MagicOnionClientOptions! options) -> void
 MagicOnion.Client.MagicOnionClientFactoryDelegate<T>
 MagicOnion.Client.MagicOnionClientFactoryProvider
+MagicOnion.Client.MagicOnionClientGenerationAttribute
 MagicOnion.Client.MagicOnionClientOptions
 MagicOnion.Client.MagicOnionClientOptions.CallInvoker.get -> Grpc.Core.CallInvoker!
 MagicOnion.Client.MagicOnionClientOptions.CallOptions.get -> Grpc.Core.CallOptions
