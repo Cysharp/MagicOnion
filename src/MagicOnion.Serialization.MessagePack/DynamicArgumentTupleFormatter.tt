@@ -9,10 +9,10 @@
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace MagicOnion.Serialization.MessagePack
-{
-    // T2 ~ T15
-    // NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.
+namespace MagicOnion.Serialization.MessagePack;
+
+// T2 ~ T15
+// NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.
 
 <# for(var i = 2; i <= 15; i++) {
     var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0}", x)));
@@ -21,61 +21,60 @@ namespace MagicOnion.Serialization.MessagePack
     var itemArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("item{0}", x)));
  #>
 
-    public class DynamicArgumentTupleFormatter<<#= typeArgs #>> : IMessagePackFormatter<DynamicArgumentTuple<<#= typeArgs #>>>
+public class DynamicArgumentTupleFormatter<<#= typeArgs #>> : IMessagePackFormatter<DynamicArgumentTuple<<#= typeArgs #>>>
+{
+<# for(var j = 1; j <= i; j++) { #>
+    readonly T<#= j #> default<#= j #>;
+<# } #>
+
+    public DynamicArgumentTupleFormatter()
     {
 <# for(var j = 1; j <= i; j++) { #>
-        readonly T<#= j #> default<#= j #>;
+        this.default<#= j #> = default!;
 <# } #>
-
-        public DynamicArgumentTupleFormatter()
-        {
-<# for(var j = 1; j <= i; j++) { #>
-            this.default<#= j #> = default!;
-<# } #>
-        }
-
-        public DynamicArgumentTupleFormatter(<#= defaultArgs #>)
-        {
-<# for(var j = 1; j <= i; j++) { #>
-            this.default<#= j #> = default<#= j #>;
-<# } #>
-        }
-
-        public void Serialize(ref MessagePackWriter writer, DynamicArgumentTuple<<#= typeArgs #>> value, MessagePackSerializerOptions options)
-        {
-            writer.WriteArrayHeader(<#= i #>);
-            var resolver = options.Resolver;
-<# for(var j = 1; j <= i; j++) { #>
-            resolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref writer, value.Item<#= j #>, options);
-<# } #>
-        }
-
-        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
-        {
-            var resolver = options.Resolver;
-            var length = reader.ReadArrayHeader();
-
-<# for(var j = 1; j <= i; j++) { #>
-            var item<#= j #> = default<#= j #>;
-<# } #>
-
-            for (var i = 0; i < length; i++)
-            {
-                switch (i)
-                {
-<# for(var j = 1; j <= i; j++) { #>
-                    case <#= j - 1 #>:
-                        item<#= j #> = resolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(ref reader, options);
-                        break;
-<# } #>
-                    default:
-                        reader.Skip();
-                        break;
-                }
-            }
-
-            return new DynamicArgumentTuple<<#= typeArgs #>>(<#= itemArgs #>);
-        }
     }
+
+    public DynamicArgumentTupleFormatter(<#= defaultArgs #>)
+    {
+<# for(var j = 1; j <= i; j++) { #>
+        this.default<#= j #> = default<#= j #>;
 <# } #>
+    }
+
+    public void Serialize(ref MessagePackWriter writer, DynamicArgumentTuple<<#= typeArgs #>> value, MessagePackSerializerOptions options)
+    {
+        writer.WriteArrayHeader(<#= i #>);
+        var resolver = options.Resolver;
+<# for(var j = 1; j <= i; j++) { #>
+        resolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref writer, value.Item<#= j #>, options);
+<# } #>
+    }
+
+    public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+    {
+        var resolver = options.Resolver;
+        var length = reader.ReadArrayHeader();
+
+<# for(var j = 1; j <= i; j++) { #>
+        var item<#= j #> = default<#= j #>;
+<# } #>
+
+        for (var i = 0; i < length; i++)
+        {
+            switch (i)
+            {
+<# for(var j = 1; j <= i; j++) { #>
+                case <#= j - 1 #>:
+                    item<#= j #> = resolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(ref reader, options);
+                    break;
+<# } #>
+                default:
+                    reader.Skip();
+                    break;
+            }
+        }
+
+        return new DynamicArgumentTuple<<#= typeArgs #>>(<#= itemArgs #>);
+    }
 }
+<# } #>

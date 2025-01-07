@@ -1,13 +1,12 @@
-namespace MagicOnion.Server.Hubs
-{
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class MethodIdAttribute : Attribute
-    {
-        public readonly int MethodId;
+namespace MagicOnion.Server.Hubs;
 
-        public MethodIdAttribute(int methodId)
-        {
-            MethodId = methodId;
-        }
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public class MethodIdAttribute : Attribute
+{
+    public readonly int MethodId;
+
+    public MethodIdAttribute(int methodId)
+    {
+        MethodId = methodId;
     }
 }

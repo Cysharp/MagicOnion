@@ -1,7 +1,6 @@
-namespace MagicOnion.Client
+namespace MagicOnion.Client;
+
+public interface IClientFilter
 {
-    public interface IClientFilter
-    {
-        ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next);
-    }
+    ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next);
 }
