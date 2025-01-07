@@ -11,67 +11,66 @@
 using System.Runtime.CompilerServices;
 using MemoryPack;
 
-namespace MagicOnion.Serialization.MemoryPack
+namespace MagicOnion.Serialization.MemoryPack;
+
+public static class DynamicArgumentTupleFormatter
 {
-    public static class DynamicArgumentTupleFormatter
+    static bool isRegistered = false;
+    public static void Register()
     {
-        static bool isRegistered = false;
-        public static void Register()
-        {
-            if (isRegistered) return;
-            isRegistered = true;
+        if (isRegistered) return;
+        isRegistered = true;
 
 <# for (var i = 2; i < 16; i++) { #>
-            MemoryPackFormatterProvider.RegisterGenericType(typeof(DynamicArgumentTuple<<#= new String(',', i - 1) #>>), typeof(DynamicArgumentTupleFormatter<<#= new String(',', i - 1) #>>));
+        MemoryPackFormatterProvider.RegisterGenericType(typeof(DynamicArgumentTuple<<#= new String(',', i - 1) #>>), typeof(DynamicArgumentTupleFormatter<<#= new String(',', i - 1) #>>));
 <# } #>
-        }
     }
+}
 
 <# for (var i = 2; i < 16; i++) {
     var dynamicArgumentTupleFormatterGenericArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"T{x}"));
     var dynamicArgumentTupleGenericArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => $"T{x}?"));
 #>
+[global::MagicOnion.Serialization.MemoryPack.Preserve]
+public class DynamicArgumentTupleFormatter<<#= dynamicArgumentTupleFormatterGenericArgs #>> : MemoryPackFormatter<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>
+{
     [global::MagicOnion.Serialization.MemoryPack.Preserve]
-    public class DynamicArgumentTupleFormatter<<#= dynamicArgumentTupleFormatterGenericArgs #>> : MemoryPackFormatter<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>
+#if UNITY_2021_3_OR_NEWER
+    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
+#else
+    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
+#endif
     {
-        [global::MagicOnion.Serialization.MemoryPack.Preserve]
-#if UNITY_2021_3_OR_NEWER
-        public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
-#else
-        public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
-#endif
+        if (!System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>())
         {
-            if (!System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>())
-            {
-                writer.DangerousWriteUnmanaged(value);
-                return;
-            }
-<#     for (var j = 1; j <= i; j++) { #>
-            writer.WriteValue(value.Item<#= j #>);
-<#     } #>
+            writer.DangerousWriteUnmanaged(value);
+            return;
         }
-
-        [global::MagicOnion.Serialization.MemoryPack.Preserve]
-#if UNITY_2021_3_OR_NEWER
-        public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
-#else
-        public override void Deserialize(ref MemoryPackReader reader, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
-#endif
-        {
-            if (!System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>())
-            {
-                reader.DangerousReadUnmanaged(out value);
-                return;
-            }
-
-            value = new DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>(
 <#     for (var j = 1; j <= i; j++) { #>
-                <# if (j != 1) { #>, <# } #>reader.ReadValue<T<#= j #>?>()
+        writer.WriteValue(value.Item<#= j #>);
 <#     } #>
-            );
-        }
     }
 
-<# } #>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+#if UNITY_2021_3_OR_NEWER
+    public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
+#else
+    public override void Deserialize(ref MemoryPackReader reader, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
+#endif
+    {
+        if (!System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>())
+        {
+            reader.DangerousReadUnmanaged(out value);
+            return;
+        }
+
+        value = new DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>(
+<#     for (var j = 1; j <= i; j++) { #>
+            <# if (j != 1) { #>, <# } #>reader.ReadValue<T<#= j #>?>()
+<#     } #>
+        );
+    }
 }
+
+<# } #>
 

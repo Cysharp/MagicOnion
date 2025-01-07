@@ -1,17 +1,15 @@
-using System;
 using System.ComponentModel;
 
-namespace MagicOnion.Internal
-{
-    // Pubternal API
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class RawBytesBox
-    {
-        public ReadOnlyMemory<byte> Bytes { get; }
+namespace MagicOnion.Internal;
 
-        public RawBytesBox(ReadOnlyMemory<byte> bytes)
-        {
-            Bytes = bytes;
-        }
+// Pubternal API
+[EditorBrowsable(EditorBrowsableState.Never)]
+public sealed class RawBytesBox
+{
+    public ReadOnlyMemory<byte> Bytes { get; }
+
+    public RawBytesBox(ReadOnlyMemory<byte> bytes)
+    {
+        Bytes = bytes;
     }
 }

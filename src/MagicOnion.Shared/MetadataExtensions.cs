@@ -1,62 +1,60 @@
 using Grpc.Core;
-using System;
 
-namespace MagicOnion
+namespace MagicOnion;
+
+public static class MetadataExtensions
 {
-    public static class MetadataExtensions
+    public const string BinarySuffix = "-bin";
+
+    /// <summary>
+    /// Get metdata entry. If does not exists, return null.
+    /// </summary>
+    public static Metadata.Entry? GetOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
     {
-        public const string BinarySuffix = "-bin";
-
-        /// <summary>
-        /// Get metdata entry. If does not exists, return null.
-        /// </summary>
-        public static Metadata.Entry? GetOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
+        for (int i = 0; i < metadata.Count; i++)
         {
-            for (int i = 0; i < metadata.Count; i++)
+            var entry = metadata[i];
+            if (ignoreCase)
             {
-                var entry = metadata[i];
-                if (ignoreCase)
+                if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return entry;
-                    }
-                }
-                else
-                {
-                    if (entry.Key == key)
-                    {
-                        return entry;
-                    }
+                    return entry;
                 }
             }
-            return null;
-        }
-
-        /// <summary>
-        /// Get metdata string value. If does not exists, return null.
-        /// </summary>
-        public static string? GetValueOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
-        {
-            for (int i = 0; i < metadata.Count; i++)
+            else
             {
-                var entry = metadata[i];
-                if (ignoreCase)
+                if (entry.Key == key)
                 {
-                    if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return entry.Value;
-                    }
-                }
-                else
-                {
-                    if (entry.Key == key)
-                    {
-                        return entry.Value;
-                    }
+                    return entry;
                 }
             }
-            return null;
         }
+        return null;
+    }
+
+    /// <summary>
+    /// Get metdata string value. If does not exists, return null.
+    /// </summary>
+    public static string? GetValueOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
+    {
+        for (int i = 0; i < metadata.Count; i++)
+        {
+            var entry = metadata[i];
+            if (ignoreCase)
+            {
+                if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    return entry.Value;
+                }
+            }
+            else
+            {
+                if (entry.Key == key)
+                {
+                    return entry.Value;
+                }
+            }
+        }
+        return null;
     }
 }

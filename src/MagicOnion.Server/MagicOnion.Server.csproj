@@ -5,7 +5,6 @@
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
 
     <DefineConstants>$(DefineConstants);USE_OBJECTPOOL_STREAMINGHUBPAYLOADPOOL</DefineConstants>
 

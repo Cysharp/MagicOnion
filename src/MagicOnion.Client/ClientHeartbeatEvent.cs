@@ -1,20 +1,17 @@
-using System;
+namespace MagicOnion.Client;
 
-namespace MagicOnion.Client
+/// <summary>
+/// Represents a client heartbeat received event.
+/// </summary>
+public readonly struct ClientHeartbeatEvent
 {
     /// <summary>
-    /// Represents a client heartbeat received event.
+    /// Gets the round trip time (RTT) between client and server.
     /// </summary>
-    public readonly struct ClientHeartbeatEvent
-    {
-        /// <summary>
-        /// Gets the round trip time (RTT) between client and server.
-        /// </summary>
-        public TimeSpan RoundTripTime { get; }
+    public TimeSpan RoundTripTime { get; }
 
-        public ClientHeartbeatEvent(long roundTripTimeMs)
-        {
-            RoundTripTime = TimeSpan.FromMilliseconds(roundTripTimeMs);
-        }
+    public ClientHeartbeatEvent(long roundTripTimeMs)
+    {
+        RoundTripTime = TimeSpan.FromMilliseconds(roundTripTimeMs);
     }
 }
