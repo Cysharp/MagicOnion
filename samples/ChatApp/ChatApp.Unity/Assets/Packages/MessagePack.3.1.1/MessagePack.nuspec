@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MessagePack</id>
+    <version>3.1.1</version>
+    <title>MessagePack for C#</title>
+    <authors>neuecc,aarnott</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/MessagePack-CSharp/MessagePack-CSharp</projectUrl>
+    <description>Extremely Fast MessagePack(MsgPack) Serializer for C# (.NET Framework, .NET 6, Unity, Xamarin).</description>
+    <copyright>© Yoshifumi Kawai and contributors. All rights reserved.</copyright>
+    <tags>MsgPack MessagePack Serialization Formatter Serializer Unity Xamarin</tags>
+    <repository type="git" url="https://github.com/MessagePack-CSharp/MessagePack-CSharp" commit="8373710fb0ae4bb453737f773b930401d8500c31" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2">
+        <dependency id="MessagePackAnalyzer" version="3.1.1" include="All" />
+        <dependency id="MessagePack.Annotations" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.NET.StringTools" version="17.11.4" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />
+        <dependency id="System.Collections.Immutable" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.5" exclude="Analyzers" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" exclude="Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="MessagePackAnalyzer" version="3.1.1" include="All" />
+        <dependency id="MessagePack.Annotations" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.NET.StringTools" version="17.11.4" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="MessagePackAnalyzer" version="3.1.1" include="All" />
+        <dependency id="MessagePack.Annotations" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.NET.StringTools" version="17.11.4" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="MessagePackAnalyzer" version="3.1.1" include="All" />
+        <dependency id="MessagePack.Annotations" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.NET.StringTools" version="17.11.4" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />
+        <dependency id="System.Collections.Immutable" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.5" exclude="Analyzers" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="MessagePackAnalyzer" version="3.1.1" include="All" />
+        <dependency id="MessagePack.Annotations" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.NET.StringTools" version="17.11.4" include="Runtime,Build,Native,ContentFiles,Analyzers,BuildTransitive" />
+        <dependency id="System.Collections.Immutable" version="8.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
