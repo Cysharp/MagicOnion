@@ -77,6 +77,21 @@ MagicOnion.Client.MagicOnionClientBase<T>.MagicOnionClientBase(MagicOnion.Client
 MagicOnion.Client.MagicOnionClientFactoryDelegate<T>
 MagicOnion.Client.MagicOnionClientFactoryProvider
 MagicOnion.Client.MagicOnionClientGenerationAttribute
+MagicOnion.Client.MagicOnionClientGenerationAttribute.DisableAutoRegistration.get -> bool
+MagicOnion.Client.MagicOnionClientGenerationAttribute.DisableAutoRegistration.set -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.EnableStreamingHubDiagnosticHandler.get -> bool
+MagicOnion.Client.MagicOnionClientGenerationAttribute.EnableStreamingHubDiagnosticHandler.set -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateFileHintNamePrefix.get -> string!
+MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateFileHintNamePrefix.set -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType
+MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType.MemoryPack = 1 -> MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType
+MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType.MessagePack = 0 -> MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType
+MagicOnion.Client.MagicOnionClientGenerationAttribute.MagicOnionClientGenerationAttribute(params System.Type![]! typesContainedInTargetAssembly) -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.MessagePackFormatterNamespace.get -> string!
+MagicOnion.Client.MagicOnionClientGenerationAttribute.MessagePackFormatterNamespace.set -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.Serializer.get -> MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType
+MagicOnion.Client.MagicOnionClientGenerationAttribute.Serializer.set -> void
+MagicOnion.Client.MagicOnionClientGenerationAttribute.TypesContainedInTargetAssembly.get -> System.Type![]!
 MagicOnion.Client.MagicOnionClientOptions
 MagicOnion.Client.MagicOnionClientOptions.CallInvoker.get -> Grpc.Core.CallInvoker!
 MagicOnion.Client.MagicOnionClientOptions.CallOptions.get -> Grpc.Core.CallOptions
