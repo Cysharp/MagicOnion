@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MagicOnion.Serialization.MessagePack</name>
+    </assembly>
+    <members>
+        <member name="T:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider">
+            <summary>
+            Provides a <see cref="T:MagicOnion.Serialization.IMagicOnionSerializerProvider"/> using MessagePack.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider.Default">
+            <summary>
+            Gets the provider with <see cref="P:MessagePack.MessagePackSerializer.DefaultOptions"/> for serialization.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider.WithEnableFallback(System.Boolean)">
+            <summary>
+            Gets a provider with method parameter fallback option. If the option is enabled, a serializer will respects the method's optional parameters.
+            </summary>
+            <param name="enableFallback"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
