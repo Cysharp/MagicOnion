@@ -29,6 +29,13 @@ namespace MagicOnion.Serialization.MessagePack
         readonly T<#= j #> default<#= j #>;
 <# } #>
 
+        public DynamicArgumentTupleFormatter()
+        {
+<# for(var j = 1; j <= i; j++) { #>
+            this.default<#= j #> = default!;
+<# } #>
+        }
+
         public DynamicArgumentTupleFormatter(<#= defaultArgs #>)
         {
 <# for(var j = 1; j <= i; j++) { #>
