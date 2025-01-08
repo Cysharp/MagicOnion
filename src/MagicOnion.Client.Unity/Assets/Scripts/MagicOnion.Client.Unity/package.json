@@ -2,7 +2,7 @@
     "name": "com.cysharp.magiconion.client.unity",
     "displayName": "MagicOnion.Client.Unity",
     "author": { "name": "Cysharp, Inc.", "url": "https://cysharp.co.jp/en/" },
-    "version": "7.0.0-preview.10",
+    "version": "7.0.0-preview.11",
     "unity": "2021.3",
     "description": "Unified Realtime/API framework for .NET platform and Unity.",
     "keywords": [
