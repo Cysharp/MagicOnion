@@ -12,30 +12,31 @@ namespace MagicOnion;
 [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder))]
 public readonly struct UnaryResult
 {
-    internal readonly bool hasRawValue;
-    internal readonly Task? rawTaskValue;
-    internal readonly Task<IResponseContext<Nil>>? response;
+    readonly object? value;
 
+    [Obsolete("Use default(UnaryResult) instead.")]
     public UnaryResult(Nil nil)
     {
-        this.hasRawValue = true;
-        this.rawTaskValue = default;
-        this.response = null;
+        this.value = default;
     }
 
-    public UnaryResult(Task<Nil> rawTaskValue)
-    {
-        this.hasRawValue = true;
-        this.rawTaskValue = rawTaskValue ?? throw new ArgumentNullException(nameof(rawTaskValue));
-        this.response = null;
-    }
+    [Obsolete("Use UnaryResult(Task) instead.")]
+    public UnaryResult(Task<Nil> rawTaskValue) : this((Task)rawTaskValue)
+    { }
 
     public UnaryResult(Task<IResponseContext<Nil>> response)
     {
-        this.hasRawValue = false;
-        this.rawTaskValue = default;
-        this.response = response ?? throw new ArgumentNullException(nameof(response));
+        this.value = response ?? throw new ArgumentNullException(nameof(response));
     }
+
+    public UnaryResult(Task rawTaskValue)
+    {
+        this.value = rawTaskValue ?? throw new ArgumentNullException(nameof(rawTaskValue));
+    }
+
+    internal bool HasRawValue
+        => this.value is null ||
+           this.value is Task { IsCompleted: true, IsFaulted: false } and not Task<IResponseContext<Nil>>;
 
     /// <summary>
     /// Asynchronous call result.
@@ -44,25 +45,20 @@ public readonly struct UnaryResult
     {
         get
         {
-            if (hasRawValue)
+            // This result has a raw Task value.
+            if (value?.GetType() == typeof(Task) || value is Task<Nil>)
             {
-                if (rawTaskValue != null)
-                {
-                    return rawTaskValue;
-                }
+                return (Task)value; // Task or Task<Nil>
             }
-            else
-            {
-                // If the UnaryResult has no raw-value and no response, it is the default value of UnaryResult.
-                // So, we will return the default value of TResponse as Task.
-                if (response is null)
-                {
-                    return Task.CompletedTask;
-                }
 
+            // This result has a response Task value.
+            if (value is Task<IResponseContext<Nil>>)
+            {
                 return UnwrapResponse();
             }
 
+            // If the UnaryResult has no raw-value and no response, it is the default value of UnaryResult.
+            // So, we will return the default value of TResponse as Task.
             return Task.CompletedTask;
         }
     }
@@ -73,7 +69,7 @@ public readonly struct UnaryResult
     public Task<Metadata> ResponseHeadersAsync => UnwrapResponseHeaders();
 
     Task<IResponseContext<Nil>> GetRequiredResponse()
-        => response ?? throw new InvalidOperationException("UnaryResult has no response.");
+        => this.value as Task<IResponseContext<Nil>> ?? throw new InvalidOperationException("UnaryResult has no response.");
 
     async Task UnwrapResponse()
     {
@@ -105,6 +101,12 @@ public readonly struct UnaryResult
         => ResponseAsync.GetAwaiter();
 
     /// <summary>
+    /// Configures an awaiter used to await this object.
+    /// </summary>
+    public ConfiguredTaskAwaitable ConfigureAwait(bool continueOnCapturedContext)
+        => ResponseAsync.ConfigureAwait(continueOnCapturedContext);
+
+    /// <summary>
     /// Gets the call status if the call has already finished.
     /// Throws InvalidOperationException otherwise.
     /// </summary>
@@ -130,15 +132,15 @@ public readonly struct UnaryResult
     /// </remarks>
     public void Dispose()
     {
-        if (response is not null)
+        if (value is Task<IResponseContext<Nil>> responseTask)
         {
-            if (!response.IsCompleted)
+            if (!responseTask.IsCompleted)
             {
                 UnwrapDispose();
             }
             else
             {
-                response.Result.Dispose();
+                responseTask.Result.Dispose();
             }
         }
     }
@@ -180,41 +182,34 @@ public readonly struct UnaryResult
         => new UnaryResult<Nil>(MessagePack.Nil.Default);
 }
 
+
 /// <summary>
 /// Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.
 /// </summary>
 [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder<>))]
 public readonly struct UnaryResult<TResponse>
 {
-    internal readonly bool hasRawValue; // internal
-    internal readonly TResponse? rawValue; // internal
-    internal readonly Task<TResponse>? rawTaskValue; // internal
-
-    readonly Task<IResponseContext<TResponse>>? response;
+    readonly TResponse? rawValue;
+    readonly object? valueTask;
 
     public UnaryResult(TResponse rawValue)
     {
-        this.hasRawValue = true;
         this.rawValue = rawValue;
-        this.rawTaskValue = null;
-        this.response = null;
     }
 
     public UnaryResult(Task<TResponse> rawTaskValue)
     {
-        this.hasRawValue = true;
-        this.rawValue = default(TResponse);
-        this.rawTaskValue = rawTaskValue ?? throw new ArgumentNullException(nameof(rawTaskValue));
-        this.response = null;
+        this.valueTask = rawTaskValue ?? throw new ArgumentNullException(nameof(rawTaskValue));
     }
 
     public UnaryResult(Task<IResponseContext<TResponse>> response)
     {
-        this.hasRawValue = false;
-        this.rawValue = default(TResponse);
-        this.rawTaskValue = null;
-        this.response = response ?? throw new ArgumentNullException(nameof(response));
+        this.valueTask = response ?? throw new ArgumentNullException(nameof(response));
     }
+
+    internal bool HasRawValue
+        => this.valueTask is null ||
+           this.valueTask is Task<TResponse> { IsCompleted: true, IsFaulted: false };
 
     /// <summary>
     /// Asynchronous call result.
@@ -223,25 +218,27 @@ public readonly struct UnaryResult<TResponse>
     {
         get
         {
-            if (!hasRawValue)
-            {
-                // If the UnaryResult has no raw-value and no response, it is the default value of UnaryResult<TResponse>.
-                // So, we will return the default value of TResponse as Task.
-                if (response is null)
-                {
-                    return Task.FromResult(default(TResponse)!);
-                }
-
-                return UnwrapResponse();
-            }
-            else if (rawTaskValue is not null)
-            {
-                return rawTaskValue;
-            }
-            else
+            // This result has a raw value.
+            if (this.valueTask is null)
             {
                 return Task.FromResult(rawValue!);
             }
+
+            // This result has a raw Task value.
+            if (this.valueTask is Task<TResponse> t)
+            {
+                return t;
+            }
+
+            // This result has a response Task value.
+            if (valueTask is Task<IResponseContext<TResponse>>)
+            {
+                return UnwrapResponse();
+            }
+
+            // If the UnaryResult has no raw-value and no response, it is the default value of UnaryResult.
+            // So, we will return the default value of TResponse as Task.
+            return Task.FromResult(default(TResponse)!);
         }
     }
 
@@ -251,7 +248,7 @@ public readonly struct UnaryResult<TResponse>
     public Task<Metadata> ResponseHeadersAsync => UnwrapResponseHeaders();
 
     Task<IResponseContext<TResponse>> GetRequiredResponse()
-        => response ?? throw new InvalidOperationException("UnaryResult has no response.");
+        => (valueTask as Task<IResponseContext<TResponse>>) ?? throw new InvalidOperationException("UnaryResult has no response.");
 
     async Task<TResponse> UnwrapResponse()
     {
@@ -295,6 +292,12 @@ public readonly struct UnaryResult<TResponse>
         => ResponseAsync.GetAwaiter();
 
     /// <summary>
+    /// Configures an awaiter used to await this object.
+    /// </summary>
+    public ConfiguredTaskAwaitable<TResponse> ConfigureAwait(bool continueOnCapturedContext)
+        => ResponseAsync.ConfigureAwait(continueOnCapturedContext);
+
+    /// <summary>
     /// Gets the call status if the call has already finished.
     /// Throws InvalidOperationException otherwise.
     /// </summary>
@@ -320,15 +323,15 @@ public readonly struct UnaryResult<TResponse>
     /// </remarks>
     public void Dispose()
     {
-        if (response is not null)
+        if (valueTask is Task<IResponseContext<TResponse>> t)
         {
-            if (!response.IsCompleted)
+            if (!t.IsCompleted)
             {
                 UnwrapDispose();
             }
             else
             {
-                response.Result.Dispose();
+                t.Result.Dispose();
             }
         }
     }

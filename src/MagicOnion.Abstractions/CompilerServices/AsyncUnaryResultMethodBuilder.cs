@@ -40,11 +40,11 @@ public struct AsyncUnaryResultMethodBuilder
         {
             if (hasResult)
             {
-                return new UnaryResult(Nil.Default);
+                return default;
             }
 
             useBuilder = true;
-            return new UnaryResult(methodBuilder.Task);
+            return new UnaryResult((Task)methodBuilder.Task);
         }
     }
 

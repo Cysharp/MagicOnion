@@ -58,19 +58,24 @@ public class UnaryResultTest
     }
     class DummyResponseContext<T> : IResponseContext<T>
     {
-        readonly T value;
+        readonly Task<T> task;
 
         public DummyResponseContext(T value)
         {
-            this.value = value;
+            this.task = Task.FromResult(value);
         }
 
-        public Task<Metadata> ResponseHeadersAsync => Task.FromResult(Metadata.Empty);
+        public DummyResponseContext(TaskCompletionSource<T> taskCompletionSource)
+        {
+            this.task = taskCompletionSource.Task;
+        }
+
+        public Task<Metadata> ResponseHeadersAsync => task.ContinueWith(_ => new Metadata() { { "x-foo-bar", "baz" } });
         public Status GetStatus() => Status.DefaultSuccess;
         public Metadata GetTrailers() => Metadata.Empty;
 
         public Type ResponseType => typeof(T);
-        public Task<T> ResponseAsync => Task.FromResult(value);
+        public Task<T> ResponseAsync => task;
 
         public void Dispose() { }
 
@@ -84,5 +89,55 @@ public class UnaryResultTest
 
         var result2 = default(UnaryResult<string>);
         (await result2).Should().Be(null);
+    }
+
+    [Fact]
+    public async Task ResponseHeadersAsync_Ctor_ResponseContext()
+    {
+        var result = new UnaryResult<int>(Task.FromResult<IResponseContext<int>>(new DummyResponseContext<int>(123)));
+        (await result.ResponseHeadersAsync).Should().Contain(x => x.Key == "x-foo-bar" && x.Value == "baz");
+    }
+
+    [Fact]
+    public async Task ResponseHeadersAsync_Never_Ctor_ResponseContext()
+    {
+        var result = new UnaryResult<int>(Task.FromResult<IResponseContext<int>>(new DummyResponseContext<int>(new TaskCompletionSource<int>())));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseHeadersAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task ResponseAsync_Ctor_Task()
+    {
+        var result = new UnaryResult<int>(Task.FromResult(123));
+        (await result.ResponseAsync).Should().Be(123);
+    }
+
+    [Fact]
+    public async Task ResponseAsync_Ctor_TaskOfNil()
+    {
+        var result = new UnaryResult<int>(Task.FromResult(123));
+        (await result.ResponseAsync).Should().Be(123);
+    }
+
+    [Fact]
+    public async Task ResponseAsync_Ctor_ResponseContext()
+    {
+        var result = new UnaryResult<int>(Task.FromResult<IResponseContext<int>>(new DummyResponseContext<int>(123)));
+        await result.ResponseAsync;
+    }
+
+    [Fact]
+    public async Task ResponseAsync_Never_Ctor_Task()
+    {
+        var result = new UnaryResult<int>(new TaskCompletionSource<int>().Task);
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
+    }
+
+
+    [Fact]
+    public async Task ResponseAsync_Never_Ctor_ResponseContext()
+    {
+        var result = new UnaryResult<int>(Task.FromResult<IResponseContext<int>>(new DummyResponseContext<int>(new TaskCompletionSource<int>())));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
     }
 }

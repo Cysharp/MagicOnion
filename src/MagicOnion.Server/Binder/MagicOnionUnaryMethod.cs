@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Server.Internal;
@@ -37,15 +38,18 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
 
     protected static ValueTask SetUnaryResultNonGeneric(UnaryResult result, ServiceContext context)
     {
-        if (result is { hasRawValue: true, rawTaskValue.IsCompletedSuccessfully: true })
+        if (result.HasRawValue)
         {
-            return Await(result.rawTaskValue, context);
+            context.Result = BoxedNil;
         }
-        context.Result = BoxedNil;
+        else
+        {
+            return Await(result, context);
+        }
 
         return default;
 
-        static async ValueTask Await(Task task, ServiceContext context)
+        static async ValueTask Await(UnaryResult task, ServiceContext context)
         {
             await task.ConfigureAwait(false);
             context.Result = BoxedNil;
@@ -54,28 +58,18 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
 
     protected static ValueTask SetUnaryResult(UnaryResult<TResponse> result, ServiceContext context)
     {
-        if (result.hasRawValue)
+        if (result.HasRawValue)
         {
-            if (result.rawTaskValue is { } task)
-            {
-                if (task.IsCompletedSuccessfully)
-                {
-                    context.Result = task.Result;
-                }
-                else
-                {
-                    return Await(task, context);
-                }
-            }
-            else
-            {
-                context.Result = result.rawValue;
-            }
+            context.Result = result.GetAwaiter().GetResult();
+        }
+        else
+        {
+            return Await(result, context);
         }
 
         return default;
 
-        static async ValueTask Await(Task<TResponse> task, ServiceContext context)
+        static async ValueTask Await(UnaryResult<TResponse> task, ServiceContext context)
         {
             context.Result = await task.ConfigureAwait(false);
         }
