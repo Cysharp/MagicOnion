@@ -93,7 +93,7 @@ jobs:
 
   # release
   create-release:
-    needs: [update-packagejson, build-dotnet, build-unity]
+    needs: [update-packagejson, build-dotnet]
     uses: Cysharp/Actions/.github/workflows/create-release.yaml@main
     with:
       commit-id: ${{ needs.update-packagejson.outputs.sha }}
@@ -107,7 +107,7 @@ jobs:
 
   cleanup:
     if: ${{ needs.update-packagejson.outputs.is-branch-created == 'true' }}
-    needs: [build-dotnet, update-packagejson, build-unity]
+    needs: [build-dotnet, update-packagejson]
     uses: Cysharp/Actions/.github/workflows/clean-packagejson-branch.yaml@main
     with:
       branch: ${{ needs.update-packagejson.outputs.branch-name }}
