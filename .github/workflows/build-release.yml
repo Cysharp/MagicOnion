@@ -100,7 +100,6 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
       tag: ${{ inputs.tag }}
       nuget-push: true
-      release-upload: true
       release-format: '{0}'
     secrets: inherit
 
