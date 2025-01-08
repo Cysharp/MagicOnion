@@ -14289,6 +14289,12 @@ references:
   commentId: M:MagicOnion.UnaryResult.#ctor(Nil)
   fullName: MagicOnion.UnaryResult.UnaryResult(Nil)
   nameWithType: UnaryResult.UnaryResult(Nil)
+- uid: MagicOnion.UnaryResult.#ctor(Task)
+  name: UnaryResult(Task)
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult__ctor_Task_
+  commentId: M:MagicOnion.UnaryResult.#ctor(Task)
+  fullName: MagicOnion.UnaryResult.UnaryResult(Task)
+  nameWithType: UnaryResult.UnaryResult(Task)
 - uid: MagicOnion.UnaryResult.#ctor(Task{MagicOnion.Client.IResponseContext{Nil}})
   name: UnaryResult(Task<IResponseContext<Nil>>)
   href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult__ctor_Task_MagicOnion_Client_IResponseContext_Nil___
@@ -14327,6 +14333,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.UnaryResult.CompletedResult
   nameWithType: UnaryResult.CompletedResult
+- uid: MagicOnion.UnaryResult.ConfigureAwait(System.Boolean)
+  name: ConfigureAwait(Boolean)
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_ConfigureAwait_System_Boolean_
+  commentId: M:MagicOnion.UnaryResult.ConfigureAwait(System.Boolean)
+  fullName: MagicOnion.UnaryResult.ConfigureAwait(System.Boolean)
+  nameWithType: UnaryResult.ConfigureAwait(Boolean)
+- uid: MagicOnion.UnaryResult.ConfigureAwait*
+  name: ConfigureAwait
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_ConfigureAwait_
+  commentId: Overload:MagicOnion.UnaryResult.ConfigureAwait
+  isSpec: "True"
+  fullName: MagicOnion.UnaryResult.ConfigureAwait
+  nameWithType: UnaryResult.ConfigureAwait
 - uid: MagicOnion.UnaryResult.Dispose
   name: Dispose()
   href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_Dispose
@@ -14487,6 +14506,23 @@ references:
   fullName.vb: MagicOnion.UnaryResult(Of TResponse).UnaryResult
   nameWithType: UnaryResult<TResponse>.UnaryResult
   nameWithType.vb: UnaryResult(Of TResponse).UnaryResult
+- uid: MagicOnion.UnaryResult`1.ConfigureAwait(System.Boolean)
+  name: ConfigureAwait(Boolean)
+  href: api/MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_ConfigureAwait_System_Boolean_
+  commentId: M:MagicOnion.UnaryResult`1.ConfigureAwait(System.Boolean)
+  fullName: MagicOnion.UnaryResult<TResponse>.ConfigureAwait(System.Boolean)
+  fullName.vb: MagicOnion.UnaryResult(Of TResponse).ConfigureAwait(System.Boolean)
+  nameWithType: UnaryResult<TResponse>.ConfigureAwait(Boolean)
+  nameWithType.vb: UnaryResult(Of TResponse).ConfigureAwait(Boolean)
+- uid: MagicOnion.UnaryResult`1.ConfigureAwait*
+  name: ConfigureAwait
+  href: api/MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_ConfigureAwait_
+  commentId: Overload:MagicOnion.UnaryResult`1.ConfigureAwait
+  isSpec: "True"
+  fullName: MagicOnion.UnaryResult<TResponse>.ConfigureAwait
+  fullName.vb: MagicOnion.UnaryResult(Of TResponse).ConfigureAwait
+  nameWithType: UnaryResult<TResponse>.ConfigureAwait
+  nameWithType.vb: UnaryResult(Of TResponse).ConfigureAwait
 - uid: MagicOnion.UnaryResult`1.Dispose
   name: Dispose()
   href: api/MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_Dispose
