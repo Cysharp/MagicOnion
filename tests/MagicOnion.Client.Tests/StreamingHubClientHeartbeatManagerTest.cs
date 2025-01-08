@@ -33,11 +33,11 @@ public class StreamingHubClientHeartbeatManagerTest
         // Act
         manager.StartClientHeartbeatLoop();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(channel.Reader.TryRead(out var heartbeat1));
@@ -74,24 +74,24 @@ public class StreamingHubClientHeartbeatManagerTest
         // Act
         manager.StartClientHeartbeatLoop();
         timeProvider.Advance(TimeSpan.FromMilliseconds(1000)); // Send
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x0 /* Sequence(0) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(1000)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900)); // Send
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x1 /* Sequence(1) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(2000)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900)); // Send
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x2 /* Sequence(2) */, .. ToMessagePackBytes(TimeSpan.FromMilliseconds(3000)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(3, clientHeartbeatResponseReceived.Count);
@@ -132,9 +132,9 @@ public class StreamingHubClientHeartbeatManagerTest
         // Act
         manager.StartClientHeartbeatLoop();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(channel.Reader.TryRead(out var heartbeat1));
@@ -170,23 +170,23 @@ public class StreamingHubClientHeartbeatManagerTest
         manager.StartClientHeartbeatLoop();
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // Send a client heartbeat message
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
 
         Assert.True(channel.Reader.TryRead(out var heartbeat1));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(250));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         // Received a response message from the server.
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x0 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddSeconds(1)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(250));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(500));
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         Assert.True(channel.Reader.TryRead(out var heartbeat2));
@@ -217,26 +217,26 @@ public class StreamingHubClientHeartbeatManagerTest
         // Act & Assert
         manager.StartClientHeartbeatLoop();
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // Send a client heartbeat message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 1s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 2s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900)); // 2.9s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         // Respond to the first message. but it does not respond to subsequent messages.
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x0 /* Sequence(0) */, .. ToMessagePackBytes(origin.AddSeconds(1)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 3s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.True(manager.TimeoutToken.IsCancellationRequested);
     }
 
@@ -265,19 +265,19 @@ public class StreamingHubClientHeartbeatManagerTest
         // Act & Assert
         manager.StartClientHeartbeatLoop();
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // Send a client heartbeat message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 1s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromSeconds(1)); // 2s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(900)); // 2.9s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
 
         // Respond to the first message. but it does not respond to subsequent messages.
@@ -286,7 +286,7 @@ public class StreamingHubClientHeartbeatManagerTest
         manager.ProcessClientHeartbeatResponse(StreamingHubPayloadPool.Shared.RentOrCreate([0x95 /* Array(5) */, 0x7e /* 0x7e(127) */, 0x2 /* Sequence(2) */, .. ToMessagePackBytes(origin.AddSeconds(3)) /* ClientSentAt */, 0xc0 /* Nil */, 0xc0 /* Nil */]));
 
         timeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 3s has elapsed since the first message.
-        await Task.Delay(10);
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         Assert.False(manager.TimeoutToken.IsCancellationRequested);
     }
 

@@ -69,7 +69,7 @@ public class HandCraftedMagicOnionMethodProviderTest(HandCraftedMagicOnionMethod
         var httpClient = factory.CreateDefaultClient();
         var receiver = Substitute.For<IHandCraftedMagicOnionMethodProviderTest_GreeterHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IHandCraftedMagicOnionMethodProviderTest_GreeterHub, IHandCraftedMagicOnionMethodProviderTest_GreeterHubReceiver>(
-            GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), receiver);
+            GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), receiver, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         await client.JoinAsync("Alice", "Room-A");

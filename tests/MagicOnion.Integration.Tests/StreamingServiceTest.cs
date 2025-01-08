@@ -36,8 +36,8 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var result  = await client.ClientStreaming();
 
         // Act
-        await result.RequestStream.WriteAsync((123, 456));
-        await result.RequestStream.WriteAsync((789, 123));
+        await result.RequestStream.WriteAsync((123, 456), CancellationToken.None);
+        await result.RequestStream.WriteAsync((789, 123), CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         var response = await result.ResponseAsync;
 
@@ -56,7 +56,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
         // Act
         var sum = 0;
-        await foreach (var item in result.ResponseStream.ReadAllAsync())
+        await foreach (var item in result.ResponseStream.ReadAllAsync(CancellationToken.None))
         {
             sum += item;
         }
@@ -78,14 +78,14 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var sum = 0;
         var readResponseTask = Task.Run(async () =>
         {
-            await foreach (var response in result.ResponseStream.ReadAllAsync())
+            await foreach (var response in result.ResponseStream.ReadAllAsync(TestContext.Current.CancellationToken))
             {
                 sum += response;
             }
-        });
-        await result.RequestStream.WriteAsync((123, 456));
-        await result.RequestStream.WriteAsync((789, 123));
-        await result.RequestStream.WriteAsync((111, 222));
+        }, TestContext.Current.CancellationToken);
+        await result.RequestStream.WriteAsync((123, 456), CancellationToken.None);
+        await result.RequestStream.WriteAsync((789, 123), CancellationToken.None);
+        await result.RequestStream.WriteAsync((111, 222), CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         await readResponseTask;
 
@@ -103,8 +103,8 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var result  = await client.ClientStreamingRefType();
 
         // Act
-        await result.RequestStream.WriteAsync(new MyStreamingRequest(123, 456));
-        await result.RequestStream.WriteAsync(new MyStreamingRequest(789, 123));
+        await result.RequestStream.WriteAsync(new MyStreamingRequest(123, 456), CancellationToken.None);
+        await result.RequestStream.WriteAsync(new MyStreamingRequest(789, 123), CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         var response = await result.ResponseAsync;
 
@@ -123,7 +123,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
         // Act
         var sum = 0;
-        await foreach (var item in result.ResponseStream.ReadAllAsync())
+        await foreach (var item in result.ResponseStream.ReadAllAsync(TestContext.Current.CancellationToken))
         {
             sum += item.Value;
         }
@@ -145,14 +145,14 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var sum = 0;
         var readResponseTask = Task.Run(async () =>
         {
-            await foreach (var response in result.ResponseStream.ReadAllAsync())
+            await foreach (var response in result.ResponseStream.ReadAllAsync(TestContext.Current.CancellationToken))
             {
                 sum += response.Value;
             }
-        });
-        await result.RequestStream.WriteAsync(new MyStreamingRequest(123, 456));
-        await result.RequestStream.WriteAsync(new MyStreamingRequest(789, 123));
-        await result.RequestStream.WriteAsync(new MyStreamingRequest(111, 222));
+        }, TestContext.Current.CancellationToken);
+        await result.RequestStream.WriteAsync(new MyStreamingRequest(123, 456), CancellationToken.None);
+        await result.RequestStream.WriteAsync(new MyStreamingRequest(789, 123), CancellationToken.None);
+        await result.RequestStream.WriteAsync(new MyStreamingRequest(111, 222), CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         await readResponseTask;
 
@@ -170,8 +170,8 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var result  = await client.ClientStreamingRefTypeReturnsNull();
 
         // Act
-        await result.RequestStream.WriteAsync(null);
-        await result.RequestStream.WriteAsync(null);
+        await result.RequestStream.WriteAsync(null, CancellationToken.None);
+        await result.RequestStream.WriteAsync(null, CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         var response = await result.ResponseAsync;
 
@@ -190,7 +190,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
         // Act
         var nullResponseCount = 0;
-        await foreach (var response in result.ResponseStream.ReadAllAsync())
+        await foreach (var response in result.ResponseStream.ReadAllAsync(TestContext.Current.CancellationToken))
         {
             nullResponseCount += response is null ? 1 : 0;
         }
@@ -212,14 +212,14 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var nullResponseCount = 0;
         var readResponseTask = Task.Run(async () =>
         {
-            await foreach (var response in result.ResponseStream.ReadAllAsync())
+            await foreach (var response in result.ResponseStream.ReadAllAsync(TestContext.Current.CancellationToken))
             {
                 nullResponseCount += response is null ? 1 : 0;
             }
-        });
-        await result.RequestStream.WriteAsync(null);
-        await result.RequestStream.WriteAsync(null);
-        await result.RequestStream.WriteAsync(null);
+        }, TestContext.Current.CancellationToken);
+        await result.RequestStream.WriteAsync(null, CancellationToken.None);
+        await result.RequestStream.WriteAsync(null, CancellationToken.None);
+        await result.RequestStream.WriteAsync(null, CancellationToken.None);
         await result.RequestStream.CompleteAsync();
         await readResponseTask;
 

@@ -255,7 +255,7 @@ public class MagicOnionTypeInfoTest
                 public class MyClass { }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "MyClass", SymbolFilter.Type).OfType<INamedTypeSymbol>().ToArray();
+        var symbols = compilation.GetSymbolsWithName(x => x == "MyClass", SymbolFilter.Type, TestContext.Current.CancellationToken).OfType<INamedTypeSymbol>().ToArray();
 
         // Act
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0]);
@@ -279,7 +279,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -307,7 +307,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -337,7 +337,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -365,7 +365,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -393,7 +393,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -419,7 +419,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -443,7 +443,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -467,7 +467,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -493,7 +493,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -517,7 +517,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -547,7 +547,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 
@@ -577,7 +577,7 @@ public class MagicOnionTypeInfoTest
                 }
             }
         ");
-        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member, TestContext.Current.CancellationToken)
             .OfType<IFieldSymbol>()
             .ToArray();
 

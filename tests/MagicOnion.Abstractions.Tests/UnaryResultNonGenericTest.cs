@@ -69,7 +69,7 @@ public class UnaryResultNonGenericTest
     public async Task ResponseHeadersAsync_Never_Ctor_ResponseContext()
     {
         var result = new UnaryResult(Task.FromResult<IResponseContext<Nil>>(new DummyResponseContext<Nil>(new TaskCompletionSource<Nil>())));
-        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseHeadersAsync.WaitAsync(TimeSpan.FromMilliseconds(250)));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseHeadersAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -90,14 +90,14 @@ public class UnaryResultNonGenericTest
     public async Task ResponseAsync_Never_Ctor_Task()
     {
         var result = new UnaryResult(new TaskCompletionSource<Nil>().Task);
-        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250)));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task ResponseAsync_Never_Ctor_ResponseContext()
     {
         var result = new UnaryResult(Task.FromResult<IResponseContext<Nil>>(new DummyResponseContext<Nil>(new TaskCompletionSource<Nil>())));
-        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250)));
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
     }
 
     static class DummyResponseContext

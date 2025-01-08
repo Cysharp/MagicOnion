@@ -1,5 +1,4 @@
 using Grpc.Core;
-using Xunit.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Filters;
 

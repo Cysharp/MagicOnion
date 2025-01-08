@@ -34,7 +34,7 @@ public class StreamingHubInterfaceInheritanceTest : IClassFixture<MagicOnionAppl
         await client.MethodA();
         await client.MethodB();
         await client.MethodC();
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_MethodA();

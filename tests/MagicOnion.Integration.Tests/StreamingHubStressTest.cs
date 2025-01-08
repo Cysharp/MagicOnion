@@ -45,7 +45,7 @@ public class StreamingHubStressTest : IClassFixture<MagicOnionApplicationFactory
                 Interlocked.Increment(ref count);
             }
 
-            await Task.Delay(500);
+            await Task.Delay(500, TestContext.Current.CancellationToken);
         });
 
         // Act

@@ -26,7 +26,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.MethodReturnCustomObject();
@@ -43,7 +43,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.MethodParameterless();
@@ -58,7 +58,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.MethodParameter_One(12345);
@@ -73,7 +73,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.MethodParameter_Many(12345, "6789");
@@ -88,7 +88,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.MethodParameter_CustomObject(new MyRequestResponse() { Item1 = 12345, Item2 = "6789" });
@@ -103,13 +103,13 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.Callback(12345, "6789");
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         var result2 = await client.Callback(98765, "43210");
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(123);
@@ -125,13 +125,13 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.CallbackCustomObject(new MyRequestResponse() { Item1 = 12345, Item2 = "6789" });
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         var result2 = await client.CallbackCustomObject(new MyRequestResponse() { Item1 = 98765, Item2 = "43210" });
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(123);
@@ -147,10 +147,10 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.ThrowReturnStatusException());
+        var ex = (RpcException?)await Record.ExceptionAsync(() => client.ThrowReturnStatusException());
 
         // Assert
         ex.Should().NotBeNull();
@@ -164,10 +164,10 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+        var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
         ex.Should().NotBeNull();
@@ -182,10 +182,10 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var factory = this.factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.Configure<MagicOnionOptions>(options => options.IsReturnExceptionStackTraceInErrorDetail = true)));
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+        var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
         ex.Should().NotBeNull();

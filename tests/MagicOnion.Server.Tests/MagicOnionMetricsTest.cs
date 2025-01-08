@@ -38,7 +38,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         {
             using var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-            var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
+            var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default, cancellationToken: TestContext.Current.CancellationToken);
             values2 = collector.GetMeasurementSnapshot();
             await client.DisposeAsync();
         }
@@ -65,10 +65,10 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var receiver = new Receiver();
         using var collector = new MetricCollector<long>(meterFactory, MagicOnionMetrics.MeterName, "magiconion.server.streaminghub.method_duration");
         using var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
+        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default, cancellationToken: TestContext.Current.CancellationToken);
 
         await client.SleepAsync();
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -85,10 +85,10 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var receiver = new Receiver();
         using var collector = new MetricCollector<long>(meterFactory, MagicOnionMetrics.MeterName, "magiconion.server.streaminghub.method_completed");
         using var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
+        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default, cancellationToken: TestContext.Current.CancellationToken);
 
         await client.MethodAsync();
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -106,7 +106,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var receiver = new Receiver();
         using var collector = new MetricCollector<long>(meterFactory, MagicOnionMetrics.MeterName, "magiconion.server.streaminghub.method_completed");
         using var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
+        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default, cancellationToken: TestContext.Current.CancellationToken);
 
         try
         {
@@ -114,7 +114,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         }
         catch
         { }
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -131,7 +131,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var receiver = new Receiver();
         using var collector = new MetricCollector<long>(meterFactory, MagicOnionMetrics.MeterName, "magiconion.server.streaminghub.exceptions");
         using var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
+        var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default, cancellationToken: TestContext.Current.CancellationToken);
 
         try
         {
@@ -139,7 +139,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         }
         catch
         { }
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         var values = collector.GetMeasurementSnapshot();
 

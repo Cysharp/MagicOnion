@@ -52,9 +52,9 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_EnableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert
@@ -72,9 +72,9 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_DisableByAttribute, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert
@@ -92,9 +92,9 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert
@@ -121,16 +121,16 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Send a heartbeat to the client.
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
 
         // Wait for receiving a heartbeat from the server.
         // The client must receive a heartbeat every 200ms from the server.
-        await heartbeatReceived.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        await heartbeatReceived.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
         // Timeout at 200 ms after receiving a heartbeat.
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(200));
 
-        await Task.Delay(150); // Wait for unblocking and disconnection.
+        await Task.Delay(150, TestContext.Current.CancellationToken); // Wait for unblocking and disconnection.
 
         // Assert
         Assert.True((bool)Fixture.Items.GetValueOrDefault("Disconnected"));
@@ -154,9 +154,9 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert
@@ -191,9 +191,9 @@ public class StreamingHubServerHeartbeatTest_DisabledByDefault : StreamingHubSer
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert
@@ -228,9 +228,9 @@ public class StreamingHubServerHeartbeatTest_EnabledByDefault : StreamingHubServ
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
-        await Task.Delay(15);
+        await Task.Delay(15, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
 
         // Assert

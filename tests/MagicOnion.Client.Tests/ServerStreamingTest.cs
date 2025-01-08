@@ -42,11 +42,11 @@ public class ServerStreamingTest
 
         // Act
         var result = await client.ValueTypeReturnValueType(arg1);
-        var moveNext1 = await result.ResponseStream.MoveNext(default);
+        var moveNext1 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current1 = result.ResponseStream.Current;
-        var moveNext2 = await result.ResponseStream.MoveNext(default);
+        var moveNext2 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current2 = result.ResponseStream.Current;
-        var moveNext3 = await result.ResponseStream.MoveNext(default);
+        var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
         client.Should().NotBeNull();
@@ -84,11 +84,11 @@ public class ServerStreamingTest
 
         // Act
         var result = await client.RefTypeReturnValueType(arg1);
-        var moveNext1 = await result.ResponseStream.MoveNext(default);
+        var moveNext1 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current1 = result.ResponseStream.Current;
-        var moveNext2 = await result.ResponseStream.MoveNext(default);
+        var moveNext2 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current2 = result.ResponseStream.Current;
-        var moveNext3 = await result.ResponseStream.MoveNext(default);
+        var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
         client.Should().NotBeNull();
@@ -126,11 +126,11 @@ public class ServerStreamingTest
 
         // Act
         var result = await client.ValueTypeReturnRefType(arg1);
-        var moveNext1 = await result.ResponseStream.MoveNext(default);
+        var moveNext1 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current1 = result.ResponseStream.Current;
-        var moveNext2 = await result.ResponseStream.MoveNext(default);
+        var moveNext2 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current2 = result.ResponseStream.Current;
-        var moveNext3 = await result.ResponseStream.MoveNext(default);
+        var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
         client.Should().NotBeNull();
@@ -168,11 +168,11 @@ public class ServerStreamingTest
 
         // Act
         var result = await client.RefTypeReturnRefType(arg1);
-        var moveNext1 = await result.ResponseStream.MoveNext(default);
+        var moveNext1 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current1 = result.ResponseStream.Current;
-        var moveNext2 = await result.ResponseStream.MoveNext(default);
+        var moveNext2 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
         var current2 = result.ResponseStream.Current;
-        var moveNext3 = await result.ResponseStream.MoveNext(default);
+        var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
         client.Should().NotBeNull();

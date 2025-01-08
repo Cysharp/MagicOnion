@@ -5,7 +5,6 @@ using MagicOnion.Client;
 using MagicOnion.Server.Hubs;
 using MessagePack;
 using Grpc.Net.Client;
-using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests;
 
@@ -143,7 +142,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task OnConnected()
     {
-        client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var x = await voidOnConnectedTask.Task;
         x.Should().Be((123, "foo", 12.3f));
         await client.DisposeAsync();
@@ -154,7 +153,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         try
         {
-            client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+            client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
             await client.ZeroArgument();
             await voidZeroTask.Task;
             //await zeroTask.Task;
@@ -173,7 +172,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task OneArgument()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         await client.OneArgument(100);
         //var x = await oneTask.Task;
         var y = await voidoneTask.Task;
@@ -185,7 +184,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task MoreArgument()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         await client.MoreArgument(100, "foo", 10.3);
         //var x = await moreTask.Task;
         var y = await voidmoreTask.Task;
@@ -197,7 +196,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task RetrunZeroArgument()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunZeroArgument();
         v.Should().Be(1000);
         await client.DisposeAsync();
@@ -205,7 +204,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task RetrunOneArgument()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunZeroArgument();
         v.Should().Be(1000);
         await client.DisposeAsync();
@@ -213,7 +212,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task RetrunMoreArgument()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunMoreArgument(10, "foo", 30.4);
         v.Should().Be(30.4);
         await client.DisposeAsync();
@@ -222,7 +221,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task OneArgument2()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         await client.OneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
         {
             //var v = await one2Task.Task;
@@ -241,7 +240,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task RetrunOneArgument2()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunOneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
         v.X.Should().Be(10);
         v.Y.Should().Be(99);
@@ -252,7 +251,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task OneArgument3()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         await client.OneArgument3(new[]
         {
             new TestObject() { X = 10, Y = 99, Z = 100 },
@@ -294,7 +293,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     [Fact]
     public async Task RetrunOneArgument3()
     {
-        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunOneArgument3(new[]
         {
             new TestObject() { X = 10, Y = 99, Z = 100 },
@@ -453,7 +452,7 @@ public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<Serve
     [Fact]
     public async Task ReceiveEx()
     {
-        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
 
         var ex = Assert.Throws<RpcException>(() =>
         {
@@ -469,7 +468,7 @@ public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<Serve
     [Fact]
     public async Task StatusCodeEx()
     {
-        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
 
         var ex = Assert.Throws<RpcException>(() =>
         {
@@ -486,7 +485,7 @@ public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<Serve
     [Fact]
     public async Task Filter()
     {
-        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         await client.FilterCheckAsync();
     }
 
