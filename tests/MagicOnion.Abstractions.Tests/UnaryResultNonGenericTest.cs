@@ -14,14 +14,25 @@ public class UnaryResultNonGenericTest
     [Fact]
     public async Task Ctor_RawValue()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var result = new UnaryResult(Nil.Default);
+#pragma warning restore CS0618 // Type or member is obsolete
         await result;
     }
 
     [Fact]
     public async Task Ctor_RawTask()
     {
+        var result = new UnaryResult((Task)Task.FromResult(Nil.Default));
+        await result;
+    }
+
+    [Fact]
+    public async Task Ctor_RawTaskOfNil()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
         var result = new UnaryResult(Task.FromResult(Nil.Default));
+#pragma warning restore CS0618 // Type or member is obsolete
         await result;
     }
 
@@ -32,7 +43,9 @@ public class UnaryResultNonGenericTest
         var value = default(Task<Nil>);
         // Act
 #pragma warning disable CS8604
+#pragma warning disable CS0618 // Type or member is obsolete
         var result = Record.Exception(() => new UnaryResult(value));
+#pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS8604
         // Assert
         result.Should().BeOfType<ArgumentNullException>();
@@ -75,11 +88,20 @@ public class UnaryResultNonGenericTest
     [Fact]
     public async Task ResponseAsync_Ctor_Task()
     {
+        var result = new UnaryResult((Task)Task.FromResult(Nil.Default));
+        await result.ResponseAsync;
+    }
+
+    [Fact]
+    public async Task ResponseAsync_Ctor_TaskOfNil()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
         var result = new UnaryResult(Task.FromResult(Nil.Default));
         await result.ResponseAsync;
     }
 
     [Fact]
+#pragma warning restore CS0618 // Type or member is obsolete
     public async Task ResponseAsync_Ctor_ResponseContext()
     {
         var result = new UnaryResult(Task.FromResult<IResponseContext<Nil>>(new DummyResponseContext<Nil>(Nil.Default)));
@@ -87,9 +109,18 @@ public class UnaryResultNonGenericTest
     }
 
     [Fact]
+    public async Task ResponseAsync_Never_Ctor_TaskOfNil()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        var result = new UnaryResult(new TaskCompletionSource<Nil>().Task);
+#pragma warning restore CS0618 // Type or member is obsolete
+        await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task ResponseAsync_Never_Ctor_Task()
     {
-        var result = new UnaryResult(new TaskCompletionSource<Nil>().Task);
+        var result = new UnaryResult(new TaskCompletionSource().Task);
         await Assert.ThrowsAsync<TimeoutException>(async () => await result.ResponseAsync.WaitAsync(TimeSpan.FromMilliseconds(250), TestContext.Current.CancellationToken));
     }
 

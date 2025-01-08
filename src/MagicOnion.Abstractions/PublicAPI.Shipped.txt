@@ -134,6 +134,7 @@ MagicOnion.ServerStreamingResult<TResponse>.ResponseStream.get -> Grpc.Core.IAsy
 MagicOnion.ServerStreamingResult<TResponse>.ServerStreamingResult() -> void
 MagicOnion.ServerStreamingResult<TResponse>.ServerStreamingResult(MagicOnion.Internal.IAsyncServerStreamingCallWrapper<TResponse>! inner) -> void
 MagicOnion.UnaryResult
+MagicOnion.UnaryResult.ConfigureAwait(bool continueOnCapturedContext) -> System.Runtime.CompilerServices.ConfiguredTaskAwaitable
 MagicOnion.UnaryResult.Dispose() -> void
 MagicOnion.UnaryResult.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter
 MagicOnion.UnaryResult.GetStatus() -> Grpc.Core.Status
@@ -142,9 +143,11 @@ MagicOnion.UnaryResult.ResponseAsync.get -> System.Threading.Tasks.Task!
 MagicOnion.UnaryResult.ResponseHeadersAsync.get -> System.Threading.Tasks.Task<Grpc.Core.Metadata!>!
 MagicOnion.UnaryResult.UnaryResult() -> void
 MagicOnion.UnaryResult.UnaryResult(MessagePack.Nil nil) -> void
+MagicOnion.UnaryResult.UnaryResult(System.Threading.Tasks.Task! rawTaskValue) -> void
 MagicOnion.UnaryResult.UnaryResult(System.Threading.Tasks.Task<MagicOnion.Client.IResponseContext<MessagePack.Nil>!>! response) -> void
 MagicOnion.UnaryResult.UnaryResult(System.Threading.Tasks.Task<MessagePack.Nil>! rawTaskValue) -> void
 MagicOnion.UnaryResult<TResponse>
+MagicOnion.UnaryResult<TResponse>.ConfigureAwait(bool continueOnCapturedContext) -> System.Runtime.CompilerServices.ConfiguredTaskAwaitable<TResponse>
 MagicOnion.UnaryResult<TResponse>.Dispose() -> void
 MagicOnion.UnaryResult<TResponse>.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter<TResponse>
 MagicOnion.UnaryResult<TResponse>.GetStatus() -> Grpc.Core.Status
