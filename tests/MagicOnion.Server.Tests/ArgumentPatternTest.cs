@@ -3,7 +3,6 @@ using MagicOnion.Client;
 using MessagePack;
 using Grpc.Net.Client;
 using MagicOnion.Internal;
-using Xunit.Abstractions;
 using MagicOnion.Serialization;
 
 namespace MagicOnion.Server.Tests;

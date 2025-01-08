@@ -202,7 +202,7 @@ public class MagicOnionGrpcMethodTest
 
             var streamingContext = new DuplexStreamingContext<int, int>((StreamingServiceContext<int, int>)context);
             await streamingContext.WriteAsync(12345);
-            var request = await streamingContext.MoveNext();
+            var request = await streamingContext.MoveNext(TestContext.Current.CancellationToken);
             requestCurrentFirst = streamingContext.Current;
         });
         var instance = new ServiceImpl();
@@ -211,7 +211,7 @@ public class MagicOnionGrpcMethodTest
         var serviceProvider = Substitute.For<IServiceProvider>();
         var metrics = new MagicOnionMetrics(new TestMeterFactory());
         var requestStream = Substitute.For<IAsyncStreamReader<int>>();
-        requestStream.MoveNext(default).ReturnsForAnyArgs(Task.FromResult(true));
+        requestStream.MoveNext(TestContext.Current.CancellationToken).ReturnsForAnyArgs(Task.FromResult(true));
         requestStream.Current.Returns(54321);
 
         var responseStream = Substitute.For<IServerStreamWriter<int>>();
@@ -225,7 +225,9 @@ public class MagicOnionGrpcMethodTest
         Assert.True(called);
         Assert.Equal(instance, invokerArgInstance);
         Assert.Equal(54321, requestCurrentFirst);
+#pragma warning disable xUnit1051 // Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken
         _ = responseStream.Received(1).WriteAsync(12345);
+#pragma warning restore xUnit1051 // Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken
     }
 
 

@@ -29,7 +29,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToSelfAsync();
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self
         Assert.True(mockReceiver.HasCalled);
@@ -53,7 +53,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToSelfAsync();
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self
         Assert.True(mockReceiver.HasCalled);
@@ -76,7 +76,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptSelfAsync();
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Other
         Assert.False(mockReceiver.HasCalled);
@@ -100,7 +100,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptSelfAsync();
 
-        await Task.Delay(TimeSpan.FromMilliseconds(100)); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(TimeSpan.FromMilliseconds(100), TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Other
         Assert.False(mockReceiver.HasCalled);
@@ -123,7 +123,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptAsync(Guid.NewGuid());
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self, Other
         Assert.True(mockReceiver.HasCalled);
@@ -146,7 +146,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptAsync(connectionIdOther);
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self
         Assert.True(mockReceiver.HasCalled);
@@ -169,7 +169,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptAsync(connectionId);
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Other
         Assert.False(mockReceiver.HasCalled);
@@ -192,7 +192,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptManyAsync(new[] { Guid.NewGuid(), Guid.NewGuid() });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self, Other
         Assert.True(mockReceiver.HasCalled);
@@ -215,7 +215,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptManyAsync(new[] { Guid.NewGuid(), connectionIdOther, Guid.NewGuid() });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self
         Assert.True(mockReceiver.HasCalled);
@@ -238,7 +238,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastExceptManyAsync(new[] { Guid.NewGuid(), connectionIdOther, Guid.NewGuid(), connectionId, Guid.NewGuid() });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: None
         Assert.False(mockReceiver.HasCalled);
@@ -262,7 +262,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToAsync(Guid.NewGuid());
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: None
         Assert.False(mockReceiver.HasCalled);
@@ -285,7 +285,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToAsync(connectionId);
 
-        await Task.Delay(100); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Other
         Assert.True(mockReceiver.HasCalled);
@@ -308,7 +308,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToAsync(connectionIdOther);
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Other
         Assert.False(mockReceiver.HasCalled);
@@ -331,7 +331,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToManyAsync(new[] { Guid.NewGuid(), Guid.NewGuid() });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: None
         Assert.False(mockReceiver.HasCalled);
@@ -354,7 +354,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToManyAsync(new[] { Guid.NewGuid(), connectionId, Guid.NewGuid() });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self
         Assert.True(mockReceiver.HasCalled);
@@ -377,7 +377,7 @@ public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 
         await hub.CallBroadcastToManyAsync(new[] { Guid.NewGuid(), connectionId, Guid.NewGuid(), connectionIdOther });
 
-        await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+        await Task.Delay(10, TestContext.Current.CancellationToken); // NOTE: The receivers may not receive broadcast yet at this point.
 
         // Target: Self, Other
         Assert.True(mockReceiver.HasCalled);

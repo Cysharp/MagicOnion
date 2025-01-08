@@ -21,7 +21,7 @@ public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<Sta
     {
         var httpClient = factory.CreateDefaultClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Alice");
-        var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this);
+        var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this, cancellationToken: TestContext.Current.CancellationToken);
         var userName = await client.GetUserNameAsync();
         userName.Should().Be("Alice");
     }
@@ -33,7 +33,7 @@ public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<Sta
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () =>
         {
-            var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this);
+            var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this, cancellationToken: TestContext.Current.CancellationToken);
         });
 
         ex.StatusCode.Should().Be(StatusCode.Unauthenticated);

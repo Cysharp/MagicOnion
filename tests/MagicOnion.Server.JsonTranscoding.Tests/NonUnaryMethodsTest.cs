@@ -18,7 +18,7 @@ public class NonUnaryMethodsTest(NonUnaryMethodsTest.ApplicationFactory factory)
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestHub/Connect", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestHub/Connect", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -31,7 +31,7 @@ public class NonUnaryMethodsTest(NonUnaryMethodsTest.ApplicationFactory factory)
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/ServerStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/ServerStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
@@ -44,7 +44,7 @@ public class NonUnaryMethodsTest(NonUnaryMethodsTest.ApplicationFactory factory)
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/ClientStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/ClientStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);
@@ -57,7 +57,7 @@ public class NonUnaryMethodsTest(NonUnaryMethodsTest.ApplicationFactory factory)
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/DuplexStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/INotSupportedMethodsService/DuplexStreamingMethod", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotImplemented, response.StatusCode);

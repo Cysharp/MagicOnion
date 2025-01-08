@@ -37,8 +37,8 @@ public class ClientStreamingTest
 
         // Act
         var result = await client.ValueTypeReturnValueType();
-        await result.RequestStream.WriteAsync(123);
-        await result.RequestStream.WriteAsync(456);
+        await result.RequestStream.WriteAsync(123, CancellationToken.None);
+        await result.RequestStream.WriteAsync(456, CancellationToken.None);
         await result.RequestStream.CompleteAsync();
 
         // Assert
@@ -70,8 +70,8 @@ public class ClientStreamingTest
 
         // Act
         var result = await client.RefTypeReturnValueType();
-        await result.RequestStream.WriteAsync("foo");
-        await result.RequestStream.WriteAsync("bar");
+        await result.RequestStream.WriteAsync("foo", CancellationToken.None);
+        await result.RequestStream.WriteAsync("bar", CancellationToken.None);
         await result.RequestStream.CompleteAsync();
 
         // Assert
@@ -102,8 +102,8 @@ public class ClientStreamingTest
 
         // Act
         var result = await client.ValueTypeReturnRefType();
-        await result.RequestStream.WriteAsync(123);
-        await result.RequestStream.WriteAsync(456);
+        await result.RequestStream.WriteAsync(123, CancellationToken.None);
+        await result.RequestStream.WriteAsync(456, CancellationToken.None);
         await result.RequestStream.CompleteAsync();
 
         // Assert
@@ -134,8 +134,8 @@ public class ClientStreamingTest
 
         // Act
         var result = await client.RefTypeReturnRefType();
-        await result.RequestStream.WriteAsync(Tuple.Create("Foo", "Bar"));
-        await result.RequestStream.WriteAsync(Tuple.Create("Baz", "Hello"));
+        await result.RequestStream.WriteAsync(Tuple.Create("Foo", "Bar"), CancellationToken.None);
+        await result.RequestStream.WriteAsync(Tuple.Create("Baz", "Hello"), CancellationToken.None);
         await result.RequestStream.CompleteAsync();
 
         // Assert

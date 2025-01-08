@@ -2,7 +2,6 @@
 
 using MagicOnion.Client;
 using MagicOnion.Server;
-using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client.DynamicClient;
@@ -81,7 +80,7 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
         ex.RetryCount.Should().Be(3);
         ex.LastException.Should().NotBeNull();
-        logger.WriteLine(ex.LastException?.ToString());
+        logger.WriteLine(ex.LastException?.ToString() ?? "(null)");
     }
 }
 public interface IClientFilterTestService : IService<IClientFilterTestService>

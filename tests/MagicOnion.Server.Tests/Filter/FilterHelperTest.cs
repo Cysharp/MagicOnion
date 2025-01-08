@@ -770,7 +770,7 @@ public class FilterHelperTest
             callStack = Environment.StackTrace;
             throw new InvalidOperationException();
         });
-        var ex = await Record.ExceptionAsync(async () => await body(default));
+        var ex = await Record.ExceptionAsync(() => body(default));
 
         // Assert
         ex.Should().NotBeNull();
@@ -851,7 +851,7 @@ public class FilterHelperTest
             callStack = Environment.StackTrace;
             throw new InvalidOperationException();
         });
-        var ex = await Record.ExceptionAsync(async () => await body(default));
+        var ex = await Record.ExceptionAsync(() => body(default));
 
         // Assert
         ex.Should().NotBeNull();

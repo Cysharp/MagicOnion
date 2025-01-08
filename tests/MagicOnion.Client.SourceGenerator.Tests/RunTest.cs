@@ -37,10 +37,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.Empty(newCompilation.GetDiagnostics());
+        Assert.Empty(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken));
 
         var results = driver.GetRunResult().Results;
         var generatedTrees = driver.GetRunResult().GeneratedTrees;
@@ -68,10 +68,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 
     [Fact]
@@ -103,10 +103,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 
     [Fact]
@@ -145,10 +145,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 
     //[Fact]
@@ -232,10 +232,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 
     [Fact]
@@ -273,10 +273,10 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 
     [Fact]
@@ -317,9 +317,9 @@ public class RunTest
         );
 
         // Run generator and update compilation
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
-        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
 }

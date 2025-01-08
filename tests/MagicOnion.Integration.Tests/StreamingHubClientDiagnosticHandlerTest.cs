@@ -25,7 +25,8 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
             channel, receiver,
-            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.Parameter_Many(12345, "Hello✨", true);
@@ -55,7 +56,8 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
             channel, receiver,
-            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var result = await client.Parameter_Zero();
@@ -85,7 +87,8 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
             channel, receiver,
-            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         await client.NoReturn_Parameter_Many(12345, "Hello✨", true);
@@ -119,10 +122,11 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
             channel, receiver,
-            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = await Record.ExceptionAsync(async () => await client.Throw());
+        var ex = await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
         Assert.Equal([DiagnosticHandler.EventType.OnRequestBegin, DiagnosticHandler.EventType.OnRequestEnd], diagnosticHandler.Events.Select(x => x.EventType));
@@ -150,11 +154,12 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
             channel, receiver,
-            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         await client.CallReceiver_Parameter_Many(12345, "Hello✨", true);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Parameter_Many(12345, "Hello✨", true);

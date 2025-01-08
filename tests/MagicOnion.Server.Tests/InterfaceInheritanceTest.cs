@@ -1,6 +1,5 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
-using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests;
 

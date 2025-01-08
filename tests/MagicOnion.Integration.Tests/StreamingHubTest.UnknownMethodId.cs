@@ -17,7 +17,7 @@ namespace MagicOnion.Integration.Tests
             var client = await clientFactory.CreateAndConnectAsync<MagicOnion.Integration.Tests.UnknownMethodIdTest.IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
 
             // Act
-            var ex = await Record.ExceptionAsync(async () => await client.CustomMethodId().WaitAsync(TimeSpan.FromSeconds(1)));
+            var ex = await Record.ExceptionAsync(() => client.CustomMethodId().WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken));
 
             // Assert
             ex.Should().NotBeNull();

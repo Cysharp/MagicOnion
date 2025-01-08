@@ -23,7 +23,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance);
+        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var client = await clientConnectTask;
@@ -39,12 +39,12 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance);
+        var clientConnectTask = StreamingHubClient.ConnectAsync<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>(channel.CreateCallInvoker(), receiver, StreamingHubClientOptions.CreateWithDefault(), factoryProvider: HandCraftedClientFactoryProvider.Instance, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var client = await clientConnectTask;
         var retVal = await client.Callback(1234, "FooBarBaz");
-        await Task.Delay(500); // Wait for the broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for the broadcast queue to be consumed.
 
         // Assert
         retVal.Should().Be(123);

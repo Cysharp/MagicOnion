@@ -234,7 +234,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_Parameter_Zero();
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Parameter_Zero();
@@ -253,7 +253,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_Parameter_One(12345);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Parameter_One(12345);
@@ -272,7 +272,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_Parameter_Many(12345, "Hello✨", true);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Parameter_Many(12345, "Hello✨", true);
@@ -400,7 +400,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_RefType(request);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_RefType(Arg.Is<MyStreamingResponse>(y => y.Value == 123 + 456));
@@ -419,7 +419,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_RefType_Null();
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_RefType_Null(default);
@@ -442,8 +442,8 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         {
             await client.CallReceiver_Delay(500); // The receiver will be called after 500ms.
             Thread.Sleep(60 * 1000); // Block the continuation.
-        });
-        await Task.Delay(1000); // Wait for broadcast queue to be consumed.
+        }, TestContext.Current.CancellationToken);
+        await Task.Delay(1000, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Delay();
@@ -455,10 +455,10 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
-        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.ThrowReturnStatusException());
+        var ex = (RpcException?)await Record.ExceptionAsync(() => client.ThrowReturnStatusException());
 
         // Assert
         ex.Should().NotBeNull();
@@ -472,10 +472,10 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
-        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+        var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
         ex.Should().NotBeNull();
@@ -514,12 +514,12 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
             {
                 var response = await client.Concurrent((x * 100) + count, $"Task{x}-{count}", x % 2 == 0);
                 results.Add((Index: count, Request: ((x * 100) + count, $"Task{x}-{count}", x % 2 == 0), Response: response));
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync(TestContext.Current.CancellationToken);
 
                 count++;
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(1000, TestContext.Current.CancellationToken);
 
             return (Sequence: x, Results: results, ReceiverResults: receiverResults);
         });
@@ -555,7 +555,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         client.Void_Parameter_Zero();
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Test_Void_Parameter_Zero();
@@ -574,7 +574,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         client.Void_Parameter_One(12345);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Test_Void_Parameter_One(12345);
@@ -593,7 +593,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         client.Void_Parameter_Many(12345, "Hello✨", true);
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_Test_Void_Parameter_Many(12345, "Hello✨", true);
@@ -654,7 +654,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
 
         // Act
         await client.CallReceiver_CustomMethodId();
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+        await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for broadcast queue to be consumed.
 
         // Assert
         receiver.Received().Receiver_CustomMethodId();

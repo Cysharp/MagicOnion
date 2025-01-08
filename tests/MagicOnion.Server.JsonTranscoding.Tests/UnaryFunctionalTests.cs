@@ -17,7 +17,7 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/NotImplemented", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/NotImplemented", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -30,8 +30,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_NoResult", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_NoResult", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var result = default(object); // null
@@ -49,8 +49,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var requestBody = "{}";
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var result = default(object); // null
@@ -67,8 +67,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_ResultRefType", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_ResultRefType", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var result = nameof(Method_NoParameter_ResultRefType); // string
@@ -84,8 +84,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_ResultComplexType", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_NoParameter_ResultComplexType", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equivalent(new TestResponse()
@@ -113,8 +113,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_OneParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_OneParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -132,8 +132,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -151,8 +151,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -170,8 +170,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_TwoParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -189,8 +189,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/Method_ManyParameter_NoResult", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -208,8 +208,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/ThrowAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/ThrowAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -227,8 +227,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/ThrowWithReturnStatusCodeAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/ThrowWithReturnStatusCodeAsync", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
@@ -245,8 +245,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
         var httpClient = factory.CreateDefaultClient();
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContextInfo", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContextInfo", new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(content) ?? throw new InvalidOperationException("Failed to deserialize a response.");
@@ -266,8 +266,8 @@ public class UnaryFunctionalTests(JsonTranscodingEnabledMagicOnionApplicationFac
                           """;
 
         // Act
-        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContext_WriteResponseHeader", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")));
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.PostAsync($"http://localhost/webapi/ITestService/CallContext_WriteResponseHeader", new StringContent(requestBody, new MediaTypeHeaderValue("application/json")), cancellationToken: TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

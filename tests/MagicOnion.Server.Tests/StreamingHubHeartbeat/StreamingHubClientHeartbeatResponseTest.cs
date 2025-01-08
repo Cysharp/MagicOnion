@@ -37,9 +37,9 @@ public class StreamingHubClientHeartbeatResponseTest(StreamingHubClientHeartbeat
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubClientHeartbeatResponseTestHub, IStreamingHubClientHeartbeatResponseTestHubReceiver>(receiver, options);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 100ms
-        await Task.Delay(50); // Client -> Server -> Client
+        await Task.Delay(50, TestContext.Current.CancellationToken); // Client -> Server -> Client
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(100)); // 200ms
-        await Task.Delay(50); // Client -> Server -> Client
+        await Task.Delay(50, TestContext.Current.CancellationToken); // Client -> Server -> Client
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(50)); // 250ms
         await client.DisposeAsync();
 

@@ -83,9 +83,9 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
 
         // Act
         var result  = await client.Callback(12345, "6789");
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         var result2  = await client.Callback(98765, "43210");
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(123);

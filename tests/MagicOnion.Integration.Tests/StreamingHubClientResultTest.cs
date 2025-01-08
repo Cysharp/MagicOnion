@@ -3,8 +3,6 @@ using Grpc.Net.Client;
 using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -257,13 +255,13 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
 
         // Act
         _ = client.Invoke_After_Disconnected();
-        await Task.Delay(200);
+        await Task.Delay(200, TestContext.Current.CancellationToken);
         await client.DisposeAsync();
         channel.Dispose();
         signalFromClient.Release();
 
         // Wait for complete processing the request on the server.
-        await signalToClient.WaitAsync();
+        await signalToClient.WaitAsync(TestContext.Current.CancellationToken);
 
         // Assert
         //testOutputHelper.WriteLine(serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected) + "/Exception") + "");

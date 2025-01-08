@@ -15,9 +15,9 @@ public class UnsafeDirectBlitResolverTest
 
         var s = new MyStruct { X = 10, Y = 99, Z = 999 };
 
-        var bin = MessagePackSerializer.Serialize(s, options);
+        var bin = MessagePackSerializer.Serialize(s, options, cancellationToken: TestContext.Current.CancellationToken);
 
-        var z = MessagePackSerializer.Deserialize<MyStruct>(bin, options);
+        var z = MessagePackSerializer.Deserialize<MyStruct>(bin, options, cancellationToken: TestContext.Current.CancellationToken);
 
         z.X.Should().Be(10);
         z.Y.Should().Be(99);

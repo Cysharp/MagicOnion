@@ -31,7 +31,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -69,7 +69,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -106,7 +106,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -144,7 +144,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -182,7 +182,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -220,7 +220,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -257,7 +257,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -296,7 +296,7 @@ public class StreamingHubHandlerTest
         for (var i = 0; i < 3; i++)
         {
             var ctx = new StreamingHubContext();
-            ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(i, $"テスト{i}", i % 2 == 0)), DateTime.Now, i * 1000);
+            ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(i, $"テスト{i}", i % 2 == 0), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, i * 1000);
             await handler.MethodBody.Invoke(ctx);
         }
 
@@ -339,7 +339,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -377,7 +377,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -415,7 +415,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -453,7 +453,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, -1 /* The client requires no response */);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, -1 /* The client requires no response */);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert

@@ -449,11 +449,11 @@ public class StreamingHubTest
         // Act
         var t = client.Parameter_One(1234);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
 
         // Assert
         var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
@@ -494,11 +494,11 @@ public class StreamingHubTest
         // Act
         var waitForDisconnectTask = client.WaitForDisconnect();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100); // Wait for processing queue.
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Wait for processing queue.
         await waitForDisconnectTask.WaitAsync(timeout.Token);
 
         // Assert
@@ -517,7 +517,7 @@ public class StreamingHubTest
         // Act
         var t = client.Parameter_One(1234);
         helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, .. (byte[])[0xcd, 0x30, 0x39] /* ServerSentAt */, 0xc0 /* Nil */, 0xc0 /* Extra */]); // Simulate heartbeat from the server.
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
@@ -543,7 +543,7 @@ public class StreamingHubTest
 
         // Act
         helper.WriteResponseRaw((byte[])[0x95 /* Array(5) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, .. (byte[])[0xcf, 0x00, 0x00, 0x01, 0x90, 0x6b, 0x97, 0x5c, 0x00] /* ServerSentAt */, 0xc0 /* Nil */, 0xc0 /* Extra(Nil) */]); // Simulate heartbeat from the server.
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         var request1 = await helper.ReadRequestRawAsync();
@@ -567,7 +567,7 @@ public class StreamingHubTest
 
         // Act
         helper.WriteResponseRaw((byte[])[0x95 /* Array(5) */, 0x7f /* Type:127 */, 0x00 /* Sequence(0) */, .. (byte[])[ 0xcd, 0x30, 0x39 ] /* ServerSentAt */, 0xc0 /* Nil */, .."Hello World"u8 /* Extra */]); // Simulate heartbeat from the server.
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal([.. "Hello World"u8], received); // Respond to the heartbeat from the server.
@@ -609,11 +609,11 @@ public class StreamingHubTest
         // Act
         var waitForDisconnectTask = client.WaitForDisconnectAsync();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromSeconds(1));
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         var disconnectionReason = await waitForDisconnectTask.WaitAsync(timeout.Token);
 
         // Assert
@@ -692,12 +692,12 @@ public class StreamingHubTest
         {
             TaskScheduler.UnobservedTaskException += unobservedTaskExceptionEventHandler;
             await CoreAsync();
-            await Task.Delay(100);
+            await Task.Delay(100, TestContext.Current.CancellationToken);
             GC.Collect();
             GC.Collect();
             GC.Collect();
             GC.Collect();
-            await Task.Delay(100);
+            await Task.Delay(100, TestContext.Current.CancellationToken);
         }
         finally
         {
@@ -727,8 +727,8 @@ public class StreamingHubTest
                 {
                     // Ignore exception
                 }
-            });
-            await Task.Delay(100);
+            }, TestContext.Current.CancellationToken);
+            await Task.Delay(100, TestContext.Current.CancellationToken);
             await client.DisposeAsync();
         }
     }

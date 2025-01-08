@@ -22,14 +22,14 @@ public sealed class TemporaryRedisServerFixture : IAsyncLifetime
         return $"{container.Hostname}:{container.GetMappedPublicPort(redisPort)}";
     }
 
-    Task IAsyncLifetime.InitializeAsync()
+    ValueTask IAsyncLifetime.InitializeAsync()
     {
-        return container.StartAsync();
+        return new ValueTask(container.StartAsync());
     }
 
-    Task IAsyncLifetime.DisposeAsync()
+    ValueTask IAsyncDisposable.DisposeAsync()
     {
-        return container.DisposeAsync().AsTask();
+        return container.DisposeAsync();
     }
 
     static int GetAvailableListenerPort()

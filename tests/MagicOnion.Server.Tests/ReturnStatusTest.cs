@@ -1,5 +1,4 @@
 using Grpc.Core;
-using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests;
 
