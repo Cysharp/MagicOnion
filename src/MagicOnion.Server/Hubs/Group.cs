@@ -25,10 +25,10 @@ internal class Group<T> : IGroup<T>
     public T All
         => group.All;
 
-    public T Except(ImmutableArray<Guid> excludes)
+    public T Except(IEnumerable<Guid> excludes)
         => group.Except(excludes);
 
-    public T Only(ImmutableArray<Guid> targets)
+    public T Only(IEnumerable<Guid> targets)
         => group.Only(targets);
 
     public T Single(Guid target)
