@@ -12,18 +12,18 @@ public class BoxTest
         var box2 = Box.Create(2);
         var box2a = Box.Create(2);
 
-        box1.Equals(box1).Should().BeTrue();
-        box1.Equals(box1a).Should().BeTrue();
-        box1.Equals(box2).Should().BeFalse();
+        Assert.True(box1.Equals(box1));
+        Assert.True(box1.Equals(box1a));
+        Assert.False(box1.Equals(box2));
 
-        box2.Equals(box2).Should().BeTrue();
-        box2.Equals(box2a).Should().BeTrue();
+        Assert.True(box2.Equals(box2));
+        Assert.True(box2.Equals(box2a));
 
-        box1.Equals(null!).Should().BeFalse();
-        box2.Equals(null!).Should().BeFalse();
+        Assert.False(box1.Equals(null!));
+        Assert.False(box2.Equals(null!));
 
-        (default(Box<int>)! == box1!).Should().BeFalse();
-        (box1! == default(Box<int>)!).Should().BeFalse();
+        Assert.False((default(Box<int>)! == box1!));
+        Assert.False((box1! == default(Box<int>)!));
     }
 
     [Fact]
@@ -37,8 +37,8 @@ public class BoxTest
         var box2 = Box.Create(value);
 
         // Assert
-        box1.Value.Should().Be(box2.Value);
-        box1.Should().BeSameAs(box2);
+        Assert.Equal(box2.Value, box1.Value);
+        Assert.Same(box2, box1);
     }
     
     [Fact]
@@ -49,10 +49,10 @@ public class BoxTest
         var box2 = Box.Create(false);
 
         // Assert
-        box1.Value.Should().BeTrue();
-        box2.Value.Should().BeFalse();
-        box1.Value.Should().NotBe(box2.Value);
-        box1.Should().NotBeSameAs(box2);
+        Assert.True(box1.Value);
+        Assert.False(box2.Value);
+        Assert.NotEqual(box2.Value, box1.Value);
+        Assert.NotSame(box2, box1);
     }
 
     [Fact]
@@ -63,9 +63,9 @@ public class BoxTest
         var box2 = Box.Create(true);
 
         // Assert
-        box1.Value.Should().BeTrue();
-        box1.Value.Should().Be(box2.Value);
-        box1.Should().BeSameAs(box2);
+        Assert.True(box1.Value);
+        Assert.Equal(box2.Value, box1.Value);
+        Assert.Same(box2, box1);
     }
     
     [Fact]
@@ -76,8 +76,8 @@ public class BoxTest
         var box2 = Box.Create(false);
 
         // Assert
-        box1.Value.Should().BeFalse();
-        box1.Value.Should().Be(box2.Value);
-        box1.Should().BeSameAs(box2);
+        Assert.False(box1.Value);
+        Assert.Equal(box2.Value, box1.Value);
+        Assert.Same(box2, box1);
     }
 }

@@ -48,7 +48,7 @@ public class UnaryResultNonGenericTest
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS8604
         // Assert
-        result.Should().BeOfType<ArgumentNullException>();
+        Assert.IsType<ArgumentNullException>(result);
     }
 
     [Fact]
@@ -68,14 +68,14 @@ public class UnaryResultNonGenericTest
         var result = Record.Exception(() => new UnaryResult(value));
 #pragma warning restore CS8604
         // Assert
-        result.Should().BeOfType<ArgumentNullException>();
+        Assert.IsType<ArgumentNullException>(result);
     }
 
     [Fact]
     public async Task ResponseHeadersAsync_Ctor_ResponseContext()
     {
         var result = new UnaryResult(Task.FromResult<IResponseContext<Nil>>(new DummyResponseContext<Nil>(Nil.Default)));
-        (await result.ResponseHeadersAsync).Should().Contain(x => x.Key == "x-foo-bar" && x.Value == "baz");
+        Assert.Contains(await result.ResponseHeadersAsync, x => x.Key == "x-foo-bar" && x.Value == "baz");
     }
 
     [Fact]
