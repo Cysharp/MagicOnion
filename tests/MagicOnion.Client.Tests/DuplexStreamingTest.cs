@@ -12,7 +12,7 @@ public class DuplexStreamingTest
         var client = MagicOnionClient.Create<IDuplexStreamingTestService>(callInvokerMock);
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
     }
 
     public interface IDuplexStreamingTestService : IService<IDuplexStreamingTestService>

@@ -14,7 +14,7 @@ public class ServerStreamingTest
         var client = MagicOnionClient.Create<IServerStreamingTestService>(callInvokerMock);
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
     }
 
     [Fact]
@@ -49,14 +49,14 @@ public class ServerStreamingTest
         var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
-        client.Should().NotBeNull();
-        sendRequest.Should().Be(Box.Create(123));
+        Assert.NotNull(client);
+        Assert.Equal(Box.Create(123), sendRequest);
 
-        moveNext1.Should().BeTrue();
-        current1.Should().Be(1);
-        moveNext2.Should().BeTrue();
-        current2.Should().Be(2);
-        moveNext3.Should().BeFalse();
+        Assert.True(moveNext1);
+        Assert.Equal(1, current1);
+        Assert.True(moveNext2);
+        Assert.Equal(2, current2);
+        Assert.False(moveNext3);
     }
     
     [Fact]
@@ -91,14 +91,14 @@ public class ServerStreamingTest
         var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
-        client.Should().NotBeNull();
-        sendRequest.Should().Be("FooBar");
+        Assert.NotNull(client);
+        Assert.Equal("FooBar", sendRequest);
 
-        moveNext1.Should().BeTrue();
-        current1.Should().Be(1);
-        moveNext2.Should().BeTrue();
-        current2.Should().Be(2);
-        moveNext3.Should().BeFalse();
+        Assert.True(moveNext1);
+        Assert.Equal(1, current1);
+        Assert.True(moveNext2);
+        Assert.Equal(2, current2);
+        Assert.False(moveNext3);
     }
     
     [Fact]
@@ -133,14 +133,14 @@ public class ServerStreamingTest
         var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
-        client.Should().NotBeNull();
-        sendRequest.Should().Be(Box.Create(123));
+        Assert.NotNull(client);
+        Assert.Equal(Box.Create(123), sendRequest);
 
-        moveNext1.Should().BeTrue();
-        current1.Should().Be("Foo");
-        moveNext2.Should().BeTrue();
-        current2.Should().Be("Bar");
-        moveNext3.Should().BeFalse();
+        Assert.True(moveNext1);
+        Assert.Equal("Foo", current1);
+        Assert.True(moveNext2);
+        Assert.Equal("Bar", current2);
+        Assert.False(moveNext3);
     }
     
     [Fact]
@@ -175,14 +175,14 @@ public class ServerStreamingTest
         var moveNext3 = await result.ResponseStream.MoveNext(TestContext.Current.CancellationToken);
 
         // Assert
-        client.Should().NotBeNull();
-        sendRequest.Should().Be("FooBar");
+        Assert.NotNull(client);
+        Assert.Equal("FooBar", sendRequest);
 
-        moveNext1.Should().BeTrue();
-        current1.Should().Be("Foo");
-        moveNext2.Should().BeTrue();
-        current2.Should().Be("Bar");
-        moveNext3.Should().BeFalse();
+        Assert.True(moveNext1);
+        Assert.Equal("Foo", current1);
+        Assert.True(moveNext2);
+        Assert.Equal("Bar", current2);
+        Assert.False(moveNext3);
     }
 
     public interface IServerStreamingTestService : IService<IServerStreamingTestService>

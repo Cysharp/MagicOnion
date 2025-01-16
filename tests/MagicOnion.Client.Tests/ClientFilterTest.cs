@@ -29,7 +29,7 @@ public class ClientFilterTest
         var result = await client.MethodA("Request");
 
         // Assert
-        result.Should().Be("Response");
+        Assert.Equal("Response", result);
         callInvokerMock.DidNotReceive();
         clientFilterMock.Received();
     }
@@ -60,10 +60,11 @@ public class ClientFilterTest
         var result = await client.MethodA("Request");
 
         // Assert
-        result.Should().Be("Response");
-        requestHeaders.Should().HaveCount(2);
-        requestHeaders.Should().Contain(x => x.Key == "x-header-1" && x.Value == "valueA");
-        requestHeaders.Should().Contain(x => x.Key == "x-header-2" && x.Value == "valueB");
+        Assert.Equal("Response", result);
+        Assert.NotNull(requestHeaders);
+        Assert.Equal(2, requestHeaders.Count());
+        Assert.Contains(requestHeaders, x => x.Key == "x-header-1" && x.Value == "valueA");
+        Assert.Contains(requestHeaders, x => x.Key == "x-header-2" && x.Value == "valueB");
     }
 
     class ClientFilterTestRequestHeaders : IClientFilter
@@ -120,11 +121,11 @@ public class ClientFilterTest
         var result = await client.MethodA("Request");
 
         // Assert
-        result.Should().Be("Response");
+        Assert.Equal("Response", result);
         callInvokerMock.Received();
         clientFilterMockFirst.Received();
         clientFilterMockSecond.Received();
-        calledFilters.Should().BeEquivalentTo(new[] { "First", "Second" });
+        Assert.Equal(new[] { "First", "Second" }, calledFilters);
     }
 
 
