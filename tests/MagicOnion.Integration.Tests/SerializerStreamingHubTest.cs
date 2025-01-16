@@ -37,7 +37,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         var result  = await client.MethodParameterless();
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
     }
 
     [Theory]
@@ -53,7 +53,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         var result  = await client.MethodParameter_One(12345);
 
         // Assert
-        result.Should().Be(123 + 12345);
+        Assert.Equal(123 + 12345, result);
     }
 
     [Theory]
@@ -69,7 +69,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         var result  = await client.MethodParameter_Many(12345, "6789");
 
         // Assert
-        result.Should().Be(123 + 12345 + 6789);
+        Assert.Equal(123 + 12345 + 6789, result);
     }
 
     [Theory]
@@ -88,11 +88,11 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(123);
-        result2.Should().Be(123);
-        receiver.Received.Should().HaveCount(2);
-        receiver.Received.Should().Contain((12345, "6789"));
-        receiver.Received.Should().Contain((98765, "43210"));
+        Assert.Equal(123, result);
+        Assert.Equal(123, result2);
+        Assert.Equal(2, receiver.Received.Count());
+        Assert.Contains((12345, "6789"), receiver.Received);
+        Assert.Contains((98765, "43210"), receiver.Received);
     }
 
     class Receiver : ISerializerTestHubReceiver

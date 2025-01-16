@@ -42,7 +42,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var response = await result.ResponseAsync;
 
         // Assert
-        response.Should().Be(123 + 456 + 789 + 123);
+        Assert.Equal(123 + 456 + 789 + 123, response);
     }
 
     [Theory]
@@ -62,7 +62,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         }
 
         // Assert
-        sum.Should().Be(Enumerable.Range(0, 10).Sum(x => (123 + 456) * x));
+        Assert.Equal(Enumerable.Range(0, 10).Sum(x => (123 + 456) * x), sum);
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         await readResponseTask;
 
         // Assert
-        sum.Should().Be(123 + 456 + 789 + 123 + 111 + 222);
+        Assert.Equal(123 + 456 + 789 + 123 + 111 + 222, sum);
     }
 
     [Theory]
@@ -109,7 +109,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var response = await result.ResponseAsync;
 
         // Assert
-        response.Value.Should().Be(123 + 456 + 789 + 123);
+        Assert.Equal(123 + 456 + 789 + 123, response.Value);
     }
 
     [Theory]
@@ -129,7 +129,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         }
 
         // Assert
-        sum.Should().Be(Enumerable.Range(0, 10).Sum(x => (123 + 456) * x));
+        Assert.Equal(Enumerable.Range(0, 10).Sum(x => (123 + 456) * x), sum);
     }
 
     [Theory]
@@ -157,7 +157,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         await readResponseTask;
 
         // Assert
-        sum.Should().Be(123 + 456 + 789 + 123 + 111 + 222);
+        Assert.Equal(123 + 456 + 789 + 123 + 111 + 222, sum);
     }
 
     [Theory]
@@ -176,7 +176,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var response = await result.ResponseAsync;
 
         // Assert
-        response.Should().BeNull();
+        Assert.Null(response);
     }
 
     [Theory]
@@ -196,7 +196,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         }
 
         // Assert
-        nullResponseCount.Should().Be(10);
+        Assert.Equal(10, nullResponseCount);
     }
 
     [Theory]
@@ -224,7 +224,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         await readResponseTask;
 
         // Assert
-        nullResponseCount.Should().Be(3);
+        Assert.Equal(3, nullResponseCount);
     }
 }
 

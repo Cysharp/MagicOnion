@@ -82,7 +82,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.Parameter_Zero();
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -100,7 +100,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.Parameter_One(12345);
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -118,7 +118,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.Parameter_Many(12345, "Hello✨", true);
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -182,7 +182,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.ValueTask_Parameter_Zero();
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -200,7 +200,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.ValueTask_Parameter_One(12345);
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -218,7 +218,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.ValueTask_Parameter_Many(12345, "Hello✨", true);
 
         // Assert
-        result.Should().Be(67890);
+        Assert.Equal(67890, result);
     }
 
     [Theory]
@@ -310,7 +310,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.Never_With_Return();
 
         // Assert
-        result.Should().Be(default(int));
+        Assert.Equal(default(int), result);
     }
 
     [Theory]
@@ -345,7 +345,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.ValueTask_Never_With_Return();
 
         // Assert
-        result.Should().Be(default(int));
+        Assert.Equal(default(int), result);
     }
 
     [Theory]
@@ -364,8 +364,8 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.RefType(request);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Value.Should().Be(123 + 456);
+        Assert.NotNull(result);
+        Assert.Equal(123 + 456, result.Value);
     }
 
     [Theory]
@@ -383,7 +383,7 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var result = await client.RefType_Null(null);
 
         // Assert
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Theory]
@@ -461,9 +461,9 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var ex = (RpcException?)await Record.ExceptionAsync(() => client.ThrowReturnStatusException());
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Unknown);
-        ex.Status.Detail.Should().Be("Detail-String");
+        Assert.NotNull(ex);
+        Assert.Equal(StatusCode.Unknown, ex!.StatusCode);
+        Assert.Equal("Detail-String", ex.Status.Detail);
     }
 
     [Fact]
@@ -478,9 +478,9 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Internal);
-        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+        Assert.NotNull(ex);
+        Assert.Equal(StatusCode.Internal, ex!.StatusCode);
+        Assert.StartsWith("An error occurred while processing handler", ex.Status.Detail);
     }
 
     [Theory]
@@ -676,8 +676,8 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var reason = await client.WaitForDisconnectAsync();
 
         // Assert
-        reason.Type.Should().Be(DisconnectionType.CompletedNormally);
-        reason.Exception.Should().BeNull();
+        Assert.Equal(DisconnectionType.CompletedNormally, reason.Type);
+        Assert.Null(reason.Exception);
     }
 
     [Theory]
@@ -700,8 +700,8 @@ public partial class StreamingHubTest : IClassFixture<MagicOnionApplicationFacto
         var reason = await client.WaitForDisconnectAsync();
 
         // Assert
-        reason.Type.Should().Be(DisconnectionType.Faulted);
-        reason.Exception.Should().NotBeNull();
+        Assert.Equal(DisconnectionType.Faulted, reason.Type);
+        Assert.NotNull(reason.Exception);
     }
 }
 

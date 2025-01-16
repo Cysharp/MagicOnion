@@ -30,7 +30,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         var retVal = await client.MethodParameterless();
 
         // Assert
-        retVal.Should().Be(123);
+        Assert.Equal(123, retVal);
     }
 
     [Fact]
@@ -47,8 +47,8 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         await Task.Delay(500, TestContext.Current.CancellationToken); // Wait for the broadcast queue to be consumed.
 
         // Assert
-        retVal.Should().Be(123);
-        receiver.Results.Should().Contain("1234,FooBarBaz");
+        Assert.Equal(123, retVal);
+        Assert.Contains("1234,FooBarBaz", receiver.Results);
     }
 
     class Receiver : IHandCraftedStreamingHubClientTestHubReceiver

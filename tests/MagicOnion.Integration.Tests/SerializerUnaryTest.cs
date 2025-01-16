@@ -40,7 +40,7 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
         var result  = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
 
         // Assert
-        result.Should().NotBeNull();
+        Assert.NotNull(result);
     }
 
     [Theory]
@@ -55,7 +55,7 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
         var result  = await client.UnaryReturnNil();
 
         // Assert
-        result.Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, result);
     }
 
     [Theory]
@@ -70,7 +70,7 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
         var result  = await client.UnaryParameterless();
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
     }
 
     [Theory]
@@ -85,7 +85,7 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
         // Assert
-        result.Should().Be(120);
+        Assert.Equal(120, result);
     }
 }
 
