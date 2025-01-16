@@ -42,7 +42,7 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
+        Assert.Single(serviceCollection.Hubs);
         Assert.Empty(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyHub"), serviceCollection.Hubs[0].ServiceType);
         Assert.Equal(2, serviceCollection.Hubs[0].Methods.Count());
@@ -156,7 +156,7 @@ public interface IMyHubReceiver
         // Task MethodA();
         Assert.Equal("MethodA", serviceCollection.Hubs[0].Methods[0].MethodName);
         Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Hubs[0].Methods[0].RequestType);
-        Assert.Equal(1, serviceCollection.Hubs[0].Methods[0].Parameters.Count());
+        Assert.Single(serviceCollection.Hubs[0].Methods[0].Parameters);
         Assert.Equal("arg1", serviceCollection.Hubs[0].Methods[0].Parameters[0].Name);
         Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Hubs[0].Methods[0].Parameters[0].Type);
         Assert.False(serviceCollection.Hubs[0].Methods[0].Parameters[0].HasExplicitDefaultValue);
@@ -283,8 +283,8 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
-        Assert.Equal(1, serviceCollection.Hubs[0].Methods.Count());
+        Assert.Single(serviceCollection.Hubs);
+        Assert.Single(serviceCollection.Hubs[0].Methods);
         // Task MethodA();
         Assert.Equal("MethodA", serviceCollection.Hubs[0].Methods[0].MethodName);
         Assert.Equal(1497325507, serviceCollection.Hubs[0].Methods[0].HubId);
@@ -328,8 +328,8 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
-        Assert.Equal(1, serviceCollection.Hubs[0].Methods.Count());
+        Assert.Single(serviceCollection.Hubs);
+        Assert.Single(serviceCollection.Hubs[0].Methods);
         // Task MethodA();
         Assert.Equal("MethodA", serviceCollection.Hubs[0].Methods[0].MethodName);
         Assert.Equal(12345, serviceCollection.Hubs[0].Methods[0].HubId);
@@ -368,7 +368,7 @@ public interface IMyHubReceiver
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -580,8 +580,8 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
-        Assert.Equal(1, serviceCollection.Hubs[0].Methods.Count());
+        Assert.Single(serviceCollection.Hubs);
+        Assert.Single(serviceCollection.Hubs[0].Methods);
         Assert.NotNull(serviceCollection.Hubs[0].Receiver);
         Assert.Equal(3, serviceCollection.Hubs[0].Receiver.Methods.Count());
         // void EventA();
@@ -594,7 +594,7 @@ public interface IMyHubReceiver
         // void EventB(Nil nil);
         Assert.Equal("EventB", serviceCollection.Hubs[0].Receiver.Methods[1].MethodName);
         Assert.False(serviceCollection.Hubs[0].Receiver.Methods[1].IsClientResult);
-        Assert.Equal(1, serviceCollection.Hubs[0].Receiver.Methods[1].Parameters.Count());
+        Assert.Single(serviceCollection.Hubs[0].Receiver.Methods[1].Parameters);
         Assert.Equal(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil, serviceCollection.Hubs[0].Receiver.Methods[1].RequestType);
         Assert.Equal(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil, serviceCollection.Hubs[0].Receiver.Methods[1].ResponseType);
         Assert.Equal(MagicOnionTypeInfo.KnownTypes.System_Void, serviceCollection.Hubs[0].Receiver.Methods[1].MethodReturnType);
@@ -642,8 +642,8 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
-        Assert.Equal(1, serviceCollection.Hubs[0].Methods.Count());
+        Assert.Single(serviceCollection.Hubs);
+        Assert.Single(serviceCollection.Hubs[0].Methods);
         Assert.NotNull(serviceCollection.Hubs[0].Receiver);
         Assert.Equal(4, serviceCollection.Hubs[0].Receiver.Methods.Count());
         // Task ClientResultA();
@@ -656,7 +656,7 @@ public interface IMyHubReceiver
         // Task<int> ClientResultB(Nil nil);
         Assert.Equal("ClientResultB", serviceCollection.Hubs[0].Receiver.Methods[1].MethodName);
         Assert.True(serviceCollection.Hubs[0].Receiver.Methods[1].IsClientResult);
-        Assert.Equal(1, serviceCollection.Hubs[0].Receiver.Methods[1].Parameters.Count());
+        Assert.Single(serviceCollection.Hubs[0].Receiver.Methods[1].Parameters);
         Assert.Equal(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil, serviceCollection.Hubs[0].Receiver.Methods[1].RequestType);
         Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Hubs[0].Receiver.Methods[1].ResponseType);
         Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<int>>(), serviceCollection.Hubs[0].Receiver.Methods[1].MethodReturnType);
@@ -706,7 +706,7 @@ public interface IMyHubReceiver
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -780,7 +780,7 @@ public interface IMyHubReceiver
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub.Id, diagnostics[0].Id);
     }
 
@@ -824,7 +824,7 @@ public interface IMyHubReceiver
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
+        Assert.Single(serviceCollection.Hubs);
         Assert.Equal(3, serviceCollection.Hubs[0].Methods.Count());
     }
     
@@ -868,7 +868,7 @@ public interface IExtraReceiverMethods2
 
         // Assert
         Assert.NotNull(serviceCollection);
-        Assert.Equal(1, serviceCollection.Hubs.Count());
+        Assert.Single(serviceCollection.Hubs);
         Assert.Equal(3, serviceCollection.Hubs[0].Receiver.Methods.Count());
     }
 }

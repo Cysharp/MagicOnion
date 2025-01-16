@@ -134,7 +134,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
         Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_OneParameter)), metadata.InterfaceMethod);
         Assert.Same(methodInfo, metadata.ImplementationMethod);
-        Assert.Equal(1, metadata.Parameters.Count());
+        Assert.Single(metadata.Parameters);
         Assert.Equal(typeof(int), metadata.RequestType);
         Assert.Null(metadata.ResponseType);
     }
@@ -184,9 +184,9 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        Assert.Equal(1, metadata.AttributeLookup.Count());
+        Assert.Single(metadata.AttributeLookup);
         Assert.Equal([typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -202,8 +202,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         // Assert
         Assert.Equal(2, metadata.AttributeLookup.Count());
         Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         // Assert
         Assert.Equal(2, metadata.AttributeLookup.Count());
         Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
         Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
         Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
@@ -235,9 +235,9 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        Assert.Equal(1, metadata.AttributeLookup.Count());
+        Assert.Single(metadata.AttributeLookup);
         Assert.Equal([typeof(MyThirdAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyThirdAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
     }
 
     [Fact]
@@ -253,8 +253,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         // Assert
         Assert.Equal(2, metadata.AttributeLookup.Count());
         Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyThirdAttribute)].Count());
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -270,9 +270,9 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         // Assert
         Assert.Equal(3, metadata.AttributeLookup.Count());
         Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyThirdAttribute)].Count());
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -288,8 +288,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         // Assert
         Assert.Equal(3, metadata.AttributeLookup.Count());
         Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyThirdAttribute)].Count());
-        Assert.Equal(1, metadata.AttributeLookup[typeof(MyFirstAttribute)].Count());
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
         Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
         Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }

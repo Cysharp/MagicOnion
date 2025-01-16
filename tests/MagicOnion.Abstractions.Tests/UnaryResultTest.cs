@@ -88,7 +88,7 @@ public class UnaryResultTest
         Assert.Equal(0, (await result));
 
         var result2 = default(UnaryResult<string>);
-        Assert.Equal(null, (await result2));
+        Assert.Null((await result2));
     }
 
     [Fact]

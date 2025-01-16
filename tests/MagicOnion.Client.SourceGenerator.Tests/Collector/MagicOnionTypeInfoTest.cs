@@ -529,7 +529,7 @@ public class MagicOnionTypeInfoTest
         // Assert
         Assert.Equal("System.Collections.Generic", typeInfo.Namespace);
         Assert.Equal("List", typeInfo.Name);
-        Assert.Equal(1, typeInfo.GenericArguments.Count());
+        Assert.Single(typeInfo.GenericArguments);
         Assert.Equal(MagicOnionTypeInfo.Create("System", "String"), typeInfo.GenericArguments[0]);
         Assert.Equal("global::System.Collections.Generic.List<global::System.String>", typeInfo.FullName);
     }
@@ -559,7 +559,7 @@ public class MagicOnionTypeInfoTest
         // Assert
         Assert.Equal("System.Collections.Generic", typeInfo.Namespace);
         Assert.Equal("List", typeInfo.Name);
-        Assert.Equal(1, typeInfo.GenericArguments.Count());
+        Assert.Single(typeInfo.GenericArguments);
         Assert.Equal(MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.CreateValueType("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")), typeInfo.GenericArguments[0]);
         Assert.Equal("global::System.Collections.Generic.List<global::System.Tuple<global::System.Int32, global::System.String>>", typeInfo.FullName);
     }

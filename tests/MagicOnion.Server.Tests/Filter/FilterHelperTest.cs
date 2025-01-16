@@ -38,7 +38,7 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        Assert.Equal(1, filters.Count());
+        Assert.Single(filters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
     }
 
@@ -67,7 +67,7 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        Assert.Equal(1, filters.Count());
+        Assert.Single(filters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
     }
 
@@ -241,7 +241,7 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        Assert.Equal(1, filters.Count());
+        Assert.Single(filters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
     }
 
@@ -270,7 +270,7 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        Assert.Equal(1, filters.Count());
+        Assert.Single(filters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
     }
 
@@ -285,9 +285,9 @@ public class FilterHelperTest
         var streamingHubFilters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        Assert.Equal(1, serviceFilters.Count());
+        Assert.Single(serviceFilters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(serviceFilters[0].Filter).Name);
-        Assert.Equal(1, streamingHubFilters.Count());
+        Assert.Single(streamingHubFilters);
         Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(streamingHubFilters[0].Filter).Name);
     }
 

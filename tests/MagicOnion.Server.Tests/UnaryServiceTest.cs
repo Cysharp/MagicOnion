@@ -31,7 +31,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
         Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
         Assert.Equal(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync), ex.Status.Detail);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.Contains("Something went wrong", ex.Message);
     }
 
@@ -56,7 +56,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.Contains("Something went wrong", ex.Message);
     }
 
@@ -69,7 +69,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.Contains("Something went wrong", ex.Message);
     }
 }
@@ -94,7 +94,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
@@ -107,7 +107,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
@@ -120,7 +120,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Equal(1, logs.Count());
+        Assert.Single(logs);
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 

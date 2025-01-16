@@ -83,7 +83,7 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
-        Assert.Equal(1, def.MethodHandlers.Count()); // Connect
+        Assert.Single(def.MethodHandlers); // Connect
         Assert.Equal(2, def.StreamingHubHandlers.Count());
     }
 

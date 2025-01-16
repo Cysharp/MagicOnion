@@ -30,7 +30,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var client = MagicOnionClient.Create<IMemoryPackSerializerTestService>(channel, MessagePackMagicOnionSerializerProvider.Default); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
-        var result = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
+        var result = await Record.ExceptionAsync(async () => await client.UnaryReturnNil());
 
         // Assert
         Assert.NotNull(result);

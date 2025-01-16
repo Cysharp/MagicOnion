@@ -40,7 +40,7 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
         Assert.Equal(2, serviceCollection.Services[0].Methods.Count());
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -208,9 +208,9 @@ namespace MyNamespace
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // UnaryResult<Nil> MethodA();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -250,9 +250,9 @@ namespace MyNamespace
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // UnaryResult<string> MethodA();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -291,9 +291,9 @@ namespace MyNamespace
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // UnaryResult<Nil> MethodA(string arg1);
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -333,9 +333,9 @@ namespace MyNamespace
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // UnaryResult<Nil> MethodA(string arg1, int arg2);
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -420,7 +420,7 @@ namespace MyNamespace
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
         Assert.Equal(4, serviceCollection.Services[0].Methods.Count());
     }
@@ -451,7 +451,7 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -481,7 +481,7 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -511,7 +511,7 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -541,7 +541,7 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -573,9 +573,9 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
@@ -613,9 +613,9 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
@@ -654,9 +654,9 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
@@ -694,7 +694,7 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
@@ -727,9 +727,9 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // Task<DuplexStreamingResult<int, string>> MethodA();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -764,7 +764,7 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id, diagnostics[0].Id);
     }
 
@@ -796,9 +796,9 @@ public interface IMyService : IService<IMyService>
         Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
         Assert.NotNull(serviceCollection);
         Assert.Empty(serviceCollection.Hubs);
-        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Single(serviceCollection.Services);
         Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
-        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
+        Assert.Single(serviceCollection.Services[0].Methods);
         // Task<DuplexStreamingResult<int, string>> MethodA();
         Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
         Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
@@ -833,7 +833,7 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, diagnostics.Count());
+        Assert.Single(diagnostics);
         Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id, diagnostics[0].Id);
     }
 }

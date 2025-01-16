@@ -47,7 +47,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         Assert.Empty(values);
 
-        Assert.Equal(1, values2.Count());
+        Assert.Single(values2);
         Assert.Equal(1, values2[0].Value);
         Assert.Equal("magiconion", values2[0].Tags["rpc.system"]);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub), values2[0].Tags["rpc.service"]);
@@ -72,7 +72,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        Assert.Equal(1, values.Count());
+        Assert.Single(values);
         Assert.True(values[0].Value >= 90);
         Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
@@ -92,7 +92,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        Assert.Equal(1, values.Count());
+        Assert.Single(values);
         Assert.Equal(1, values[0].Value);
         Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
@@ -118,7 +118,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        Assert.Equal(1, values.Count());
+        Assert.Single(values);
         Assert.Equal(1, values[0].Value);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub.ThrowAsync), values[0].Tags["rpc.method"]);
@@ -143,7 +143,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        Assert.Equal(1, values.Count());
+        Assert.Single(values);
         Assert.Equal(1, values[0].Value);
         Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
         Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
