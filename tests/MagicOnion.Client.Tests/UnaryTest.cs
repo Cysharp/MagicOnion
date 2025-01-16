@@ -16,7 +16,7 @@ public class UnaryTest
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
     }
 
     [Fact]
@@ -40,9 +40,10 @@ public class UnaryTest
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
         callInvokerMock.Received();
-        actualCallOptions.Headers.Should().Contain(x => x.Key == "foo" && x.Value == "bar");
+        Assert.NotNull(actualCallOptions.Headers);
+        Assert.Contains(actualCallOptions.Headers, x => x.Key == "foo" && x.Value == "bar");
     }
 
     [Fact]
@@ -59,7 +60,7 @@ public class UnaryTest
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
         callInvokerMock.Received();
     }
 
@@ -85,9 +86,9 @@ public class UnaryTest
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
         callInvokerMock.Received();
-        actualCancellationToken.Should().Be(cts.Token);
+        Assert.Equal(cts.Token, actualCancellationToken);
     }
     
     [Fact]
@@ -111,9 +112,10 @@ public class UnaryTest
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
         callInvokerMock.Received();
-        actualHeaders.Should().Contain(x => x.Key == "foo" && x.Value == "bar");
+        Assert.NotNull(actualHeaders);
+        Assert.Contains(actualHeaders, x => x.Key == "foo" && x.Value == "bar");
     }
 
     [Fact]
@@ -139,9 +141,9 @@ public class UnaryTest
         var result = await client.ParameterlessReturnNil();
 
         // Assert
-        result.Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, result);
         callInvokerMock.Received();
-        serializedResponse.ToArray().Should().BeEquivalentTo(new[] { MessagePackCode.Nil });
+        Assert.Equal(new[] { MessagePackCode.Nil }, serializedResponse.ToArray());
     }
 
     [Fact]
@@ -157,7 +159,7 @@ public class UnaryTest
         var result = await client.ParameterlessReturnNil();
 
         // Assert
-        result.Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, result);
         callInvokerMock.Received();
     }
 
@@ -174,7 +176,7 @@ public class UnaryTest
         var result = await client.ParameterlessReturnValueType();
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
         callInvokerMock.Received();
     }
 
@@ -191,7 +193,7 @@ public class UnaryTest
         var result = await client.ParameterlessReturnRefType();
 
         // Assert
-        result.Should().Be("FooBar");
+        Assert.Equal("FooBar", result);
         callInvokerMock.Received();
     }
 
@@ -210,7 +212,7 @@ public class UnaryTest
         var result = await client.OneRefTypeParameterReturnValueType(request);
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
         callInvokerMock.Received();
     }
 
@@ -229,7 +231,7 @@ public class UnaryTest
         var result = await client.OneValueTypeParameterReturnValueType(request);
 
         // Assert
-        result.Should().Be(456);
+        Assert.Equal(456, result);
         callInvokerMock.Received();
     }
 
@@ -255,9 +257,9 @@ public class UnaryTest
         var result = await client.OneRefTypeParameterReturnRefType(request);
 
         // Assert
-        result.Should().Be("Ok");
+        Assert.Equal("Ok", result);
         callInvokerMock.Received();
-        sentRequest.Should().Be("RequestValue");
+        Assert.Equal("RequestValue", sentRequest);
     }
 
     [Fact]
@@ -282,9 +284,9 @@ public class UnaryTest
         var result = await client.OneValueTypeParameterReturnRefType(request);
 
         // Assert
-        result.Should().Be("OK");
+        Assert.Equal("OK", result);
         callInvokerMock.Received();
-        (sentRequest?.Value).Should().Be(123);
+        Assert.Equal(123, (sentRequest?.Value));
     }
 
     [Fact]
@@ -310,10 +312,10 @@ public class UnaryTest
         var result = await client.TwoParametersReturnRefType(requestArg1, requestArg2);
 
         // Assert
-        result.Should().Be("OK");
+        Assert.Equal("OK", result);
         callInvokerMock.Received();
-        (sentRequest?.Value.Item1).Should().Be(123);
-        (sentRequest?.Value.Item2).Should().Be("Foo");
+        Assert.Equal(123, (sentRequest?.Value.Item1));
+        Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
 
     [Fact]
@@ -339,10 +341,10 @@ public class UnaryTest
         var result = await client.TwoParametersReturnValueType(requestArg1, requestArg2);
 
         // Assert
-        result.Should().Be(987);
+        Assert.Equal(987, result);
         callInvokerMock.Received();
-        (sentRequest?.Value.Item1).Should().Be(123);
-        (sentRequest?.Value.Item2).Should().Be("Foo");
+        Assert.Equal(123, (sentRequest?.Value.Item1));
+        Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
 
     [Fact]
@@ -418,8 +420,8 @@ public class UnaryTest
 
         // Assert
         callInvokerMock.Received();
-        (sentRequest?.Value.Item1).Should().Be(123);
-        (sentRequest?.Value.Item2).Should().Be("Foo");
+        Assert.Equal(123, (sentRequest?.Value.Item1));
+        Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
 
     [Fact]
@@ -440,8 +442,8 @@ public class UnaryTest
         var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType().ResponseHeadersAsync);
 
         // Assert
-        result.StatusCode.Should().Be(StatusCode.Unknown);
-        result.Message.Should().Be("FaultedOnResponseHeaders");
+        Assert.Equal(StatusCode.Unknown, result.StatusCode);
+        Assert.Equal("FaultedOnResponseHeaders", result.Message);
         callInvokerMock.Received();
     }
 
@@ -458,8 +460,8 @@ public class UnaryTest
         var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType());
 
         // Assert
-        result.StatusCode.Should().Be(StatusCode.Unknown);
-        result.Message.Should().Be("Faulted");
+        Assert.Equal(StatusCode.Unknown, result.StatusCode);
+        Assert.Equal("Faulted", result.Message);
         callInvokerMock.Received();
     }
 
@@ -491,7 +493,7 @@ public class UnaryTest
         var client = MagicOnionClient.Create<IMaxParametersService>(callInvokerMock);
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
     }
 
     public interface IMaxParametersService : IService<IMaxParametersService>

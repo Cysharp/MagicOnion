@@ -32,8 +32,8 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var result = await client.MethodReturnCustomObject();
 
         // Assert
-        result.Item1.Should().Be(12345);
-        result.Item2.Should().Be("6789");
+        Assert.Equal(12345, result.Item1);
+        Assert.Equal("6789", result.Item2);
     }
 
 
@@ -49,7 +49,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var result = await client.MethodParameterless();
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var result = await client.MethodParameter_One(12345);
 
         // Assert
-        result.Should().Be(123 + 12345);
+        Assert.Equal(123 + 12345, result);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var result = await client.MethodParameter_Many(12345, "6789");
 
         // Assert
-        result.Should().Be(123 + 12345 + 6789);
+        Assert.Equal(123 + 12345 + 6789, result);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var result = await client.MethodParameter_CustomObject(new MyRequestResponse() { Item1 = 12345, Item2 = "6789" });
 
         // Assert
-        result.Should().Be(123 + 12345 + 6789);
+        Assert.Equal(123 + 12345 + 6789, result);
     }
 
     [Fact]
@@ -112,11 +112,11 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(123);
-        result2.Should().Be(123);
-        receiver.Received.Should().HaveCount(2);
-        receiver.Received.Should().Contain((12345, "6789"));
-        receiver.Received.Should().Contain((98765, "43210"));
+        Assert.Equal(123, result);
+        Assert.Equal(123, result2);
+        Assert.Equal(2, receiver.Received.Count());
+        Assert.Contains((12345, "6789"), receiver.Received);
+        Assert.Contains((98765, "43210"), receiver.Received);
     }
 
     [Fact]
@@ -134,11 +134,11 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // Assert
-        result.Should().Be(123);
-        result2.Should().Be(123);
-        receiver.Received.Should().HaveCount(2);
-        receiver.Received.Should().Contain((12345, "6789"));
-        receiver.Received.Should().Contain((98765, "43210"));
+        Assert.Equal(123, result);
+        Assert.Equal(123, result2);
+        Assert.Equal(2, receiver.Received.Count());
+        Assert.Contains((12345, "6789"), receiver.Received);
+        Assert.Contains((98765, "43210"), receiver.Received);
     }
 
     [Fact]
@@ -153,9 +153,9 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var ex = (RpcException?)await Record.ExceptionAsync(() => client.ThrowReturnStatusException());
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Unknown);
-        ex.Status.Detail.Should().Be("Detail-String");
+        Assert.NotNull(ex);
+        Assert.Equal(StatusCode.Unknown, ex!.StatusCode);
+        Assert.Equal("Detail-String", ex.Status.Detail);
     }
 
     [Fact]
@@ -170,9 +170,9 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Internal);
-        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+        Assert.NotNull(ex);
+        Assert.Equal(StatusCode.Internal, ex!.StatusCode);
+        Assert.StartsWith("An error occurred while processing handler", ex.Status.Detail);
     }
 
     [Fact]
@@ -188,10 +188,10 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         var ex = (RpcException?)await Record.ExceptionAsync(() => client.Throw());
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Internal);
-        ex.Message.Should().Contain("Something went wrong.");
-        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+        Assert.NotNull(ex);
+        Assert.Equal(StatusCode.Internal, ex!.StatusCode);
+        Assert.Contains("Something went wrong.", ex.Message);
+        Assert.StartsWith("An error occurred while processing handler", ex.Status.Detail);
     }
 
     class Receiver : IMemoryPackSerializerTestHubReceiver

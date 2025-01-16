@@ -30,10 +30,10 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var client = MagicOnionClient.Create<IMemoryPackSerializerTestService>(channel, MessagePackMagicOnionSerializerProvider.Default); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
-        var result = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
+        var result = await Record.ExceptionAsync(async () => await client.UnaryReturnNil());
 
         // Assert
-        result.Should().NotBeNull();
+        Assert.NotNull(result);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var result = await client.UnaryReturnNil();
 
         // Assert
-        result.Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, result);
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var result = await client.UnaryReturnCustomObject();
 
         // Assert
-        result.Name.Should().Be("Alice");
-        result.Age.Should().Be(18);
+        Assert.Equal("Alice", result.Name);
+        Assert.Equal(18, result.Age);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var result = await client.UnaryParameterless();
 
         // Assert
-        result.Should().Be(123);
+        Assert.Equal(123, result);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var result = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, "15");
 
         // Assert
-        result.Should().Be(120);
+        Assert.Equal(120, result);
     }
 
     [Fact]
@@ -104,8 +104,8 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
         var result = await client.UnaryCustomObject(new MyObject() { Name = "Alice", Age = 18 });
 
         // Assert
-        result.Name.Should().Be("Alice");
-        result.Age.Should().Be(18);
+        Assert.Equal("Alice", result.Name);
+        Assert.Equal(18, result.Age);
     }
 }
 

@@ -173,16 +173,16 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
 
             var result = await client.Unary1(10, 20, "hogehoge");
 
-            result.Id.Should().Be(30);
-            result.Data.Should().Be("hogehoge");
+            Assert.Equal(30, result.Id);
+            Assert.Equal("hogehoge", result.Data);
         }
         {
             var client = new ArgumentPatternManualClient(channel);
 
             var result = await client.Unary1(10, 20, "__omit_last_argument__");
 
-            result.Id.Should().Be(30);
-            result.Data.Should().Be("unknown");
+            Assert.Equal(30, result.Id);
+            Assert.Equal("unknown", result.Data);
         }
     }
 
@@ -193,8 +193,8 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
 
         var result = await client.Unary2(new MyRequest { Id = 30, Data = "huga" });
 
-        result.Id.Should().Be(30);
-        result.Data.Should().Be("huga");
+        Assert.Equal(30, result.Id);
+        Assert.Equal("huga", result.Data);
     }
 
     [Fact]
@@ -204,8 +204,8 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
 
         var result = await client.Unary3();
 
-        result.Id.Should().Be(-1);
-        result.Data.Should().Be("NoArg");
+        Assert.Equal(-1, result.Id);
+        Assert.Equal("NoArg", result.Data);
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
         var client = MagicOnionClient.Create<IArgumentPattern>(channel);
 
         var result = await client.Unary4();
-        result.Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, result);
     }
 
     [Fact]
@@ -223,8 +223,8 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
         var client = MagicOnionClient.Create<IArgumentPattern>(channel);
 
         var result = await client.Unary5(new MyStructRequest(999, 9999));
-        result.X.Should().Be(999);
-        result.Y.Should().Be(9999);
+        Assert.Equal(999, result.X);
+        Assert.Equal(9999, result.Y);
     }
 
     async Task<T> First<T>(IAsyncStreamReader<T> reader)
@@ -241,35 +241,35 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
         {
             var callResult = await client.ServerStreamingResult1(10, 100, "aaa");
             var result = await First(callResult.ResponseStream);
-            result.Id.Should().Be(110);
-            result.Data.Should().Be("aaa");
+            Assert.Equal(110, result.Id);
+            Assert.Equal("aaa", result.Data);
         }
 
         {
             var callResult = await client.ServerStreamingResult2(new MyRequest { Id = 999, Data = "zzz" });
             var result = await First(callResult.ResponseStream);
-            result.Id.Should().Be(999);
-            result.Data.Should().Be("zzz");
+            Assert.Equal(999, result.Id);
+            Assert.Equal("zzz", result.Data);
         }
 
         {
             var callResult = await client.ServerStreamingResult3();
             var result = await First(callResult.ResponseStream);
-            result.Id.Should().Be(-1);
-            result.Data.Should().Be("empty");
+            Assert.Equal(-1, result.Id);
+            Assert.Equal("empty", result.Data);
         }
 
         {
             var callResult = await client.ServerStreamingResult4();
             var result = await First(callResult.ResponseStream);
-            result.Should().Be(Nil.Default);
+            Assert.Equal(Nil.Default, result);
         }
 
         {
             var callResult = await client.ServerStreamingResult5(new MyStructRequest { X = 9, Y = 100 });
             var result = await First(callResult.ResponseStream);
-            result.X.Should().Be(9);
-            result.Y.Should().Be(100);
+            Assert.Equal(9, result.X);
+            Assert.Equal(100, result.Y);
         }
     }
 

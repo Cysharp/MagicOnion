@@ -18,7 +18,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.MethodId.Should().Be(FNV1A32.GetHashCode(nameof(IMyHub_MethodId.Method_Default)));
+        Assert.Equal(FNV1A32.GetHashCode(nameof(IMyHub_MethodId.Method_Default)), metadata.MethodId);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.MethodId.Should().Be(12345);
+        Assert.Equal(12345, metadata.MethodId);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
+        Assert.NotNull(ex);
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -90,13 +90,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_Task)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().BeEmpty();
-        metadata.RequestType.Should().Be<Nil>();
-        metadata.ResponseType.Should().BeNull();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_Task)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Empty(metadata.Parameters);
+        Assert.Equal(typeof(Nil), metadata.RequestType);
+        Assert.Null(metadata.ResponseType);
     }
 
     [Fact]
@@ -110,13 +110,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_TaskOfValue)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().BeEmpty();
-        metadata.RequestType.Should().Be<Nil>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_TaskOfValue)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Empty(metadata.Parameters);
+        Assert.Equal(typeof(Nil), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -130,13 +130,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_OneParameter)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().HaveCount(1);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().BeNull();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_OneParameter)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Single(metadata.Parameters);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Null(metadata.ResponseType);
     }
 
     [Fact]
@@ -150,13 +150,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_TwoParameters)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().HaveCount(2);
-        metadata.RequestType.Should().Be<DynamicArgumentTuple<int, string>>();
-        metadata.ResponseType.Should().BeNull();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_TwoParameters)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Equal(2, metadata.Parameters.Count());
+        Assert.Equal(typeof(DynamicArgumentTuple<int, string>), metadata.RequestType);
+        Assert.Null(metadata.ResponseType);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().BeEmpty();
+        Assert.Empty(metadata.AttributeLookup);
     }
 
     [Fact]
@@ -184,9 +184,9 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
+        Assert.Single(metadata.AttributeLookup);
+        Assert.Equal([typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -200,10 +200,10 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -217,11 +217,11 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -235,9 +235,9 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
+        Assert.Single(metadata.AttributeLookup);
+        Assert.Equal([typeof(MyThirdAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
     }
 
     [Fact]
@@ -251,10 +251,10 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -268,11 +268,11 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
+        Assert.Equal(3, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -286,12 +286,12 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        Assert.Equal(3, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -305,11 +305,11 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.Metadata.Should().HaveCount(5);
-        metadata.Metadata.Select(x => x.GetType().Name).Should().Equal([ /* Class */ nameof(MyThirdAttribute),  /* Method */ nameof(MyFirstAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute)]);
-        metadata.Metadata[2].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(0);
-        metadata.Metadata[3].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(1);
-        metadata.Metadata[4].Should().BeOfType<MySecondAttribute>().Subject.Value.Should().Be(2);
+        Assert.Equal(5, metadata.Metadata.Count());
+        Assert.Equal([ /* Class */ nameof(MyThirdAttribute),  /* Method */ nameof(MyFirstAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute), nameof(MySecondAttribute)], metadata.Metadata.Select(x => x.GetType().Name));
+        Assert.Equal(0, Assert.IsType<MySecondAttribute>(metadata.Metadata[2]).Value);
+        Assert.Equal(1, Assert.IsType<MySecondAttribute>(metadata.Metadata[3]).Value);
+        Assert.Equal(2, Assert.IsType<MySecondAttribute>(metadata.Metadata[4]).Value);
     }
 
     [Fact]
@@ -323,13 +323,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTask)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().BeEmpty();
-        metadata.RequestType.Should().Be<Nil>();
-        metadata.ResponseType.Should().BeNull();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTask)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Empty(metadata.Parameters);
+        Assert.Equal(typeof(Nil), metadata.RequestType);
+        Assert.Null(metadata.ResponseType);
     }
 
     [Fact]
@@ -343,13 +343,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTaskOfValue)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().BeEmpty();
-        metadata.RequestType.Should().Be<Nil>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTaskOfValue)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Empty(metadata.Parameters);
+        Assert.Equal(typeof(Nil), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -363,13 +363,13 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
 
         // Assert
-        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
-        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
-        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_Void)));
-        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.Parameters.Should().BeEmpty();
-        metadata.RequestType.Should().Be<Nil>();
-        metadata.ResponseType.Should().BeNull();
+        Assert.Equal(typeof(MyHub), metadata.StreamingHubImplementationType);
+        Assert.Equal(typeof(IMyHub), metadata.StreamingHubInterfaceType);
+        Assert.Same(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_Void)), metadata.InterfaceMethod);
+        Assert.Same(methodInfo, metadata.ImplementationMethod);
+        Assert.Empty(metadata.Parameters);
+        Assert.Equal(typeof(Nil), metadata.RequestType);
+        Assert.Null(metadata.ResponseType);
     }
 
     interface IMyHubReceiver

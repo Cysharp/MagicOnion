@@ -23,7 +23,7 @@ public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<Sta
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Alice");
         var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this, cancellationToken: TestContext.Current.CancellationToken);
         var userName = await client.GetUserNameAsync();
-        userName.Should().Be("Alice");
+        Assert.Equal("Alice", userName);
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<Sta
             var client = await StreamingHubClient.ConnectAsync<IAuthorizeHub, IAuthorizeHubReceiver>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }), this, cancellationToken: TestContext.Current.CancellationToken);
         });
 
-        ex.StatusCode.Should().Be(StatusCode.Unauthenticated);
+        Assert.Equal(StatusCode.Unauthenticated, ex.StatusCode);
     }
 }

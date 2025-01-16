@@ -144,7 +144,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var x = await voidOnConnectedTask.Task;
-        x.Should().Be((123, "foo", 12.3f));
+        Assert.Equal((123, "foo", 12.3f), x);
         await client.DisposeAsync();
     }
 
@@ -177,7 +177,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
         //var x = await oneTask.Task;
         var y = await voidoneTask.Task;
         //x.Should().Be(100);
-        y.Should().Be(100);
+        Assert.Equal(100, y);
         await client.DisposeAsync();
     }
 
@@ -189,7 +189,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
         //var x = await moreTask.Task;
         var y = await voidmoreTask.Task;
         //x.Should().Be((100, "foo", 10.3));
-        y.Should().Be((100, "foo", 10.3));
+        Assert.Equal((100, "foo", 10.3), y);
         await client.DisposeAsync();
     }
 
@@ -198,7 +198,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunZeroArgument();
-        v.Should().Be(1000);
+        Assert.Equal(1000, v);
         await client.DisposeAsync();
     }
     [Fact]
@@ -206,7 +206,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunZeroArgument();
-        v.Should().Be(1000);
+        Assert.Equal(1000, v);
         await client.DisposeAsync();
     }
     [Fact]
@@ -214,7 +214,7 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunMoreArgument(10, "foo", 30.4);
-        v.Should().Be(30.4);
+        Assert.Equal(30.4, v);
         await client.DisposeAsync();
     }
 
@@ -231,9 +231,9 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
         }
         {
             var v = await voidone2Task.Task;
-            v.X.Should().Be(10);
-            v.Y.Should().Be(99);
-            v.Z.Should().Be(100);
+            Assert.Equal(10, v.X);
+            Assert.Equal(99, v.Y);
+            Assert.Equal(100, v.Z);
         }
         await client.DisposeAsync();
     }
@@ -242,9 +242,9 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this, cancellationToken: TestContext.Current.CancellationToken);
         var v = await client.RetrunOneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
-        v.X.Should().Be(10);
-        v.Y.Should().Be(99);
-        v.Z.Should().Be(100);
+        Assert.Equal(10, v.X);
+        Assert.Equal(99, v.Y);
+        Assert.Equal(100, v.Z);
         await client.DisposeAsync();
     }
 
@@ -276,17 +276,17 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
         {
             var v = await voidone3Task.Task;
 
-            v[0].X.Should().Be(10);
-            v[0].Y.Should().Be(99);
-            v[0].Z.Should().Be(100);
+            Assert.Equal(10, v[0].X);
+            Assert.Equal(99, v[0].Y);
+            Assert.Equal(100, v[0].Z);
 
-            v[1].X.Should().Be(5);
-            v[1].Y.Should().Be(39);
-            v[1].Z.Should().Be(200);
+            Assert.Equal(5, v[1].X);
+            Assert.Equal(39, v[1].Y);
+            Assert.Equal(200, v[1].Z);
 
-            v[2].X.Should().Be(4);
-            v[2].Y.Should().Be(59);
-            v[2].Z.Should().Be(300);
+            Assert.Equal(4, v[2].X);
+            Assert.Equal(59, v[2].Y);
+            Assert.Equal(300, v[2].Z);
         }
         await client.DisposeAsync();
     }
@@ -301,17 +301,17 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
             new TestObject() { X = 4, Y = 59, Z = 300 },
         });
 
-        v[0].X.Should().Be(10);
-        v[0].Y.Should().Be(99);
-        v[0].Z.Should().Be(100);
+        Assert.Equal(10, v[0].X);
+        Assert.Equal(99, v[0].Y);
+        Assert.Equal(100, v[0].Z);
 
-        v[1].X.Should().Be(5);
-        v[1].Y.Should().Be(39);
-        v[1].Z.Should().Be(200);
+        Assert.Equal(5, v[1].X);
+        Assert.Equal(39, v[1].Y);
+        Assert.Equal(200, v[1].Z);
 
-        v[2].X.Should().Be(4);
-        v[2].Y.Should().Be(59);
-        v[2].Z.Should().Be(300);
+        Assert.Equal(4, v[2].X);
+        Assert.Equal(59, v[2].Y);
+        Assert.Equal(300, v[2].Z);
         await client.DisposeAsync();
     }
 
@@ -459,7 +459,7 @@ public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<Serve
             client.ReceiveExceptionAsync().GetAwaiter().GetResult();
         });
 
-        ex.StatusCode.Should().Be(StatusCode.Internal);
+        Assert.Equal(StatusCode.Internal, ex.StatusCode);
         logger.WriteLine(ex.ToString());
 
         await client.DisposeAsync();
@@ -475,7 +475,7 @@ public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<Serve
             client.StatusCodeAsync().GetAwaiter().GetResult();
         });
 
-        ex.StatusCode.Should().Be((StatusCode)99);
+        Assert.Equal((StatusCode)99, ex.StatusCode);
         logger.WriteLine(ex.Status.Detail);
         logger.WriteLine(ex.ToString());
 

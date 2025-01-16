@@ -161,13 +161,11 @@ public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
     [Fact]
     public void Filter()
     {
-        Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult()).Status.Detail
-            .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Finally");
-
-        Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult()).Status.Detail
-            .Should().Be("DumpFilter, MultiFilter2, MoreThanFilter3, SimpleFilter1 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, MultiFilter2, Begin, Finally, MultiFilter2xyz, (99, 30, 4595), SimpleFilter1, Begin, Finally");
-
-        Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult()).Status.Detail
-            .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Catch, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Catch, Finally");
+        var ex1 = Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult());
+        Assert.Equal("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Finally", ex1.Status.Detail);
+        var ex2 = Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult());
+        Assert.Equal("DumpFilter, MultiFilter2, MoreThanFilter3, SimpleFilter1 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, MultiFilter2, Begin, Finally, MultiFilter2xyz, (99, 30, 4595), SimpleFilter1, Begin, Finally", ex2.Status.Detail);
+        var ex3 = Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult());
+        Assert.Equal("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Catch, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Catch, Finally", ex3.Status.Detail);
     }
 }

@@ -27,7 +27,7 @@ public class DynamicArgumentTupleServiceTest : IClassFixture<MagicOnionApplicati
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var client = clientFactory.Create<IDynamicArgumentTupleService>(channel);
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-        result.Should().Be(120);
+        Assert.Equal(120, result);
     }
 }
 

@@ -36,11 +36,11 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
             var filters = Enumerable.Range(0, i).Select(_ => new CountFilter(i)).ToArray();
             var client = clientFactory.Create<IClientFilterTestService>(channel, filters);
             var r0 = await client.Unary1(1000, 2000);
-            r0.Should().Be(3000 + 10 * i);
+            Assert.Equal(3000 + 10 * i, r0);
 
             foreach (var item in filters)
             {
-                item.CalledCount.Should().Be(1);
+                Assert.Equal(1, item.CalledCount);
             }
         }
     }
@@ -59,8 +59,8 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
         await res;
 
         var trailers = res.GetTrailers();
-        trailers.Should().ContainSingle(x => x.Key == "x-foo" && x.Value == "abcdefg");
-        trailers.Should().ContainSingle(x => x.Key == "x-bar" && x.Value == "hijklmn");
+        Assert.Single(trailers, x => x.Key == "x-foo" && x.Value == "abcdefg");
+        Assert.Single(trailers, x => x.Key == "x-bar" && x.Value == "hijklmn");
     }
 
     [Theory]
@@ -78,8 +78,8 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
             }).AlwaysError();
         });
 
-        ex.RetryCount.Should().Be(3);
-        ex.LastException.Should().NotBeNull();
+        Assert.Equal(3, ex.RetryCount);
+        Assert.NotNull(ex.LastException);
         logger.WriteLine(ex.LastException?.ToString() ?? "(null)");
     }
 }

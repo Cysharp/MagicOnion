@@ -1,4 +1,3 @@
-using FluentAssertions;
 using MessagePack;
 using MessagePack.Resolvers;
 
@@ -19,9 +18,9 @@ public class UnsafeDirectBlitResolverTest
 
         var z = MessagePackSerializer.Deserialize<MyStruct>(bin, options, cancellationToken: TestContext.Current.CancellationToken);
 
-        z.X.Should().Be(10);
-        z.Y.Should().Be(99);
-        z.Z.Should().Be(999);
+        Assert.Equal(10, z.X);
+        Assert.Equal(99, z.Y);
+        Assert.Equal(999, z.Z);
     }
 }
 

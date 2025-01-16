@@ -16,8 +16,8 @@ public class MethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().BeEmpty();
+        Assert.Empty(metadata.AttributeLookup);
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
+        Assert.Single(metadata.AttributeLookup);
+        Assert.Equal([typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -61,10 +61,10 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -78,11 +78,11 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -96,9 +96,9 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
+        Assert.Single(metadata.AttributeLookup);
+        Assert.Equal([typeof(MyThirdAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
     }
 
     [Fact]
@@ -112,10 +112,10 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
+        Assert.Equal(2, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
     }
 
     [Fact]
@@ -129,11 +129,11 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
+        Assert.Equal(3, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -147,12 +147,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
-        metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        Assert.Equal(3, metadata.AttributeLookup.Count());
+        Assert.Equal([typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute)], metadata.AttributeLookup.Select(x => x.Key));
+        Assert.Single(metadata.AttributeLookup[typeof(MyThirdAttribute)]);
+        Assert.Single(metadata.AttributeLookup[typeof(MyFirstAttribute)]);
+        Assert.Equal(3, metadata.AttributeLookup[typeof(MySecondAttribute)].Count());
+        Assert.Equal([new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2)], metadata.AttributeLookup[typeof(MySecondAttribute)]);
     }
 
     [Fact]
@@ -166,12 +166,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.Unary);
-        metadata.RequestType.Should().Be<MessagePack.Nil>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.Unary, metadata.MethodType);
+        Assert.Equal(typeof(MessagePack.Nil), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -185,12 +185,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.Unary);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.Unary, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -204,12 +204,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.Unary);
-        metadata.RequestType.Should().Be<DynamicArgumentTuple<int, string>>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.Unary, metadata.MethodType);
+        Assert.Equal(typeof(DynamicArgumentTuple<int, string>), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -223,12 +223,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<MessagePack.Nil>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(MessagePack.Nil), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -242,12 +242,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -261,12 +261,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<DynamicArgumentTuple<int, string>>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(DynamicArgumentTuple<int, string>), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
 
@@ -281,12 +281,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<MessagePack.Nil>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(MessagePack.Nil), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -300,12 +300,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -319,12 +319,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ServerStreaming);
-        metadata.RequestType.Should().Be<DynamicArgumentTuple<int, string>>();
-        metadata.ResponseType.Should().Be<int>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ServerStreaming, metadata.MethodType);
+        Assert.Equal(typeof(DynamicArgumentTuple<int, string>), metadata.RequestType);
+        Assert.Equal(typeof(int), metadata.ResponseType);
     }
 
     [Fact]
@@ -338,12 +338,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ClientStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<string>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ClientStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(string), metadata.ResponseType);
     }
 
     [Fact]
@@ -357,8 +357,8 @@ public class MethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -372,12 +372,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.ClientStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<string>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.ClientStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(string), metadata.ResponseType);
     }
 
     [Fact]
@@ -391,8 +391,8 @@ public class MethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -406,12 +406,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.DuplexStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<string>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.DuplexStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(string), metadata.ResponseType);
     }
 
     [Fact]
@@ -425,8 +425,8 @@ public class MethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -440,12 +440,12 @@ public class MethodHandlerMetadataFactoryTest
         var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
-        metadata.ServiceImplementationType.Should().Be<MyService>();
-        metadata.ServiceImplementationMethod.Should().BeSameAs(methodInfo);
-        metadata.ServiceInterface.Should().Be<IMyService>();
-        metadata.MethodType.Should().Be(MethodType.DuplexStreaming);
-        metadata.RequestType.Should().Be<int>();
-        metadata.ResponseType.Should().Be<string>();
+        Assert.Equal(typeof(MyService), metadata.ServiceImplementationType);
+        Assert.Same(methodInfo, metadata.ServiceImplementationMethod);
+        Assert.Equal(typeof(IMyService), metadata.ServiceInterface);
+        Assert.Equal(MethodType.DuplexStreaming, metadata.MethodType);
+        Assert.Equal(typeof(int), metadata.RequestType);
+        Assert.Equal(typeof(string), metadata.ResponseType);
     }
 
     [Fact]
@@ -459,8 +459,8 @@ public class MethodHandlerMetadataFactoryTest
         var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     interface IMyService : IService<IMyService>

@@ -20,10 +20,10 @@ namespace MagicOnion.Integration.Tests
             var ex = await Record.ExceptionAsync(() => client.CustomMethodId().WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken));
 
             // Assert
-            ex.Should().NotBeNull();
-            var rpcException = ex.Should().BeOfType<RpcException>().Subject;
-            rpcException.Status.StatusCode.Should().Be(StatusCode.Unimplemented);
-            factory.Logs.Should().Contain(x => x.Contains("HubMethodNotFound\tStreamingHub method '-1'"));
+            Assert.NotNull(ex);
+            var rpcException = Assert.IsType<RpcException>(ex);
+            Assert.Equal(StatusCode.Unimplemented, rpcException.Status.StatusCode);
+            Assert.Contains(factory.Logs, x => x.Contains("HubMethodNotFound\tStreamingHub method '-1'"));
         }
     }
 

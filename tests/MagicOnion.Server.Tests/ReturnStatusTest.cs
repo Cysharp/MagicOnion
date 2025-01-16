@@ -113,6 +113,6 @@ public class ReturnStatusTest : IClassFixture<ServerFixture<ReturnStatus>>
             client.CustomThrow(123).GetAwaiter().GetResult();
         });
 
-        ex.Status.StatusCode.Should().Be((StatusCode)123);
+        Assert.Equal((StatusCode)123, ex.Status.StatusCode);
     }
 }

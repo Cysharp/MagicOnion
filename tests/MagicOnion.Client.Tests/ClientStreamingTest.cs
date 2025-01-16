@@ -14,7 +14,7 @@ public class ClientStreamingTest
         var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Assert
-        client.Should().NotBeNull();
+        Assert.NotNull(client);
     }
 
     [Fact]
@@ -42,11 +42,11 @@ public class ClientStreamingTest
         await result.RequestStream.CompleteAsync();
 
         // Assert
-        client.Should().NotBeNull();
-        (await result.ResponseAsync).Should().Be(9876);
+        Assert.NotNull(client);
+        Assert.Equal(9876, (await result.ResponseAsync));
         callInvokerMock.Received();
-        clientStreamWriterMock.Completed.Should().BeTrue();
-        clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Box.Create(123), Box.Create(456) });
+        Assert.True(clientStreamWriterMock.Completed);
+        Assert.Equal(new[] { Box.Create(123), Box.Create(456) }, clientStreamWriterMock.Written);
     }
 
     [Fact]
@@ -75,11 +75,11 @@ public class ClientStreamingTest
         await result.RequestStream.CompleteAsync();
 
         // Assert
-        client.Should().NotBeNull();
-        (await result.ResponseAsync).Should().Be(9876);
+        Assert.NotNull(client);
+        Assert.Equal(9876, (await result.ResponseAsync));
         callInvokerMock.Received();
-        clientStreamWriterMock.Completed.Should().BeTrue();
-        clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { "foo", "bar" });
+        Assert.True(clientStreamWriterMock.Completed);
+        Assert.Equal(new[] { "foo", "bar" }, clientStreamWriterMock.Written);
     }
 
     [Fact]
@@ -107,11 +107,11 @@ public class ClientStreamingTest
         await result.RequestStream.CompleteAsync();
 
         // Assert
-        client.Should().NotBeNull();
-        (await result.ResponseAsync).Should().Be("OK");
+        Assert.NotNull(client);
+        Assert.Equal("OK", (await result.ResponseAsync));
         callInvokerMock.Received();
-        clientStreamWriterMock.Completed.Should().BeTrue();
-        clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Box.Create(123), Box.Create(456) });
+        Assert.True(clientStreamWriterMock.Completed);
+        Assert.Equal(new[] { Box.Create(123), Box.Create(456) }, clientStreamWriterMock.Written);
     }
     
     [Fact]
@@ -139,11 +139,11 @@ public class ClientStreamingTest
         await result.RequestStream.CompleteAsync();
 
         // Assert
-        client.Should().NotBeNull();
-        (await result.ResponseAsync).Should().Be("OK");
+        Assert.NotNull(client);
+        Assert.Equal("OK", (await result.ResponseAsync));
         callInvokerMock.Received();
-        clientStreamWriterMock.Completed.Should().BeTrue();
-        clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Tuple.Create("Foo", "Bar"), Tuple.Create("Baz", "Hello") });
+        Assert.True(clientStreamWriterMock.Completed);
+        Assert.Equal(new[] { Tuple.Create("Foo", "Bar"), Tuple.Create("Baz", "Hello") }, clientStreamWriterMock.Written);
     }
 
     public interface IClientStreamingTestService : IService<IClientStreamingTestService>

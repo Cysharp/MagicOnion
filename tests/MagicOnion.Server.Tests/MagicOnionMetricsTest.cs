@@ -45,18 +45,18 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         values3 = collector.GetMeasurementSnapshot();
 
-        values.Should().BeEmpty();
+        Assert.Empty(values);
 
-        values2.Should().HaveCount(1);
-        values2[0].Value.Should().Be(1);
-        values2[0].Tags["rpc.system"].Should().Be("magiconion");
-        values2[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
+        Assert.Single(values2);
+        Assert.Equal(1, values2[0].Value);
+        Assert.Equal("magiconion", values2[0].Tags["rpc.system"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values2[0].Tags["rpc.service"]);
 
-        values3.Should().HaveCount(2);
-        values3[0].Value.Should().Be(1);
-        values3[1].Value.Should().Be(-1);
-        values3[1].Tags["rpc.system"].Should().Be("magiconion");
-        values3[1].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
+        Assert.Equal(2, values3.Count());
+        Assert.Equal(1, values3[0].Value);
+        Assert.Equal(-1, values3[1].Value);
+        Assert.Equal("magiconion", values3[1].Tags["rpc.system"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values3[1].Tags["rpc.service"]);
     }
 
     [Fact]
@@ -72,11 +72,11 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        values.Should().HaveCount(1);
-        values[0].Value.Should().BeGreaterThanOrEqualTo(90);
-        values[0].Tags["rpc.system"].Should().Be("magiconion");
-        values[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
-        values[0].Tags["rpc.method"].Should().Be(nameof(IMagicOnionMetricsTestHub.SleepAsync));
+        Assert.Single(values);
+        Assert.True(values[0].Value >= 90);
+        Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub.SleepAsync), values[0].Tags["rpc.method"]);
     }
 
     [Fact]
@@ -92,12 +92,12 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        values.Should().HaveCount(1);
-        values[0].Value.Should().Be(1);
-        values[0].Tags["rpc.system"].Should().Be("magiconion");
-        values[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
-        values[0].Tags["rpc.method"].Should().Be(nameof(IMagicOnionMetricsTestHub.MethodAsync));
-        values[0].Tags["magiconion.streaminghub.is_error"].Should().Be(false);
+        Assert.Single(values);
+        Assert.Equal(1, values[0].Value);
+        Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub.MethodAsync), values[0].Tags["rpc.method"]);
+        Assert.Equal(false, values[0].Tags["magiconion.streaminghub.is_error"]);
     }
 
     [Fact]
@@ -118,11 +118,11 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        values.Should().HaveCount(1);
-        values[0].Value.Should().Be(1);
-        values[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
-        values[0].Tags["rpc.method"].Should().Be(nameof(IMagicOnionMetricsTestHub.ThrowAsync));
-        values[0].Tags["magiconion.streaminghub.is_error"].Should().Be(true);
+        Assert.Single(values);
+        Assert.Equal(1, values[0].Value);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub.ThrowAsync), values[0].Tags["rpc.method"]);
+        Assert.Equal(true, values[0].Tags["magiconion.streaminghub.is_error"]);
     }
 
     [Fact]
@@ -143,12 +143,12 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
 
         var values = collector.GetMeasurementSnapshot();
 
-        values.Should().HaveCount(1);
-        values[0].Value.Should().Be(1);
-        values[0].Tags["rpc.system"].Should().Be("magiconion");
-        values[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
-        values[0].Tags["rpc.method"].Should().Be(nameof(IMagicOnionMetricsTestHub.ThrowAsync));
-        values[0].Tags["error.type"].Should().Be("System.InvalidOperationException");
+        Assert.Single(values);
+        Assert.Equal(1, values[0].Value);
+        Assert.Equal("magiconion", values[0].Tags["rpc.system"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub), values[0].Tags["rpc.service"]);
+        Assert.Equal(nameof(IMagicOnionMetricsTestHub.ThrowAsync), values[0].Tags["rpc.method"]);
+        Assert.Equal("System.InvalidOperationException", values[0].Tags["error.type"]);
     }
 
     class Receiver : IMagicOnionMetricsTestHubReceiver

@@ -29,9 +29,9 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
-        ex.StatusCode.Should().Be(StatusCode.AlreadyExists);
-        ex.Status.Detail.Should().Be(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync));
-        logs.Should().HaveCount(1);
+        Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
+        Assert.Equal(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync), ex.Status.Detail);
+        Assert.Single(logs);
     }
 
     [Fact]
@@ -42,9 +42,9 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().Contain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.Contains("Something went wrong", ex.Message);
     }
 
     [Fact]
@@ -55,9 +55,9 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().Contain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.Contains("Something went wrong", ex.Message);
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().Contain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.Contains("Something went wrong", ex.Message);
     }
 }
 
@@ -93,9 +93,9 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().NotContain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
     [Fact]
@@ -106,9 +106,9 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().NotContain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
     [Fact]
@@ -119,9 +119,9 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
-        ex.StatusCode.Should().Be(StatusCode.Unknown);
-        logs.Should().HaveCount(1);
-        ex.Message.Should().NotContain("Something went wrong");
+        Assert.Equal(StatusCode.Unknown, ex.StatusCode);
+        Assert.Single(logs);
+        Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.NoParameterReturnNilAsync()).Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, (await client.NoParameterReturnNilAsync()));
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.NoParameterReturnValueTypeAsync()).Should().Be(1234);
+        Assert.Equal(1234, (await client.NoParameterReturnValueTypeAsync()));
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.NoParameterReturnRefTypeAsync()).Value.Should().Be("1234");
+        Assert.Equal("1234", (await client.NoParameterReturnRefTypeAsync()).Value);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneValueTypeParameterReturnNilAsync(123)).Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, (await client.OneValueTypeParameterReturnNilAsync(123)));
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneValueTypeParameterReturnValueTypeAsync(123)).Should().Be(123);
+        Assert.Equal(123, (await client.OneValueTypeParameterReturnValueTypeAsync(123)));
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneValueTypeParameterReturnRefTypeAsync(123)).Value.Should().Be("123");
+        Assert.Equal("123", (await client.OneValueTypeParameterReturnRefTypeAsync(123)).Value);
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoValueTypeParametersReturnNilAsync(123, 456)).Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, (await client.TwoValueTypeParametersReturnNilAsync(123, 456)));
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoValueTypeParametersReturnValueTypeAsync(123, 456)).Should().Be(123 + 456);
+        Assert.Equal(123 + 456, (await client.TwoValueTypeParametersReturnValueTypeAsync(123, 456)));
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoValueTypeParametersReturnRefTypeAsync(123, 456)).Value.Should().Be((123 + 456).ToString());
+        Assert.Equal((123 + 456).ToString(), (await client.TwoValueTypeParametersReturnRefTypeAsync(123, 456)).Value);
     }
 
     [Fact]
@@ -212,8 +212,8 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
-        ex.StatusCode.Should().Be(StatusCode.AlreadyExists);
-        ex.Status.Detail.Should().Be(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync));
+        Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
+        Assert.Equal(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync), ex.Status.Detail);
     }
 
     [Fact]
@@ -223,8 +223,8 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsRefTypeAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
-        ex.StatusCode.Should().Be(StatusCode.AlreadyExists);
-        ex.Status.Detail.Should().Be(nameof(IUnaryTestService.ReturnTypeIsRefTypeAndNonSuccessResponseAsync));
+        Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
+        Assert.Equal(nameof(IUnaryTestService.ReturnTypeIsRefTypeAndNonSuccessResponseAsync), ex.Status.Detail);
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneRefTypeParameterReturnNilAsync(new UnaryTestMyRequest(123))).Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, (await client.OneRefTypeParameterReturnNilAsync(new UnaryTestMyRequest(123))));
     }
 
     [Fact]
@@ -242,7 +242,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoRefTypeParametersReturnNilAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))).Should().Be(Nil.Default);
+        Assert.Equal(Nil.Default, (await client.TwoRefTypeParametersReturnNilAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))));
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneRefTypeParameterReturnValueTypeAsync(new UnaryTestMyRequest(123))).Should().Be(123);
+        Assert.Equal(123, (await client.OneRefTypeParameterReturnValueTypeAsync(new UnaryTestMyRequest(123))));
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoRefTypeParametersReturnValueTypeAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))).Should().Be(123 + 456);
+        Assert.Equal(123 + 456, (await client.TwoRefTypeParametersReturnValueTypeAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))));
     }
 
     [Fact]
@@ -269,7 +269,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.OneRefTypeParameterReturnRefTypeAsync(new UnaryTestMyRequest(123))).Value.Should().Be("123");
+        Assert.Equal("123", (await client.OneRefTypeParameterReturnRefTypeAsync(new UnaryTestMyRequest(123))).Value);
     }
 
     [Fact]
@@ -278,7 +278,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
-        (await client.TwoRefTypeParametersReturnRefTypeAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))).Value.Should().Be((123 + 456).ToString());
+        Assert.Equal((123 + 456).ToString(), (await client.TwoRefTypeParametersReturnRefTypeAsync(new UnaryTestMyRequest(123), new UnaryTestMyRequest(456))).Value);
     }
 
     [Fact]
@@ -316,7 +316,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var result = await client.NullResponseAsync(null);
 
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
 }

@@ -23,7 +23,7 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Alice");
         var client = MagicOnionClient.Create<IAuthorizeClassService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
         var userName = await client.GetUserNameAsync();
-        userName.Should().Be("Alice");
+        Assert.Equal("Alice", userName);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IAuthorizeClassService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync());
-        ex.StatusCode.Should().Be(StatusCode.Unauthenticated);
+        Assert.Equal(StatusCode.Unauthenticated, ex.StatusCode);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IAuthorizeClassService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        (await client.AddAsync(123, 456)).Should().Be(579);
+        Assert.Equal(579, (await client.AddAsync(123, 456)));
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Alice");
         var client = MagicOnionClient.Create<IAuthorizeMethodService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
         var userName = await client.GetUserNameAsync();
-        userName.Should().Be("Alice");
+        Assert.Equal("Alice", userName);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IAuthorizeMethodService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync());
-        ex.StatusCode.Should().Be(StatusCode.Unauthenticated);
+        Assert.Equal(StatusCode.Unauthenticated, ex.StatusCode);
     }
 
     [Fact]
@@ -67,6 +67,6 @@ public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IAuthorizeMethodService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        (await client.AddAsync(123, 456)).Should().Be(579);
+        Assert.Equal(579, (await client.AddAsync(123, 456)));
     }
 }

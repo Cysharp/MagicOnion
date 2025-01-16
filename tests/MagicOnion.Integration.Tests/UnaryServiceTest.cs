@@ -30,7 +30,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var result = client.NonGeneric(123);
         await result;
 
-        result.GetTrailers().Should().Contain(x => x.Key == "x-request-arg0" && x.Value == "123");
+        Assert.Contains(result.GetTrailers(), x => x.Key == "x-request-arg0" && x.Value == "123");
     }
 
     [Theory]
@@ -41,7 +41,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var client = clientFactory.Create<IUnaryService>(channel);
         var result  = client.ManyParametersReturnsValueType(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
         var result2 = await result;
-        result2.Should().Be(120);
+        Assert.Equal(120, result2);
     }
 
     [Theory]
@@ -51,7 +51,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var client = clientFactory.Create<IUnaryService>(channel);
         var result  = await client.RefType(new MyUnaryRequest(123, 456));
-        result.Value.Should().Be(123 + 456);
+        Assert.Equal(123 + 456, result.Value);
     }
 
     [Theory]
@@ -61,7 +61,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var client = clientFactory.Create<IUnaryService>(channel);
         var result  = await client.RefTypeNull(default);
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 }
 
