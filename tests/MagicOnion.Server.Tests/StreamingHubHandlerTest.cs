@@ -35,7 +35,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_Task) + " called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_Task) + " called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -49,7 +49,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_TaskOfInt32) + " called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_TaskOfInt32) + " called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, {Int32:12345}]
@@ -87,7 +87,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
     [Fact]
     public async Task Parameterless_Returns_ValueTask()
@@ -110,7 +110,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTask) + " called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTask) + " called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -124,7 +124,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTaskOfInt32) + " called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTaskOfInt32) + " called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, {Int32:12345}]
@@ -162,7 +162,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Single_Returns_Task) + "(12345) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Single_Returns_Task) + "(12345) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -200,7 +200,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_Task) + "(12345,テスト,True) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_Task) + "(12345,テスト,True) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -237,7 +237,7 @@ public class StreamingHubHandlerTest
             writer.Flush();
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, {Int32:12345}]
@@ -274,7 +274,7 @@ public class StreamingHubHandlerTest
             writer.Flush();
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -301,9 +301,9 @@ public class StreamingHubHandlerTest
         }
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(0,テスト0,True) called.");
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(1,テスト1,False) called.");
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(2,テスト2,True) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(0,テスト0,True) called.", hubInstance.Results);
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(1,テスト1,False) called.", hubInstance.Results);
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(2,テスト2,True) called.", hubInstance.Results);
 
         byte[] BuildMessage(int messageId, int retVal)
         {
@@ -317,9 +317,9 @@ public class StreamingHubHandlerTest
             writer.Flush();
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage(0, 0));
-        fakeStreamingHubContext.Responses[1].Memory.ToArray().Should().Equal(BuildMessage(1000, 1));
-        fakeStreamingHubContext.Responses[2].Memory.ToArray().Should().Equal(BuildMessage(2000, 2));
+        Assert.Equal(BuildMessage(0, 0), fakeStreamingHubContext.Responses[0].Memory.ToArray());
+        Assert.Equal(BuildMessage(1000, 1), fakeStreamingHubContext.Responses[1].Memory.ToArray());
+        Assert.Equal(BuildMessage(2000, 2), fakeStreamingHubContext.Responses[2].Memory.ToArray());
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Void) + " called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Void) + " called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -357,7 +357,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -381,7 +381,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Single_Void) + "(12345) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Single_Void) + "(12345) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -395,7 +395,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Void) + "(12345,テスト,True) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Void) + "(12345,テスト,True) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, Nil]
@@ -433,7 +433,7 @@ public class StreamingHubHandlerTest
 
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]
@@ -457,8 +457,8 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Void) + "(12345,テスト,True) called.");
-        fakeStreamingHubContext.Responses.Should().BeEmpty();
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Void) + "(12345,テスト,True) called.", hubInstance.Results);
+        Assert.Empty(fakeStreamingHubContext.Responses);
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public class StreamingHubHandlerTest
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
-        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.");
+        Assert.Contains(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.", hubInstance.Results);
         byte[] BuildMessage()
         {
             // [MessageId, MethodId, {Xor:Int32:12345}]
@@ -501,7 +501,7 @@ public class StreamingHubHandlerTest
             serializer.Serialize(buffer, 12345);
             return buffer.WrittenMemory.ToArray();
         }
-        fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
+        Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
     }
 
     [Fact]

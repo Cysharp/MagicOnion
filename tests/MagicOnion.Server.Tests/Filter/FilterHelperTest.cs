@@ -21,11 +21,11 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(4);
-        filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Global.Instance");
-        filters[1].Filter.Should().BeOfType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactory>().Which.Type.Should().Be(typeof(TestFilterAttribute));
-        filters[2].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
-        filters[3].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
+        Assert.Equal(4, filters.Count());
+        Assert.Equal("Global.Instance", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
+        Assert.Equal(typeof(TestFilterAttribute), Assert.IsType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactory>(filters[1].Filter).Type);
+        Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[2].Filter).Name);
+        Assert.Equal("Attribute.Method", Assert.IsType<TestFilterAttribute>(filters[3].Filter).Name);
     }
 
     [Fact]
@@ -38,8 +38,8 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(1);
-        filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
+        Assert.Equal(1, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
     }
 
     [Fact]
@@ -52,9 +52,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
-        filters[1].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
+        Assert.Equal(2, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
+        Assert.Equal("Attribute.Method", Assert.IsType<TestFilterAttribute>(filters[1].Filter).Name);
     }
 
     [Fact]
@@ -67,8 +67,8 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(1);
-        filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
+        Assert.Equal(1, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(filters[0].Filter).Name);
     }
 
     [Fact]
@@ -88,12 +88,11 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(5 + 4 + 4);
-        filters.Select(x => x.Filter).OfType<TestFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
-        {
+        Assert.Equal(5 + 4 + 4, filters.Count());
+        Assert.Equal([
             "-256", "-123", "-64", "1", "64", "123", "256",
             "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"
-        });
+        ], filters.Select(x => x.Filter).OfType<TestFilterAttribute>().Select(x => x.Name));
     }
 
     [Fact]
@@ -108,9 +107,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<LegacyFilterFactory>();
-        filters[1].Filter.Should().BeOfType<TestFilterAttribute>();
+        Assert.Equal(2, filters.Count());
+        Assert.IsType<LegacyFilterFactory>(filters[0].Filter);
+        Assert.IsType<TestFilterAttribute>(filters[1].Filter);
     }
 
     [Fact]
@@ -123,9 +122,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<LegacyFilterFactoryAttribute>();
-        filters[1].Filter.Should().BeOfType<TestFilterAttribute>();
+        Assert.Equal(2, filters.Count());
+        Assert.IsType<LegacyFilterFactoryAttribute>(filters[0].Filter);
+        Assert.IsType<TestFilterAttribute>(filters[1].Filter);
     }
 
     [TestFilter("Attribute.Class")]
@@ -225,11 +224,11 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(4);
-        filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Global.Instance");
-        filters[1].Filter.Should().BeOfType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactory>().Which.Type.Should().Be(typeof(TestHubFilterAttribute));
-        filters[2].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
-        filters[3].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
+        Assert.Equal(4, filters.Count());
+        Assert.Equal("Global.Instance", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
+        Assert.Equal(typeof(TestHubFilterAttribute), Assert.IsType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactory>(filters[1].Filter).Type);
+        Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[2].Filter).Name);
+        Assert.Equal("Attribute.Method", Assert.IsType<TestHubFilterAttribute>(filters[3].Filter).Name);
     }
 
     [Fact]
@@ -242,8 +241,8 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(1);
-        filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
+        Assert.Equal(1, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
     }
 
     [Fact]
@@ -256,9 +255,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
-        filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
+        Assert.Equal(2, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
+        Assert.Equal("Attribute.Method", Assert.IsType<TestHubFilterAttribute>(filters[1].Filter).Name);
     }
 
     [Fact]
@@ -271,8 +270,8 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(1);
-        filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
+        Assert.Equal(1, filters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(filters[0].Filter).Name);
     }
 
     [Fact]
@@ -286,10 +285,10 @@ public class FilterHelperTest
         var streamingHubFilters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        serviceFilters.Should().HaveCount(1);
-        serviceFilters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
-        streamingHubFilters.Should().HaveCount(1);
-        streamingHubFilters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
+        Assert.Equal(1, serviceFilters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestFilterAttribute>(serviceFilters[0].Filter).Name);
+        Assert.Equal(1, streamingHubFilters.Count());
+        Assert.Equal("Attribute.Class", Assert.IsType<TestHubFilterAttribute>(streamingHubFilters[0].Filter).Name);
     }
 
     [Fact]
@@ -309,12 +308,10 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(5 + 4 + 4);
-        filters.Select(x => x.Filter).OfType<TestHubFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
-        {
-            "-256", "-123", "-64", "1", "64", "123", "256",
-            "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"
-        });
+        Assert.Equal(5 + 4 + 4, filters.Count());
+        Assert.Equal(["-256", "-123", "-64", "1", "64", "123", "256",
+                "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"],
+            filters.Select(x => x.Filter).OfType<TestHubFilterAttribute>().Select(x => x.Name));
     }
 
     [Fact]
@@ -329,9 +326,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<LegacyHubFilterFactory>();
-        filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>();
+        Assert.Equal(2, filters.Count());
+        Assert.IsType<LegacyHubFilterFactory>(filters[0].Filter);
+        Assert.IsType<TestHubFilterAttribute>(filters[1].Filter);
     }
     
     [Fact]
@@ -344,9 +341,9 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(2);
-        filters[0].Filter.Should().BeOfType<LegacyHubFilterFactoryAttribute>();
-        filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>();
+        Assert.Equal(2, filters.Count());
+        Assert.IsType<LegacyHubFilterFactoryAttribute>(filters[0].Filter);
+        Assert.IsType<TestHubFilterAttribute>(filters[1].Filter);
     }
 
     [TestHubFilter("Attribute.Class")]
@@ -453,8 +450,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Unnamed");
+        Assert.NotNull(instance);
+        Assert.Equal("Unnamed", Assert.IsType<TestFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -468,9 +465,9 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().Be(filterDesc.Filter);
-        instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Instantiated");
+        Assert.NotNull(instance);
+        Assert.Equal(filterDesc.Filter, instance);
+        Assert.Equal("Instantiated", Assert.IsType<TestFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -486,8 +483,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+        Assert.NotNull(instance);
+        Assert.Equal("ValueFromServiceProvider", Assert.IsType<TestFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -503,8 +500,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+        Assert.NotNull(instance);
+        Assert.Equal("ValueFromServiceProvider", Assert.IsType<TestFilterAttribute>(instance).Name);
     }
 
     class TestServiceFilterFactory : IMagicOnionFilterFactory<IMagicOnionServiceFilter>
@@ -538,8 +535,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Unnamed");
+        Assert.NotNull(instance);
+        Assert.Equal("Unnamed", Assert.IsType<TestHubFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -553,9 +550,9 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().Be(filterDesc.Filter);
-        instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Instantiated");
+        Assert.NotNull(instance);
+        Assert.Equal(filterDesc.Filter, instance);
+        Assert.Equal("Instantiated", Assert.IsType<TestHubFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -571,8 +568,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+        Assert.NotNull(instance);
+        Assert.Equal("ValueFromServiceProvider", Assert.IsType<TestHubFilterAttribute>(instance).Name);
     }
 
     [Fact]
@@ -588,8 +585,8 @@ public class FilterHelperTest
         var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
-        instance.Should().NotBeNull();
-        instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+        Assert.NotNull(instance);
+        Assert.Equal("ValueFromServiceProvider", Assert.IsType<TestHubFilterAttribute>(instance).Name);
     }
 
     class TestStreamingHubFilterFactory : IMagicOnionFilterFactory<IStreamingHubFilter>
@@ -635,7 +632,7 @@ public class FilterHelperTest
         await body(default);
 
         // Assert
-        results.Should().Equal(1, 2, 0, 200, 100);
+        Assert.Equal([1, 2, 0, 200, 100], results);
     }
 
     class ListIntInjectedServiceFilter : IMagicOnionFilterFactory<IMagicOnionServiceFilter>
@@ -684,7 +681,7 @@ public class FilterHelperTest
         await body(default);
 
         // Assert
-        results.Should().Equal(1, 2, 0, 200, 100);
+        Assert.Equal([1, 2, 0, 200, 100], results);
     }
 
     class ListIntInjectedStreamingHubFilter : IMagicOnionFilterFactory<IStreamingHubFilter>
@@ -742,7 +739,7 @@ public class FilterHelperTest
         await body(default);
 
         // Assert
-        results.Should().Equal(1, 2, 0, 200, 100);
+        Assert.Equal([1, 2, 0, 200, 100], results);
     }
 
     [Fact]
@@ -773,9 +770,9 @@ public class FilterHelperTest
         var ex = await Record.ExceptionAsync(() => body(default));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.StackTrace.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
-        callStack.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
+        Assert.NotNull(ex);
+        Assert.DoesNotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass", ex.StackTrace);
+        Assert.DoesNotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass", callStack);
     }
 
     class DelegateServiceFilter : IMagicOnionServiceFilter
@@ -823,7 +820,7 @@ public class FilterHelperTest
         await body(default);
 
         // Assert
-        results.Should().Equal(1, 2, 0, 200, 100);
+        Assert.Equal([1, 2, 0, 200, 100], results);
     }
 
     [Fact]
@@ -854,9 +851,9 @@ public class FilterHelperTest
         var ex = await Record.ExceptionAsync(() => body(default));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.StackTrace.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
-        callStack.Should().NotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass");
+        Assert.NotNull(ex);
+        Assert.DoesNotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass", ex.StackTrace);
+        Assert.DoesNotContain("MagicOnion.Server.Filters.Internal.FilterHelper.<>c__DisplayClass", callStack);
     }
 
     class DelegateHubFilter : IStreamingHubFilter

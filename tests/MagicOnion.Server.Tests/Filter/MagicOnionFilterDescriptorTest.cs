@@ -16,7 +16,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(int.MaxValue);
+        Assert.Equal(int.MaxValue, order);
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(int.MaxValue);
+        Assert.Equal(int.MaxValue, order);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(256);
+        Assert.Equal(256, order);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(256);
+        Assert.Equal(256, order);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(123);
+        Assert.Equal(123, order);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(123);
+        Assert.Equal(123, order);
     }
 
     [Fact]
@@ -95,9 +95,9 @@ public class MagicOnionFilterDescriptorTest
         var instancedFilter = ((IMagicOnionFilterFactory<IMagicOnionServiceFilter>)desc.Filter).CreateInstance(serviceProvider);
 
         // Assert
-        instancedFilter.Should().BeOfType<ServiceFilter>();
-        desc.Filter.Should().BeOfType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactory>()
-            .Which.Type.Should().Be(typeof(ServiceFilter));
+        Assert.IsType<ServiceFilter>(instancedFilter);
+        var filter = Assert.IsType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactory>(desc.Filter);
+        Assert.Equal(typeof(ServiceFilter), filter.Type);
     }
 
     [Fact]
@@ -111,9 +111,9 @@ public class MagicOnionFilterDescriptorTest
         var instancedFilter = ((IMagicOnionFilterFactory<IMagicOnionServiceFilter>)desc.Filter).CreateInstance(serviceProvider);
 
         // Assert
-        instancedFilter.Should().BeOfType<ServiceFilter>();
-        desc.Filter.Should().BeOfType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactoryFactory>()
-            .Which.Type.Should().Be(typeof(ServiceFilterFactory));
+        Assert.IsType<ServiceFilter>(instancedFilter);
+        var filter = Assert.IsType<MagicOnionFilterDescriptor<IMagicOnionServiceFilter>.MagicOnionFilterFromTypeFactoryFactory>(desc.Filter);
+        Assert.Equal(typeof(ServiceFilterFactory), filter.Type);
     }
 
     [Fact]
@@ -127,9 +127,9 @@ public class MagicOnionFilterDescriptorTest
         var instancedFilter = ((IMagicOnionFilterFactory<IStreamingHubFilter>)desc.Filter).CreateInstance(serviceProvider);
 
         // Assert
-        instancedFilter.Should().BeOfType<StreamingHubFilter>();
-        desc.Filter.Should().BeOfType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactory>()
-            .Which.Type.Should().Be(typeof(StreamingHubFilter));
+        Assert.IsType<StreamingHubFilter>(instancedFilter);
+        var filter = Assert.IsType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactory>(desc.Filter);
+        Assert.Equal(typeof(StreamingHubFilter), filter.Type);
     }
 
     [Fact]
@@ -143,9 +143,9 @@ public class MagicOnionFilterDescriptorTest
         var instancedFilter = ((IMagicOnionFilterFactory<IStreamingHubFilter>)desc.Filter).CreateInstance(serviceProvider);
 
         // Assert
-        instancedFilter.Should().BeOfType<StreamingHubFilter>();
-        desc.Filter.Should().BeOfType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactoryFactory>()
-            .Which.Type.Should().Be(typeof(StreamingHubFilterFactory));
+        Assert.IsType<StreamingHubFilter>(instancedFilter);
+        var filter = Assert.IsType<MagicOnionFilterDescriptor<IStreamingHubFilter>.MagicOnionFilterFromTypeFactoryFactory>(desc.Filter);
+        Assert.Equal(typeof(StreamingHubFilterFactory), filter.Type);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class MagicOnionFilterDescriptorTest
         var exception = Record.Exception(() => new MagicOnionServiceFilterDescriptor(targetType)); // MagicOnionServiceFilterDescriptor can't accept non-IMagicOnionServiceFilter types.
 
         // Assert
-        exception.Should().NotBeNull();
+        Assert.NotNull(exception);
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class MagicOnionFilterDescriptorTest
         var exception = Record.Exception(() => new StreamingHubFilterDescriptor(targetType)); // StreamingHubFilterDescriptor can't accept non-IStreamingHubFilter types.
 
         // Assert
-        exception.Should().NotBeNull();
+        Assert.NotNull(exception);
     }
 
     class ServiceFilter : IMagicOnionServiceFilter, IMagicOnionOrderedFilter

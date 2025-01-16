@@ -44,12 +44,12 @@ public class InterfaceInheritanceTest : IClassFixture<ServerFixture<InterfaceInh
         var client = MagicOnionClient.Create<IInterfaceInheritanceService>(channel);
 
         var r = await client.Unary1(3, 4);
-        r.Should().Be(3 + 4);
+        Assert.Equal(3 + 4, r);
 
         var m = await client.UnaryBase(3, 4);
-        m.Should().Be(3 * 4);
+        Assert.Equal(3 * 4, m);
 
         var s = await client.UnaryBaseBase(3, 4);
-        s.Should().Be(3 - 4);
+        Assert.Equal(3 - 4, s);
     }
 }

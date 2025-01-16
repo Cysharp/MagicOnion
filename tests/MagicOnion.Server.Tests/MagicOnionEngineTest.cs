@@ -26,8 +26,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
-        def.MethodHandlers.Should().BeEmpty();
-        def.StreamingHubHandlers.Should().BeEmpty();
+        Assert.Empty(def.MethodHandlers);
+        Assert.Empty(def.StreamingHubHandlers);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
-        def.MethodHandlers.Should().HaveCount(2);
-        def.StreamingHubHandlers.Should().BeEmpty();
+        Assert.Equal(2, def.MethodHandlers.Count());
+        Assert.Empty(def.StreamingHubHandlers);
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
-        def.MethodHandlers.Should().HaveCount(1); // Connect
-        def.StreamingHubHandlers.Should().HaveCount(2);
+        Assert.Equal(1, def.MethodHandlers.Count()); // Connect
+        Assert.Equal(2, def.StreamingHubHandlers.Count());
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().HaveCount(6); // IMyHub.Connect, IMyService.MethodA, IMyService.MethodB, IMyGenericsHub.Connect, IMyGenericsService.MethodA, IMyGenericsService.MethodB
-        def.StreamingHubHandlers.Should().HaveCount(4); // IMyHub.MethodA, IMyHub.MethodB, IMyGenericsHub.MethodA, IMyGenericsHub.MethodB
+        Assert.Equal(6, def.MethodHandlers.Count()); // IMyHub.Connect, IMyService.MethodA, IMyService.MethodB, IMyGenericsHub.Connect, IMyGenericsService.MethodA, IMyGenericsService.MethodB
+        Assert.Equal(4, def.StreamingHubHandlers.Count()); // IMyHub.MethodA, IMyHub.MethodB, IMyGenericsHub.MethodA, IMyGenericsHub.MethodB
     }
     
     [Fact]
@@ -121,8 +121,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Ignored"));
-        def.StreamingHubHandlers.Should().NotContain(x => x.HubName.Contains("Ignored"));
+        Assert.DoesNotContain(def.MethodHandlers, x => x.ServiceName.Contains("Ignored"));
+        Assert.DoesNotContain(def.StreamingHubHandlers, x => x.HubName.Contains("Ignored"));
     }
   
     [Fact]
@@ -140,8 +140,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("NonPublic"));
-        def.StreamingHubHandlers.Should().NotContain(x => x.HubName.Contains("NonPublic"));
+        Assert.DoesNotContain(def.MethodHandlers, x => x.ServiceName.Contains("NonPublic"));
+        Assert.DoesNotContain(def.StreamingHubHandlers, x => x.HubName.Contains("NonPublic"));
     }
  
     [Fact]
@@ -159,8 +159,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Abstract"));
-        def.StreamingHubHandlers.Should().NotContain(x => x.HubName.Contains("Abstract"));
+        Assert.DoesNotContain(def.MethodHandlers, x => x.ServiceName.Contains("Abstract"));
+        Assert.DoesNotContain(def.StreamingHubHandlers, x => x.HubName.Contains("Abstract"));
     }
 
     [Fact]
@@ -178,8 +178,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().Contain(x => x.ServiceType == typeof(MyConstructedGenericsService));
-        def.StreamingHubHandlers.Should().Contain(x => x.HubType == typeof(MyConstructedGenericsHub));
+        Assert.Contains(def.MethodHandlers, x => x.ServiceType == typeof(MyConstructedGenericsService));
+        Assert.Contains(def.StreamingHubHandlers, x => x.HubType == typeof(MyConstructedGenericsHub));
     }
     
     [Fact]
@@ -197,10 +197,10 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
-        def.MethodHandlers.Should().NotContain(x => x.ServiceType.Name.Contains("GenericsDefinition"));
-        def.StreamingHubHandlers.Should().NotContain(x => x.HubType.Name.Contains("GenericsDefinition"));
-        def.MethodHandlers.Should().NotContain(x => x.ServiceType.IsGenericTypeDefinition);
-        def.StreamingHubHandlers.Should().NotContain(x => x.HubType.IsGenericTypeDefinition);
+        Assert.DoesNotContain(def.MethodHandlers, x => x.ServiceType.Name.Contains("GenericsDefinition"));
+        Assert.DoesNotContain(def.StreamingHubHandlers, x => x.HubType.Name.Contains("GenericsDefinition"));
+        Assert.DoesNotContain(def.MethodHandlers, x => x.ServiceType.IsGenericTypeDefinition);
+        Assert.DoesNotContain(def.StreamingHubHandlers, x => x.HubType.IsGenericTypeDefinition);
     }
     
     [Fact]
@@ -218,8 +218,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -237,8 +237,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
     
     [Fact]
@@ -251,7 +251,7 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().BeNull();
+        Assert.Null(ex);
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().BeNull();
+        Assert.Null(ex);
     }
 
     [Fact]
@@ -277,8 +277,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -291,8 +291,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -305,8 +305,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     [Fact]
@@ -319,8 +319,8 @@ public class MagicOnionEngineTest
         var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
 
         // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
+        Assert.NotNull(ex);
+        Assert.IsType<InvalidOperationException>(ex);
     }
 
     class NonService : IServiceMarker {}
@@ -334,20 +334,20 @@ public class MagicOnionEngineTest
     [Fact]
     public void ShouldIgnoreAssembly()
     {
-        MagicOnionEngine.ShouldIgnoreAssembly("mscorlib").Should().BeTrue();
-        MagicOnionEngine.ShouldIgnoreAssembly("System.Private.CoreLib").Should().BeTrue();
-        MagicOnionEngine.ShouldIgnoreAssembly("Grpc.Net.Client").Should().BeTrue();
-        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client").Should().BeTrue();
-        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client._DynamicClient_").Should().BeTrue();
-        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Server").Should().BeTrue();
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("mscorlib"));
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("System.Private.CoreLib"));
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("Grpc.Net.Client"));
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client"));
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client._DynamicClient_"));
+        Assert.True(MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Server"));
 
-        MagicOnionEngine.ShouldIgnoreAssembly("").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("A").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("AspNetCoreSample").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("GrpcSample").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("MyGrpc.Net").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("MyApp.System.Net").Should().BeFalse();
-        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnionSample").Should().BeFalse();
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly(""));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("A"));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("AspNetCoreSample"));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("GrpcSample"));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("MyGrpc.Net"));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("MyApp.System.Net"));
+        Assert.False(MagicOnionEngine.ShouldIgnoreAssembly("MagicOnionSample"));
     }
 }
 #endif
