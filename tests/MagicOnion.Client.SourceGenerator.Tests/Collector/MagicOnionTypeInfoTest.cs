@@ -13,11 +13,11 @@ public class MagicOnionTypeInfoTest
 
         // Assert
         var fullName = typeInfo.FullName;
-        fullName.Should().Be("global::System.String");
-        typeInfo.IsArray.Should().BeFalse();
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.ElementType.Should().BeNull();
-        typeInfo.UnderlyingType.Should().BeNull();
+        Assert.Equal("global::System.String", fullName);
+        Assert.False(typeInfo.IsArray);
+        Assert.False(typeInfo.IsEnum);
+        Assert.Null(typeInfo.ElementType);
+        Assert.Null(typeInfo.UnderlyingType);
     }
 
     [Fact]
@@ -28,9 +28,9 @@ public class MagicOnionTypeInfoTest
 
         // Assert
         var fullName = typeInfo.FullName;
-        fullName.Should().Be("global::System.String[]");
-        typeInfo.IsArray.Should().BeTrue();
-        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        Assert.Equal("global::System.String[]", fullName);
+        Assert.True(typeInfo.IsArray);
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "String"), typeInfo.ElementType);
     }
     
     [Fact]
@@ -43,8 +43,8 @@ public class MagicOnionTypeInfoTest
 
         // Assert
         var fullName = typeInfo.FullName;
-        fullName.Should().Be("global::System.Tuple<global::System.Int32[], global::System.String>[]");
-        typeInfo.IsArray.Should().BeTrue();
+        Assert.Equal("global::System.Tuple<global::System.Int32[], global::System.String>[]", fullName);
+        Assert.True(typeInfo.IsArray);
     }
     
     [Fact]
@@ -55,9 +55,9 @@ public class MagicOnionTypeInfoTest
 
         // Assert
         var fullName = typeInfo.FullName;
-        fullName.Should().Be("global::System.String[][]");
-        typeInfo.IsArray.Should().BeTrue();
-        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "String[]")); // NOTE: Currently, MOTypeInfo doesn't handle an element type for jagged array.
+        Assert.Equal("global::System.String[][]", fullName);
+        Assert.True(typeInfo.IsArray);
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "String[]"), typeInfo.ElementType); // NOTE: Currently, MOTypeInfo doesn't handle an element type for jagged array.
     }
        
     [Fact]
@@ -68,9 +68,9 @@ public class MagicOnionTypeInfoTest
 
         // Assert
         var fullName = typeInfo.FullName;
-        fullName.Should().Be("global::System.String[,,]");
-        typeInfo.ArrayRank.Should().Be(3);
-        typeInfo.IsArray.Should().BeTrue();
+        Assert.Equal("global::System.String[,,]", fullName);
+        Assert.Equal(3, typeInfo.ArrayRank);
+        Assert.True(typeInfo.IsArray);
     }
 
     [Fact]
@@ -80,10 +80,10 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<string>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.String");
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.IsArray.Should().BeFalse();
-        typeInfo.IsValueType.Should().BeFalse();
+        Assert.Equal("global::System.String", typeInfo.FullName);
+        Assert.False(typeInfo.IsEnum);
+        Assert.False(typeInfo.IsArray);
+        Assert.False(typeInfo.IsValueType);
     }
 
     [Fact]
@@ -93,10 +93,10 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<byte>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.Byte");
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.IsArray.Should().BeFalse();
-        typeInfo.IsValueType.Should().BeTrue();
+        Assert.Equal("global::System.Byte", typeInfo.FullName);
+        Assert.False(typeInfo.IsEnum);
+        Assert.False(typeInfo.IsArray);
+        Assert.True(typeInfo.IsValueType);
     }
 
     [Fact]
@@ -106,10 +106,10 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.Tuple<global::System.Int32, global::System.String>");
-        typeInfo.GenericArguments.Should().HaveCount(2);
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.IsArray.Should().BeFalse();
+        Assert.Equal("global::System.Tuple<global::System.Int32, global::System.String>", typeInfo.FullName);
+        Assert.Equal(2, typeInfo.GenericArguments.Count());
+        Assert.False(typeInfo.IsEnum);
+        Assert.False(typeInfo.IsArray);
     }
     
     [Fact]
@@ -119,12 +119,12 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<int[]>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.Int32[]");
-        typeInfo.GenericArguments.Should().BeEmpty();
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.IsArray.Should().BeTrue();
-        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
-        typeInfo.ArrayRank.Should().Be(1);
+        Assert.Equal("global::System.Int32[]", typeInfo.FullName);
+        Assert.Empty(typeInfo.GenericArguments);
+        Assert.False(typeInfo.IsEnum);
+        Assert.True(typeInfo.IsArray);
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType("System", "Int32"), typeInfo.ElementType);
+        Assert.Equal(1, typeInfo.ArrayRank);
     }
 
     [Fact]
@@ -134,12 +134,12 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<int[,,]>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.Int32[,,]");
-        typeInfo.GenericArguments.Should().BeEmpty();
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.IsArray.Should().BeTrue();
-        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
-        typeInfo.ArrayRank.Should().Be(3);
+        Assert.Equal("global::System.Int32[,,]", typeInfo.FullName);
+        Assert.Empty(typeInfo.GenericArguments);
+        Assert.False(typeInfo.IsEnum);
+        Assert.True(typeInfo.IsArray);
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType("System", "Int32"), typeInfo.ElementType);
+        Assert.Equal(3, typeInfo.ArrayRank);
     }
 
     [Fact]
@@ -149,13 +149,13 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<DayOfWeek>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.DayOfWeek");
-        typeInfo.GenericArguments.Should().BeEmpty();
-        typeInfo.IsEnum.Should().BeTrue();
-        typeInfo.IsValueType.Should().BeTrue();
-        typeInfo.UnderlyingType.Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
-        typeInfo.IsArray.Should().BeFalse();
-        typeInfo.ElementType.Should().BeNull();
+        Assert.Equal("global::System.DayOfWeek", typeInfo.FullName);
+        Assert.Empty(typeInfo.GenericArguments);
+        Assert.True(typeInfo.IsEnum);
+        Assert.True(typeInfo.IsValueType);
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType("System", "Int32"), typeInfo.UnderlyingType);
+        Assert.False(typeInfo.IsArray);
+        Assert.Null(typeInfo.ElementType);
     }
     
     [Fact]
@@ -165,17 +165,17 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>();
 
         // Assert
-        typeInfo.FullName.Should().Be("global::System.DayOfWeek[]");
-        typeInfo.GenericArguments.Should().BeEmpty();
-        typeInfo.IsEnum.Should().BeFalse();
-        typeInfo.UnderlyingType.Should().BeNull();
-        typeInfo.IsArray.Should().BeTrue();
+        Assert.Equal("global::System.DayOfWeek[]", typeInfo.FullName);
+        Assert.Empty(typeInfo.GenericArguments);
+        Assert.False(typeInfo.IsEnum);
+        Assert.Null(typeInfo.UnderlyingType);
+        Assert.True(typeInfo.IsArray);
         Assert.NotNull(typeInfo.ElementType);
-        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.CreateEnum("System", "DayOfWeek", MagicOnionTypeInfo.CreateValueType("System", "Int32")));
-        typeInfo.ElementType.IsEnum.Should().BeTrue();
-        typeInfo.ElementType.IsArray.Should().BeFalse();
-        typeInfo.ElementType.IsValueType.Should().BeTrue();
-        typeInfo.ElementType.UnderlyingType.Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
+        Assert.Equal(MagicOnionTypeInfo.CreateEnum("System", "DayOfWeek", MagicOnionTypeInfo.CreateValueType("System", "Int32")), typeInfo.ElementType);
+        Assert.True(typeInfo.ElementType.IsEnum);
+        Assert.False(typeInfo.ElementType.IsArray);
+        Assert.True(typeInfo.ElementType.IsValueType);
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType("System", "Int32"), typeInfo.ElementType.UnderlyingType);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateValueType("MyNamespace", "MyStruct", new [] { MagicOnionTypeInfo.CreateFromType<byte>() });
 
         // Assert
-        typeInfo.IsValueType.Should().BeTrue();
+        Assert.True(typeInfo.IsValueType);
     }
 
     [Fact]
@@ -206,8 +206,8 @@ public class MagicOnionTypeInfoTest
         // Assert
         var fullName = typeInfo.FullName;
         var genericArguments = typeInfo.GenericArguments;
-        fullName.Should().Be("global::System.Collections.Generic.Dictionary<global::System.String, global::System.Int32>");
-        genericArguments.Should().Equal(MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.CreateValueType("System", "Int32"));
+        Assert.Equal("global::System.Collections.Generic.Dictionary<global::System.String, global::System.Int32>", fullName);
+        Assert.Equal([MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.CreateValueType("System", "Int32")], genericArguments);
     }
 
     [Fact]
@@ -223,8 +223,8 @@ public class MagicOnionTypeInfoTest
         // Assert
         var fullName = typeInfo.FullName;
         var genericArgumentsNested = typeInfo.GenericArguments[1].GenericArguments;
-        fullName.Should().Be("global::System.Collections.Generic.Dictionary<global::System.String, global::System.Tuple<global::System.Double, global::System.Byte>>");
-        genericArgumentsNested.Should().Equal(MagicOnionTypeInfo.CreateValueType("System", "Double"), MagicOnionTypeInfo.CreateValueType("System", "Byte"));
+        Assert.Equal("global::System.Collections.Generic.Dictionary<global::System.String, global::System.Tuple<global::System.Double, global::System.Byte>>", fullName);
+        Assert.Equal([MagicOnionTypeInfo.CreateValueType("System", "Double"), MagicOnionTypeInfo.CreateValueType("System", "Byte")], genericArgumentsNested);
     }
 
     [Fact]
@@ -240,9 +240,9 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0]);
 
         // Assert
-        typeInfo.Namespace.Should().BeEmpty();
-        typeInfo.Name.Should().Be("MyClass");
-        typeInfo.FullName.Should().Be("global::MyClass");
+        Assert.Empty(typeInfo.Namespace);
+        Assert.Equal("MyClass", typeInfo.Name);
+        Assert.Equal("global::MyClass", typeInfo.FullName);
     }
 
     [Fact]
@@ -261,9 +261,9 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0]);
 
         // Assert
-        typeInfo.Namespace.Should().Be("MyNamespace");
-        typeInfo.Name.Should().Be("MyClass");
-        typeInfo.FullName.Should().Be("global::MyNamespace.MyClass");
+        Assert.Equal("MyNamespace", typeInfo.Namespace);
+        Assert.Equal("MyClass", typeInfo.Name);
+        Assert.Equal("global::MyNamespace.MyClass", typeInfo.FullName);
     }
 
     [Fact]
@@ -287,11 +287,11 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple",
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "Tuple",
             MagicOnionTypeInfo.CreateValueType("System", "Nullable", 
                 MagicOnionTypeInfo.CreateValueType("System", "Boolean")),
             MagicOnionTypeInfo.CreateValueType("System", "Nullable",
-                MagicOnionTypeInfo.CreateValueType("System", "Int64"))));
+                MagicOnionTypeInfo.CreateValueType("System", "Int64"))), typeInfo);
     }
        
     [Fact]
@@ -315,9 +315,9 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateValueType( "System", "Int32", Array.Empty<MagicOnionTypeInfo>()));
-        typeInfo.IsValueType.Should().BeTrue();
-        typeInfo.IsEnum.Should().BeFalse();
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType( "System", "Int32", Array.Empty<MagicOnionTypeInfo>()), typeInfo);
+        Assert.True(typeInfo.IsValueType);
+        Assert.False(typeInfo.IsEnum);
     }
 
     [Fact]
@@ -345,7 +345,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte")));
+        Assert.Equal(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte")), typeInfo);
     }
         
     [Fact]
@@ -373,7 +373,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte"))));
+        Assert.Equal(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte"))), typeInfo);
     }
            
     [Fact]
@@ -401,9 +401,10 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple", 
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "Tuple", 
             MagicOnionTypeInfo.CreateValueType("System", "Int32"),
-            MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte"))));
+            MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateValueType("System", "Byte"))),
+            typeInfo);
     }
     
     [Fact]
@@ -427,7 +428,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.CreateValueType("System", "Int32")));
+        Assert.Equal(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.CreateValueType("System", "Int32")), typeInfo);
     }
         
     [Fact]
@@ -451,7 +452,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Int32[]"));
+        Assert.Equal(MagicOnionTypeInfo.CreateArray("System", "Int32[]"), typeInfo);
     }
 
     [Fact]
@@ -475,9 +476,10 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", 
+        Assert.Equal(MagicOnionTypeInfo.CreateArray("System", "Tuple", 
             MagicOnionTypeInfo.CreateValueType("System", "Int32"),
-            MagicOnionTypeInfo.Create("System", "String")));
+            MagicOnionTypeInfo.Create("System", "String")),
+            typeInfo);
     }
     
     [Fact]
@@ -501,7 +503,7 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "String", Array.Empty<MagicOnionTypeInfo>(), 3));
+        Assert.Equal(MagicOnionTypeInfo.CreateArray("System", "String", Array.Empty<MagicOnionTypeInfo>(), 3), typeInfo);
     }
 
     [Fact]
@@ -525,11 +527,11 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Namespace.Should().Be("System.Collections.Generic");
-        typeInfo.Name.Should().Be("List");
-        typeInfo.GenericArguments.Should().HaveCount(1);
-        typeInfo.GenericArguments[0].Should().Be(MagicOnionTypeInfo.Create("System", "String"));
-        typeInfo.FullName.Should().Be("global::System.Collections.Generic.List<global::System.String>");
+        Assert.Equal("System.Collections.Generic", typeInfo.Namespace);
+        Assert.Equal("List", typeInfo.Name);
+        Assert.Equal(1, typeInfo.GenericArguments.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "String"), typeInfo.GenericArguments[0]);
+        Assert.Equal("global::System.Collections.Generic.List<global::System.String>", typeInfo.FullName);
     }
 
     [Fact]
@@ -555,11 +557,11 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Namespace.Should().Be("System.Collections.Generic");
-        typeInfo.Name.Should().Be("List");
-        typeInfo.GenericArguments.Should().HaveCount(1);
-        typeInfo.GenericArguments[0].Should().Be(MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.CreateValueType("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")));
-        typeInfo.FullName.Should().Be("global::System.Collections.Generic.List<global::System.Tuple<global::System.Int32, global::System.String>>");
+        Assert.Equal("System.Collections.Generic", typeInfo.Namespace);
+        Assert.Equal("List", typeInfo.Name);
+        Assert.Equal(1, typeInfo.GenericArguments.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.CreateValueType("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")), typeInfo.GenericArguments[0]);
+        Assert.Equal("global::System.Collections.Generic.List<global::System.Tuple<global::System.Int32, global::System.String>>", typeInfo.FullName);
     }
 
     [Fact]
@@ -585,12 +587,12 @@ public class MagicOnionTypeInfoTest
         var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
-        typeInfo.Namespace.Should().Be("System");
-        typeInfo.Name.Should().Be("ValueTuple");
-        typeInfo.GenericArguments.Should().HaveCount(2);
-        typeInfo.GenericArguments[0].Should().Be(MagicOnionTypeInfo.Create("System", "String"));
-        typeInfo.GenericArguments[1].Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
-        typeInfo.FullName.Should().Be("global::System.ValueTuple<global::System.String, global::System.Int32>");
+        Assert.Equal("System", typeInfo.Namespace);
+        Assert.Equal("ValueTuple", typeInfo.Name);
+        Assert.Equal(2, typeInfo.GenericArguments.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "String"), typeInfo.GenericArguments[0]);
+        Assert.Equal(MagicOnionTypeInfo.CreateValueType("System", "Int32"), typeInfo.GenericArguments[1]);
+        Assert.Equal("global::System.ValueTuple<global::System.String, global::System.Int32>", typeInfo.FullName);
     }
 
     [Fact]
@@ -601,7 +603,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Short);
         // Assert
-        formatted.Should().Be("Nil");
+        Assert.Equal("Nil", formatted);
     }
     
     [Fact]
@@ -612,7 +614,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Short);
         // Assert
-        formatted.Should().Be("Tuple<String, Int32>");
+        Assert.Equal("Tuple<String, Int32>", formatted);
     }
 
     [Fact]
@@ -623,7 +625,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified);
         // Assert
-        formatted.Should().Be("global::MessagePack.Nil");
+        Assert.Equal("global::MessagePack.Nil", formatted);
     }
 
     [Fact]
@@ -634,7 +636,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified);
         // Assert
-        formatted.Should().Be("global::System.Tuple<global::System.String, global::System.Int32>");
+        Assert.Equal("global::System.Tuple<global::System.String, global::System.Int32>", formatted);
     }
 
     [Fact]
@@ -645,7 +647,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace);
         // Assert
-        formatted.Should().Be("MessagePack.Nil");
+        Assert.Equal("MessagePack.Nil", formatted);
     }
 
     [Fact]
@@ -656,7 +658,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.OpenGenerics);
         // Assert
-        formatted.Should().Be("Tuple<,>");
+        Assert.Equal("Tuple<,>", formatted);
     }
     
     [Fact]
@@ -667,7 +669,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments);
         // Assert
-        formatted.Should().Be("Tuple");
+        Assert.Equal("Tuple", formatted);
     }
 
     [Fact]
@@ -678,7 +680,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var types = typeInfo.EnumerateDependentTypes().ToArray();
         // Assert
-        types.Should().Equal(MagicOnionTypeInfo.CreateFromType<int>());
+        Assert.Equal([MagicOnionTypeInfo.CreateFromType<int>()], types);
     }
     
     [Fact]
@@ -689,8 +691,8 @@ public class MagicOnionTypeInfoTest
         // Act
         var types = typeInfo.EnumerateDependentTypes().ToArray();
         // Assert
-        types.Should().Equal(MagicOnionTypeInfo.CreateFromType<DayOfWeek>());
-    }    
+        Assert.Equal([MagicOnionTypeInfo.CreateFromType<DayOfWeek>()], types);
+    }
 
     [Fact]
     public void EnumerateDependentTypes_Enum_Generics()
@@ -700,7 +702,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var types = typeInfo.EnumerateDependentTypes().ToArray();
         // Assert
-        types.Should().Equal(MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>(), MagicOnionTypeInfo.CreateFromType<DayOfWeek>());
+        Assert.Equal([MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>(), MagicOnionTypeInfo.CreateFromType<DayOfWeek>()], types);
     }
 
     [Fact]
@@ -711,7 +713,7 @@ public class MagicOnionTypeInfoTest
         // Act
         var types = typeInfo.EnumerateDependentTypes().ToArray();
         // Assert
-        types.Should().Equal(MagicOnionTypeInfo.CreateFromType<int>(), MagicOnionTypeInfo.CreateFromType<string>());
+        Assert.Equal([MagicOnionTypeInfo.CreateFromType<int>(), MagicOnionTypeInfo.CreateFromType<string>()], types);
     }
     
     [Fact]
@@ -722,13 +724,15 @@ public class MagicOnionTypeInfoTest
         // Act
         var types = typeInfo.EnumerateDependentTypes().ToArray();
         // Assert
-        types.Should().Equal(
-            MagicOnionTypeInfo.CreateFromType<int>(),
-            MagicOnionTypeInfo.CreateFromType<Dictionary<string, Task<byte[]>>>(),
-            MagicOnionTypeInfo.CreateFromType<string>(),
-            MagicOnionTypeInfo.CreateFromType<Task<byte[]>>(),
-            MagicOnionTypeInfo.CreateFromType<byte[]>(),
-            MagicOnionTypeInfo.CreateFromType<byte>());
+        Assert.Equal([
+                MagicOnionTypeInfo.CreateFromType<int>(),
+                MagicOnionTypeInfo.CreateFromType<Dictionary<string, Task<byte[]>>>(),
+                MagicOnionTypeInfo.CreateFromType<string>(),
+                MagicOnionTypeInfo.CreateFromType<Task<byte[]>>(),
+                MagicOnionTypeInfo.CreateFromType<byte[]>(),
+                MagicOnionTypeInfo.CreateFromType<byte>()
+            ],
+            types);
     }
 
     [Fact]
@@ -739,6 +743,6 @@ public class MagicOnionTypeInfoTest
         // Act
         var genericDefinition = typeInfo.GetGenericTypeDefinition();
         // Assert
-        genericDefinition.Should().Be(MagicOnionTypeInfo.Create("System", "ValueTuple", Array.Empty<MagicOnionTypeInfo>(), true));
+        Assert.Equal(MagicOnionTypeInfo.Create("System", "ValueTuple", Array.Empty<MagicOnionTypeInfo>(), true), genericDefinition);
     }
 }

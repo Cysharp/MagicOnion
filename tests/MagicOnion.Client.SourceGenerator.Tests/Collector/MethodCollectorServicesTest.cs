@@ -37,14 +37,14 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(2);
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[1].MethodName.Should().Be("MethodC");
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(2, serviceCollection.Services[0].Methods.Count());
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal("MethodC", serviceCollection.Services[0].Methods[1].MethodName);
     }
 
     [Fact]
@@ -77,10 +77,10 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().BeEmpty();
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Empty(serviceCollection.Services);
     }
 
     [Fact]
@@ -109,10 +109,10 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult>());
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -141,10 +141,10 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool, long>[]>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>[]>());
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Tuple<int, string>[]>>());
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Tuple<bool, long>[]>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>[]>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<Tuple<int, string>[]>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -173,10 +173,10 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool?, long?>>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int?>());
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<int?>>());
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Tuple<bool?, long?>>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int?>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<int?>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -205,19 +205,19 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // UnaryResult<Nil> MethodA();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Empty(serviceCollection.Services[0].Methods[0].Parameters);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
 
@@ -247,19 +247,19 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // UnaryResult<string> MethodA();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<string>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Empty(serviceCollection.Services[0].Methods[0].Parameters);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<string>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -288,20 +288,20 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // UnaryResult<Nil> MethodA(string arg1);
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[0].Type);
+        Assert.Equal("arg1", serviceCollection.Services[0].Methods[0].Parameters[0].Name);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -330,20 +330,20 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // UnaryResult<Nil> MethodA(string arg1, int arg2);
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[0].Type);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].Parameters[1].Type);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
 
@@ -373,19 +373,19 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeTrue();
-        serviceCollection.Services[0].Methods[0].Parameters[0].DefaultValue.Should().Be("\"Hello\"");
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].Parameters[1].DefaultValue.Should().Be("1234");
-        serviceCollection.Services[0].Methods[0].Parameters[1].HasExplicitDefaultValue.Should().BeTrue();
-        serviceCollection.Services[0].Methods[0].Parameters[2].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<long>());
-        serviceCollection.Services[0].Methods[0].Parameters[2].DefaultValue.Should().Be("0");
-        serviceCollection.Services[0].Methods[0].Parameters[2].HasExplicitDefaultValue.Should().BeTrue();
-        serviceCollection.Services[0].Methods[0].Parameters[3].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[3].DefaultValue.Should().Be("null");
-        serviceCollection.Services[0].Methods[0].Parameters[3].HasExplicitDefaultValue.Should().BeTrue();
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[0].Type);
+        Assert.True(serviceCollection.Services[0].Methods[0].Parameters[0].HasExplicitDefaultValue);
+        Assert.Equal("\"Hello\"", serviceCollection.Services[0].Methods[0].Parameters[0].DefaultValue);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].Parameters[1].Type);
+        Assert.Equal("1234", serviceCollection.Services[0].Methods[0].Parameters[1].DefaultValue);
+        Assert.True(serviceCollection.Services[0].Methods[0].Parameters[1].HasExplicitDefaultValue);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<long>(), serviceCollection.Services[0].Methods[0].Parameters[2].Type);
+        Assert.Equal("0", serviceCollection.Services[0].Methods[0].Parameters[2].DefaultValue);
+        Assert.True(serviceCollection.Services[0].Methods[0].Parameters[2].HasExplicitDefaultValue);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[3].Type);
+        Assert.Equal("null", serviceCollection.Services[0].Methods[0].Parameters[3].DefaultValue);
+        Assert.True(serviceCollection.Services[0].Methods[0].Parameters[3].HasExplicitDefaultValue);
     }
 
     [Fact]
@@ -417,12 +417,12 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(4);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(4, serviceCollection.Services[0].Methods.Count());
     }
 
     [Fact]
@@ -451,8 +451,8 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
     [Fact]
@@ -481,8 +481,8 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
     [Fact]
@@ -511,8 +511,8 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
     [Fact]
@@ -541,8 +541,8 @@ namespace MyNamespace
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
     [Fact]
@@ -570,19 +570,19 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Nil>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Empty(serviceCollection.Services[0].Methods[0].Parameters);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -610,20 +610,20 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[0].Type);
+        Assert.Equal("arg1", serviceCollection.Services[0].Methods[0].Parameters[0].Name);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -651,22 +651,22 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].Parameters[1].Name.Should().Be("arg2");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("ServerStreaming", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].Parameters[0].Type);
+        Assert.Equal("arg1", serviceCollection.Services[0].Methods[0].Parameters[0].Name);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].Parameters[1].Type);
+        Assert.Equal("arg2", serviceCollection.Services[0].Methods[0].Parameters[1].Name);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -694,8 +694,8 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, diagnostics[0].Id);
     }
 
 
@@ -724,19 +724,19 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // Task<DuplexStreamingResult<int, string>> MethodA();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<DuplexStreamingResult<int, string>>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Empty(serviceCollection.Services[0].Methods[0].Parameters);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<DuplexStreamingResult<int, string>>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -764,8 +764,8 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id, diagnostics[0].Id);
     }
 
     [Fact]
@@ -793,19 +793,19 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        compilation.GetDiagnostics(TestContext.Current.CancellationToken).Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().BeEmpty();
-        serviceCollection.Services.Should().HaveCount(1);
-        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
-        serviceCollection.Services[0].Methods.Should().HaveCount(1);
+        Assert.DoesNotContain(compilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity == DiagnosticSeverity.Error);
+        Assert.NotNull(serviceCollection);
+        Assert.Empty(serviceCollection.Hubs);
+        Assert.Equal(1, serviceCollection.Services.Count());
+        Assert.Equal(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"), serviceCollection.Services[0].ServiceType);
+        Assert.Equal(1, serviceCollection.Services[0].Methods.Count());
         // Task<DuplexStreamingResult<int, string>> MethodA();
-        serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
-        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
-        serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ClientStreamingResult<int, string>>>());
+        Assert.Equal("IMyService", serviceCollection.Services[0].Methods[0].ServiceName);
+        Assert.Equal("MethodA", serviceCollection.Services[0].Methods[0].MethodName);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<int>(), serviceCollection.Services[0].Methods[0].RequestType);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<string>(), serviceCollection.Services[0].Methods[0].ResponseType);
+        Assert.Empty(serviceCollection.Services[0].Methods[0].Parameters);
+        Assert.Equal(MagicOnionTypeInfo.CreateFromType<Task<ClientStreamingResult<int, string>>>(), serviceCollection.Services[0].Methods[0].MethodReturnType);
     }
 
     [Fact]
@@ -833,7 +833,7 @@ public interface IMyService : IService<IMyService>
         var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id);
+        Assert.Equal(1, diagnostics.Count());
+        Assert.Equal(MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters.Id, diagnostics[0].Id);
     }
 }
