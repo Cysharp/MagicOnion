@@ -1,0 +1,27 @@
+# Unary と StreamingHub
+
+MagicOnion では Unary サービスと StreamingHub サービスの2種類の API 実装方式を提供します。これらのどちらを使用しても RPC スタイルの API を定義できます。
+
+Unary と StreamingHub の違いは次の通りです:
+
+- Unary は一度に1つのリクエストと1つのレスポンスを処理するシンプルな HTTP の POST リクエストです ([Unary サービスの基礎](unary/index))
+- StreamingHub は継続した接続を使用してリクエストとレスポンスでメッセージを送りあう双方向通信です ([StreamingHub の基礎](unary/index))
+
+すべてを StreamingHub で実装することも可能ですが、サーバーからの通知を必要としない一般的な API (REST や Web API の代わり) では Unary を使用することを推奨します。
+
+## Unary のメリット
+
+- ロードバランシングと Observability
+    - Unary は実質 HTTP POST 呼び出しなので ASP.NET Core をはじめ、ロードバランサーや CDN、WAF のような既存の仕組みとの親和性があります
+    - StreamingHub は一つの長時間リクエストであり、内部の Hub メソッド呼び出しをログに残すことはインフラストラクチャーレベルでは困難です
+        - これは Hub メソッドの呼び出しはロードバランスできないことを意味します
+- StreamingHub のオーバーヘッド
+    - Unary の実体はシンプルな HTTP POST であり、StreamingHub のような接続の確立が不要です
+    - StreamingHub は接続時にメッセージループの起動やハートビートのセットアップといった追加の処理を行うオーバーヘッドがあります
+
+## StreamingHub のメリット
+
+- サーバーからクライアントへのリアルタイムメッセージ送信
+    - サーバーからクライアントに対しての通知が必要な場合は StreamingHub の使用を検討してください
+    - 例えばチャットのメッセージ通知やゲームの位置同期などが該当します
+    - Unary や通常の HTTP リクエストの場合に必要なポーリング/ロングポーリングの代わりとなります

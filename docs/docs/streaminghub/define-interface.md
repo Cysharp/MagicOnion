@@ -1,0 +1,2 @@
+# Define StreamingHub interface
+TBW
