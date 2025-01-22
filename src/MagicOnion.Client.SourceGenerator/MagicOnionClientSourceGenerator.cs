@@ -25,7 +25,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             var attr = attrs.FirstOrDefault(x => x.AttributeClass?.Name == MagicOnionClientGenerationAttributeName);
             if (attr is null) return; // TODO: ReportDiagnostic
 
-            var options = ParseClientGenerationOptions(attr);
+            var options = ParseClientGenerationOptions(attr, initializerClassDecl, semanticModel);
             if (!TryParseClientGenerationSpec(sourceProductionContext, semanticModel, initializerClassDecl, attr, out var spec))
             {
                 return;

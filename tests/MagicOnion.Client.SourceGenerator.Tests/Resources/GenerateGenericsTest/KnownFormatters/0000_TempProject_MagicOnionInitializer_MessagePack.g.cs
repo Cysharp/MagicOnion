@@ -41,8 +41,20 @@ namespace TempProject
 
             static MessagePackGeneratedGetFormatterHelper()
             {
-                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(0)
+                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(12)
                 {
+                    {typeof(global::System.Collections.Generic.Dictionary<global::System.String, global::TempProject.MyResponse>), 0},
+                    {typeof(global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>), 1},
+                    {typeof(global::System.Collections.Generic.IDictionary<global::System.String, global::TempProject.MyResponse>), 2},
+                    {typeof(global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>), 3},
+                    {typeof(global::System.Collections.Generic.IList<global::TempProject.MyResponse>), 4},
+                    {typeof(global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>), 5},
+                    {typeof(global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>), 6},
+                    {typeof(global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>), 7},
+                    {typeof(global::System.Collections.Generic.List<global::System.Int32>), 8},
+                    {typeof(global::System.Collections.Generic.List<global::TempProject.MyResponse>), 9},
+                    {typeof(global::System.Linq.IGrouping<global::System.Int32, global::TempProject.MyResponse>), 10},
+                    {typeof(global::System.Linq.ILookup<global::System.Int32, global::TempProject.MyResponse>), 11},
                 };
             }
             internal static object GetFormatter(global::System.Type t)
@@ -55,8 +67,45 @@ namespace TempProject
             
                 switch (key)
                 {
+                    case 0: return new global::MessagePack.Formatters.DictionaryFormatter<global::System.String, global::TempProject.MyResponse>();
+                    case 1: return new global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::TempProject.MyResponse>();
+                    case 2: return new global::MessagePack.Formatters.InterfaceDictionaryFormatter<global::System.String, global::TempProject.MyResponse>();
+                    case 3: return new global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::TempProject.MyResponse>();
+                    case 4: return new global::MessagePack.Formatters.InterfaceListFormatter2<global::TempProject.MyResponse>();
+                    case 5: return new global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::TempProject.MyResponse>();
+                    case 6: return new global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<global::System.String, global::TempProject.MyResponse>();
+                    case 7: return new global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::TempProject.MyResponse>();
+                    case 8: return new global::MessagePack.Formatters.ListFormatter<global::System.Int32>();
+                    case 9: return new global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>();
+                    case 10: return new global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.Int32, global::TempProject.MyResponse>();
+                    case 11: return new global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.Int32, global::TempProject.MyResponse>();
                     default: return null;
                 }
+            }
+        }
+        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+        [Preserve]
+        static class TypeHints
+        {
+            [Preserve]
+            internal static void Register()
+            {
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MessagePack.Nil>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.Dictionary<global::System.String, global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IDictionary<global::System.String, global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IList<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.List<global::System.Int32>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Collections.Generic.List<global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Int32>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Linq.IGrouping<global::System.Int32, global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Linq.ILookup<global::System.Int32, global::TempProject.MyResponse>>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.String>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::TempProject.MyResponse>();
             }
         }
     }

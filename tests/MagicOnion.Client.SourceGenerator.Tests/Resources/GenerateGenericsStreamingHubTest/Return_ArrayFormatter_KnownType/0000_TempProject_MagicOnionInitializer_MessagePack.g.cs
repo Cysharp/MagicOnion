@@ -59,5 +59,23 @@ namespace TempProject
                 }
             }
         }
+        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+        [Preserve]
+        static class TypeHints
+        {
+            [Preserve]
+            internal static void Register()
+            {
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MessagePack.Nil>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Boolean>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Boolean[]>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Int32>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Int32[]>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Single>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Single[]>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.String>();
+                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.String[]>();
+            }
+        }
     }
 }

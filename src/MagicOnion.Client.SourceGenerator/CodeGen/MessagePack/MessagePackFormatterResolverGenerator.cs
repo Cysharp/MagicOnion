@@ -3,7 +3,7 @@ using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.CodeGen.MessagePack;
 
-internal class MessagePackFormatterResolverGenerator(bool emitGenericFormatterInstantiationAndTypeHints) : ISerializerFormatterGenerator
+internal class MessagePackFormatterResolverGenerator() : ISerializerFormatterGenerator
 {
     public (string HintNameSuffix, string Source) Build(GenerationContext generationContext, SerializationFormatterCodeGenContext ctx)
     {
@@ -49,10 +49,7 @@ internal class MessagePackFormatterResolverGenerator(bool emitGenericFormatterIn
 
         EmitResolver(ctx, writer);
         EmitGetFormatterHelper(ctx, writer);
-        if (emitGenericFormatterInstantiationAndTypeHints)
-        {
-            EmitTypeHints(ctx, writer);
-        }
+        EmitTypeHints(ctx, writer);
 
         writer.AppendLineWithFormat($$"""
                 }
@@ -97,9 +94,7 @@ internal class MessagePackFormatterResolverGenerator(bool emitGenericFormatterIn
 
     void EmitGetFormatterHelper(SerializationFormatterCodeGenContext ctx, StringBuilder writer)
     {
-        var formatterRegistrations = emitGenericFormatterInstantiationAndTypeHints
-            ? ctx.FormatterRegistrations
-            : ctx.FormatterRegistrations.Where(x => x is EnumSerializationInfo).ToArray();
+        var formatterRegistrations = ctx.FormatterRegistrations;
 
         writer.AppendLineWithFormat($$"""
                     static class MessagePackGeneratedGetFormatterHelper

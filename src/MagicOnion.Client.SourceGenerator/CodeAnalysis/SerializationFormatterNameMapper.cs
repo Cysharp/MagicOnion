@@ -22,15 +22,17 @@ public interface IWellKnownSerializationTypes
 public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
 {
     readonly string userDefinedFormatterNamespace;
+    readonly bool allowToMapUserDefinedFormatter;
 
     public IWellKnownSerializationTypes WellKnownTypes => MessagePackWellKnownSerializationTypes.Instance;
 
-    public MessagePackFormatterNameMapper(string userDefinedFormatterNamespace)
+    public MessagePackFormatterNameMapper(string userDefinedFormatterNamespace, bool allowToMapUserDefinedFormatter)
     {
         userDefinedFormatterNamespace = string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "MessagePack.Formatters" : userDefinedFormatterNamespace;
         if (!userDefinedFormatterNamespace.StartsWith("global::")) userDefinedFormatterNamespace = "global::" + userDefinedFormatterNamespace;
 
         this.userDefinedFormatterNamespace = userDefinedFormatterNamespace;
+        this.allowToMapUserDefinedFormatter = allowToMapUserDefinedFormatter;
     }
 
     public bool TryMapGeneric(MagicOnionTypeInfo type, [NotNullWhen(true)] out string? formatterName, [NotNullWhen(true)] out string? formatterConstructorArgs)
@@ -52,7 +54,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
             formatterName = $"{mappedFormatterName}<{genericTypeArgs}>";
             formatterConstructorArgs = "()";
         }
-        else
+        else if (allowToMapUserDefinedFormatter)
         {
             // User-defined generic types
             formatterName = $"{userDefinedFormatterNamespace}{(string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>";

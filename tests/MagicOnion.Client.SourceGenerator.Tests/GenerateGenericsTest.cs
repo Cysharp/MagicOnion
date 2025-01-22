@@ -80,6 +80,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+        [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -124,6 +125,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -143,6 +145,140 @@ public class GenerateGenericsTest
 
     [Fact]
     public async Task Parameters_Nested_Array()
+    {
+        var source = """
+        using System;
+        using System.Threading.Tasks;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<Nil> GetValuesAsync(MyGenericObject<MyNestedGenericObject[]> arg0);
+            }
+        
+            public class MyGenericObject<T>
+            {
+            }
+        
+            public class MyNestedGenericObject
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Parameters_Nested_DoNotGenerateResolver()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<Nil> A(MyGenericObject<MyGenericObject<MyObject>> a);
+                UnaryResult<Nil> B(MyGenericObject<MyGenericObject<MyGenericObject<MyObject>>> a);
+                UnaryResult<Nil> C(MyGenericObject<MyGenericObject<MyGenericObject<int>>> a);
+            }
+        
+            [MessagePackObject]
+            public class MyObject
+            {
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Parameters_Nested_DoNotGenerateResolver_Enum()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<Nil> GetEnumAsync(MyGenericObject<MyGenericObject<MyEnum>> arg0);
+            }
+        
+            public enum MyEnum
+            {
+                A, B, C
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Parameters_Nested_DoNotGenerateResolver_Array()
     {
         var source = """
         using System;
@@ -372,6 +508,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -417,6 +554,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -461,6 +599,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -505,6 +644,7 @@ public class GenerateGenericsTest
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
             partial class MagicOnionInitializer {}
         }
         
@@ -524,6 +664,229 @@ public class GenerateGenericsTest
 
     [Fact]
     public async Task Return_Nested_Array()
+    {
+        var source = """
+        using System;
+        using System.Threading.Tasks;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyGenericObject<MyNestedGenericObject[]>> GetValuesAsync();
+            }
+
+            public class MyGenericObject<T>
+            {
+            }
+
+            public class MyNestedGenericObject
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("MessagePack.GenerateResolverForCustomFormatter", true)]
+            partial class MagicOnionInitializer {}
+        }
+
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Return_Nested_DoNotGenerateResolver()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyGenericObject<MyGenericObject<MyObject>>> A();
+                UnaryResult<MyGenericObject<MyGenericObject<MyGenericObject<MyObject>>>> B();
+                UnaryResult<MyGenericObject<MyGenericObject<MyGenericObject<int>>>> C();
+            }
+        
+            [MessagePackObject]
+            public class MyObject
+            {
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Return_MultipleTypeArgs_DoNotGenerateResolver()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyGenericObject<int, MyObject>> A();
+                UnaryResult<MyGenericObject<MyObject, int>> B();
+            }
+        
+            [MessagePackObject]
+            public class MyObject
+            {
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T1, T2>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T1, T2> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T1, T2>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T1, T2> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T1, T2> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Return_Enum_DoNotGenerateResolver()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyGenericObject<MyEnum>> GetEnumAsync();
+            }
+        
+            public enum MyEnum
+            {
+                A, B, C
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Return_Nested_Enum_DoNotGenerateResolver()
+    {
+        var source = """
+        using System;
+        using MessagePack;
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace TempProject
+        {
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<MyGenericObject<MyGenericObject<MyEnum>>> GetEnumAsync();
+            }
+        
+            public enum MyEnum
+            {
+                A, B, C
+            }
+        
+            [MessagePackObject]
+            public class MyGenericObject<T>
+            {
+            }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
+        }
+        
+        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        namespace MessagePack.Formatters.TempProject
+        {
+            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            {
+                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+            }
+        }
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task Return_Nested_Array_DoNotGenerateResolver()
     {
         var source = """
         using System;
