@@ -1427,6 +1427,51 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.MagicOnionClientGenerationAttribute.TypesContainedInTargetAssembly
   nameWithType: MagicOnionClientGenerationAttribute.TypesContainedInTargetAssembly
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
+  name: MagicOnionClientGenerationOptionAttribute
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html
+  commentId: T:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
+  nameWithType: MagicOnionClientGenerationOptionAttribute
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Object)
+  name: MagicOnionClientGenerationOptionAttribute(String, Object)
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute__ctor_System_String_System_Object_
+  commentId: M:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Object)
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(System.String, System.Object)
+  nameWithType: MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(String, Object)
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor*
+  name: MagicOnionClientGenerationOptionAttribute
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute__ctor_
+  commentId: Overload:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute
+  nameWithType: MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key
+  name: Key
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute_Key
+  commentId: P:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key
+  nameWithType: MagicOnionClientGenerationOptionAttribute.Key
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key*
+  name: Key
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute_Key_
+  commentId: Overload:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key
+  isSpec: "True"
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key
+  nameWithType: MagicOnionClientGenerationOptionAttribute.Key
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value
+  name: Value
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute_Value
+  commentId: P:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value
+  nameWithType: MagicOnionClientGenerationOptionAttribute.Value
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value*
+  name: Value
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute_Value_
+  commentId: Overload:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value
+  isSpec: "True"
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value
+  nameWithType: MagicOnionClientGenerationOptionAttribute.Value
 - uid: MagicOnion.Client.MagicOnionClientOptions
   name: MagicOnionClientOptions
   href: api/MagicOnion.Client.MagicOnionClientOptions.html
@@ -3632,12 +3677,12 @@ references:
   commentId: T:MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper
   fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper
   nameWithType: MessagePackFormatterNameMapper
-- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.#ctor(System.String)
-  name: MessagePackFormatterNameMapper(String)
-  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MessagePackFormatterNameMapper__ctor_System_String_
-  commentId: M:MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.#ctor(System.String)
-  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.MessagePackFormatterNameMapper(System.String)
-  nameWithType: MessagePackFormatterNameMapper.MessagePackFormatterNameMapper(String)
+- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.#ctor(System.String,System.Boolean)
+  name: MessagePackFormatterNameMapper(String, Boolean)
+  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MessagePackFormatterNameMapper__ctor_System_String_System_Boolean_
+  commentId: M:MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.#ctor(System.String,System.Boolean)
+  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.MessagePackFormatterNameMapper(System.String, System.Boolean)
+  nameWithType: MessagePackFormatterNameMapper.MessagePackFormatterNameMapper(String, Boolean)
 - uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.#ctor*
   name: MessagePackFormatterNameMapper
   href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MessagePackFormatterNameMapper__ctor_
@@ -4253,6 +4298,24 @@ references:
   commentId: F:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName
   fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName
   nameWithType: MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName
+- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeFullName
+  name: MagicOnionClientGenerationOptionAttributeFullName
+  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_MagicOnionClientGenerationOptionAttributeFullName
+  commentId: F:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeFullName
+  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeFullName
+  nameWithType: MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeFullName
+- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeName
+  name: MagicOnionClientGenerationOptionAttributeName
+  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_MagicOnionClientGenerationOptionAttributeName
+  commentId: F:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeName
+  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeName
+  nameWithType: MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeName
+- uid: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeShortName
+  name: MagicOnionClientGenerationOptionAttributeShortName
+  href: api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html#MagicOnion_Client_SourceGenerator_MagicOnionClientSourceGenerator_MagicOnionClientGenerationOptionAttributeShortName
+  commentId: F:MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeShortName
+  fullName: MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeShortName
+  nameWithType: MagicOnionClientSourceGenerator.MagicOnionClientGenerationOptionAttributeShortName
 - uid: MagicOnion.Client.StreamingHubClient
   name: StreamingHubClient
   href: api/MagicOnion.Client.StreamingHubClient.html

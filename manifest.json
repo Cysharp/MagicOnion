@@ -377,6 +377,18 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html",
+          "hash": "Qx6vmZHjFmhs3FiWTb8TysRYtrD34wTTxLDK8sQwTwI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Client.MagicOnionClientOptions.yml",
       "output": {
         ".html": {
@@ -729,7 +741,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MessagePackFormatterNameMapper.html",
-          "hash": "/4hX68hReaRzIef8aBRBBmkUqIur/GHpTyzvKBDNz4Q="
+          "hash": "twLFlStW+LiqaJBp0FiUDgnInfMzduKOqBJwNAUw3+A="
         }
       },
       "is_incremental": false,
@@ -897,7 +909,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator.html",
-          "hash": "aatq2EdBihR1y9Ikzt+WxouHTuVd4EhdUHQGirYbixU="
+          "hash": "o6qqngOsw8QXHImkG3EdkHoYyJQZWHCnMw2gOMU/Lyk="
         }
       },
       "is_incremental": false,
@@ -993,7 +1005,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.html",
-          "hash": "iG1lfW5Xqm2xdPe51JDnkFpy8c9df1UAANx2S/b3rMI="
+          "hash": "bsTkQ0m43TtkGXfAM1lF4LPYaYLeWlPzEvN7N3JpdaU="
         }
       },
       "is_incremental": false,
@@ -2913,7 +2925,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "UsKGqoZ0TR4OA7u+9KhL7vc3vaOsxnfHZrXAg7DF5YE="
+          "hash": "9vEyXm/zXCuQpTiTUnDC9f5BgMGb0mIZPv9HDBjHYso="
         }
       },
       "is_incremental": false,
@@ -3000,7 +3012,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 242,
+          "total_file_count": 243,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
