@@ -32,16 +32,15 @@ public enum SerializerType
 public record GenerationOptions(
     SerializerType Serializer,
     bool DisableAutoRegistration,
-    string MessagePackFormatterNamespace,
     bool EnableStreamingHubDiagnosticHandler,
-    string GenerateFileHintNamePrefix
-)
+    string GenerateFileHintNamePrefix,
+    IReadOnlyDictionary<string, object> AdditionalOptions)
 {
     public static GenerationOptions Default { get; } = new (
         SerializerType.MessagePack,
         DisableAutoRegistration: false,
-        MessagePackFormatterNamespace: "MessagePack.Formatters",
         EnableStreamingHubDiagnosticHandler: false,
-        GenerateFileHintNamePrefix: string.Empty
+        GenerateFileHintNamePrefix: string.Empty,
+        AdditionalOptions: new Dictionary<string, object>()
     );
 }

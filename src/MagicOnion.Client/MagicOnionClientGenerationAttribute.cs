@@ -4,7 +4,7 @@ namespace MagicOnion.Client;
 /// Marker attribute for generating clients of MagicOnion.
 /// The source generator collects the classes specified by this attribute and uses them to generate source.
 /// </summary>
-[AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class MagicOnionClientGenerationAttribute : Attribute
 {
     /// <summary>
@@ -20,6 +20,7 @@ public class MagicOnionClientGenerationAttribute : Attribute
     /// <summary>
     /// Gets or set the namespace of pre-generated MessagePackFormatters. The default value is <c>MessagePack.Formatters</c>.
     /// </summary>
+    [Obsolete("This property is obsolete. Use [MagicOnionClientGenerationOption(\"MessagePack.FormatterNamespace\", \"MessagePack.Formatters\")] instead.")]
     public string MessagePackFormatterNamespace { get; set; } = "MessagePack.Formatters";
 
     /// <summary>
@@ -42,5 +43,27 @@ public class MagicOnionClientGenerationAttribute : Attribute
     {
         MessagePack = 0,
         MemoryPack = 1,
+    }
+}
+
+/// <summary>
+/// Specifies the options for generating clients of MagicOnion.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+public class MagicOnionClientGenerationOptionAttribute : Attribute
+{
+    /// <summary>
+    /// Gets or sets the key of the option.
+    /// </summary>
+    public string Key { get; set; }
+    /// <summary>
+    /// Gets or sets the value of the option.
+    /// </summary>
+    public object? Value { get; set; }
+
+    public MagicOnionClientGenerationOptionAttribute(string key, object value)
+    {
+        Key = key;
+        Value = value;
     }
 }

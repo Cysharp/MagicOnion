@@ -322,4 +322,40 @@ public class RunTest
         Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
         Assert.DoesNotContain(newCompilation.GetDiagnostics(TestContext.Current.CancellationToken), x => x.Severity > DiagnosticSeverity.Info);
     }
+
+    [Fact]
+    public void RunAndGenerate_SerializationAdditionalOptions()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+            #nullable enable
+            using System;
+            using System.Threading.Tasks;
+            using MagicOnion;
+            using MagicOnion.Client;
+
+            namespace TempProject;
+
+
+            public interface IMyService : IService<IMyService>
+            {
+                UnaryResult<string> MethodAsync(string name, int age);
+            }
+
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            [MagicOnionClientGenerationOption("Foo", 123)]
+            [MagicOnionClientGenerationOption("Bar", true)]
+            partial class MagicOnionInitializer {}
+            """);
+
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics, TestContext.Current.CancellationToken);
+    }
 }

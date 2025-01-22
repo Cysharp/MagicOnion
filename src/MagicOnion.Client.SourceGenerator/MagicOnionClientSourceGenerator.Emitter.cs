@@ -13,6 +13,10 @@ public partial class MagicOnionClientSourceGenerator
     public const string MagicOnionClientGenerationAttributeName = $"{MagicOnionClientGenerationAttributeShortName}Attribute";
     public const string MagicOnionClientGenerationAttributeFullName = $"MagicOnion.Client.{MagicOnionClientGenerationAttributeName}";
 
+    public const string MagicOnionClientGenerationOptionAttributeShortName = "MagicOnionClientGenerationOption";
+    public const string MagicOnionClientGenerationOptionAttributeName = $"{MagicOnionClientGenerationOptionAttributeShortName}Attribute";
+    public const string MagicOnionClientGenerationOptionAttributeFullName = $"MagicOnion.Client.{MagicOnionClientGenerationOptionAttributeName}";
+
     static class Emitter
     {
         public static void Emit(GenerationContext context, ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
@@ -45,8 +49,10 @@ public partial class MagicOnionClientSourceGenerator
                     EnumFormatterGenerator: _ => string.Empty
                 ),
                 SerializerType.MessagePack => (
-                    Mapper: new MessagePackFormatterNameMapper(context.Options.MessagePackFormatterNamespace),
-                    Generator: new MessagePackFormatterResolverGenerator(emitGenericFormatterInstantiationAndTypeHints: false),
+                    Mapper: new MessagePackFormatterNameMapper(
+                        (context.Options.AdditionalOptions.TryGetValue("MessagePack.FormatterNamespace", out var formatterNamespace) ? formatterNamespace as string : null) ?? "MessagePack.Formatters",
+                        context.Options.AdditionalOptions.TryGetValue("MessagePack.GenerateResolverForCustomFormatter", out var generateTypeHintsForCustomFormatter) && generateTypeHintsForCustomFormatter.Equals(true)),
+                    Generator: new MessagePackFormatterResolverGenerator(),
                     EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(context, x)
                 ),
                 _ => throw new NotImplementedException(),

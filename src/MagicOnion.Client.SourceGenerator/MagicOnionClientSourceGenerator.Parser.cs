@@ -74,9 +74,13 @@ public partial class MagicOnionClientSourceGenerator
         }
     }
 
-    static GenerationOptions ParseClientGenerationOptions(AttributeData attr)
+    static GenerationOptions ParseClientGenerationOptions(AttributeData attr, ClassDeclarationSyntax initializerClassDecl, SemanticModel semanticModel)
     {
-        var options = GenerationOptions.Default;
+        var initializerClassSymbol = semanticModel.GetDeclaredSymbol(initializerClassDecl) ?? throw new InvalidOperationException();
+        var additionalOptionAttrs = initializerClassSymbol.GetAttributes().Where(x => x.AttributeClass?.Name == MagicOnionClientGenerationOptionAttributeName).ToArray();
+
+        var additionalOptions = new Dictionary<string, object>();
+        var options = GenerationOptions.Default with { AdditionalOptions = additionalOptions };
 
         foreach (var namedArg in attr.NamedArguments)
         {
@@ -90,8 +94,8 @@ public partial class MagicOnionClientSourceGenerator
                 case nameof(GenerationOptions.Serializer):
                     options = options with { Serializer = (SerializerType)(int)namedArg.Value.Value! };
                     break;
-                case nameof(GenerationOptions.MessagePackFormatterNamespace):
-                    options = options with { MessagePackFormatterNamespace = (string)namedArg.Value.Value! };
+                case "MessagePackFormatterNamespace": // Backward compatibility
+                    additionalOptions["MessagePack.FormatterNamespace"] = (string)namedArg.Value.Value!;
                     break;
                 case nameof(GenerationOptions.EnableStreamingHubDiagnosticHandler):
                     options = options with { EnableStreamingHubDiagnosticHandler = (bool)namedArg.Value.Value! };
@@ -99,6 +103,14 @@ public partial class MagicOnionClientSourceGenerator
                 case nameof(GenerationOptions.GenerateFileHintNamePrefix):
                     options = options with { GenerateFileHintNamePrefix = (string)namedArg.Value.Value! };
                     break;
+            }
+        }
+
+        if (additionalOptionAttrs.Length > 0)
+        {
+            foreach (var additionalOptionAttr in additionalOptionAttrs)
+            {
+                additionalOptions[additionalOptionAttr.ConstructorArguments[0].Value!.ToString()!] = additionalOptionAttr.ConstructorArguments[1].Value!;
             }
         }
 
