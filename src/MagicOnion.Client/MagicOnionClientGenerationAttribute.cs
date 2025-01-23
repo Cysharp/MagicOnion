@@ -61,7 +61,7 @@ public class MagicOnionClientGenerationOptionAttribute : Attribute
     /// </summary>
     public object? Value { get; set; }
 
-    public MagicOnionClientGenerationOptionAttribute(string key, object value)
+    public MagicOnionClientGenerationOptionAttribute(string key, object? value)
     {
         Key = key;
         Value = value;
