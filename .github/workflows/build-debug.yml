@@ -44,6 +44,16 @@ jobs:
       - run: dotnet retest -- -c Debug MagicOnion.sln
       - run: dotnet retest -- -c Release MagicOnion.sln
 
+  run-client-nativeaot-tests:
+    name: "Run Client Native AOT tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      - run: dotnet publish -r linux-x64 tests/MagicOnion.Client.NativeAot.Tests/MagicOnion.Client.NativeAot.Tests.csproj
+      - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net9.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
+
   build-unity:
     name: "Build Unity package"
     if: ${{ (github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:') }}
@@ -111,6 +121,6 @@ jobs:
       #    retention-days: 1
 
   actions-timeline:
-    needs: [build-dotnet, run-tests, build-unity]
+    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
     secrets: inherit
