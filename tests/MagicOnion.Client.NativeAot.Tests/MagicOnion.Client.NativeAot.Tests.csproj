@@ -1,0 +1,34 @@
+<Project Sdk="MSTest.Sdk/3.6.1">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <OutputType>exe</OutputType>
+    <PublishAot>true</PublishAot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MagicOnion.Client.Tests\ChannelAsyncStreamReader.cs" Link="Shared\ChannelAsyncStreamReader.cs" />
+    <Compile Include="..\MagicOnion.Client.Tests\ChannelClientStreamWriter.cs" Link="Shared\ChannelClientStreamWriter.cs" />
+    <Compile Include="..\MagicOnion.Client.Tests\MockAsyncStreamReader.cs" Link="Shared\MockAsyncStreamReader.cs" />
+    <Compile Include="..\MagicOnion.Client.Tests\MockClientStreamWriter.cs" Link="Shared\MockClientStreamWriter.cs" />
+    <Compile Include="..\MagicOnion.Client.Tests\MockSerializationContext.cs" Link="Shared\MockSerializationContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+</Project>
