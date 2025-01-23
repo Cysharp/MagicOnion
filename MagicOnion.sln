@@ -57,11 +57,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{A8550C24-2486-49DA-8D1A-DB6BBB2E9905}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build-canary.yml = .github\workflows\build-canary.yml
-		.github\workflows\build-debug.yml = .github\workflows\build-debug.yml
 		.github\workflows\build-docs.yml = .github\workflows\build-docs.yml
-		.github\workflows\build-release.yml = .github\workflows\build-release.yml
 		.github\workflows\prevent-github-change.yml = .github\workflows\prevent-github-change.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\stale.yml = .github\workflows\stale.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B5617CC1-55FD-4F77-BA75-9450474C6527}"
