@@ -91,7 +91,11 @@ MagicOnion.Client.MagicOnionClientGenerationAttribute.Serializer.get -> MagicOni
 MagicOnion.Client.MagicOnionClientGenerationAttribute.Serializer.set -> void
 MagicOnion.Client.MagicOnionClientGenerationAttribute.TypesContainedInTargetAssembly.get -> System.Type![]!
 MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
-MagicOnion.Client.MagicOnionClientGenerationOptionAttribute(string! key, object? value) -> void
+MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(string! key, object? value) -> void
+MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key.get -> string!
+MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Key.set -> void
+MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value.get -> object?
+MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.Value.set -> void
 MagicOnion.Client.MagicOnionClientOptions
 MagicOnion.Client.MagicOnionClientOptions.CallInvoker.get -> Grpc.Core.CallInvoker!
 MagicOnion.Client.MagicOnionClientOptions.CallOptions.get -> Grpc.Core.CallOptions
