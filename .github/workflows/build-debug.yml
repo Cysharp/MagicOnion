@@ -121,6 +121,6 @@ jobs:
       #    retention-days: 1
 
   actions-timeline:
-    needs: [build-dotnet, run-tests, build-unity]
+    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
     secrets: inherit
