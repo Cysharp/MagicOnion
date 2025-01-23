@@ -1433,12 +1433,15 @@ references:
   commentId: T:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
   fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute
   nameWithType: MagicOnionClientGenerationOptionAttribute
-- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Object)
-  name: MagicOnionClientGenerationOptionAttribute(String, Object)
-  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute__ctor_System_String_System_Object_
-  commentId: M:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Object)
-  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(System.String, System.Object)
-  nameWithType: MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(String, Object)
+- uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Nullable{System.Object})
+  name: MagicOnionClientGenerationOptionAttribute(String, Nullable<Object>)
+  href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute__ctor_System_String_System_Nullable_System_Object__
+  commentId: M:MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor(System.String,System.Nullable{System.Object})
+  name.vb: MagicOnionClientGenerationOptionAttribute(String, Nullable(Of Object))
+  fullName: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(System.String, System.Nullable<System.Object>)
+  fullName.vb: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(System.String, System.Nullable(Of System.Object))
+  nameWithType: MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(String, Nullable<Object>)
+  nameWithType.vb: MagicOnionClientGenerationOptionAttribute.MagicOnionClientGenerationOptionAttribute(String, Nullable(Of Object))
 - uid: MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.#ctor*
   name: MagicOnionClientGenerationOptionAttribute
   href: api/MagicOnion.Client.MagicOnionClientGenerationOptionAttribute.html#MagicOnion_Client_MagicOnionClientGenerationOptionAttribute__ctor_
@@ -8375,15 +8378,12 @@ references:
   commentId: T:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   nameWithType: MemoryPackMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
-  name: Create(MethodType, Nullable<MethodInfo>)
-  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
-  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
-  name.vb: Create(MethodType, Nullable(Of MethodInfo))
-  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
-  fullName.vb: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
-  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
-  nameWithType.vb: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
+- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
+  name: Create(MethodType, MethodInfo)
+  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Reflection_MethodInfo_
+  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
+  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Reflection.MethodInfo)
+  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
 - uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_
