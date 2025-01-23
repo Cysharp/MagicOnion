@@ -51,8 +51,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - run: dotnet publish -r linux-x64 dotnet publish tests\MagicOnion.Client.NativeAot.Tests
-      - run: tests\MagicOnion.Client.NativeAot.Tests\bin\Release\net9.0\linux-x64\publish\MagicOnion.Client.NativeAot.Tests
+      - run: dotnet publish -r linux-x64 dotnet publish tests/MagicOnion.Client.NativeAot.Tests/MagicOnion.Client.NativeAot.Tests.csproj
+      - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net9.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
 
   build-unity:
     name: "Build Unity package"
