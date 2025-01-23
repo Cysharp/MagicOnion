@@ -1,4 +1,4 @@
-name: Build Debug
+name: Build
 
 on:
   push:
@@ -20,9 +20,6 @@ on:
       - .github/**
       - docs/**
 
-env:
-  BUILD_CONFIG: Debug
-
 jobs:
   build-dotnet:
     name: "Build .NET projects"
@@ -31,7 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
+      - run: dotnet build -c Debug ./MagicOnion.sln
+      - run: dotnet build -c Release ./MagicOnion.sln
 
   run-tests:
     name: "Run tests"
@@ -55,7 +53,7 @@ jobs:
       - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net9.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
 
   build-unity:
-    name: "Build Unity package"
+    name: "Verify the integrity of files for Unity"
     if: ${{ (github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:') }}
     strategy:
       matrix:
