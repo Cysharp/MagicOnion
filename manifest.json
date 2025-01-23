@@ -1653,7 +1653,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter.html",
-          "hash": "SFVeqAbWU+RKCP47TpQveLsg3tkDcNh56WcpSZnXDMk="
+          "hash": "10HBqf1A3wOA2eUtyyWA3FGzrdPkPddkpeHkgUlJlnk="
         }
       },
       "is_incremental": false,
@@ -1665,7 +1665,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html",
-          "hash": "Mz/OR6pH3brUntPfUxGFdbLwDwD0dvtbO9vz0ZnaiBE="
+          "hash": "mrTtdqRlP/mzcSFQeBeeV9f1U4nuEU8tNP+uFeLmZZU="
         }
       },
       "is_incremental": false,

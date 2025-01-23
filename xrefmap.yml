@@ -8378,12 +8378,15 @@ references:
   commentId: T:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   nameWithType: MemoryPackMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
-  name: Create(MethodType, MethodInfo)
-  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Reflection_MethodInfo_
-  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Reflection.MethodInfo)
-  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Reflection.MethodInfo)
-  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
+- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name: Create(MethodType, Nullable<MethodInfo>)
+  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
+  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name.vb: Create(MethodType, Nullable(Of MethodInfo))
+  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
+  fullName.vb: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
+  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
+  nameWithType.vb: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
 - uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_
