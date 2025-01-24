@@ -134,3 +134,7 @@ nuget/*.unitypackage
 src/MagicOnion.Client.Unity/Packages/manifest.json
 
 packages
+
+
+# Node
+node_modules/
