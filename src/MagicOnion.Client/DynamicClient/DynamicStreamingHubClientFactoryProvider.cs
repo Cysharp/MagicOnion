@@ -10,7 +10,7 @@ public class DynamicNotSupportedStreamingHubClientFactoryProvider : IStreamingHu
 
     public bool TryGetFactory<TStreamingHub, TReceiver>([NotNullWhen(true)] out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
-        throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(TStreamingHub)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
+        throw new NotSupportedException($"Unable to find a client factory of type '{typeof(TStreamingHub)}'. If the application is running on IL2CPP or AOT, the runtime and MagicOnion do not support dynamic code generation. Please use pre-generated code with Source Generator instead");
     }
 }
 

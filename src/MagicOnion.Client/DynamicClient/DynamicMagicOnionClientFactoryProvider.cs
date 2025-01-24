@@ -10,7 +10,7 @@ public class DynamicNotSupportedMagicOnionClientFactoryProvider : IMagicOnionCli
 
     public bool TryGetFactory<T>([NotNullWhen(true)] out MagicOnionClientFactoryDelegate<T>? factory) where T : IService<T>
     {
-        throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
+        throw new NotSupportedException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, the runtime and MagicOnion do not support dynamic code generation. Please use pre-generated code with Source Generator instead");
     }
 }
 
