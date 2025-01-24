@@ -41,7 +41,7 @@ public class UnaryTest
 
         // Assert
         Assert.NotNull(client);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
         Assert.NotNull(actualCallOptions.Headers);
         Assert.Contains(actualCallOptions.Headers, x => x.Key == "foo" && x.Value == "bar");
     }
@@ -61,7 +61,7 @@ public class UnaryTest
 
         // Assert
         Assert.NotNull(client);
-        callInvokerMock.Received().AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<Nil>>>(), "www.example.com", Arg.Any<CallOptions>(), Arg.Any<Box<Nil>>());
+        _ = callInvokerMock.Received().AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<Nil>>>(), "www.example.com", Arg.Any<CallOptions>(), Arg.Any<Box<Nil>>());
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class UnaryTest
 
         // Assert
         Assert.NotNull(client);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default!, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default!, default!);
         Assert.Equal(cts.Token, actualCancellationToken);
     }
     
@@ -113,7 +113,7 @@ public class UnaryTest
 
         // Assert
         Assert.NotNull(client);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
         Assert.NotNull(actualHeaders);
         Assert.Contains(actualHeaders, x => x.Key == "foo" && x.Value == "bar");
     }
@@ -142,7 +142,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(Nil.Default, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
         Assert.Equal(new[] { MessagePackCode.Nil }, serializedResponse.ToArray());
     }
 
@@ -160,7 +160,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(Nil.Default, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(123, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal("FooBar", result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, string>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, string>)!, default, default, default!);
     }
 
     [Fact]
@@ -213,7 +213,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(123, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, Box<int>>)!, default, default, default!);
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(456, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, Box<int>>)!, default, default, default!);
     }
 
     [Fact]
@@ -258,7 +258,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal("Ok", result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, string>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, string>)!, default, default, default!);
         Assert.Equal("RequestValue", sentRequest);
     }
 
@@ -285,7 +285,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal("OK", result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, string>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, string>)!, default, default, default!);
         Assert.Equal(123, (sentRequest?.Value));
     }
 
@@ -313,7 +313,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal("OK", result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, string>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, string>)!, default, default, default!);
         Assert.Equal(123, (sentRequest?.Value.Item1));
         Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
@@ -342,7 +342,7 @@ public class UnaryTest
 
         // Assert
         Assert.Equal(987, result);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>)!, default, default, default!);
         Assert.Equal(123, (sentRequest?.Value.Item1));
         Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
@@ -360,7 +360,7 @@ public class UnaryTest
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!);
     }
 
     [Fact]
@@ -377,7 +377,7 @@ public class UnaryTest
         await client.OneRefTypeParameterNonGenericReturnType(request);
 
         // Assert
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<string, Box<Nil>>)!, default, default, default!);
     }
 
     [Fact]
@@ -394,7 +394,7 @@ public class UnaryTest
         await client.OneValueTypeParameterNonGenericReturnType(request);
 
         // Assert
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<int>, Box<Nil>>)!, default, default, default!);
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class UnaryTest
         await client.TwoParametersNonGenericReturnType(requestArg1, requestArg2);
 
         // Assert
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>)!, default, default, default!);
         Assert.Equal(123, (sentRequest?.Value.Item1));
         Assert.Equal("Foo", (sentRequest?.Value.Item2));
     }
@@ -444,7 +444,7 @@ public class UnaryTest
         // Assert
         Assert.Equal(StatusCode.Unknown, result.StatusCode);
         Assert.Equal("FaultedOnResponseHeaders", result.Message);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
     }
 
     [Fact]
@@ -462,7 +462,7 @@ public class UnaryTest
         // Assert
         Assert.Equal(StatusCode.Unknown, result.StatusCode);
         Assert.Equal("Faulted", result.Message);
-        callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
+        _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
     }
 
     public interface IUnaryTestService : IService<IUnaryTestService>
