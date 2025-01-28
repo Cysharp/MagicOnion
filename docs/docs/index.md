@@ -1,7 +1,3 @@
----
-title: About MagicOnion
----
-
 # MagicOnion
 
 Unified Realtime/API framework for .NET platform and Unity.
@@ -22,10 +18,16 @@ Interfaces are schemas and provide API services, just like the plain C# code
 
 Using the StreamingHub real-time communication service, the server can broadcast data to multiple clients
 
+MagicOnion uses [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) to serialize call arguments and return values. .NET primitives and other complex types that can be serialized into MessagePack objects. See MessagePack for C# for details about serialization.
+
+## Use Cases
+
 MagicOnion can be adopted or replaced in the following use cases:
 
 - RPC services such as gRPC, used by Microservices, and WCF, commonly used by WinForms/WPF
-- API services such as ASP.NET Core MVC targeting Unity, Xamarin, and Windows clients
+- API services such as ASP.NET Core MVC targeting Unity, .NET MAUI, and Windows clients
 - Bi-directional real-time communication such as Socket.io, SignalR, Photon and UNet
 
-MagicOnion uses [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) to serialize call arguments and return values. .NET primitives and other complex types that can be serialized into MessagePack objects. See MessagePack for C# for details about serialization.
+MagicOnion supports API services and real-time communication, making it suitable for various use cases. You can use either of these features separately, but configurations that combine both are also supported.
+
+![](/img/docs/fig-usecase.png)

@@ -28,3 +28,7 @@
   --ifm-color-primary-lightest: #ffffff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+[lang='ja-Jp'] .theme-doc-sidebar-container nav {
+  font-size: 0.85rem;
+}

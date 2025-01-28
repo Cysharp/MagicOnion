@@ -93,3 +93,26 @@ namespace MagicOnion.Client
 
 ## 切断検知の改善
 通信状況の悪化や切断の早期検知を実現するために MagicOnion はハートビート機能を提供しています。ハートビート機能については [ハートビート](heartbeat) を参照してください。
+
+## 再接続
+StreamingHub クライアントは自動での再接続を行いません。アプリケーションは切断されたことを検知して必要に応じて再接続(再作成)をする必要があります。サーバー上の StreamingHub は再開することができないため、再接続後のユーザーやアプリケーションの状態に合わせて再開処理を行ってください。
+
+```csharp
+async ValueTask KeepConnectionAsync(CancellationToken shutdownToken)
+{
+    while (!shutdownToken.IsCancellationRequested)
+    {
+        try
+        {
+            var client = await StreamingHubClient.ConnectAsync<IGreeterHub, IGreeterHubReceiver>(channel, receiver);
+            await client.WaitForDisconnectAsync();
+        }
+        catch (RpcException ex)
+        {
+            ...
+        }
+    }
+}
+```
+
+StreamingHubClient は再接続時には作り直す必要があるため、フィールドに保持していたり、外部に公開している場合などは注意が必要です。

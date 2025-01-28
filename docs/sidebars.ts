@@ -28,12 +28,30 @@ const sidebars: SidebarsConfig = {
         'installation/unity'
       ],
     },
-    'unary-or-streaminghub',
+    {
+      type: 'category',
+      label: 'What\'s new',
+      collapsed: true,
+      items: [
+        'release-notes/7.0',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Fundamentals',
+      items: [
+        'fundamentals/unary-or-streaminghub',
+        'fundamentals/exceptions-and-status-codes',
+        'fundamentals/lifecycle',
+        'fundamentals/aot',
+      ],
+    },
     {
       type: 'category',
       label: 'Unary service',
       items: [
         'unary/index',
+        'unary/raw-bytes-response',
       ],
     },
     {
@@ -53,6 +71,7 @@ const sidebars: SidebarsConfig = {
           ]
         },
         'streaminghub/processing-order',
+        'streaminghub/server-events',
         'streaminghub/disconnection',
         'streaminghub/heartbeat',
         'streaminghub/client-results',
@@ -60,21 +79,12 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'MagicOnion in Action',
-      items: [
-        {
-          type: 'category',
-          label: 'Filter',
-          items:[
-            'in-action/filter/index',
-            'in-action/filter/client-filter',
-            'in-action/filter/extensibility',
-            'in-action/filter/di',
-          ]
-        },
-        'in-action/lifecycle',
-        'in-action/exceptions-and-status-codes',
-        'in-action/aot',
+      label: 'Filter',
+      items:[
+        'filter/index',
+        'filter/client-filter',
+        'filter/extensibility',
+        'filter/di',
       ]
     },
     {

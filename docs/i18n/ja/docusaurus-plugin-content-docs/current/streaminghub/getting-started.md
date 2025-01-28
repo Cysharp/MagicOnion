@@ -180,9 +180,9 @@ class ChatHubReceiver : IChatHubReceiver
 }
 ```
 
-## クライアントプロキシを作成して StreamingHub に接続する
+## クライアントから StreamingHub に接続してメソッドを呼び出す
 
-SteramingHub に接続するには、`StreamingHubClient.ConnectAsync` メソッドを使用することで接続とクライアントプロキシの作成を行います。
+クライアントから StreamingHub に接続するには `StreamingHubClient.ConnectAsync` メソッドを使用します。このメソッドは接続を確立し、クライアントプロキシーを返します。
 
 `ConnectAsync` メソッドには接続先の `GrpcChannel` オブジェクトとレシーバーインターフェースのインスタンスを渡します。接続が確立されるとクライアントプロキシが返されます。サーバーから受信したメッセージはここで渡したレシーバーのインスタンスのメソッド呼び出しとなります。
 

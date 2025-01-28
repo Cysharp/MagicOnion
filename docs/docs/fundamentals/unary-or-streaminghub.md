@@ -8,6 +8,9 @@ Below are the differences between Unary and StreamingHub:
 - Unary can process a single request and response at a time, similar to a simple HTTP POST request
 - StreamingHub is a bidirectional communication that sends messages with a single continuous request and response
 
+![](/img/docs/fig-unary-streaminghub.png)
+
+
 ## Benefits of Unary
 
 - Load Balancing and Observability
@@ -20,7 +23,7 @@ Below are the differences between Unary and StreamingHub:
 
 ## Benefits of StreamingHub
 
-- Real-time message sending from the server to the client
+- Real-time message sending from the server to the client (including multiple clients)
     - If notifications from the server to the client are required, consider using StreamingHub
     - This is recommended for chat message notifications, game position synchronization, etc.
     - It replaces the need for polling/long polling with Unary or regular HTTP requests

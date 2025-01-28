@@ -29,6 +29,23 @@ StreamingHub が提供するメソッドを **Hub メソッド** と呼びます
 ## シリアライズ
 Unary サービスと同様にメソッドの引数及び戻り値はデフォルトで MessagePack によってシリアライズされます。そのため型が MessagePack でシリアライズできるようにマークされているか、あるいは構成されている必要があります。また、メソッドの引数は最大で15個まで許可されます。
 
+## 継承
+StreamingHub のインターフェースは継承できます。これは複数の Hub で共通のメソッドを持つ場合に役立ちます。
+
+```csharp
+public inteface ICommonHub
+{
+    ValueTask PingAsync();
+}
+
+public inteface IChatHub : IStreamingHub<IChatHub, IChatHubReceiver>, ICommonHub
+{
+    ValueTask JoinAsync(string roomName, string userName);
+    ValueTask LeaveAsync();
+    ValueTask SendMessageAsync(string message);
+}
+```
+
 ## 高度な設定
 
 ### `Ignore` 属性
