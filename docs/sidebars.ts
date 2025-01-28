@@ -61,6 +61,7 @@ const sidebars: SidebarsConfig = {
         'streaminghub/index',
         'streaminghub/getting-started',
         'streaminghub/define-interface',
+        'streaminghub/call-client',
         {
           type: 'category',
           label: 'Group',
@@ -70,7 +71,6 @@ const sidebars: SidebarsConfig = {
             'streaminghub/group-backplane',
           ]
         },
-        'streaminghub/processing-order',
         'streaminghub/server-events',
         'streaminghub/disconnection',
         'streaminghub/heartbeat',

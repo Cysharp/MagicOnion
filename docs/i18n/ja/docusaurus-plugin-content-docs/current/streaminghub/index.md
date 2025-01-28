@@ -41,7 +41,7 @@ flowchart TD
 
 
 ## サーバー上の StreamingHub インスタンス
-サーバー上の StreamingHub のインスタンスは各クライアントの接続ごとに作成されます。これらのインスタンスはクライアント間で共有されません。
+サーバー上の StreamingHub のインスタンスは各クライアントの接続ごとに作成されます。これらのインスタンスはクライアント間で共有されません。この特徴を利用して、StreamingHub のインスタンスのフィールドにはクライアントごとのステートを保持できます。
 
 ```mermaid
 flowchart TD
@@ -57,167 +57,43 @@ flowchart TD
 再接続時のユーザーのステートはアプリケーションで適切に管理する必要があります。例えばユーザー ID を使用して再接続時のユーザー情報の復元や継続といった処理を実装する必要があります。また、クライアントが切断を検知した際にサーバー上でも切断を検知している保証はありません。切断イベントについて詳しくは[切断のハンドリング](disconnection)を参照してください。
 :::
 
-<!--
+## 処理順序
 
-## Example
+StreamingHub のインスタンスの Hub メソッドの呼び出しは、そのインスタンスに接続しているクライアントからの呼び出し順に処理されることが保証されます。これはクライアントからの複数の呼び出しは同時に実行されないということを意味します。
 
-The following code is a simple example of a game implementation using StreamingHub and Unity.
+:::info
+これは StreamingHub のインスタンス、つまり接続ごとの原則であり、サーバー全体での処理順序を保証するものではありません。他のクライアントからの呼び出しは同時に実行される可能性があるため、サーバーの内部状態に関する一貫性はアプリケーションで保証する必要があります。
+:::
 
-```csharp
-// Server -> Client definition
-public interface IGamingHubReceiver
-{
-    // The method must have a return type of `void` and can have up to 15 parameters of any type.
-    void OnJoin(Player player);
-    void OnLeave(Player player);
-    void OnMove(Player player);
-}
+```mermaid
+gantt
+    title Timeline
+    dateFormat X
+    axisFormat %s
+    section MethodA
+    Invoke   : 0, 1
+    section MethodA
+    Process   :active, 1, 3
 
-// Client -> Server definition
-// implements `IStreamingHub<TSelf, TReceiver>`  and share this type between server and client.
-public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
-{
-    // The method must return `ValueTask`, `ValueTask<T>`, `Task` or `Task<T>` and can have up to 15 parameters of any type.
-    ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
-    ValueTask LeaveAsync();
-    ValueTask MoveAsync(Vector3 position, Quaternion rotation);
-}
+    section MethodB
+    Invoke   : 1, 2
+    section MethodB
+    Process   :active, 3, 5
 
-// for example, request object by MessagePack.
-[MessagePackObject]
-public class Player
-{
-    [Key(0)]
-    public string Name { get; set; }
-    [Key(1)]
-    public Vector3 Position { get; set; }
-    [Key(2)]
-    public Quaternion Rotation { get; set; }
-}
+    section MethodC
+    Invoke   : 2, 3
+    section MethodC
+    Process   :active, 5, 7
 ```
 
-```csharp
-// Server implementation
-// implements : StreamingHubBase<THub, TReceiver>, THub
-public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGamingHub
-{
-    // this class is instantiated per connected so fields are cache area of connection.
-    IGroup room;
-    Player self;
-    IInMemoryStorage<Player> storage;
 
-    public async ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation)
-    {
-        self = new Player() { Name = userName, Position = position, Rotation = rotation };
+StreamingHub のメソッド呼び出しは下記のような特徴を持ちます:
 
-        // Group can bundle many connections and it has inmemory-storage so add any type per group.
-        (room, storage) = await Group.AddAsync(roomName, self);
+- 一つの Hub インスタンスの Hub メソッド呼び出しは常にシーケンシャル
+- 一つの Hub インスタンスの Hub メソッドが同時に実行されることはない
+- 常にクライアントが呼び出した順に呼び出される
+- クライアントからの呼び出しが欠落することはない
 
-        // Typed Server->Client broadcast.
-        Broadcast(room).OnJoin(self);
+シーケンシャルかつ同時に呼び出されないという特徴から Hub メソッドの中で同一クライアントによる他の Hub メソッド呼び出しを待ち合わせるといった処理を行うとデッドロックする点に注意が必要です。
 
-        return storage.AllValues.ToArray();
-    }
-
-    public async ValueTask LeaveAsync()
-    {
-        await room.RemoveAsync(this.Context);
-        Broadcast(room).OnLeave(self);
-    }
-
-    public async ValueTask MoveAsync(Vector3 position, Quaternion rotation)
-    {
-        self.Position = position;
-        self.Rotation = rotation;
-        Broadcast(room).OnMove(self);
-    }
-
-    // You can hook OnConnecting/OnDisconnected by override.
-    protected override ValueTask OnDisconnected()
-    {
-        // on disconnecting, if automatically removed this connection from group.
-        return ValueTask.CompletedTask;
-    }
-}
-```
-
-You can write client like this.
-
-```csharp
-public class GamingHubClient : IGamingHubReceiver
-{
-    Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
-
-    IGamingHub client;
-
-    public async ValueTask<GameObject> ConnectAsync(ChannelBase grpcChannel, string roomName, string playerName)
-    {
-        this.client = await StreamingHubClient.ConnectAsync<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
-
-        var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
-        foreach (var player in roomPlayers)
-        {
-            (this as IGamingHubReceiver).OnJoin(player);
-        }
-
-        return players[playerName];
-    }
-
-    // methods send to server.
-
-    public ValueTask LeaveAsync()
-    {
-        return client.LeaveAsync();
-    }
-
-    public ValueTask MoveAsync(Vector3 position, Quaternion rotation)
-    {
-        return client.MoveAsync(position, rotation);
-    }
-
-    // dispose client-connection before channel.ShutDownAsync is important!
-    public Task DisposeAsync()
-    {
-        return client.DisposeAsync();
-    }
-
-    // You can watch connection state, use this for retry etc.
-    public Task WaitForDisconnect()
-    {
-        return client.WaitForDisconnect();
-    }
-
-    // Receivers of message from server.
-
-    void IGamingHubReceiver.OnJoin(Player player)
-    {
-        Debug.Log("Join Player:" + player.Name);
-
-        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.name = player.Name;
-        cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
-        players[player.Name] = cube;
-    }
-
-    void IGamingHubReceiver.OnLeave(Player player)
-    {
-        Debug.Log("Leave Player:" + player.Name);
-
-        if (players.TryGetValue(player.Name, out var cube))
-        {
-            GameObject.Destroy(cube);
-        }
-    }
-
-    void IGamingHubReceiver.OnMove(Player player)
-    {
-        Debug.Log("Move Player:" + player.Name);
-
-        if (players.TryGetValue(player.Name, out var cube))
-        {
-            cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
-        }
-    }
-}
-```
--->
+メソッドの呼び出しは欠落することはありません。これは StreamingHub はクライアントが呼び出した順序で処理するためです。MethodA, MethodB, MethodC と呼び出して MethodB のみ呼び出されないということは発生しません。ただし、呼び出しとは別に常に切断などで結果を受け取れない可能性があります。これは MethodA, MethodB, MethodC と呼び出した場合、サーバー上では処理を待機/実行継続しているがクライアントが切断された場合は MethodB 以降の結果を受け取れないといったケースです。
