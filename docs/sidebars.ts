@@ -51,6 +51,8 @@ const sidebars: SidebarsConfig = {
       label: 'Unary service',
       items: [
         'unary/index',
+        'unary/getting-started',
+        'unary/metadata',
         'unary/raw-bytes-response',
       ],
     },

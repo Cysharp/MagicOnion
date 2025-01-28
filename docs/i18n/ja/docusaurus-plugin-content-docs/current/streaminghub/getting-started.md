@@ -4,12 +4,12 @@
 
 ## 手順
 
-StreamingHub を実装、利用するには下記の手順が必要となります。
+StreamingHub を定義、実装、利用するには下記の手順が必要となります。
 
 - サーバーとクライアントの間で共有する StreamingHub インターフェイスを定義する
 - サーバープロジェクトで定義した StreamingHub インターフェイスを実装する
 - クライアントプロジェクトで定義した StreamingHub レシーバーを実装する
-- クライアントプロジェクトで定義した StreamingHub を呼び出すためのクライアントプロキシを作成する
+- クライアントプロジェクトで定義した StreamingHub を呼び出すためのクライアントプロキシーを作成する
 
 ## サーバーとクライアントの間で共有する StreamingHub インターフェイスを定義する
 
@@ -184,7 +184,7 @@ class ChatHubReceiver : IChatHubReceiver
 
 クライアントから StreamingHub に接続するには `StreamingHubClient.ConnectAsync` メソッドを使用します。このメソッドは接続を確立し、クライアントプロキシーを返します。
 
-`ConnectAsync` メソッドには接続先の `GrpcChannel` オブジェクトとレシーバーインターフェースのインスタンスを渡します。接続が確立されるとクライアントプロキシが返されます。サーバーから受信したメッセージはここで渡したレシーバーのインスタンスのメソッド呼び出しとなります。
+`ConnectAsync` メソッドには接続先の `GrpcChannel` オブジェクトとレシーバーインターフェースのインスタンスを渡します。接続が確立されるとクライアントプロキシーが返されます。サーバーから受信したメッセージはここで渡したレシーバーのインスタンスのメソッド呼び出しとなります。
 
 ```csharp
 var channel = GrpcChannel.ForAddress("https://localhost:5001");
