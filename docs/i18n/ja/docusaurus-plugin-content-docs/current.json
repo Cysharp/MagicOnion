@@ -15,6 +15,10 @@
     "message": "基礎",
     "description": "The label for category Fundamentals in sidebar docsSidebar"
   },
+  "sidebar.docsSidebar.category.Logging and Monitoring": {
+    "message": "ログと監視",
+    "description": "The label for category Logging and Monitoring in sidebar docsSidebar"
+  },
   "sidebar.docsSidebar.category.Unary service": {
     "message": "Unary サービス",
     "description": "The label for category Unary service in sidebar docsSidebar"

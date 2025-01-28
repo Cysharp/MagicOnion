@@ -1,6 +1,6 @@
 # Unary の基礎
 
-Unary サービスは、RPC や Web-API のスタイルでリクエスト/レスポンス API を提供する実装方式であり、gRPC の Unary コールとして実装されます。インフラストラクチャーレベルではリクエストは gRPC over HTTP/2 のリクエストとして観測できます。
+Unary サービスは、RPC や Web-API のスタイルでリクエスト/レスポンス API を提供する実装方式であり、gRPC の Unary コールとして実装されます。インフラストラクチャーレベルではリクエストは gRPC over HTTP/2 のリクエストとして観測でき、ASP.NET Core 上でも1つの HTTP リクエストとして取り扱われます。
 
 ```mermaid
 sequenceDiagram

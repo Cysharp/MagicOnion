@@ -42,8 +42,16 @@ const sidebars: SidebarsConfig = {
       items: [
         'fundamentals/unary-or-streaminghub',
         'fundamentals/exceptions-and-status-codes',
+        'fundamentals/authentication',
         'fundamentals/lifecycle',
         'fundamentals/aot',
+        {
+          type: 'category',
+          label: 'Logging and Monitoring',
+          items: [
+            'fundamentals/metrics',
+          ],
+        },
       ],
     },
     {
@@ -86,7 +94,7 @@ const sidebars: SidebarsConfig = {
         'filter/index',
         'filter/client-filter',
         'filter/extensibility',
-        'filter/di',
+        'filter/dependency-injection',
       ]
     },
     {
@@ -94,9 +102,8 @@ const sidebars: SidebarsConfig = {
       label: 'Integration',
       items: [
         'integration/unity',
-        'integration/di',
+        'integration/dependency-injection',
         'integration/json-transcoding',
-        'integration/metrics',
       ]
     },
     {
