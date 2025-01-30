@@ -1,9 +1,10 @@
 # JSON Transcoding and Swagger
-TBW
 
-The feature inspired by [Microsoft.AspNetCore.Grpc.JsonTranscoding.](https://learn.microsoft.com/en-us/aspnet/core/grpc/json-transcoding?view=aspnetcore-9.0)
+JSON transcoding is a mechanism that converts Unary services into JSON APIs and provides them as HTTP/1 endpoints, making it possible to call Unary services from tools such as cURL.
 
 This is the successor to the previous MagicOnion.Server.HttpGateway, but it is a completely new implementation and is not compatible, and is mainly intended for development support purposes.
+
+The feature inspired by [Microsoft.AspNetCore.Grpc.JsonTranscoding.](https://learn.microsoft.com/en-us/aspnet/core/grpc/json-transcoding?view=aspnetcore-9.0)
 
 - https://github.com/Cysharp/MagicOnion/pull/859
 

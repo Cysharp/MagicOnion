@@ -1,47 +1,39 @@
 # Client Filter
-TBW
 
-MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
+Client Filter is a powerful feature to hook before-after service method invocation. Filter like gRPC client interceptor but more familiar programming model like HttpClient handlers or ASP.NET Core middlewares.
 
 :::info
 Currently, the feature is only supported for Unary.
 :::
 
-```csharp
-// you can attach in MagicOnionClient.Create.
-var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
-{
-    new LoggingFilter(),
-    new AppendHeaderFilter(),
-    new RetryFilter()
-});
-```
+## Implementation and Usage
+To implement a filter, inherit from `IClientFilter` and implement the `SendAsync` method. This is the same programming model as HttpClient's `HttpMessageHandler` or ASP.NET Core middleware.
 
-You can create custom client-filter by implements `IClientFilter.SendAsync`.
+In the filter, you call the `next` delegate to call the next filter or the actual method. You can skip calling `next` or catch exceptions from calling `next` to add exception handling.
 
 ```csharp
-public class IDemoFilter : IClientFilter
+public class DemoFilter : IClientFilter
 {
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         try
         {
-            /* Before Request, context.MethodPath/CallOptions/Items, etc */
+            // Before Request: context.MethodPath/CallOptions/Items
+            // Console.WriteLine("Request Begin:" + context.MethodPath);
+            // ...
 
             var response = await next(context); /* Call next filter or method body */
 
-            /* After Request, response.GetStatus/GetTrailers/GetResponseAs<T>, etc */
+            // After Request: response.GetStatus/GetTrailers/GetResponseAs<T>
+            // var result = await response.GetResponseAs<T>();
+            // var status = response.GetStatus();
+            // ...
 
             return response;
         }
         catch (RpcException ex)
         {
-            /* Get gRPC Error Response */
-            throw;
-        }
-        catch (OperationCanceledException ex)
-        {
-            /* If canceled */
+            /* gRPC Exception */
             throw;
         }
         catch (Exception ex)
@@ -51,13 +43,33 @@ public class IDemoFilter : IClientFilter
         }
         finally
         {
-            /* Common Finalize */
+            /* Clean-up */
         }
     }
 }
 ```
 
-Here is the sample filters, you can imagine what you can do.
+You can end the processing in the filter without calling the method by creating a new instance of `ResponseContext`. This allows you to implement a mock-like implementation.
+
+:::warning
+You can change the request header by getting and modifying `CallOptions` from `RequestContext`. However, `CallOptions` is holded per MagicOnionClient instance, so be careful not to add duplicate headers for each request.
+:::
+
+
+To use the implemented filter in the client, specify an array of `IClientFilter` in the arguments of `MagicOnionClient.Create`.
+
+```csharp
+var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
+{
+    new DemoFilter(),
+    new LoggingFilter(),
+    new AppendHeaderFilter(),
+    new RetryFilter()
+});
+```
+
+## Sample Implementation
+The following are examples of adding headers, outputting request logs, and retrying.
 
 ```csharp
 public class AppendHeaderFilter : IClientFilter

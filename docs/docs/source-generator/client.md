@@ -1,14 +1,12 @@
 # Pre-generated client codes
 
-TBW
-
 MagicOnion supports Unity, NativeAOT, and other platforms that require pre-generated client code with Source Generator (MagicOnion.Client.SourceGenerator).
 
 MagicOnion.Client.SourceGenerator is shipped with MagicOnion.Client package.
 This means that you no longer need to the install generator tool (moc) and setup additional build steps.
 
 ## Supported development environments
-- Unity 2021.3.0f1 or later
+- Unity 2022.3.0f1 or later
 - .NET 6 or later
 - Visual Studio 2022 version 17.2 or later
 - Rider 2023.1 or later
@@ -50,5 +48,13 @@ static void RegisterResolvers()
 You can specify options in the named constructor of the attribute.
 
 - **`DisableAutoRegistration`**: Sets whether to disable automatically calling `Register` during start-up. (Automatic registration requires .NET 5+ or Unity)
-- **`MessagePackFormatterNamespace`**: Sets the namespace of pre-generated MessagePackFormatters. The default value is `MessagePack.Formatters`.
 - **`Serializer`**: Sets the serializer used for message serialization. The default value is `GenerateSerializerType.MessagePack`.
+
+### Additional options
+
+You can specify additional options with the `MagicOnionClientGenerationOption` attribute.
+
+For MessagePack, there are options for compatibility with the previous mpc.
+
+- **`MessagePack.FormatterNamespace`**: Specifies the namespace of the pre-generated Formatter. The default is `MessagePack.Formatters`.
+- **`MessagePack.GenerateResolverForCustomFormatter`**: Specifies whether to use pre-generated MessagePack Formatter. The default is `false`.

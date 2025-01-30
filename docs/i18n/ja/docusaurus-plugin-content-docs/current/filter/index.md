@@ -49,11 +49,6 @@ public class SampleFilterAttribute : MagicOnionFilterAttribute
 MagicOnion は ASP.NET Core MVC によく似たフィルターの API も提供しています。
 これらの API は柔軟なフィルターの実装をサポートします。詳細については [フィルターの拡張性](extensibility) を参照してください。
 
-- `IMagicOnionServiceFilter` interface
-- `IStreamingHubFilter` interface
-- `IMagicOnionFilterFactory<T>` interface
-- `IMagicOnionOrderedFilter` interface
-
 
 ## グローバルフィルター
 フィルターは MagicOnionOptions の `GlobalFilters` に追加することでアプリケーション全体に適用できます。
