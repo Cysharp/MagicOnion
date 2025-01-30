@@ -52,6 +52,7 @@ const sidebars: SidebarsConfig = {
             'fundamentals/metrics',
           ],
         },
+        'fundamentals/version-compatibility',
       ],
     },
     {
@@ -93,6 +94,7 @@ const sidebars: SidebarsConfig = {
       items:[
         'filter/index',
         'filter/client-filter',
+        'filter/streaminghub-filter',
         'filter/extensibility',
         'filter/dependency-injection',
       ]
@@ -120,7 +122,6 @@ const sidebars: SidebarsConfig = {
         'advanced/customize-serialization-encryption',
         'advanced/magiconionoptions',
         'advanced/map-service-endpoints',
-        'advanced/version-compatibility',
         'advanced/memorypack',
         'advanced/raw-grpc'
       ]

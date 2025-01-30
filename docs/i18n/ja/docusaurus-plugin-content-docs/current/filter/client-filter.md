@@ -1,47 +1,40 @@
-# Client Filter
-TBW
+# クライアントフィルター
 
-MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
+クライアントフィルターはクライアント上で、サービスのメソッドの呼び出し前後をフックする強力な機能です。フィルターは gRPC サーバーインターセプターと似たような機能を提供しますが、HttpClient のハンドラーのような馴染みやすいプログラミングモデルを提供します。
+
 
 :::info
-Currently, the feature is only supported for Unary.
+現時点では Unary のみをサポートします。
 :::
 
-```csharp
-// you can attach in MagicOnionClient.Create.
-var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
-{
-    new LoggingFilter(),
-    new AppendHeaderFilter(),
-    new RetryFilter()
-});
-```
+## 実装と使用方法
+クライアントフィルターを実装するには `IClientFilter` インターフェースを実装します。これは HttpClient の HttpMessageHandler や ASP.NET Core のミドルウェアと同じプログラミングモデルです。
 
-You can create custom client-filter by implements `IClientFilter.SendAsync`.
+フィルター内では `next` デリゲートを呼び出すことで次のフィルターまたは実際のメソッドを呼び出します。例えば `next` の呼び出しをスキップしたり、`next` の呼び出しの例外をキャッチすることで例外時の処理を追加するといったことが可能です。
 
 ```csharp
-public class IDemoFilter : IClientFilter
+public class DemoFilter : IClientFilter
 {
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         try
         {
-            /* Before Request, context.MethodPath/CallOptions/Items, etc */
+            // Before Request: context.MethodPath/CallOptions/Items
+            // Console.WriteLine("Request Begin:" + context.MethodPath);
+            // ...
 
             var response = await next(context); /* Call next filter or method body */
 
-            /* After Request, response.GetStatus/GetTrailers/GetResponseAs<T>, etc */
+            // After Request: response.GetStatus/GetTrailers/GetResponseAs<T>
+            // var result = await response.GetResponseAs<T>();
+            // var status = response.GetStatus();
+            // ...
 
             return response;
         }
         catch (RpcException ex)
         {
-            /* Get gRPC Error Response */
-            throw;
-        }
-        catch (OperationCanceledException ex)
-        {
-            /* If canceled */
+            /* gRPC Exception */
             throw;
         }
         catch (Exception ex)
@@ -51,13 +44,34 @@ public class IDemoFilter : IClientFilter
         }
         finally
         {
-            /* Common Finalize */
+            /* Clean-up */
         }
     }
 }
 ```
 
-Here is the sample filters, you can imagine what you can do.
+`ResponseContext` のインスタンスを新規に作成して返すことでメソッドを呼び出さずにフィルターで処理を終了することも可能です。これによりモックのような実装を実現できます。
+
+:::warning
+`RequestContext` から `CallOptions` を取得して変更することでリクエストヘッダーを変更することができます。ただし、`CallOptions` は MagicOnionClient インスタンスごとに保持されるため、リクエスト毎に追加すると重複登録となるため注意してください。
+:::
+
+
+実装したフィルターをクライアントで使用するには `MagicOnionClient.Create` の引数で `IClientFilter` の配列を指定します。
+
+```csharp
+var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
+{
+    new DemoFilter(),
+    new LoggingFilter(),
+    new AppendHeaderFilter(),
+    new RetryFilter()
+});
+```
+
+## サンプル実装例
+
+以下はヘッダーを追加する例や、リクエストのログを出力する例、リトライ処理を行う例などのサンプルです。
 
 ```csharp
 public class AppendHeaderFilter : IClientFilter
