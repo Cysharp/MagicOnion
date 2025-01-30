@@ -44,6 +44,7 @@ const sidebars: SidebarsConfig = {
         'fundamentals/exceptions-and-status-codes',
         'fundamentals/authentication',
         'fundamentals/lifecycle',
+        'fundamentals/https',
         'fundamentals/aot',
         {
           type: 'category',

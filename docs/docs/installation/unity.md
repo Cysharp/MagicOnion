@@ -17,7 +17,7 @@ MagicOnion is provided as a NuGet package, so you need to install [NuGetForUnity
 
 ## Install YetAnotherHttpHandler and gRPC libraries
 
-C-core based Unity libraries have been discontinued in the gRPC project, so you need to use [YetAnotherHttpHandler]((https://github.com/Cysharp/YetAnotherHttpHandler)). Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions. [It also covers how to install grpc-dotnet (Grpc.Net.Client)](https://github.com/Cysharp/YetAnotherHttpHandler#using-grpc-grpc-dotnet-library).
+C-core based Unity libraries have been discontinued in the gRPC project, so you need to use [YetAnotherHttpHandler]((https://github.com/Cysharp/YetAnotherHttpHandler). Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions. [It also covers how to install grpc-dotnet (Grpc.Net.Client)](https://github.com/Cysharp/YetAnotherHttpHandler#using-grpc-grpc-dotnet-library).
 
 ## Install MagicOnion.Client
 

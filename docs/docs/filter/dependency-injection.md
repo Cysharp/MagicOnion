@@ -4,7 +4,7 @@
 This feature and document is applies to the server-side only.
 :::
 
-MagicOnion filters supports [Dependency Injection](#dependency-injection). There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
+MagicOnion filters supports Dependency Injection. There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
 
 The following is an example of how to use `FromTypeFilter`, `FromServiceFitler`.
 
