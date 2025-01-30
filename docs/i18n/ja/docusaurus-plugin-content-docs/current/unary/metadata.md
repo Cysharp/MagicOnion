@@ -15,7 +15,7 @@ var client = MagicOnionClient.Create<IGreeterService>(channel).WithHeaders(new M
 });
 ```
 
-クライアント作成時に `MagicOnionClientOptions` クラスを渡すオーバーロードや `MagicOnionClient.WithOptions` メソッドなどで `CallOptions` を使用して設定できます。また、それ以外の方法として [クライアントフィルター](../filter/client-filter) を使用することでリクエスト時にメタデータを設定できます。
+クライアント作成時に `MagicOnionClientOptions` クラスを渡すオーバーロードや `MagicOnionClient.WithOptions` メソッドなどで `CallOptions` を使用して設定できます。また、それ以外の方法として [クライアントフィルター](/filter/client-filter) を使用することでリクエスト時にメタデータを設定できます。
 
 ### レスポンスのメタデータを読み取る
 `UnaryResult` 構造体の `ResponseHeadersAsync` プロパティを使用してメタデータを読み取れます。 `ResponseHeadersAsync` はサーバーが応答するまで待機します。

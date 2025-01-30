@@ -1,254 +1,102 @@
 # StreamingHub service fundamentals
-TBW
 
-StreamingHub is a mechanism for real-time communication in an RPC style between the server and the client.
+StreamingHub is a mechanism for real-time communication between servers and clients using RPC-style communication.
 
-StreamingHub supports not only calls from the client to the server, but also calls from the server to the client. For example, this is used for receiving messages in a chat app, and synchronizing player position information in real-time game.
+StreamingHub can not only call methods on the server from the client, but also send messages from the server to the client. It is used for receiving messages in chat applications and synchronizing player position information in real-time games.
 
-## Usage
-
-- Define a StreamingHub interface in a shared library that is shared between the server and the client.
-- Implement the StreamingHub interface in the server project.
-- Implement the StreamingHub receiver in the client project.
-- Create a client proxy to call the StreamingHub.
-
-### Define StreamingHub interface in a shared library
-
-```csharp
-// A hub must inherit `IStreamingHub<TSelf, TReceiver>`.
-public interface IChatHub : IStreamingHub<IChatHub, IChatHubReceiver>
-{
-    ValueTask JoinAsync(string roomName, string userName);
-    ValueTask LeaveAsync();
-    ValueTask SendMessageAsync(string message);
-}
-
-public interface IChatHubReceiver
-{
-    void OnJoin(string userName);
-    void OnLeave(string userName);
-    void OnSendMessage(string userName, string message);
-}
+```mermaid
+sequenceDiagram
+    Client-->Server: Establish connection
+    Client->>+Server: Request
+    Server->>-Client: Response
+    Server->>Client: Push
+    Server->>Client: Push
+    Server->>Client: Push
+    Client->>+Server: Request
+    Server->>-Client: Response
+    Server-->Client: Disconnect
 ```
 
-### Implement StreamingHub in a server project
+StreamingHub maintains a connection to the client on the server, and can send messages to the client at any time. The client of StreamingHub has the role of receiving messages from the server and is called a **receiver**.
 
-The StreamingHub implementation must inherit `StreamingHubBase<THub, TReceiver>` and implement the StreamingHub interface.
+Unlike Unary, SteramingHub is treated as a single long HTTP request from connection to disconnection at the infrastructure level and ASP.NET Core level.
 
-```csharp
-public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
-{
-    IGroup<IChatHubReceiver>? room;
-    string userName = "unknown";
+## Calling multiple clients at once
 
-    public async ValueTask JoinAsync(string roomName, string userName)
-    {
-        this.room = await Group.AddAsync(roomName);
-        this.userName = userName;
-        room.All.OnJoin(userName);
-    }
+StreamingHub has a feature to send messages to multiple clients (receivers) at once. This is called a **Group**. A group is a mechanism for bundling multiple clients, and clients can belong to multiple groups. For more information, see [Group](group).
 
-    public async ValueTask LeaveAsync()
-    {
-        room.All.OnLeave(Context.ConnectionId);
-        await room.RemoveAsync(Context);
-    }
+```mermaid
+flowchart TD
+    C0[Client] --> I0[Hub Instance]
 
-    public async ValueTask SendMessageAsync(string message)
-    {
-        room.All.OnMessage(userName, message);
-    }
-}
-```
+    I1[Hub Instance] --> C1[Client]
+    I2[Hub Instance] --> C2[Client]
+    I3[Hub Instance] --> C3[Client]
+    I4[Hub Instance] --> C4[Client]
 
-## Implement StreamingHub receiver in a client project
-
-The StreamingHub receiver will receive messages from the server.
-
-```csharp
-class ChatHubReceiver : IChatHubReceiver
-{
-    public void OnJoin(string userName)
-        => Console.WriteLine($"{userName} joined.");
-    public void OnLeave(string userName)
-        => Console.WriteLine($"{userName} left.");
-    public void OnMessage(string userName, string message)
-        => Console.WriteLine($"{userName}: {message}");
-}
-```
-
-### Create a client proxy to connect the StreamingHub
-
-To connect to the StreamingHub, you need to create a client proxy using the `StreamingHubClient.ConnectAsync` method.
-
-```csharp
-var channel = GrpcChannel.ForAddress("https://localhost:5001");
-var receiver = new ChatHubReceiver();
-var client = await StreamingHubClient.ConnectAsync<IChatHub, IChatHubReceiver>(channel, receiver);
-
-await client.JoinAsync("room", "user1");
-await client.SendMessageAsync("Hello, world!");
+    G[Group] --> I1
+    G --> I2
+    G --> I3
+    G --> I4
+    I0 --> G
 ```
 
 
-## Example
+## Server-side StreamingHub instances
+The StreamingHub instance on the server is created for each client connection. These instances are not shared between clients. You can use this feature to keep client-specific state in the fields of the StreamingHub instance.
 
-The following code is a simple example of a game implementation using StreamingHub and Unity.
-
-```csharp
-// Server -> Client definition
-public interface IGamingHubReceiver
-{
-    // The method must have a return type of `void` and can have up to 15 parameters of any type.
-    void OnJoin(Player player);
-    void OnLeave(Player player);
-    void OnMove(Player player);
-}
-
-// Client -> Server definition
-// implements `IStreamingHub<TSelf, TReceiver>`  and share this type between server and client.
-public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
-{
-    // The method must return `ValueTask`, `ValueTask<T>`, `Task` or `Task<T>` and can have up to 15 parameters of any type.
-    ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
-    ValueTask LeaveAsync();
-    ValueTask MoveAsync(Vector3 position, Quaternion rotation);
-}
-
-// for example, request object by MessagePack.
-[MessagePackObject]
-public class Player
-{
-    [Key(0)]
-    public string Name { get; set; }
-    [Key(1)]
-    public Vector3 Position { get; set; }
-    [Key(2)]
-    public Quaternion Rotation { get; set; }
-}
+```mermaid
+flowchart TD
+    I1[Hub Instance] <--> C1[Client]
+    I2[Hub Instance] <--> C2[Client]
+    I3[Hub Instance] <--> C3[Client]
+    I4[Hub Instance] <--> C4[Client]
 ```
 
-```csharp
-// Server implementation
-// implements : StreamingHubBase<THub, TReceiver>, THub
-public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGamingHub
-{
-    // this class is instantiated per connected so fields are cache area of connection.
-    IGroup room;
-    Player self;
-    IInMemoryStorage<Player> storage;
+1 Hub instance is created on the server for each client connection. The Hub instance is destroyed when the client is disconnected. Once the Hub is destroyed, it cannot be resumed. After disconnection is detected, you need to establish a connection again.
 
-    public async ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation)
-    {
-        self = new Player() { Name = userName, Position = position, Rotation = rotation };
+:::tip
+The state of the user when reconnecting must be managed by the application. For example, you need to implement processes such as restoring or continuing user information when reconnecting using the user ID. Also, there is no guarantee that the server will detect disconnection when the client detects disconnection. For more information about disconnection events, see [Handling disconnections](disconnection).
+:::
 
-        // Group can bundle many connections and it has inmemory-storage so add any type per group.
-        (room, storage) = await Group.AddAsync(roomName, self);
+## Hub method processing order
 
-        // Typed Server->Client broadcast.
-        Broadcast(room).OnJoin(self);
+The Hub method calls on a StreamingHub instance are guaranteed to be processed in the order in which they are called by the clients connected to that instance. This means that multiple calls from clients are not executed simultaneously.
 
-        return storage.AllValues.ToArray();
-    }
+:::info
+This is a principle for each StreamingHub instance, not a guarantee of processing order for the entire server. Since calls from other clients may be executed simultaneously, application-level consistency of the server's internal state must be ensured.
+:::
 
-    public async ValueTask LeaveAsync()
-    {
-        await room.RemoveAsync(this.Context);
-        Broadcast(room).OnLeave(self);
-    }
+```mermaid
+gantt
+    title Timeline
+    dateFormat X
+    axisFormat %s
+    section MethodA
+    Invoke   : 0, 1
+    section MethodA
+    Process   :active, 1, 3
 
-    public async ValueTask MoveAsync(Vector3 position, Quaternion rotation)
-    {
-        self.Position = position;
-        self.Rotation = rotation;
-        Broadcast(room).OnMove(self);
-    }
+    section MethodB
+    Invoke   : 1, 2
+    section MethodB
+    Process   :active, 3, 5
 
-    // You can hook OnConnecting/OnDisconnected by override.
-    protected override ValueTask OnDisconnected()
-    {
-        // on disconnecting, if automatically removed this connection from group.
-        return ValueTask.CompletedTask;
-    }
-}
+    section MethodC
+    Invoke   : 2, 3
+    section MethodC
+    Process   :active, 5, 7
 ```
 
-You can write client like this.
+StreamingHub method calls have the following characteristics:
 
-```csharp
-public class GamingHubClient : IGamingHubReceiver
-{
-    Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
+- A Hub instance's Hub method call is always sequential
+- A Hub instance's Hub method is never executed simultaneously
+- The order of calls from clients is always maintained
+- Calls from clients are never lost
 
-    IGamingHub client;
+You should be aware that if you wait for other Hub method calls from the same client in a Hub method, you may encounter a deadlock. This is because Hub method calls are always sequential and never executed simultaneously.
 
-    public async ValueTask<GameObject> ConnectAsync(ChannelBase grpcChannel, string roomName, string playerName)
-    {
-        this.client = await StreamingHubClient.ConnectAsync<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
+Method calls are never lost. StreamingHub processes the calls in the order in which the clients called them. For example, if MethodA, MethodB, and MethodC are called, MethodB will never be missed.
 
-        var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
-        foreach (var player in roomPlayers)
-        {
-            (this as IGamingHubReceiver).OnJoin(player);
-        }
-
-        return players[playerName];
-    }
-
-    // methods send to server.
-
-    public ValueTask LeaveAsync()
-    {
-        return client.LeaveAsync();
-    }
-
-    public ValueTask MoveAsync(Vector3 position, Quaternion rotation)
-    {
-        return client.MoveAsync(position, rotation);
-    }
-
-    // dispose client-connection before channel.ShutDownAsync is important!
-    public Task DisposeAsync()
-    {
-        return client.DisposeAsync();
-    }
-
-    // You can watch connection state, use this for retry etc.
-    public Task WaitForDisconnect()
-    {
-        return client.WaitForDisconnect();
-    }
-
-    // Receivers of message from server.
-
-    void IGamingHubReceiver.OnJoin(Player player)
-    {
-        Debug.Log("Join Player:" + player.Name);
-
-        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.name = player.Name;
-        cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
-        players[player.Name] = cube;
-    }
-
-    void IGamingHubReceiver.OnLeave(Player player)
-    {
-        Debug.Log("Leave Player:" + player.Name);
-
-        if (players.TryGetValue(player.Name, out var cube))
-        {
-            GameObject.Destroy(cube);
-        }
-    }
-
-    void IGamingHubReceiver.OnMove(Player player)
-    {
-        Debug.Log("Move Player:" + player.Name);
-
-        if (players.TryGetValue(player.Name, out var cube))
-        {
-            cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
-        }
-    }
-}
-```
+However, it is possible that you will not always receive the results due to disconnection, etc. This means that if MethodA, MethodB, and MethodC are called, the server will continue to wait for processing/execution, but if the client is disconnected, the results after MethodB will not be received.
