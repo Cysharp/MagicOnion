@@ -1,6 +1,6 @@
 # Supported Platforms
 
-MagicOnion is designed to run on the .NET platform. The requirements for the server and client are as follows.
+MagicOnion is designed to run on various .NET platforms. The requirements for the server and client are as follows.
 
 ## Server-side (MagicOnion.Server)
 

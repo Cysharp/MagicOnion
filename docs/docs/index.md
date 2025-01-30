@@ -25,9 +25,12 @@ MagicOnion uses [MessagePack for C#](https://github.com/neuecc/MessagePack-CShar
 MagicOnion can be adopted or replaced in the following use cases:
 
 - RPC services such as gRPC, used by Microservices, and WCF, commonly used by WinForms/WPF
-- API services such as ASP.NET Core MVC targeting Unity, .NET MAUI, and Windows clients
+- API services such as ASP.NET Core Web API targeting various platforms and clients such as Windows WPF applications, Unity games, .NET for iOS, Android, and .NET MAUI
 - Bi-directional real-time communication such as Socket.io, SignalR, Photon and UNet
 
 MagicOnion supports API services and real-time communication, making it suitable for various use cases. You can use either of these features separately, but configurations that combine both are also supported.
 
 ![](/img/docs/fig-usecase.png)
+
+## Technology Stack
+TBW

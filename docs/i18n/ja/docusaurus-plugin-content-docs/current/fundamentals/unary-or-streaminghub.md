@@ -6,7 +6,7 @@ Unary と StreamingHub の違いは次の通りです:
 
 - Unary は一度に1つのリクエストと1つのレスポンスを処理するシンプルな HTTP の POST リクエストです
     - 詳細: [Unary サービスの基礎](../unary/)
-- StreamingHub は継続した接続を使用してリクエストとレスポンスでメッセージを送りあう双方向通信です
+- StreamingHub は継続した接続を使用してクライアントとサーバー間でメッセージを送りあう双方向通信です
     - 詳細: [StreamingHub の基礎](../streaminghub/)
 
 ![](/img/docs/fig-unary-streaminghub.png)

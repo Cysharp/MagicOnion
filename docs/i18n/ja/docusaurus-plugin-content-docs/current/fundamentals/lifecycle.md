@@ -19,6 +19,10 @@ Unary サービスと StreamingHub のメソッド、およびフィルター内
 `Items` は認証フィルターのような場所から値をセットし、サービスメソッドから取り出すために利用できます。
 
 :::warning
+**ServiceContext をキャッシュしないでください。** ServiceContext はリクエスト中にのみ有効であり、MagicOnion はインスタンスを再利用する可能性があります。リクエスト後にコンテキストから参照されるオブジェクトの状態も不定です。
+:::
+
+:::warning
 ServiceContext は「接続ごと」のコンテキストです。StreamingHub 内でも ServiceContext にアクセスできますが、接続中は常に同じコンテキストを共有するため注意が必要です。例えば Timestamp は接続したときの時刻、メソッドに関連するプロパティーは常に特別なメソッドである `Connect` がセットされます。`Items` プロパティーも Hub メソッド呼び出し単位ではクリアされません。
 
 StreamingHubFilter 内では StreamingHubContext を使用してください。StreamingHubContext は StreamingHub のメソッド呼び出しごとのコンテキストです。
