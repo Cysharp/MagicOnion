@@ -80,7 +80,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 
 これでサービスの定義と実装が行えました。
 
-MagicOnion サーバーを開始する準備が整いました。F5 キーを押すか `dotnet run` コマンドを使用して MagicOnion サーバーを開始できます。
+MagicOnion サーバーを開始する準備が整いました。F5 キーを押すか `dotnet run` コマンドを使用して MagicOnion サーバーを開始できます。この際にサーバーが起動したときに表示される URL はクライアントから接続する先となるためメモしておいてください。
 
 ## クライアントサイド: サービスの呼び出し
 
@@ -89,6 +89,9 @@ MagicOnion サーバーを開始する準備が整いました。F5 キーを押
 `IMyFirstService` インターフェースを共有し、クライアントで使用します。ファイルリンク、共有ライブラリ、またはコピー＆ペーストなど、様々な方法でインターフェースを共有できます。
 
 クライアントコードでは `MagicOnionClient` で共有インターフェースを元にクライアントプロキシをに作成し、サービスを透過的に呼び出します。
+
+初めに gRPC のチャンネルを作成します。gRPC チャンネルは接続を抽象化したものであり先ほどメモした URL を `GrpcChannel.ForAddress` メソッドに渡して作成します。作成されたチャンネルを使用して MagicOnion のクライアントプロキシーを作成します。
+
 
 ```csharp
 using Grpc.Net.Client;

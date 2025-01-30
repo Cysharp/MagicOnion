@@ -32,5 +32,14 @@ MagicOnion supports API services and real-time communication, making it suitable
 
 ![](/img/docs/fig-usecase.png)
 
-## Technology Stack
-TBW
+## Technology stack
+
+MagicOnion is built on top of various modern technologies.
+
+![](/img/docs/fig-technology-stack.png)
+
+The server is implemented on a gRPC server (grpc-dotnet) on ASP.NET Core, utilizing the features of ASP.NET Core and Grpc.AspNetCore.Server. This includes DI, logging, metrics, and Hosting API.
+
+Transport uses the HTTP/2 protocol and utilizes binary messaging with gRPC. Instead of Protocol Buffers, which are commonly used in gRPC, it adopts MessagePack, which has high affinity and expressive power with .NET.
+
+The client supports not only .NET runtime but also Unity game engine runtime. It uses a gRPC client (grpc-dotnet) based on .NET built-in HttpClient on these runtimes and builds the MagicOnion client library on top of it.

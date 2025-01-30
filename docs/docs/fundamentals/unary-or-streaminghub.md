@@ -1,14 +1,16 @@
 # Unary or StreamingHub
-TBW
+MagicOnion provides two types of API implementation methods: Unary services and StreamingHub services. You can define RPC-style APIs using either of these methods.
 
-MagicOnion can define RPC-style APIs using Unary services and StreamingHub services. You can implement everything with StreamingHub, but for general APIs that do not require notifications from the server, it is recommended to use Unary.
+The differences between Unary and StreamingHub are as follows:
 
-Below are the differences between Unary and StreamingHub:
-
-- Unary can process a single request and response at a time, similar to a simple HTTP POST request
-- StreamingHub is a bidirectional communication that sends messages with a single continuous request and response
+- Unary is a simple HTTP POST request that processes one request and one response at a time
+    - See: [Unary service fundamentals](/unary/)
+- StreamingHub is bidirectional communication that sends messages between the client and server using a continuous connection
+    - See: [StreamingHub fundamentals](/streaminghub/)
 
 ![](/img/docs/fig-unary-streaminghub.png)
+
+You can implement everything with StreamingHub, but for general APIs that do not require notifications from the server (e.g., REST or Web APIs), it is recommended to use Unary.
 
 
 ## Benefits of Unary
