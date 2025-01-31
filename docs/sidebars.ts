@@ -24,7 +24,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Installation',
       items: [
-        'installation/index',
+        'installation/packages',
         'installation/unity'
       ],
     },
@@ -60,7 +60,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Unary service',
       items: [
-        'unary/index',
+        'unary/fundamentals',
         'unary/getting-started',
         'unary/metadata',
         'unary/raw-bytes-response',
@@ -70,7 +70,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'StreamingHub service',
       items: [
-        'streaminghub/index',
+        'streaminghub/fundamentals',
         'streaminghub/getting-started',
         'streaminghub/define-interface',
         'streaminghub/call-client',
@@ -93,7 +93,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Filter',
       items:[
-        'filter/index',
+        'filter/fundamentals',
         'filter/client-filter',
         'filter/streaminghub-filter',
         'filter/extensibility',

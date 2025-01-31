@@ -13,13 +13,14 @@ const config: Config = {
   url: 'https://cysharp.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/MagicOnion.Docs.Preview/',
+  baseUrl: process.env.GITHUB_REPOSITORY?.replace(/^[^/]+\//, '') || '/MagicOnion/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Cysharp', // Usually your GitHub org/user name.
   projectName: 'MagicOnion', // Usually your repo name.
 
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 

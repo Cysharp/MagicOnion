@@ -38,4 +38,4 @@ class StreamingHubFilterAttribute : StreamingHubFilterAttribute
 
 StreamingHub フィルターは Hub メソッドの呼び出し単位で実行されるため、エラーハンドリングやロギング、メソッドの計測などに適しています。
 
-StreamingHub フィルターも通常のフィルターと同様に拡張用のインターフェースが用意されているため、柔軟なフィルター実装が可能です。
+StreamingHub フィルターも通常のフィルターと同様に拡張用のインターフェースが用意されているため、柔軟なフィルター実装が可能です。詳しくは [フィルターの拡張性](/filter/extensibility) を参照してください。
