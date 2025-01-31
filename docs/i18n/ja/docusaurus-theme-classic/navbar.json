@@ -1,0 +1,14 @@
+{
+  "title": {
+    "message": "MagicOnion",
+    "description": "The title in the navbar"
+  },
+  "item.label.Documents": {
+    "message": "Documents",
+    "description": "Navbar item with label Documents"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  }
+}

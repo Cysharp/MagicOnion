@@ -1,0 +1,50 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.docsSidebar.category.Installation": {
+    "message": "インストール",
+    "description": "The label for category Installation in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.What's new": {
+    "message": "新機能",
+    "description": "The label for category What's new in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Fundamentals": {
+    "message": "基礎",
+    "description": "The label for category Fundamentals in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Logging and Monitoring": {
+    "message": "ログと監視",
+    "description": "The label for category Logging and Monitoring in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Unary service": {
+    "message": "Unary サービス",
+    "description": "The label for category Unary service in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.StreamingHub service": {
+    "message": "StreamingHub サービス",
+    "description": "The label for category StreamingHub service in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Group": {
+    "message": "グループ",
+    "description": "The label for category Group in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Filter": {
+    "message": "フィルター",
+    "description": "The label for category Filter in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Integration": {
+    "message": "インテグレーション",
+    "description": "The label for category Integration in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Source Generator": {
+    "message": "Source Generator",
+    "description": "The label for category Source Generator in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Advanced": {
+    "message": "高度な機能",
+    "description": "The label for category Advanced in sidebar docsSidebar"
+  }
+}
