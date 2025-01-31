@@ -49,7 +49,7 @@ const config: Config = {
           sidebarCollapsed: false,
 
           editUrl: (params) => params.locale == 'en'
-            ? `https://github.com/Cysharp/MagicOnion/tree/main/docs/${params.docPath}`
+            ? `https://github.com/Cysharp/MagicOnion/tree/main/docs/docs/${params.docPath}`
             : `https://github.com/Cysharp/MagicOnion/tree/main/docs/i18n/${params.locale}/docusaurus-plugin-content-docs/current/${params.docPath}`,
         },
         theme: {
