@@ -1,45 +1,24 @@
 # HTTPS/TLS
-TBW
 
-MagicOnion supports TLS encrypted connection.
+MagicOnion supports encrypted connections using TLS. This page explains how to configure TLS encrypted connections in MagicOnion.
 
-### Server-side
-In general, HTTPS encryption settings on the server follow ASP.NET Core. For more information, see [Enforce HTTPS in ASP.NET Core | Microsoft Docs](https://docs.microsoft.com/ja-jp/aspnet/core/security/enforcing-ssl).
+## Server
+The server-side HTTPS encryption settings follow ASP.NET Core. For more information, see [Enforcing HTTPS in ASP.NET Core | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl).
 
-> **NOTE**: The limitations on macOS environment and when running on Docker are also described in ASP.NET Core documentation.
+## Client
+The behavior and settings of HTTPS encryption on the client side depend on whether the runtime is .NET Framework/.NET 8 or later or Unity. This affects the use of development certificates.
 
-### Client-side
-Depending on whether the client supports .NET Standard 2.1 or .NET Standard 2.1 (including Unity), the configuration is different.
+### .NET Framework or .NET 8+
+On .NET Framework or .NET runtimes, certificate handling is the same as the standard behavior of `HttpClient` and uses the OS certificate store. For example, in Windows, certificates are validated using the Windows certificate store.
 
-#### .NET Standard 2.1 or .NET 6+
-If the client supports .NET Standard 2.1 or newer, MagicOnion uses `Grpc.Net.Client` (a pure C# implementation) for gRPC connection.
+### Unity
+When the client is Unity, MagicOnion recommends using YetAnotherHttpHandler. YetAnotherHttpHandler has its own certificate store, so additional settings are required when using development certificates. For more information, see [YetAnotherHttpHandler README](https://github.com/Cysharp/YetAnotherHttpHandler?tab=readme-ov-file#advanced).
 
-Grpc.Net.Client uses `HttpClient` internally, so it handles certificates the same way as `HttpClient`. For example, on Windows, it uses Windows's certificate store to validate certificates.
+## Using non-encrypted HTTP connections without TLS
+In general, we recommend using HTTPS for connections between servers and clients. However, there may be cases where you want to temporarily set up a non-encrypted connection, such as during development. You can configure non-encrypted HTTP/2 connections by changing the settings (non-encrypted HTTP/2 is called HTTP/2 over cleartext (h2c)).
 
-#### .NET Standard 2.0 (.NET Framework 4.6.1+)
-If the client supports .NET Standard 2.0, MagicOnion uses `Grpc.Core` (C-library binding) for gRPC connection.
-
-Grpc.Core has its [own certificate store built into the library](https://github.com/grpc/grpc/blob/master/etc/roots.pem) and uses it unless you specify a certificate. This certificate store contains common CAs and is rarely a problem in production environment.
-
-However, there is a problem when connecting with a server using [ASP.NET Core development certificate](https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=visual-studio#trust-the-aspnet-core-https-development-certificate-on-windows-and-macos). For example, if you see the following exceptions when you try to connect, the server certificate validation may have failed.
-
-```
-Grpc.Core.RpcException: 'Status(StatusCode="Unavailable", Detail="failed to connect to all addresses", ...')
-```
-
-The following workarounds are suggested for such cases:
-
-- Issue and configure a trusted certificate to the server
-- Use OpenSSL commands to issue and configure self-signed certificates to servers and clients
-- Unencrypted connection without TLS
-
-### Use HTTP unencrypted connection without TLS
-It is recommended to use HTTPS for server-client connection, but in some cases during development you may want to configure unencrypted connection. Also, you need to configure unencrypted connection in macOS because ALPN over TLS is not supported.
-
-#### Server-side
-To allow your server to accept unencrypted HTTP/2, you must configure an endpoint to listen to Kestrel. Endpoints can be configured either by using `appsettings.json` or directly in the source code.
-
-See also [Unable to start ASP.NET Core gRPC app on macOS | Troubleshoot gRPC on .NET Core](https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot#unable-to-start-aspnet-core-grpc-app-on-macos) for details.
+### Server
+To accept non-encrypted HTTP/2 connections, you need to configure the endpoint in Kestrel. You can configure the endpoint in `appsettings.
 
 ```json
 {
@@ -64,30 +43,41 @@ See also [Unable to start ASP.NET Core gRPC app on macOS | Troubleshoot gRPC on 
 }
 ```
 
+or
+
 ```csharp
-webBuilder
-    .UseKestrel(options =>
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during development.
+    options.ConfigureEndpointDefaults(endpointOptions =>
     {
-        // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during development.
-        options.ConfigureEndpointDefaults(endpointOptions =>
-        {
-            endpointOptions.Protocols = HttpProtocols.Http2;
-        });
-    })
-    .UseStartup<Startup>();
+        endpointOptions.Protocols = HttpProtocols.Http2;
+    });
+});
 ```
 
-#### Client-side (.NET Standard 2.1 or .NET 6+; Grpc.Net.Client)
-When calling `GrpcChannel.ForAddress`, change the URL scheme to HTTP and the port to an unencrypted port.
+### Client
+You need to change the URL scheme to HTTP and the port number to an unencrypted port when calling `GrpcChannel.ForAddress`.
 
 ```csharp
 var channel = GrpcChannel.ForAddress("http://localhost:5000");
 ```
 
-See also [Call insecure gRPC services with .NET Core client | Troubleshoot gRPC on .NET Core | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client) for details.
+For more information, see [Call insecure gRPC services with .NET Core client | Troubleshoot gRPC on .NET Core | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client).
 
-#### Limitations
-If unencrypted HTTP/2 connection is accepted, HTTP/1 and HTTP/2 cannot be served on the same port.
-When TLS is enabled, ALPN is used for HTTP/2 negotiation, but with non-TLS, this is not possible.
+#### Additional configuration for Unity client
 
-If you want HTTP/1 and HTTP/2 to work together for the convenience of hosting a web site or API, you can listen on multiple ports by configuring Kestrel.
+When you are using YetAnotherHttpHandler in Unity, you need to specify the `Http2Only` option when creating an instance of YetAnotherHttpHandler.
+
+```csharp
+var handler = new YetAnotherHttpHandler(new()
+{
+    Http2Only = true,
+});
+```
+
+
+### Limitations
+If you want to accept non-encrypted HTTP/2 connections, you cannot provide HTTP/1 and HTTP/2 on the same port. This is because when accepting non-encrypted HTTP/2 connections, ALPN is used for HTTP/2 negotiation, which cannot be done without TLS.
+
+If you want to host a website or API that supports both HTTP/1 and HTTP/2, you can achieve this by configuring Kestrel to listen on multiple ports.
