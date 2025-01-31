@@ -146,4 +146,4 @@ public class CustomAuthorizeAttribute : MagicOnionFilterAttribute
 }
 ```
 
-詳しくは [フィルター](/filter/) を参照してください。
+詳しくは [フィルター](/filter/fundamentals) を参照してください。

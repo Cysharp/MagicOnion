@@ -4,9 +4,9 @@ MagicOnion provides two types of API implementation methods: Unary services and 
 The differences between Unary and StreamingHub are as follows:
 
 - Unary is a simple HTTP POST request that processes one request and one response at a time
-    - See: [Unary service fundamentals](/unary/)
+    - See: [Unary service fundamentals](/unary/fundamentals)
 - StreamingHub is bidirectional communication that sends messages between the client and server using a continuous connection
-    - See: [StreamingHub fundamentals](/streaminghub/)
+    - See: [StreamingHub fundamentals](/streaminghub/fundamentals)
 
 ![](/img/docs/fig-unary-streaminghub.png)
 
