@@ -110,5 +110,5 @@ Console.WriteLine($"Result: {result}");
 ```
 
 :::tip
-When using MagicOnion client in Unity applications, see also [Using in Unity](/installation/unity).
+When using MagicOnion client in Unity applications, see also [Works with Unity](/installation/unity).
 :::

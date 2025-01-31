@@ -26,6 +26,8 @@ MagicOnion can be adopted or replaced in the following use cases:
 
 MagicOnion supports API services and real-time communication, making it suitable for various use cases. You can use either of these features separately, but configurations that combine both are also supported.
 
+More information about MagicOnion can be found in the [MagicOnion documentation](https://cysharp.github.io/MagicOnion/).
+
 ## Supported Platforms
 
 MagicOnion is designed to run on various .NET platforms. The requirements for the server and client are as follows.
@@ -157,7 +159,10 @@ Console.WriteLine($"Result: {result}");
 ```
 
 > [!TIP]
-> When using MagicOnion client in Unity applications, see also [Using in Unity](https://cysharp.github.io/MagicOnion/installation/unity).
+> When using MagicOnion client in Unity applications, see also [Works with Unity](https://cysharp.github.io/MagicOnion/installation/unity).
+
+## More detailed documentation
+More information about MagicOnion can be found in the [MagicOnion documentation](https://cysharp.github.io/MagicOnion/).
 
 ## License
 This library is under the MIT License.
