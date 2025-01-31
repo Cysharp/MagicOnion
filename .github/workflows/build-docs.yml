@@ -1,29 +1,57 @@
-name: Update Docs
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
 
 jobs:
-  run-docfx:
+  build:
+    name: Build Docusaurus
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
         with:
-          repository: Cysharp/DocfxTemplate
-          path: docs/_DocfxTemplate
-      - uses: Kirbyrawr/docfx-action@master
-        name: Docfx metadata
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
         with:
-          args: metadata docs/docfx.json
-      - uses: Kirbyrawr/docfx-action@master
-        name: Docfx build
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          args: build docs/docfx.json
-      - name: Publish to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+          node-version: 18
+          cache: 'pnpm'
+          cache-dependency-path: 'docs/pnpm-lock.yaml'
+      - name: Install dependencies
+        working-directory: docs
+        run: pnpm install --frozen-lockfile
+      - name: Build website
+        working-directory: docs
+        run: pnpm build
+
+      - name: Upload Build Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_site
+          path: docs/build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
