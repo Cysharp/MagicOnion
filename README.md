@@ -1,5 +1,5 @@
 # MagicOnion
-![build-debug](https://github.com/Cysharp/MagicOnion/workflows/build-debug/badge.svg) ![build-canary](https://github.com/Cysharp/MagicOnion/workflows/build-canary/badge.svg) ![build-release](https://github.com/Cysharp/MagicOnion/workflows/build-release/badge.svg) [![Releases](https://img.shields.io/github/release/Cysharp/MagicOnion.svg)](https://github.com/Cysharp/MagicOnion/releases)
+[![Build](https://github.com/Cysharp/MagicOnion/actions/workflows/build.yml/badge.svg)](https://github.com/Cysharp/MagicOnion/actions/workflows/build.yml) [![Build Canary](https://github.com/Cysharp/MagicOnion/actions/workflows/build-canary.yml/badge.svg)](https://github.com/Cysharp/MagicOnion/actions/workflows/build-canary.yml) [![Release](https://github.com/Cysharp/MagicOnion/actions/workflows/release.yml/badge.svg)](https://github.com/Cysharp/MagicOnion/actions/workflows/release.yml) [![Releases](https://img.shields.io/github/release/Cysharp/MagicOnion.svg)](https://github.com/Cysharp/MagicOnion/releases)
 
 Unified Realtime/API framework for .NET platform and Unity.
 
