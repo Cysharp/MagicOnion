@@ -1,21 +1,22 @@
-# クイックスタート
-このガイドではシンプルな MagicOnion サーバーとクライアントを作成する方法を示します。サーバーは、2 つの数値を加算するシンプルなサービスを提供し、クライアントはサービスを呼び出して結果を取得します。
+# 빠른 시작
+이 가이드에서는 간단한 MagicOnion 서버와 클라이언트를 만드는 방법을 소개합니다. 서버는 두 개의 숫자를 더하는 간단한 서비스를 제공하고, 클라이언트는 서비스를 호출하여 결과를 얻습니다.
 
-MagicOnion は Web API のような RPC サービスとリアルタイム通信の StreamingHub を提供します。このセクションでは Web API のような RPC サービスを実装します。
+MagicOnion은 Web API와 같은 RPC 서비스와 실시간 통신을 위한 StreamingHub를 제공합니다. 이 섹션에서는 Web API와 같은 RPC 서비스를 이용해 구현합니다.
 
-## サーバーサイド: サービスの定義と実装
+## 서버 측: 서비스 정의 및 구현
 
-初めに、MagicOnion サーバープロジェクトを作成し、サービスインターフェイスを定義して実装します。
+먼저 MagicOnion 서버 프로젝트를 생성하고 서비스 인터페이스를 정의하고 구현합니다.
 
-### 1. MagicOnion 用の gRPC サーバープロジェクトのセットアップ
+### 1. MagicOnion용 gRPC 서버 프로젝트 설정하기
 
-Minimal API プロジェクトから始める（詳細: [ASP.NET Core で最小限の Web API を作成するチュートリアル](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api)）ため、**ASP.NET Core Empty** テンプレートからプロジェクトを作成します。プロジェクトには NuGet パッケージ `MagicOnion.Server` を追加します。.NET CLI ツールを使用して追加する場合は、次のコマンドを実行します。
+
+Minimal API 프로젝트부터 시작하기 위해 (상세: [ASP.NET Core를 사용하여 최소 API 만들기](https://learn.microsoft.com/ko-kr/aspnet/core/tutorials/min-web-api)), **ASP.NET Core Empty** 템플릿에서 프로젝트를 생성합니다. 프로젝트에 NuGet 패키지 `MagicOnion.Server`를 추가합니다. .NET CLI 도구를 사용하여 추가하는 경우 다음 명령을 실행합니다.
 
 ```bash
 dotnet add package MagicOnion.Server
 ```
 
-`Program.cs` を開いて、Services と App にいくつかの設定を追加します。
+`Program.cs`를 열고 Services와 App에 몇 가지 설정을 추가합니다.
 
 ```csharp
 using MagicOnion;
@@ -32,13 +33,13 @@ app.MapMagicOnionService(); // Add this line
 app.Run();
 ```
 
-以上で、サーバープロジェクトで MagicOnion を使用する準備が整いました。
+이제 서버 프로젝트에서 MagicOnion을 사용할 준비가 되었습니다.
 
-### 2. サービスの実装
+### 2. 서비스 구현
 
-`IMyFirstService` インターフェースを追加して、サーバーとクライアント間で共有します。ここでは共有するインターフェースを含む名前空間を MyApp.Shared としています。
+`IMyFirstService` 인터페이스를 추가하여 서버와 클라이언트 간에 공유합니다. 여기서는 공유할 인터페이스를 포함하는 네임스페이스를 MyApp.Shared로 지정합니다.
 
-戻り値は `UnaryResult` または `UnaryResult<T>` 型である必要があり、これは Task や ValueTask と同様に非同期メソッドとして扱われます。
+반환값은 `UnaryResult` 또는 `UnaryResult<T>` 타입이어야 하며, `Task`나 `ValueTask`와 마찬가지로 비동기 메서드로 취급됩니다.
 
 ```csharp
 using System;
@@ -56,7 +57,7 @@ namespace MyApp.Shared
 }
 ```
 
-`IMyFirstService` インターフェースを実装するクラスを追加します。クライアントからの呼び出しはこのクラスで処理します。
+`IMyFirstService` 인터페이스를 구현하는 클래스를 추가합니다. 클라이언트로부터의 호출은 이 클래스에서 처리한다.
 
 ```csharp
 using MagicOnion;
@@ -78,19 +79,19 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 }
 ```
 
-これでサービスの定義と実装が行えました。
+이제 서비스를 정의하고 구현할 수 있게 되었습니다.
 
-MagicOnion サーバーを開始する準備が整いました。F5 キーを押すか `dotnet run` コマンドを使用して MagicOnion サーバーを開始できます。この際にサーバーが起動したときに表示される URL はクライアントから接続する先となるためメモしておいてください。
+MagicOnion 서버를 시작할 준비가 완료되었습니다. F5 키를 누르거나 `dotnet run` 명령을 사용하여 MagicOnion 서버를 시작할 수 있습니다. 이때 서버가 시작될 때 표시되는 URL은 클라이언트에서 연결할 주소가 되므로 메모해 두시기 바랍니다.
 
-## クライアントサイド: サービスの呼び出し
+## 클라이언트 측: 서비스 호출
 
-**コンソール アプリケーション** プロジェクトを作成し、NuGet パッケージ `MagicOnion.Client` を追加します。
+**콘솔 애플리케이션** 프로젝트를 생성하고 NuGet 패키지 `MagicOnion.Client`를 추가합니다.
 
-`IMyFirstService` インターフェースを共有し、クライアントで使用します。ファイルリンク、共有ライブラリ、またはコピー＆ペーストなど、様々な方法でインターフェースを共有できます。
+`IMyFirstService` 인터페이스를 공유하여 클라이언트에서 사용합니다. 파일 링크, 공유 라이브러리 또는 복사 및 붙여넣기 등 다양한 방법으로 인터페이스를 공유할 수 있습니다.
 
-クライアントコードでは `MagicOnionClient` で共有インターフェースを元にクライアントプロキシをに作成し、サービスを透過的に呼び出します。
+클라이언트 코드에서는 `MagicOnionClient`에서 공유 인터페이스를 기반으로 클라이언트 프록시를 생성하여 서비스를 투명하게 호출합니다.
 
-初めに gRPC のチャンネルを作成します。gRPC チャンネルは接続を抽象化したものであり先ほどメモした URL を `GrpcChannel.ForAddress` メソッドに渡して作成します。作成されたチャンネルを使用して MagicOnion のクライアントプロキシーを作成します。
+먼저 gRPC 채널을 생성합니다. gRPC 채널은 연결을 추상화한 것으로, 앞서 메모한 URL을 `GrpcChannel.ForAddress` 메서드에 전달하여 생성합니다. 생성된 채널을 사용하여 MagicOnion의 클라이언트 프록시를 생성합니다.
 
 
 ```csharp
@@ -110,5 +111,5 @@ Console.WriteLine($"Result: {result}");
 ```
 
 :::tip
-MagicOnion クライアントを Unity アプリケーションで使用する場合は、[Unity での利用](installation/unity)も参照してください。
+MagicOnion 클라이언트를 Unity 환경에서 사용하려면 [Unity 환경에서 사용하기](installation/unity)를 참고하세요.
 :::

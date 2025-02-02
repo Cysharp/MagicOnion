@@ -1,9 +1,9 @@
-# AOT サポート (IL2CPP, Native AOT)
+# AOT 지원 (IL2CPP, Native AOT)
 
-## クライアント
-MagicOnion のクライアントは Unity の IL2CPP や Native AOT といった AOT コンパイルをサポートしています。
+## 클라이언트
+MagicOnion의 클라이언트는 Unity의 IL2CPP나 Native AOT와 같은 AOT 컴파일을 지원합니다.
 
-これらの AOT コンパイルされた環境下で MagicOnion クライアントを使用するには Source Generator を使用する追加の設定が必要となります。詳しくは [Source Generator の事前クライアントコード生成](../source-generator/client) ページを参照してください。
+이러한 AOT 컴파일된 환경에서 MagicOnion 클라이언트를 사용하려면 Source Generator를 사용하는 추가 설정이 필요합니다. 자세한 내용은 [Source Generator의 사전 클라이언트 코드 생성](../source-generator/client) 페이지를 참조하시기 바랍니다.
 
-## サーバー
-v7.0.0 の時点ではサーバーは Native AOT をサポートしていません。
+## 서버
+v7.0.0 시점에서는 서버는 Native AOT를 지원하지 않습니다.

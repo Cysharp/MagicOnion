@@ -1,12 +1,12 @@
-# クライアント結果
+# 클라이언트 결과
 
 :::tip
-この機能は MagicOnion v7.0.0 で追加されました。
+이 기능은 MagicOnion v7.0.0에서 추가되었습니다.
 :::
 
-"クライアント結果" は [SignalR で実装されている同名の機能](https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0#client-results) に触発されたものです。
+"클라이언트 결과"는 [SignalR에서 구현된 동명의 기능](https://learn.microsoft.com/ko-kr/aspnet/core/signalr/hubs#client-results)에서 영감을 받은 것입니다.
 
-従来、StreamingHub はサーバーからクライアントに対してはメッセージを一方的に送信する(Fire-and-Forget)ことしかできませんでしたが、クライアント結果はサーバーの Hub やアプリケーションロジックから特定のクライアントのメソッドを呼び出し、その結果を受け取ることができます。
+기존에 StreamingHub는 서버에서 클라이언트에 대해서는 메시지를 일방적으로 송신하는(Fire-and-Forget) 것밖에 할 수 없었지만, 클라이언트 결과는 서버의 Hub나 애플리케이션 로직에서 특정 클라이언트의 메소드를 호출하고, 그 결과를 받을 수 있습니다.
 
 ```csharp
 interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
@@ -38,7 +38,7 @@ class MyHubReceiver : IMyHubReceiver
 }
 ```
 
-サーバー上ではグループの `Client` または `Single` を介してメソッド呼び出しを行い、結果を受け取ることができます。
+서버 상에서는 그룹의 `Client` 또는 `Single`을 통해 메소드 호출을 수행하고, 결과를 받을 수 있습니다.
 
 ```csharp
 var result = await Client.HelloAsync();
@@ -48,13 +48,13 @@ var result2 = await _group.Single(clientId).HelloAsync();
 Console.WriteLine(result2);
 ```
 
-## 例外
-クライアント上で例外が発生した場合、呼び出し元には `RpcException` がスローされ、接続が切断された場合やタイムアウトが発生した場合は `TaskCanceledException` (`OperationCanceledException`) がスローされます。
+## 예외
+클라이언트 상에서 예외가 발생한 경우, 호출자에게는 `RpcException`이 던져지고, 연결이 해제된 경우나 타임아웃이 발생한 경우는 `TaskCanceledException` (`OperationCanceledException`)이 던져집니다.
 
-## タイムアウト
-デフォルトではサーバーからクライアントへの呼び出しのタイムアウトは 5 秒です。タイムアウトが超過した場合、呼び出し元には `TaskCanceledException` (`OperationCanceledException`) がスローされます。デフォルトのタイムアウトは `MagicOnionOptions.ClientResultsDefaultTimeout` プロパティを介して設定できます。
+## 타임아웃
+기본적으로 서버에서 클라이언트로의 호출의 타임아웃은 5초입니다. 타임아웃이 초과된 경우, 호출자에게는 `TaskCanceledException` (`OperationCanceledException`)이 던져집니다. 기본 타임아웃은 `MagicOnionOptions.ClientResultsDefaultTimeout` 속성을 통해 설정할 수 있습니다.
 
-メソッド呼び出しごとにタイムアウトを明示的にオーバーライドするにはメソッド引数として `CancellationToken` を指定し、任意のタイミングで `CancellationToken` を渡してタイムアウトを指定します。このキャンセルはクライアントには伝播しないことに注意してください。クライアントは常に `default(CancellationToken)` を受け取ります。
+메소드 호출마다 타임아웃을 명시적으로 오버라이드하려면 메소드 인자로 `CancellationToken`을 지정하고, 임의의 타이밍에서 `CancellationToken`을 전달하여 타임아웃을 지정합니다. 이 취소는 클라이언트에게는 전파되지 않는다는 점에 주의해 주세요. 클라이언트는 항상 `default(CancellationToken)`을 받습니다.
 
 ```csharp
 interface IMyHubReceiver
@@ -68,7 +68,7 @@ var result = await Client.DoLongWorkAsync(cts.Token);
 Console.WriteLine(result);
 ```
 
-## 制限事項
-- 複数のクライアントに対して呼び出しを行うことはサポートされていません。`Client` または `Single` を使用する必要があります
-- グループのバックプレーンとして Redis または NAT が使用されている場合、クライアント結果はサポートされていません
-- クライアント側でのクライアント結果メソッド呼び出し中に Hub メソッドを呼び出すとデッドロックが発生します
+## 제한사항
+- 복수의 클라이언트에 대해 호출을 수행하는 것은 지원되지 않습니다. `Client` 또는 `Single`을 사용해야 합니다
+- 그룹의 백플레인으로 Redis 또는 NAT가 사용되고 있는 경우, 클라이언트 결과는 지원되지 않습니다
+- 클라이언트 측에서 클라이언트 결과 메소드 호출 중에 Hub 메소드를 호출하면 데드락이 발생합니다

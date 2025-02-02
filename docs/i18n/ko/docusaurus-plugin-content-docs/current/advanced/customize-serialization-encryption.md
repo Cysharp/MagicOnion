@@ -1,12 +1,12 @@
-# メッセージのシリアライズと暗号化のカスタマイズ
+# 메시지의 직렬화와 암호화 커스터마이징
 
-MagicOnion はデフォルトで通信のシリアライズに MessagePack を使用しますが、シリアライズ処理をカスタマイズするための拡張ポイントも提供しています。カスタマイズは MessagePack 以外のシリアライザーの使用や暗号化などが含まれます。
+MagicOnion은 기본적으로 통신의 직렬화에 MessagePack을 사용하지만, 직렬화 처리를 커스터마이징하기 위한 확장 포인트도 제공합니다. 커스터마이징은 MessagePack 이외의 시리얼라이저 사용이나 암호화 등이 포함됩니다.
 
-## カスタマイズ方法
+## 커스터마이징 방법
 
-シリアライズのカスタマイズは `IMagicOnionSerializerProvider` インターフェースとその `Create` メソッドが返す `IMagicOnionSerializer` インターフェースを実装したシリアライザーを実装します。
+직렬화의 커스터마이징은 `IMagicOnionSerializerProvider` 인터페이스와 그 `Create` 메소드가 반환하는 `IMagicOnionSerializer` 인터페이스를 구현한 시리얼라이저를 구현합니다.
 
-実装したシリアライザープロバイダーを `MagicOnionSerializerProvider.Default` プロパティーにセットするか、`MagicOnionClient`, `StramingHubClient` の引数に渡すことで使用できます。
+구현한 시리얼라이저 프로바이더를 `MagicOnionSerializerProvider.Default` 프로퍼티에 설정하거나, `MagicOnionClient`, `StreamingHubClient`의 인자로 전달하여 사용할 수 있습니다.
 
 ## API
 
@@ -37,8 +37,8 @@ public static class MagicOnionSerializerProvider
 }
 ```
 
-## サンプルコード
-以下のコードは XOR 暗号化を行う簡単な例です。
+## 샘플 코드
+다음 코드는 XOR 암호화를 수행하는 간단한 예시입니다.
 
 ```csharp
 public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider

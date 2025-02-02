@@ -1,19 +1,19 @@
-# 事前生成されたクライアントコード
+# Pre-generated client codes
 
-MagicOnion は Unity、NativeAOT など事前生成されたクライアントコードが必要なプラットフォームを Source Generator でサポートしています。
+MagicOnion은 Unity, NativeAOT 등 Pre-generated client codes가 필요한 플랫폼을 Source Generator로 지원합니다.
 
-Source Generator は MagicOnion.Client パッケージに同梱されているため、以前のバージョンのようなコード生成ツール (moc) のインストールや追加のビルドステップの設定は不要です。
+Source Generator는 MagicOnion.Client 패키지에 포함되어 있으므로, 이전 버전과 같은 코드 생성 도구(moc)의 설치나 추가 빌드 단계 설정이 불필요합니다.
 
-## サポートされている開発環境
-- Unity 2022.3.0f1 以降
-- .NET 6 以降
-- Visual Studio 2022 version 17.2 以降
-- Rider 2023.1 以降
+## 지원되는 개발 환경
+- Unity 2022.3.0f1 이상
+- .NET 6 이상
+- Visual Studio 2022 version 17.2 이상
+- Rider 2023.1 이상
 
-## 使用方法
-任意の名前の `partial` クラスをアプリケーション内に定義します。そして `MagicOnionClientGeneration` 属性を付け、サービスインターフェースを検索する対象となるアセンブリ内の任意の型を指定します。
+## 사용 방법
+임의의 이름의 `partial` 클래스를 애플리케이션 내에 정의합니다. 그리고 `MagicOnionClientGeneration` 속성을 붙이고, 서비스 인터페이스를 검색할 대상이 되는 어셈블리 내의 임의의 타입을 지정합니다.
 
-たとえば `MyApp.Shared` アセンブリに `MyApp.Shared.Services.IGreeterService` と `MyApp.Shared.Hubs.IChatHub` が含まれている場合そのうちの一つを指定します。
+예를 들어 `MyApp.Shared` 어셈블리에 `MyApp.Shared.Services.IGreeterService`와 `MyApp.Shared.Hubs.IChatHub`가 포함되어 있는 경우 그 중 하나를 지정합니다.
 
 ```csharp
 using MagicOnion.Client;
@@ -22,7 +22,7 @@ using MagicOnion.Client;
 partial class MagicOnionGeneratedClientInitializer {}
 ```
 
-次に生成された MessagePack Resolver (`MagicOnionGeneratedClientInitializer.Resolver` プロパティ)を使用するように MessagePack を構成します。これは従来の MagicOnion.Generator を使用する場合と同様です。
+다음으로 생성된 MessagePack Resolver(`MagicOnionGeneratedClientInitializer.Resolver` 프로퍼티)를 사용하도록 MessagePack을 구성합니다. 이는 기존의 MagicOnion.Generator를 사용하는 경우와 동일합니다.
 
 ```csharp
 #if UNITY_2019_4_OR_NEWER
@@ -43,19 +43,18 @@ static void RegisterResolvers()
 }
 ```
 
-## ソース生成オプション
-コンストラクターの名前付き引数でオプションを指定できます。
+## 소스 생성 옵션
+생성자의 명명된 인자로 옵션을 지정할 수 있습니다.
 
-- **`DisableAutoRegistration`**: 起動時に `<MagicOnionClientGeneration属性を付加したクラス>.Register` メソッドを自動的に呼び出す機能を無効にするかどうかを設定します (自動登録は .NET 5+ または Unity でのみ機能します)
-    - このオプションにより `Register` を呼び出さなかった場合、手動で呼び出すかクライアント作成時に `ClientFactoryProvider` または `StreamingHubClientFactoryProvider` プロパティーを渡す必要があります
-- **`Serializer`**: シリアライズに使用するシリアライザーを設定します。デフォルトは `GenerateSerializerType.MessagePack` です
+- **`DisableAutoRegistration`**: 시작 시 `<MagicOnionClientGeneration속성을 추가한 클래스>.Register` 메소드를 자동으로 호출하는 기능을 비활성화할지 여부를 설정합니다 (자동 등록은 .NET 5+ 또는 Unity에서만 작동합니다)
+    - 이 옵션으로 `Register`를 호출하지 않은 경우, 수동으로 호출하거나 클라이언트 생성 시 `ClientFactoryProvider` 또는 `StreamingHubClientFactoryProvider` 프로퍼티를 전달해야 합니다
+- **`Serializer`**: 직렬화에 사용할 시리얼라이저를 설정합니다. 기본값은 `GenerateSerializerType.MessagePack`입니다
 
-### 追加のオプション
+### 추가 옵션
 
-`MagicOnionClientGenerationOption` 属性で追加のオプションを指定できます。
+`MagicOnionClientGenerationOption` 속성으로 추가 옵션을 지정할 수 있습니다.
 
-MessagePack 向けには過去の mpc との互換性のためのオプションが存在します。
+MessagePack을 위해서는 과거의 mpc와의 호환성을 위한 옵션이 존재합니다.
 
-- **`MessagePack.FormatterNamespace`**: 事前生成された Formatter の名前空間を指定します。デフォルトは `MessagePack.Formatters` です
-- **`MessagePack.GenerateResolverForCustomFormatter`**: 事前生成された MessagePack Formatter を使用するかどうかを指定します。デフォルトは `false` です
-
+- **`MessagePack.FormatterNamespace`**: 사전 생성된 Formatter의 네임스페이스를 지정합니다. 기본값은 `MessagePack.Formatters`입니다
+- **`MessagePack.GenerateResolverForCustomFormatter`**: 사전 생성된 MessagePack Formatter를 사용할지 여부를 지정합니다. 기본값은 `false`입니다

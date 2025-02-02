@@ -1,17 +1,17 @@
-# 認証
+# 인증
 
-MagicOnion 自体には認証機能はありませんが、ASP.NET Core の認証機能を利用することで MagicOnion サーバーに認証機能を実装できます。ASP.NET Core の機能を使用しない場合であっても、MagicOnion のフィルター機能を使用して独自の認証機能を実装することもできます。
+MagicOnion 자체에는 인증 기능이 없지만, ASP.NET Core의 인증 기능을 이용하여 MagicOnion 서버에 인증 기능을 구현할 수 있습니다. ASP.NET Core의 기능을 사용하지 않는 경우에도, MagicOnion의 필더(Filter) 기능을 사용하여 독자적인 인증 기능을 구현할 수도 있습니다.
 
-このガイドではそれぞれの実装方法を簡単に紹介します。
+이 가이드에서는 각각의 구현 방법을 간단히 소개합니다.
 
-## JWT (JSON Web Token) ベアラー認証 (ヘッダー認証)
+## JWT (JSON Web Token) Bearer 인증 (Header 인증)
 
-JWT (JSON Web Token) を使用したベアラー認証は ASP.NET Core の認証機能で実装できます。ここでは、JWT を使用した認証の実装例を説明します。また、ASP.NET Core の認証についての詳しい情報は [ASP.NET Core のドキュメント](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-9.0) を参照してください。
+JWT(JSON Web Token)를 사용한 Bearer 인증은 ASP.NET Core의 인증 기능으로 구현할 수 있습니다. 여기서는 JWT를 사용한 인증의 구현 예시를 설명합니다. 또한, [ASP.NET Core 인증](https://learn.microsoft.com/ko-kr/aspnet/core/security/authentication/)에 대한 자세한 정보는 ASP.NET Core의 문서를 참조해 주세요.
 
-また、ASP.NET Core の機能を利用することの利点として `HttpContext` から認証されたユーザー情報を取得できる点があります。
+또한, ASP.NET Core의 기능을 이용하는 것의 장점으로 `HttpContext`에서 인증된 사용자 정보를 가져올 수 있다는 점이 있습니다.
 
-### 認証/認可ミドルウェアの追加
-ASP.NET Core の認証機能を使用するためにサービスの認証関連のサービスの追加と HTTP パイプラインに認証/認可のミドルウェアを追加が必要です。
+### 인증(Authentication)/권한 부여(Authorization) 미들웨어 추가
+ASP.NET Core의 인증 기능을 사용하기 위해 서비스의 인증 관련 서비스의 추가와 HTTP 파이프라인에 인증/권한 부여 미들웨어의 추가가 필요합니다.
 
 ```csharp
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -42,9 +42,9 @@ app.UseAuthorization();
 app.MapMagicOnionService();
 ```
 
-### JWT トークンの生成
+### JWT 토큰 생성
 
-JWT トークンの生成は、`System.IdentityModel.Tokens.Jwt` パッケージを使用して行います。以下は JWT トークンを生成してクライアントに返す例です。
+JWT 토큰의 생성은 `System.IdentityModel.Tokens.Jwt` 패키지를 사용하여 수행합니다. 다음은 JWT 토큰을 생성하여 클라이언트에 반환하는 예시입니다.
 
 ```csharp
 var userName = "Alice";
@@ -71,11 +71,11 @@ return new TokenResponse
 };
 ```
 
-### サービスで認証を必須とする
+### 서비스에서 인증을 필수로 하기
 
-サービスで認証されたユーザーのみがアクセスできるようにするには `Authorize` 属性をクラスまたはメソッドに適用します。これは ASP.NET Core の `Authorize` 属性です。必要に応じて `Role` を指定することも可能です。詳しくは ASP.NET Core のドキュメントを参照してください。
+서비스에서 인증된 사용자만이 접근할 수 있도록 하려면 `Authorize` 속성을 클래스 또는 메서드에 적용합니다. 이는 ASP.NET Core의 `Authorize` 속성입니다. 필요에 따라 `Role`을 지정하는 것도 가능합니다. 자세한 내용은 [ASP.NET Core의 문서](https://learn.microsoft.com/ko-kr/aspnet/core/security/authorization/simple)를 참조해 주세요.
 
-正しく認証された場合、`Context.CallContext.GetHttpContext().User` と、その `UserPrincipal` の `Identity` プロパティから認証されたユーザーを取得できます。
+올바르게 인증된 경우, `Context.CallContext.GetHttpContext().User`와, 그 `UserPrincipal`의 `Identity` 속성에서 인증된 사용자를 가져올 수 있습니다.
 
 ```csharp
 [Authorize]
@@ -89,9 +89,9 @@ public class GreeterService : ServiceBase<IGreeterService>, IGreeterService
 }
 ```
 
-#### 匿名アクセスを許可する
+#### 익명 액세스를 허용하기
 
-サービス全体に認証を必須としている場合でも、個別のメソッドに `AllowAnonymous` 属性を使用して匿名アクセスを許可することもできます。
+서비스 전체에 인증을 필수로 하고 있는 경우에도, 개별 메서드에 `AllowAnonymous` 속성을 사용하여 익명 액세스를 허용할 수도 있습니다.
 
 ```csharp
 [Authorize]
@@ -111,8 +111,8 @@ public class GreeterService : ServiceBase<IGreeterService>, IGreeterService
 }
 ```
 
-### クライアントで JWT トークンをリクエストに付加する
-クライアントで JWT トークンをリクエストに付加するには、`MagicOnionClient` の `WithHeaders` メソッドを使用します。
+### 클라이언트에서 JWT 토큰을 요청에 추가하기
+클라이언트에서 JWT 토큰을 요청에 추가하려면, `MagicOnionClient`의 `WithHeaders` 메서드를 사용합니다.
 
 ```csharp
 var client = MagicOnionClient.Create<IGreeterService>(channel).WithHeaders(new Metadata {
@@ -120,11 +120,11 @@ var client = MagicOnionClient.Create<IGreeterService>(channel).WithHeaders(new M
 });
 ```
 
-リクエストに付加するその他の方法については [メタデータとヘッダー](/unary/metadata) を参照してください。
+요청에 추가하는 기타 방법에 대해서는 [메타데이터와 헤더](../unary/metadata) 페이지를 참조하시기 바랍니다.
 
 
-## フィルター認証
-フィルターではリクエストを処理する前にヘッダーの値を検証できることを利用して、独自の簡単な API キー検証を実装できます。
+## 필터(Filter) 인증
+필터에서는 요청을 처리하기 전에 헤더의 값을 검증할 수 있음을 이용하여, 독자적인 간단한 API 키 검증을 구현할 수 있습니다.
 
 ```csharp
 public class CustomAuthorizeAttribute : MagicOnionFilterAttribute
@@ -139,11 +139,11 @@ public class CustomAuthorizeAttribute : MagicOnionFilterAttribute
             return;
         }
 
-        // ここで認証処理を行う
+        // 여기서 인증 처리 하기
 
         await next(context);
     }
 }
 ```
 
-詳しくは [フィルター](/filter/fundamentals) を参照してください。
+자세한 내용은 [필터](/filter/fundamentals) 페이지를 참조하시기 바랍니다.

@@ -1,16 +1,15 @@
-# クライアントフィルター
+# 클라이언트 필터
 
-クライアントフィルターはクライアント上で、サービスのメソッドの呼び出し前後をフックする強力な機能です。フィルターは gRPC サーバーインターセプターと似たような機能を提供しますが、HttpClient のハンドラーのような馴染みやすいプログラミングモデルを提供します。
-
+클라이언트 필터는 클라이언트 상에서, 서비스의 메소드 호출 전후를 후크하는 강력한 기능입니다. 필터는 gRPC 서버 인터셉터와 비슷한 기능을 제공하지만, HttpClient의 핸들러와 같은 친숙한 프로그래밍 모델을 제공합니다.
 
 :::info
-現時点では Unary のみをサポートします。
+현시점에서는 Unary만을 지원합니다.
 :::
 
-## 実装と使用方法
-クライアントフィルターを実装するには `IClientFilter` インターフェースを実装します。これは HttpClient の HttpMessageHandler や ASP.NET Core のミドルウェアと同じプログラミングモデルです。
+## 구현과 사용 방법
+클라이언트 필터를 구현하려면 `IClientFilter` 인터페이스를 구현합니다. 이는 HttpClient의 HttpMessageHandler나 ASP.NET Core의 미들웨어와 같은 프로그래밍 모델입니다.
 
-フィルター内では `next` デリゲートを呼び出すことで次のフィルターまたは実際のメソッドを呼び出します。例えば `next` の呼び出しをスキップしたり、`next` の呼び出しの例外をキャッチすることで例外時の処理を追加するといったことが可能です。
+필터 내에서는 `next` 델리게이트를 호출함으로써 다음 필터 또는 실제 메소드를 호출합니다. 예를 들어 `next`의 호출을 스킵하거나, `next`의 호출의 예외를 캐치함으로써 예외 시의 처리를 추가하는 등의 것이 가능합니다.
 
 ```csharp
 public class DemoFilter : IClientFilter
@@ -50,14 +49,13 @@ public class DemoFilter : IClientFilter
 }
 ```
 
-`ResponseContext` のインスタンスを新規に作成して返すことでメソッドを呼び出さずにフィルターで処理を終了することも可能です。これによりモックのような実装を実現できます。
+`ResponseContext` 인스턴스를 새로 생성하여 반환함으로써 메소드를 호출하지 않고 필터에서 처리를 종료하는 것도 가능합니다. 이를 통해 목(mock)과 같은 구현을 실현할 수 있습니다.
 
 :::warning
-`RequestContext` から `CallOptions` を取得して変更することでリクエストヘッダーを変更することができます。ただし、`CallOptions` は MagicOnionClient インスタンスごとに保持されるため、リクエスト毎に追加すると重複登録となるため注意してください。
+`RequestContext`에서 `CallOptions`를 취득하여 변경함으로써 요청 헤더를 변경할 수 있습니다. 단, `CallOptions`는 MagicOnionClient 인스턴스마다 보유되기 때문에, 요청마다 추가하면 중복 등록이 되므로 주의해 주세요.
 :::
 
-
-実装したフィルターをクライアントで使用するには `MagicOnionClient.Create` の引数で `IClientFilter` の配列を指定します。
+구현한 필터를 클라이언트에서 사용하려면 `MagicOnionClient.Create`의 인자로 `IClientFilter`의 배열을 지정합니다.
 
 ```csharp
 var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
@@ -69,9 +67,9 @@ var client = MagicOnionClient.Create<ICalcService>(channel, new IClientFilter[]
 });
 ```
 
-## サンプル実装例
+## 샘플 구현 예
 
-以下はヘッダーを追加する例や、リクエストのログを出力する例、リトライ処理を行う例などのサンプルです。
+다음은 헤더를 추가하는 예시나, 요청의 로그를 출력하는 예시, 재시도 처리를 수행하는 예시 등의 샘플입니다.
 
 ```csharp
 public class AppendHeaderFilter : IClientFilter

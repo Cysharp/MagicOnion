@@ -4,39 +4,39 @@
     "description": "The label for version current"
   },
   "sidebar.docsSidebar.category.Installation": {
-    "message": "インストール",
+    "message": "설치",
     "description": "The label for category Installation in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.What's new": {
-    "message": "新機能",
+    "message": "새로운 기능",
     "description": "The label for category What's new in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Fundamentals": {
-    "message": "基礎",
+    "message": "기초",
     "description": "The label for category Fundamentals in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Logging and Monitoring": {
-    "message": "ログと監視",
+    "message": "로그 및 모니터링",
     "description": "The label for category Logging and Monitoring in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Unary service": {
-    "message": "Unary サービス",
+    "message": "Unary 서비스",
     "description": "The label for category Unary service in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.StreamingHub service": {
-    "message": "StreamingHub サービス",
+    "message": "StreamingHub 서비스",
     "description": "The label for category StreamingHub service in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Group": {
-    "message": "グループ",
+    "message": "그룹",
     "description": "The label for category Group in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Filter": {
-    "message": "フィルター",
+    "message": "필터",
     "description": "The label for category Filter in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Integration": {
-    "message": "インテグレーション",
+    "message": "통합",
     "description": "The label for category Integration in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Source Generator": {
@@ -44,7 +44,7 @@
     "description": "The label for category Source Generator in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Advanced": {
-    "message": "高度な機能",
+    "message": "고급 기능",
     "description": "The label for category Advanced in sidebar docsSidebar"
   }
 }

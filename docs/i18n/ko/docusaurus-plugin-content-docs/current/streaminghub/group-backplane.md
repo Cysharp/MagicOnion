@@ -1,7 +1,7 @@
-# グループを Redis や NATS で接続する
-MagicOnion のグループは Redis や NATS を使用して複数のサーバーインスタンス間で接続できます。これは SignalR のバックプレーンに相当する仕組みです。
+# 그룹을 Redis나 NATS로 연결하기
+MagicOnion의 그룹은 Redis나 NATS를 사용하여 복수의 서버 인스턴스 간에 연결할 수 있습니다. 이는 SignalR의 backplane에 해당하는 구조입니다.
 
-この仕組みを使用するとサーバーのインスタンスを問わず、特定の名前のグループに所属しているクライアントに対してメッセージを送信できます。これによりサーバーのスケールアウトが可能なアーキテクチャーを構築できます。
+이 구조를 사용하면 서버의 인스턴스와 관계없이, 특정 이름의 그룹에 소속되어 있는 클라이언트에 대해서 메시지를 송신할 수 있습니다. 이를 통해 서버의 스케일아웃이 가능한 아키텍처를 구축할 수 있습니다.
 
 ```mermaid
 flowchart TD
@@ -42,15 +42,15 @@ flowchart TD
     end
 ```
 
-## Redis を使用する
+## Redis 사용하기
 
-Redis を使用する場合は `MagicOnion.Server.Redis` パッケージをインストールします。
+Redis를 사용하는 경우는 `MagicOnion.Server.Redis` 패키지를 설치합니다.
 
 ```shell
 dotnet add package MagicOnion.Server.Redis
 ```
 
-次に `AddMagicOnion` で返されるビルダーに対して `UseRedisGroup` メソッドを使用して Redis を使用するよう設定します。
+다음으로 `AddMagicOnion`으로 반환되는 빌더에 대해서 `UseRedisGroup` 메소드를 사용하여 Redis를 사용하도록 설정합니다.
 
 ```csharp
 builder.Services.AddMagicOnion()
@@ -61,7 +61,7 @@ builder.Services.AddMagicOnion()
     });
 ```
 
-`UseRedisGroup` メソッドはオプション引数としてデフォルトのグループプロバイダーとするかどうかを指定する引数があります。デフォルトのグループプロバイダーとする場合は `true` を指定します。省略した場合や `false` を指定した場合は StreamingHub ごとに `[GroupConfiguration]` 属性を使用してグループプロバイダーを指定する必要があります。
+`UseRedisGroup` 메소드는 옵션 인자로서 기본 group provider로 할지 여부를 지정하는 인자가 있습니다. 기본 group provider로 하는 경우는 `true`를 지정합니다. 생략한 경우나 `false`를 지정한 경우는 StreamingHub마다 `[GroupConfiguration]` 속성을 사용하여 group provider를 지정할 필요가 있습니다.
 
 ```csharp
 [GroupConfiguration(typeof(RedisGroupProvider))]
@@ -71,21 +71,21 @@ public class MyStreamingHub : StreamingHubBase<IMyStreamingHub, IMyStreamingHubR
 }
 ```
 
-## NATS を使用する (プレビュー)
+## NATS 사용하기 (Preview)
 
-NATS のサポートは現時点でプレビューであり、Multicaster のパッケージとして提供されます。 NATS を使用するには `Multicaster.Distributed.Nats` パッケージをインストールします。
+NATS의 지원은 현시점에서 Preview이며, Multicaster의 패키지로서 제공됩니다. NATS를 사용하려면 `Multicaster.Distributed.Nats` 패키지를 설치합니다.
 
 ```shell
 dotnet add package Multicaster.Distributed.Nats
 ```
 
-次にサービスに `NatsGroupOptions` を登録します。
+다음으로 서비스에 `NatsGroupOptions`를 등록합니다.
 
 ```csharp
 builder.Services.AddSingleton<NatsGroupOptions>(new NatsGroupOptions() { Url = "nats://localhost:4222" });
 ```
 
-NATS を使用するグループを使う StreamingHub で `[GroupConfiguration]` 属性を使用してグループプロバイダーを指定します。
+NATS를 사용하는 그룹을 사용하는 StreamingHub에서 `[GroupConfiguration]` 속성을 사용하여 group provider를 지정합니다.
 
 ```csharp
 [GroupConfiguration(typeof(NatsGroupProvider))]
@@ -95,14 +95,14 @@ public class MyStreamingHub : StreamingHubBase<IMyStreamingHub, IMyStreamingHubR
 }
 ```
 
-デフォルトのグループプロバイダーとしたい場合は以下のように `IMulticastGroupProvier` を入れ替えます。
+기본 group provider로 하고 싶은 경우는 다음과 같이 `IMulticastGroupProvier`를 교체합니다.
 
 ```csharp
 builder.Services.RemoveAll<IMulticastGroupProvider>();
 builder.Services.AddSingleton<IMulticastGroupProvider, NatsGroupProvider>();
 ```
 
-## 制限事項
+## 제한 사항
 
-- クライアント結果はサポートされません
-- `Count`, `CountAsync` メソッドはサポートされません
+- 클라이언트 결과는 지원되지 않습니다
+- `Count`, `CountAsync` 메소드는 지원되지 않습니다

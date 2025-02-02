@@ -1,41 +1,41 @@
-# ServiceContext とライフサイクル
+# ServiceContext와 Lifecycle
 
 ## ServiceContext
 
-Unary サービスと StreamingHub のメソッド、およびフィルター内では `this.Context` で `ServiceContext` にアクセスできます。
+Unary 서비스와 StreamingHub 메서드, 그리고 필터 내부에서 `this.Context`를 통해 `ServiceContext`에 접근할 수 있습니다.
 
-| プロパティ | 型 | 説明 |
+| 속성 | 타입 | 설명 |
 | --- | --- | --- |
-| Items | `ConcurrentDictionary<string, object>` | リクエスト/接続ごとのオブジェクトストレージ |
-| ContextId | `Guid` | リクエスト(Service)ごと/接続(StreamingHub)ごとの一意の ID |
-| Timestamp | `DateTime` | リクエスト/接続開始時刻 |
-| ServiceType | `Type` | 呼び出されたクラス |
-| MethodInfo | `MethodInfo` | 呼び出されたメソッド |
-| AttributeLookup | `ILookup<Type, Attribute>` | サービスとメソッドの両方をマージしたキャッシュされた属性 |
-| CallContext | `ServerCallContext` | 生の gRPC コンテキスト |
-| MessageSerializer | `IMagicOnionSerializer` | 使用しているシリアライザー |
-| ServiceProvider | `IServiceProvider` | リクエストに関連付けられたサービスプロバイダー |
+| Items | `ConcurrentDictionary<string, object>` | 요청(request)/연결(connection)당 객체 저장소입니다. |
+| ContextId | `Guid` | 요청(서비스)/연결(StreamingHub)당 고유 ID입니다. |
+| Timestamp | `DateTime` | 요청/연결이 시작된 시간의 타임스탬프입니다. |
+| ServiceType | `Type` | 호출된 클래스입니다. |
+| MethodInfo | `MethodInfo` | 호출된 메서드입니다. |
+| AttributeLookup | `ILookup<Type, Attribute>` | 서비스와 메서드 모두에서 병합된 캐시된 속성들입니다. |
+| CallContext | `ServerCallContext` | Raw gRPC 컨텍스트입니다. |
+| MessageSerializer | `IMagicOnionSerializer` | 사용 중인 시리얼라이저입니다. |
+| ServiceProvider | `IServiceProvider` | 서비스 제공자를 가져옵니다. |
 
-`Items` は認証フィルターのような場所から値をセットし、サービスメソッドから取り出すために利用できます。
+`Items`는 인증 필터와 같은 곳에서 값을 설정하고, 서비스 메서드에서 가져오기 위해 사용할 수 있습니다.
 
 :::warning
-**ServiceContext をキャッシュしないでください。** ServiceContext はリクエスト中にのみ有効であり、MagicOnion はインスタンスを再利用する可能性があります。リクエスト後にコンテキストから参照されるオブジェクトの状態も不定です。
+**ServiceContext를 캐시하지 마십시오.** ServiceContext는 요청 중에만 유효하며 MagicOnion은 인스턴스를 재사용할 수 있습니다. 요청 후 컨텍스트에서 참조된 객체들의 상태도 정의되지 않습니다.
 :::
 
 :::warning
-ServiceContext は「接続ごと」のコンテキストです。StreamingHub 内でも ServiceContext にアクセスできますが、接続中は常に同じコンテキストを共有するため注意が必要です。例えば Timestamp は接続したときの時刻、メソッドに関連するプロパティーは常に特別なメソッドである `Connect` がセットされます。`Items` プロパティーも Hub メソッド呼び出し単位ではクリアされません。
+ServiceContext는 "연결당" 컨텍스트입니다. StreamingHub 내부에서 ServiceContext에 접근할 수 있지만, 동일한 컨텍스트가 연결 전체에서 공유된다는 점을 주의하세요. 예를 들어, Timestamp는 연결이 설정된 시간이며, 메서드와 관련된 속성들은 항상 `Connect`와 같은 특별한 메서드에 의해 설정됩니다. `Items` 속성은 Hub 메서드 호출마다 초기화되지 않습니다.
 
-StreamingHubFilter 内では StreamingHubContext を使用してください。StreamingHubContext は StreamingHub のメソッド呼び出しごとのコンテキストです。
+StreamingHubFilter 내부에서는 StreamingHubContext를 사용하세요. StreamingHubContext는 각 StreamingHub 메서드 호출에 대한 컨텍스트입니다.
 :::
 
-### グローバルな ServiceContext
-MagicOnion は HttpContext.Current のようにグローバルに現在のコンテキストを取得できます。`ServiceContext.Current` で取得できますが、`MagicOnionOptions.EnableCurrentContext = true` が必要です。デフォルトは `false` です。
+### 전역(global) ServiceContext
+MagicOnion은 HttpContext.Current처럼 전역으로 현재의 컨텍스트를 가져올 수 있습니다. `ServiceContext.Current`로 가져올 수 있지만, `MagicOnionOptions.EnableCurrentContext = true`가 필요합니다. 기본값은 `false`입니다.
 
-パフォーマンスやコードの複雑性の観点から `ServiceContext.Current` の使用は避けることをお勧めします。
+성능과 코드의 복잡성 관점에서 `ServiceContext.Current`의 사용은 피하는 것을 권장합니다.
 
-## ライフサイクル
+## Lifecycle
 
-Unary サービスのライフサイクルは疑似コードで以下のようになります。リクエストを受信し処理する度に新しいサービスのインスタンスが作成されます。
+Unary 서비스의 Lifecycle은 의사 코드로 다음과 같습니다. 요청이 수신되고 처리될 때마다 새로운 서비스 인스턴스가 생성됩니다.
 
 ```csharp
 async Task<Response> UnaryMethod(Request request)
@@ -54,7 +54,7 @@ async Task<Response> UnaryMethod(Request request)
 }
 ```
 
-StreamingHub サービスのライフサイクルは疑似コードで以下のようになります。接続中、StreamingHub のインスタンスは維持されるためステートを保持できます。
+StreamingHub 서비스의 Lifecycle은 의사 코드로 다음과 같습니다. 연결되어 있는 동안 StreamingHub 인스턴스가 유지되므로 상태를 유지할 수 있습니다.
 
 ```csharp
 async Task StreamingHubMethod()

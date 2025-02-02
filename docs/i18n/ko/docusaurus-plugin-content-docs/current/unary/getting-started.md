@@ -1,20 +1,20 @@
-# Unary サービスを始める
+# Unary 서비스 시작하기
 
-このチュートリアルでは Unary サービスの実装を始めるための簡単な手順を紹介します。
+이 튜토리얼에서는 Unary 서비스의 구현을 시작하기 위한 간단한 절차를 소개합니다.
 
-## 手順
+## 절차
 
-Unary サービスを定義、実装、利用するには下記の手順が必要となります。
+Unary 서비스를 정의, 구현, 이용하기 위해서는 아래의 절차가 필요합니다.
 
-- サーバーとクライアントの間で共有する Unary サービスインターフェイスを定義する
-- サーバープロジェクトで定義した Unary サービスインターフェイスを実装する
-- クライアントプロジェクトから定義した Unary サービスを呼び出す
+- 서버와 클라이언트 간에 공유할 Unary 서비스 인터페이스를 정의합니다.
+- 서버 프로젝트에서 정의한 Unary 서비스 인터페이스를 구현합니다.
+- 클라이언트 프로젝트에서 정의한 Unary 서비스를 호출합니다.
 
-## サーバーとクライアントの間で共有する Unary サービスインターフェイスを定義する
+## 서버와 클라이언트 간에 공유할 Unary 서비스 인터페이스를 정의
 
-共有ライブラリープロジェクトに Unary サービスのインターフェイスを定義します (Unity の場合はソースコードコピーやファイルリンクで対応します)。Unary サービスのインターフェースは `IService<TSelf>` を継承する必要があります。
+공유 라이브러리 프로젝트에 Unary 서비스의 인터페이스를 정의합니다 (Unity의 경우는 소스 코드 복사나 파일 링크로 대응합니다). Unary 서비스의 인터페이스는 `IService<TSelf>`를 상속해야 합니다.
 
-以下は挨拶を返す Unary サービスインターフェースの例です。
+다음은 인사를 반환하는 Unary 서비스 인터페이스의 예시입니다.
 
 ```csharp
 public interface IGreeterService : IService<IGreeterService>
@@ -23,11 +23,11 @@ public interface IGreeterService : IService<IGreeterService>
 }
 ```
 
-Unary サービスに定義するメソッドの戻り値の型は `UnaryResult` または `UnaryResult<T>` である必要があります。これは `ValueTask`, `ValueTask<T>` と同じような意味を持つ、Unary サービス特有の戻り値の型です。
+Unary 서비스에 정의하는 메서드의 반환값 타입은 `UnaryResult` 또는 `UnaryResult<T>`여야 합니다. 이는 `ValueTask`, `ValueTask<T>`와 같은 의미를 가지는, Unary 서비스 특유의 반환값 타입입니다.
 
-## サーバープロジェクトで定義した Unary サービスインターフェイスを実装する
+## 서버 프로젝트에서 정의한 Unary 서비스 인터페이스를 구현
 
-サーバー上でクライアントから呼び出される Unary サービスを実装します。サーバーの実装は `ServiceBase<TSelf>` を継承し、定義した Unary サービスインターフェイスを実装する必要があります。
+서버 상에서 클라이언트로부터 호출되는 Unary 서비스를 구현합니다. 서버의 구현은 `ServiceBase<TSelf>`를 상속하고, 정의한 Unary 서비스 인터페이스를 구현해야 합니다.
 
 ```csharp
 public class GreeterService : ServiceBase<IGreeterService>, IGreeterService
@@ -39,9 +39,9 @@ public class GreeterService : ServiceBase<IGreeterService>, IGreeterService
 }
 ```
 
-`UnaryResult` および `UnaryResult<T>` 型は `ValueTask`, `Task` などと同様に非同期メソッド (`async`) として定義できます。
+`UnaryResult` 및 `UnaryResult<T>` 타입은 `ValueTask`, `Task` 등과 마찬가지로 비동기 메서드(`async`)로 정의할 수 있습니다.
 
-メソッドの処理に非同期を必要としない場合は `UnaryResult.FromResult` や `UnaryResult.CompletedResult` などを使用して同期的に処理を返すこともできます。
+메서드의 처리에 비동기가 필요하지 않은 경우에는 `UnaryResult.FromResult`나 `UnaryResult.CompletedResult` 를 사용하여 동기적으로 반환할 수도 있습니다.
 
 
 ```csharp
@@ -54,18 +54,18 @@ public class GreeterService : ServiceBase<IGreeterService>, IGreeterService
 }
 ```
 
-## クライアントプロジェクトから定義した Unary サービスを呼び出す
+## 클라이언트 프로젝트에서 정의한 Unary 서비스를 호출
 
-クライアントから Unary サービスのメソッドを呼び出すには `MagicOnionClient.Create<T>` メソッドを使用します。
+클라이언트에서 Unary 서비스의 메서드를 호출하려면 `MagicOnionClient.Create<T>` 메서드를 사용합니다.
 
-`Create<T>` メソッドには Unary サービスインターフェースと接続先の `GrpcChannel` オブジェクトを渡します。このメソッドは指定したインターフェースに対応するクライアントプロキシーを生成します。この時点ではサーバーにリクエストは発生しません。
+`Create<T>` 메서드에는 Unary 서비스 인터페이스와 접속할 `GrpcChannel` 객체를 전달합니다. 이 메서드는 지정한 인터페이스에 대응하는 클라이언트 프록시를 생성합니다. 이 시점에서는 서버에 요청이 발생하지 않습니다.
 
 ```csharp
 var channel = GrpcChannel.ForAddress("https://localhost:5001");
 var client = await MagicOnionClient.Create<IGreeterService>(channel, receiver);
 ```
 
-生成したクライアントプロキシーを使用して Unary サービスのメソッドを呼び出します。
+생성한 클라이언트 프록시를 사용하여 Unary 서비스의 메서드를 호출합니다.
 
 ```csharp
 var result = await client.SayHelloAsync("Alice", 18);

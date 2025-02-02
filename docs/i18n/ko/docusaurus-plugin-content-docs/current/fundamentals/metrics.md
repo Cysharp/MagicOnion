@@ -1,7 +1,7 @@
-# メトリクス
-MagicOnion サーバーは、System.Diagnostics.Metrics を使用した StreamingHub に関連するメトリクスをサポートしています。
+# 메트릭
+MagicOnion 서버는 System.Diagnostics.Metrics를 사용한 StreamingHub 관련 메트릭(Metrics)을 지원합니다.
 
-- see: https://learn.microsoft.com/en-us/dotnet/core/diagnostics/metrics
+- see: https://learn.microsoft.com/ko-kr/dotnet/core/diagnostics/metrics
 
 ## Meter: MagicOnion.Server
 
@@ -15,9 +15,9 @@ MagicOnion サーバーは、System.Diagnostics.Metrics を使用した Streamin
 ## Tags
 
 |Tag name|Value|
-|--|--|
+|--|---------------------------------------------------|
 |rpc.system|`magiconion`|
-|rpc.service|StreamingHub インターフェース名 (例: `IGreeterService`)|
-|rpc.method|StreamingHub メソッド名 (例: `HelloAsync`)|
-|magiconion.streaminghub.is_error|StreamingHub メソッドの呼び出しが失敗したかどうか (例: `true` or `false`)|
-|error.type|スローされた例外の型 (例: `System.InvalidOperationException`)|
+|rpc.service|StreamingHub 인터페이스 이름 (예: `IGreeterService`)|
+|rpc.method|StreamingHub 메소드명 (예: `HelloAsync`)|
+|magiconion.streaminghub.is_error|StreamingHub 메서드 호출이 실패했는지 여부 (예: `true` or `false`)|
+|error.type|발생한 예외의 타입 (예: `System.InvalidOperationException`)|

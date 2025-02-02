@@ -1,23 +1,23 @@
-# ハートビート
+# 하트비트 (Heartbeat)
 
 :::tip
-この機能は MagicOnion v7.0.0 で追加されました。
+이 기능은 MagicOnion v7.0.0에서 추가되었습니다.
 :::
 
-ハートビート機能はサーバーとクライアント間の接続を維持し切断を早期に検出するために、サーバーからクライアントへ、クライアントからサーバーへ定期的にメッセージを送信する機能です。ハートビートには送信先が一定時間内に応答しない場合に切断するためのタイムアウトを指定できます。
+하트비트 기능은 서버와 클라이언트 간의 접속을 유지하고 연결 해제를 조기에 감지하기 위해, 서버에서 클라이언트로, 클라이언트에서 서버로 정기적으로 메시지를 송신하는 기능입니다. 하트비트에는 송신처가 일정 시간 내에 응답하지 않는 경우에 연결을 해제하기 위한 타임아웃을 지정할 수 있습니다.
 
-## HTTP/2 の PING フレームを使わない理由
+## HTTP/2의 PING 프레임을 사용하지 않는 이유
 
-HTTP/2 にはハートビートのための PING フレームというメカニズムがあります。それにも関わらず MagicOnion には独自のハートビート機能があります。これはネットワーク構成にロードバランサーが含まれている場合、ロードバランサーが PING フレームを処理し MagicOnion サーバーに到達しない可能性があるためです。
+HTTP/2에는 하트비트를 위한 PING 프레임이라는 메커니즘이 있습니다. 그럼에도 불구하고 MagicOnion에는 독자적인 하트비트 기능이 있습니다. 이는 네트워크 구성에 로드밸런서가 포함되어 있는 경우, 로드밸런서가 PING 프레임을 처리하여 MagicOnion 서버에 도달하지 않을 가능성이 있기 때문입니다.
 
 ```plaintext
 [Client] ← PING/PONG → [LoadBalancer] ← PING/PONG → [Server]
 ```
 
-MagicOnion はこのような環境下での疎通確認を確実にするために、サーバーとクライアント間で明示的にデータを送受信するハートビートメカニズムを提供しています。
+MagicOnion은 이러한 환경에서의 소통 확인을 확실하게 하기 위해, 서버와 클라이언트 간에 명시적으로 데이터를 송수신하는 하트비트 메커니즘을 제공하고 있습니다.
 
-## クライアント
-`StreamingHubClient` を作成する際にクライアントからのハートビートを指定できます。デフォルトでは無効になっています。
+## 클라이언트
+`StreamingHubClient`를 생성할 때 클라이언트로부터의 하트비트를 지정할 수 있습니다. 기본적으로는 비활성화되어 있습니다.
 
 ```csharp
 // Send a message to the server every 30 seconds
@@ -59,9 +59,8 @@ public class StreamingHubClientOptions
 }
 ```
 
-
-## サーバー
-サーバーからのハートビートは `MagicOnionOptions` を介してグローバルに有効にするか `Heartbeat` 属性を使用して個別に有効にできます。デフォルトでは無効になっています。
+## 서버
+서버로부터의 하트비트는 `MagicOnionOptions`를 통해 전역적으로 활성화하거나 `Heartbeat` 속성을 사용하여 개별적으로 활성화할 수 있습니다. 기본적으로는 비활성화되어 있습니다.
 
 ```csharp
 // Enable heartbeat for all StreamingHub instances
@@ -85,7 +84,7 @@ public class MyHub : StreamingHubBase<IMyHub, IMyHubReceiver>
 }
 ```
 
-サーバーサイドのハートビートは「サーバーがハートビートを送信した時刻」を `ServerTime` プロパティに設定します。クライアントはこれを使用してクライアントとサーバーの時刻を同期できます。サーバー時刻は常に UTC で送信されます。
+서버 측의 하트비트는 "서버가 하트비트를 송신한 시각"을 `ServerTime` 속성에 설정합니다. 클라이언트는 이것을 사용하여 클라이언트와 서버의 시각을 동기화할 수 있습니다. 서버 시각은 항상 UTC로 송신됩니다.
 
 ```csharp
 // Client-side code:
@@ -96,11 +95,11 @@ var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatR
 var hub = await StreamingHubClient.ConnectAsync<IChatHub, IChatHubReceiver>(channel, receiver, options);
 ```
 
-## 追加のメタデータ
-追加のメタデータをサーバーのハートビートメッセージに追加することができます。これは、例えば、同期目的でサーバー情報を含めるために使用できます。
+## 추가 메타데이터
+추가 메타데이터를 서버의 하트비트 메시지에 추가할 수 있습니다. 이는, 예를 들어, 동기화 목적으로 서버 정보를 포함하기 위해 사용할 수 있습니다.
 
-### サーバー
-メタデータをサーバーのハートビートメッセージに追加するには、`IStreamingHubHeartbeatMetadataProvider` インターフェースを実装し、DI コンテナに登録するか、`Heartbeat` 属性の `MetadataProvider` プロパティで指定します。
+### 서버
+메타데이터를 서버의 하트비트 메시지에 추가하려면, `IStreamingHubHeartbeatMetadataProvider` 인터페이스를 구현하고, DI 컨테이너에 등록하거나, `Heartbeat` 속성의 `MetadataProvider` 프로퍼티로 지정합니다.
 
 ```csharp
 public class CustomHeartbeatMetadataProvider : IStreamingHubHeartbeatMetadataProvider
@@ -112,8 +111,8 @@ public class CustomHeartbeatMetadataProvider : IStreamingHubHeartbeatMetadataPro
     }
 }
 ```
-### クライアント
-クライアントサイドでは、`StreamingHubClient` を作成する際にハートビートのコールバックをオプションとして設定できます。
+### 클라이언트
+클라이언트 측에서는, `StreamingHubClient`를 생성할 때 하트비트의 콜백을 옵션으로 설정할 수 있습니다.
 
 ```csharp
 var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x =>
@@ -123,18 +122,18 @@ var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatR
 var hub = await StreamingHubClient.ConnectAsync<IChatHub, IChatHubReceiver>(channel, receiver, options);
 ```
 
-## サーバー上でのハートビートの高度な操作
-サーバーからのハートビートは `IMagicOnionHeartbeatFeature` インターフェースを介していくつか高度な機能にアクセスできます。このインターフェースの実装は `IHttpContext.Features` (`Context.CallContext.GetHttpContext().Features`) から取得できます。
+## 서버 상에서의 하트비트의 고급 조작
+서버로부터의 하트비트는 `IMagicOnionHeartbeatFeature` 인터페이스를 통해 몇 가지 고급 기능에 접근할 수 있습니다. 이 인터페이스의 구현은 `IHttpContext.Features` (`Context.CallContext.GetHttpContext().Features`)에서 얻을 수 있습니다.
 
-### `Unregister` メソッド
-`Unregister` メソッドはその StreamingHub のクライアント接続におけるハートビートを無効にします。デバッグ時に一時的にハートビートを無効にする仕組みが必要な場合に利用できます。
+### `Unregister` 메소드
+`Unregister` 메소드는 해당 StreamingHub의 클라이언트 접속에서의 하트비트를 비활성화합니다. 디버그 시에 일시적으로 하트비트를 비활성화하는 구조가 필요한 경우에 이용할 수 있습니다.
 
-### `SetAckCallback` メソッド
-クライアントからのハートビートの応答を受信したときのコールバックを設定できます。
+### `SetAckCallback` 메소드
+클라이언트로부터의 하트비트 응답을 수신했을 때의 콜백을 설정할 수 있습니다.
 
-### `Latency` プロパティ
-クライアントとのレイテンシーを取得します。送受信されていない場合は `TimeSpan.Zero` が返されます。
+### `Latency` 속성
+클라이언트와의 레이턴시를 취득합니다. 송수신되지 않은 경우는 `TimeSpan.Zero`가 반환됩니다.
 
-## 制限事項
+## 제한사항
 
-ハートビートは、v7.0.0 より前のクライアントやサーバーと互換性がありません。v7.0.0 の前後のバージョンが混在する可能性がある StreamingHub で有効にしないでください。
+하트비트는 v7.0.0 이전의 클라이언트나 서버와 호환성이 없습니다. v7.0.0의 전후 버전이 혼재할 가능성이 있는 StreamingHub에서 활성화하지 마세요.

@@ -1,21 +1,21 @@
-# JSON トランスコーディングと Swagger
+# JSON 트랜스코딩과 Swagger
 
-JSON トランスコーディングはUnary サービスを  HTTP/1 エンドポイントで JSON API として変換して提供する仕組みです。これにより cURL のようなツールから Unary サービスを呼び出すことが可能となります。
-これは以前の MagicOnion.Server.HttpGateway の後継であり、完全に新しい実装であり互換性はなく、主に開発サポート目的です。
+JSON 트랜스코딩은 Unary 서비스를 HTTP/1 엔드포인트에서 JSON API로 변환하여 제공하는 구조입니다. 이를 통해 cURL과 같은 도구에서 Unary 서비스를 호출하는 것이 가능해집니다.
+이는 이전의 MagicOnion.Server.HttpGateway의 후속이며, 완전히 새로운 구현으로 호환성은 없으며, 주로 개발 지원 목적입니다.
 
-この機能は [Microsoft.AspNetCore.Grpc.JsonTranscoding](https://learn.microsoft.com/en-us/aspnet/core/grpc/json-transcoding?view=aspnetcore-9.0) に触発されたものです。
+이 기능은 [Microsoft.AspNetCore.Grpc.JsonTranscoding](https://learn.microsoft.com/ko-kr/aspnet/core/grpc/json-transcoding)에서 영감을 받았습니다.
 
 - https://github.com/Cysharp/MagicOnion/pull/859
 
 :::warning
-この機能は `Production` 環境での使用を意図していません。
-**もし Web ベース (HTTP/1) の API を提供したい場合は、代わりに ASP.NET Core Web API を強くお勧めします。**
+이 기능은 `Production` 환경에서의 사용을 의도하지 않았습니다.
+**만약 웹 기반(HTTP/1) API를 제공하고 싶다면, 대신 ASP.NET Core Web API를 강력히 추천합니다.**
 
-デフォルトでは JsonTranscoding は `Production` 環境で有効にすることはできません。`MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment` を `true` に変更する必要があります。
+기본적으로 JsonTranscoding은 `Production` 환경에서 활성화할 수 없습니다. `MagicOnionJsonTranscodingOptions.AllowEnableInNonDevelopmentEnvironment`를 `true`로 변경해야 합니다.
 :::
 
-## 有効化
-JSON トランスコーディングとを有効にするには、`AddMagicOnion` に続いて `AddJsonTranscoding` を呼び出し、Swagger を有効にするために `AddJsonTranscodingSwagger` を呼び出します。
+## 활성화
+JSON 트랜스코딩을 활성화하려면, `AddMagicOnion` 다음에 `AddJsonTranscoding`을 호출하고, Swagger를 활성화하기 위해 `AddJsonTranscodingSwagger`를 호출합니다.
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);

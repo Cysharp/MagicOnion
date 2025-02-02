@@ -1,28 +1,28 @@
-# サーバー上の接続、切断イベント
+# 서버 상의 연결, 연결 해제 이벤트
 
-サーバー上ではクライアントが接続したり切断した際にイベントが発生します。これらのイベントは `StreamingHubBase` クラスのイベントメソッドをオーバーライドすることでハンドルできます。
+서버 상에서는 클라이언트가 연결되거나 연결 해제가 될 때 이벤트가 발생합니다. 이러한 이벤트들은 `StreamingHubBase` 클래스의 이벤트 메소드를 오버라이드함으로써 핸들링할 수 있습니다.
 
-## `OnConnecting` メソッド
-`OnConnecting` メソッドはクライアントが StreamingHub に接続を確立中に呼び出されます。この時点ではクライアントとの接続が確立されていないため、クライアントやグループに関する操作を行うことはできません。
+## `OnConnecting` 메서드
+`OnConnecting` 메서드는 클라이언트가 StreamingHub에 연결을 설정할 때 호출됩니다. 이 시점에서는 클라이언트와의 연결이 아직 설정되지 않았으므로, 클라이언트나 그룹에 대한 작업을 수행할 수 없습니다.
 
 ```csharp
 protected override async ValueTask OnConnecting()
 {
-    // クライアントが接続を確立中の処理
+    // 클라이언트가 연결을 설정하는 중의 처리
 
-    // 例: StreamingHub 自体の初期化など
+    // 예: StreamingHub 자체의 초기화 등
 }
 ```
 
-## `OnConnected` メソッド
-`OnConnected` メソッドはクライアントが StreamingHub に接続が完了した際に呼び出されます。この時点でクライアントとの接続が確立済みとなり、クライアントの呼び出しやグループの操作が可能です。
+## `OnConnected` 메서드
+`OnConnected` 메서드는 클라이언트가 StreamingHub에 연결을 완료했을 때 호출됩니다. 이 시점에서는 클라이언트와의 연결이 설정되었으므로, 클라이언트를 호출하거나 그룹에 대한 작업을 수행할 수 있습니다.
 
 ```csharp
 protected override async ValueTask OnConnected()
 {
-    // クライアントが接続完了時の処理
+    // 클라이언트가 접속 완료 시의 처리
 
-    // 例: グループへの追加や初期状態の送信
+    // 예: 그룹에 추가하거나 초기 상태의 송신
     // this.group = await Group.AddAsync("MyGroup");
     // Client.OnConnected(initialState);
     // ..
@@ -30,14 +30,14 @@ protected override async ValueTask OnConnected()
 ```
 
 
-## `OnDisconnected` メソッド
-`OnDisconnected` メソッドはクライアントが StreamingHub から切断された際に呼び出されます。この時点でクライアントとの接続は切断されているため、クライアントに関する操作は無効です。
+## `OnDisconnected` 메서드
+`OnDisconnected` 메서드는 클라이언트가 StreamingHub에서 연결 해제될 때 호출됩니다. 이 시점에서는 클라이언트와의 연결이 해제되었으므로, 클라이언트와 관련된 작업은 유효하지 않습니다.
 
 ```csharp
 protected override async ValueTask OnDisconnected()
 {
-    // クライアントが切断された際の処理
+    // 클라이언트가 연결 해제된 시점의 처리
 }
 ```
 
-切断についての関連した操作や情報は [切断のハンドリング](disconnection) を参照してください。
+연결 해제에 관련된 조작이나 정보는 [연결 해제의 핸들링](disconnection)을 참조해 주세요.
