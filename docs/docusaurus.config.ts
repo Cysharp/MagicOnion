@@ -29,10 +29,13 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'ja'],
+    locales: ['en', 'ja', 'ko'],
     localeConfigs: {
       ja: {
         htmlLang: 'ja-JP',
+      },
+      ko: {
+        htmlLang: 'ko-KR',
       }
     }
   },
