@@ -39,6 +39,10 @@
     "message": "インテグレーション",
     "description": "The label for category Integration in sidebar docsSidebar"
   },
+  "sidebar.docsSidebar.category.Best practices": {
+    "message": "ベストプラクティス",
+    "description": "The label for category Best practices in sidebar docsSidebar"
+  },
   "sidebar.docsSidebar.category.Source Generator": {
     "message": "Source Generator",
     "description": "The label for category Source Generator in sidebar docsSidebar"
