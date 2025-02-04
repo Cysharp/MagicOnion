@@ -32,3 +32,14 @@
 [lang='ja-Jp'] .theme-doc-sidebar-container nav {
   font-size: 0.85rem;
 }
+
+header .theme-last-updated {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  display: block;
+  margin-top: calc((var(--ifm-h1-vertical-rhythm-bottom) * var(--ifm-leading) * -1) + 0.8rem);
+  margin-bottom: calc(var(--ifm-h1-vertical-rhythm-bottom) * var(--ifm-leading));
+}
+header .theme-last-updated b {
+  font-weight: normal;
+}
