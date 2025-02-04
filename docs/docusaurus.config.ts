@@ -51,7 +51,7 @@ const config: Config = {
           routeBasePath: '/',
 
           sidebarPath: './sidebars.ts',
-          sidebarCollapsed: false,
+          sidebarCollapsed: true,
 
           showLastUpdateTime: true,
 
@@ -59,8 +59,8 @@ const config: Config = {
             ? `https://github.com/Cysharp/MagicOnion/tree/main/docs/docs/${params.docPath}`
             : `https://github.com/Cysharp/MagicOnion/tree/main/docs/i18n/${params.locale}/docusaurus-plugin-content-docs/current/${params.docPath}`,
 
-            remarkPlugins: [additionalHeaderMetaRow],
-          },
+          remarkPlugins: [additionalHeaderMetaRow],
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -90,6 +90,12 @@ const config: Config = {
           position: 'left',
           label: 'License',
           docId: 'license',
+        },
+        {
+          type: 'doc',
+          position: 'left',
+          label: 'Support',
+          docId: 'support',
         },
         {
           href: 'https://cysharp.co.jp/en/',

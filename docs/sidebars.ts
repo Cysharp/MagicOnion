@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Installation',
+      collapsed: false,
       items: [
         'installation/packages',
         'installation/unity'
@@ -31,7 +32,6 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'What\'s new',
-      collapsed: true,
       items: [
         'release-notes/7.0',
       ],
@@ -39,8 +39,10 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Fundamentals',
+      collapsed: false,
       items: [
         'fundamentals/unary-or-streaminghub',
+        'fundamentals/project-structure',
         'fundamentals/exceptions-and-status-codes',
         'fundamentals/authentication',
         'fundamentals/lifecycle',
@@ -126,7 +128,7 @@ const sidebars: SidebarsConfig = {
         'advanced/memorypack',
         'advanced/raw-grpc'
       ]
-    }
+    },
   ],
 };
 
