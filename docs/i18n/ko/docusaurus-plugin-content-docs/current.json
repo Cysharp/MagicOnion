@@ -39,6 +39,10 @@
     "message": "통합",
     "description": "The label for category Integration in sidebar docsSidebar"
   },
+  "sidebar.docsSidebar.category.Best practices": {
+    "message": "모범 사례",
+    "description": "The label for category Best practices in sidebar docsSidebar"
+  },
   "sidebar.docsSidebar.category.Source Generator": {
     "message": "Source Generator",
     "description": "The label for category Source Generator in sidebar docsSidebar"

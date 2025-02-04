@@ -7,6 +7,14 @@
     "message": "Documents",
     "description": "Navbar item with label Documents"
   },
+  "item.label.License": {
+    "message": "License",
+    "description": "Navbar item with label License"
+  },
+  "item.label.Support": {
+    "message": "Support",
+    "description": "Navbar item with label Support"
+  },
   "item.label.GitHub": {
     "message": "GitHub",
     "description": "Navbar item with label GitHub"
