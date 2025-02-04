@@ -2,6 +2,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
+import additionalHeaderMetaRow from './src/remark/additionalHeaderMetaRow';
+
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
@@ -51,10 +53,14 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           sidebarCollapsed: false,
 
+          showLastUpdateTime: true,
+
           editUrl: (params) => params.locale == 'en'
             ? `https://github.com/Cysharp/MagicOnion/tree/main/docs/docs/${params.docPath}`
             : `https://github.com/Cysharp/MagicOnion/tree/main/docs/i18n/${params.locale}/docusaurus-plugin-content-docs/current/${params.docPath}`,
-        },
+
+            remarkPlugins: [additionalHeaderMetaRow],
+          },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -107,10 +113,6 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {
-              label: 'Documentation',
-              to: '/',
-            },
             {
               label: 'About MagicOnion',
               to: '/',
