@@ -1,11 +1,14 @@
 name: PR Merged
 
+# use push event instead of pull_request/close event. This ensure running workflow via Organization user, not via Fork user.
+# To make sure push has happen by PR merge, use head_commit message to identity typical merge commit message.
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - main
 
 jobs:
   post:
-    if: ${{ github.event.pull_request.merged == true }}
+    if: ${{ startsWith(github.event.head_commit.message, 'Merge pull request ') }}
     uses: Cysharp/Actions/.github/workflows/dd-event-post.yaml@main
     secrets: inherit
