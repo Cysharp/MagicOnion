@@ -150,6 +150,11 @@ const config: Config = {
       theme: prismThemes.vsLight,
       darkTheme: prismThemes.vsDark,
     },
+    algolia: {
+      appId: '0DYBMKEZO1',
+      apiKey: '64d5987b3063e5de9b6da30e6171fb8e',
+      indexName: 'cysharpio',
+    },
   } satisfies Preset.ThemeConfig,
 
   markdown: {
