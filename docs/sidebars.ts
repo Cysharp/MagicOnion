@@ -104,6 +104,14 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Best practices',
+      items: [
+        'best-practices/load-tests',
+        'best-practices/hub-context-pattern',
+      ]
+    },
+    {
+      type: 'category',
       label: 'Integration',
       items: [
         'integration/unity',
