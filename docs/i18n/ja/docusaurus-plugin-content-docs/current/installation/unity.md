@@ -52,6 +52,11 @@ var client = MagicOnionClient.Create<IMyFirstService>(channel);
 
 Unity 向けに GrpcChannel をラップした、より開発に役立つ機能を提供する拡張も提供しています。詳しくは [Unity インテグレーション](../integration/unity) ページを参照してください。
 
+## UnityEngine.Vector3 などの Unity 固有型を使用する
+`UnityEngine.Vector2`, `UnityEngine.Vector3` などの Unity に固有な型を使用するには追加のパッケージのインストールが必要です。
+
+Unity プロジェクトには MessagePack-CSharp の Unity 向けパッケージの導入が必要となり、サーバーや共有ライブラリーでは Unity 固有の型をサポートするための NuGet パッケージをインストールする必要があります。詳しくは MessagePack-CSharp の [Unity support](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#unity-support) および [Extensions](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#extensions) のセクションを参照してください。
+
 ## IL2CPP での動作
 
 Unity プロジェクトがスクリプティングバックエンドとして IL2CPP を使用している場合、追加の設定が必要です。詳細については [Source Generator を使用した Ahead-of-Time コンパイルサポート](../source-generator/client) ページを参照してください。
