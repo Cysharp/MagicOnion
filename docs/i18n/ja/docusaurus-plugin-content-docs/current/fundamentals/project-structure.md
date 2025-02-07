@@ -98,11 +98,11 @@ MyApp.Server.sln
       └─ ...
 ```
 
-MyApp.Shared プロジェクトは .NET クラスライブラリーとして作成し、`MagicOnion.Abstractions` パッケージを参照し、純粋なインターフェースの定義やデータ型、列挙型のみを定義します。加えて Unity プロジェクトから Unity Package Manager によって参照できるように `package.json` を含め、`bin`, `obj` といったフォルダーを出力しないように構成します。
+MyApp.Shared プロジェクトは .NET クラスライブラリーとして作成し、`MagicOnion.Abstractions` パッケージを参照し、純粋なインターフェースの定義やデータ型、列挙型のみを定義します。加えて Unity プロジェクトから Unity Package Manager によって参照できるように `package.json` を含め、`bin`, `obj` といったフォルダーを出力しないように構成します。これにより Unity プロジェクトからも MyApp.Shared に含まれる C# ソースコードを参照できるようになります。
 
 `package.json` の内容は下記のような最小構成の JSON ファイルです。
 
-```json
+```json title="src/MyApp.Shared/package.json"
 {
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
@@ -113,15 +113,20 @@ MyApp.Shared プロジェクトは .NET クラスライブラリーとして作�
 
 アセンブリーを分割するために `MyApp.Shared.Unity.asmdef` (Assembly Definition) ファイルを追加することもお勧めします。`.Unity` サフィックスを付けるなど `MyApp.Shared` と完全に同じ名前にならないように注意してください。
 
-次に `MyApp.Shared.csproj` に下記のような設定を追加します。`bin`, `obj` ディレクトリーを作成しないようにする設定と Unity 向けのファイルを IDE 上に表示しないようにする設定です。
+次に `MyApp.Shared` に下記の2つの設定ファイル(`Directory.Build.props` と `Directory.Build.targets`) を追加します。`bin`, `obj` ディレクトリーを作成しないようにする設定と Unity 向けのファイルを IDE 上に表示しないようにする設定です。
 
-```xml
+```xml title="src/MyApp.Shared/Directory.Build.props"
+<Project>
   <PropertyGroup>
     <!-- https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output -->
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
   </PropertyGroup>
+</Project>
+```
 
-    <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
+```xml title="src/MyApp.Shared/Directory.Build.targets"
+<Project>
+  <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
   <ItemGroup>
     <None Remove="**\package.json" />
     <None Remove="**\*.asmdef" />
@@ -137,16 +142,18 @@ MyApp.Shared プロジェクトは .NET クラスライブラリーとして作�
     <EmbeddedResource Remove=".artifacts\**\**.*" />
     <EmbeddedResource Remove="bin\**\*.*;obj\**\*.*" />
   </ItemGroup>
+</Project>
 ```
 
 この設定により中間ファイルやビルド済みファイルは `.artifacts` 以下に出力されるようになるため、`bin`, `obj` ディレクトリーが作成されている場合は削除してください。
 
 次に Unity プロジェクトの `Packages/manifest.json` に MyApp.Shared への参照を追加します。
 
-```json
+```json title="src/MyApp.Unity/Packages/manifest.json"
 {
   "dependencies": {
-    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../MyApp.Shared/MyApp.Shared.Unity"
+    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../MyApp.Shared/MyApp.Shared.Unity",
+    ...
   }
 }
 ```

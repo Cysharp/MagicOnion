@@ -101,7 +101,7 @@ In addition, it includes a `package.json` to make it available to Unity projects
 
 Here is an example of a minimal `package.json` file for a Unity local package.
 
-```json
+```json title="src/MyApp.Shared/package.json"
 {
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
@@ -112,15 +112,20 @@ Here is an example of a minimal `package.json` file for a Unity local package.
 
 We recommend creating a `MyApp.Shared.Unity.asmdef` (Assembly Definition) file to define the Unity-specific assembly and to avoid naming conflicts with `MyApp.Shared`. Be careful not to use the same name as `MyApp.Shared` by adding a `.Unity` suffix, for example.
 
-Next, add the following settings to `MyApp.Shared.csproj` to prevent the creation of `bin` and `obj` directories and to hide Unity-specific files from the IDE.
+Next, add the following two setting files (`Directory.Build.props` and `Directory.Bulid.targets`) to `MyApp.Shared` to prevent the creation of `bin` and `obj` directories and to hide Unity-specific files from the IDE.
 
-```xml
+```xml title="src/MyApp.Shared/Directory.Build.props"
+<Project>
   <PropertyGroup>
     <!-- https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output -->
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
   </PropertyGroup>
+</Project>
+```
 
-    <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
+```xml title="src/MyApp.Shared/Directory.Build.targets"
+<Project>
+  <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
   <ItemGroup>
     <None Remove="**\package.json" />
     <None Remove="**\*.asmdef" />
@@ -136,16 +141,18 @@ Next, add the following settings to `MyApp.Shared.csproj` to prevent the creatio
     <EmbeddedResource Remove=".artifacts\**\**.*" />
     <EmbeddedResource Remove="bin\**\*.*;obj\**\*.*" />
   </ItemGroup>
+</Project>
 ```
 
 With this configuration, intermediate files and built files are output to `.artifacts`, so if `bin` and `obj` directories are created, delete them.
 
 Next, add a reference to `MyApp.Shared` in the Unity project's `Packages/manifest.json`.
 
-```json
+```json title="src/MyApp.Unity/Packages/manifest.json"
 {
   "dependencies": {
-    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../MyApp.Shared/MyApp.Shared.Unity"
+    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../MyApp.Shared/MyApp.Shared.Unity",
+    ...
   }
 }
 ```
