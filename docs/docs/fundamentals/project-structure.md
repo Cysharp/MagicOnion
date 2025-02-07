@@ -97,7 +97,7 @@ MyApp.Server.sln
 ```
 
 `MyApp.Shared` project is created as a .NET class library, references the `MagicOnion.Abstractions` package, and defines only pure interface definitions, data types, and enum types.
-In addition, it includes a `package.json` to make it available to Unity projects via the Unity Package Manager, and is configured not to output folders such as `bin` and `obj`.
+In addition, it includes a `package.json` to make it available to Unity projects via the Unity Package Manager, and is configured not to output folders such as `bin` and `obj`. This allows C# source code contained in `MyApp.Shared` to be referenced from Unity projects.
 
 Here is an example of a minimal `package.json` file for a Unity local package.
 

@@ -155,8 +155,8 @@ MyApp.Server プロジェクトからは MyApp.Shared プロジェクトをプ�
 
 ### SlnMerge によるソリューションの統合
 
-[SlnMerge](https://github.com/Cysharp/SlnMerge) という Unity 向けのエディター拡張を使用することで Unity が生成するソリューションと .NET プロジェクトのソリューションを統合できます。
+Unity 向けのエディター拡張の [SlnMerge](https://github.com/Cysharp/SlnMerge) を使用することで Unity が生成するソリューションと .NET プロジェクトのソリューションを統合できます。
 
 例えば MyApp.Server.sln には MyApp.Server と MyApp.Shared プロジェクトが含まれますが、Unity で生成されるソリューションには Unity 向けのプロジェクト (Assembly-CSharp, Assembly-CSharp-Editor など) のみが含まれます。SlnMerge を使用することでこれらのソリューションを統合し、Unity からソリューションを開いた場合でもシームレスにサーバープロジェクトを参照できるようになります。
 
-これにより Unity と .NET プロジェクト間での参照検索やデバッガーステップインなどが可能となり開発効率を改善できる場合があります。
+これにより Unity と .NET プロジェクト間での参照検索やデバッガーステップインなどが可能となりより良い開発体験を得られます。
