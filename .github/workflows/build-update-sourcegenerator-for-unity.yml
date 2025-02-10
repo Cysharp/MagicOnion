@@ -1,0 +1,11 @@
+name: Update pre-built SourceGenerator for Unity (Legacy)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-sourcegenerator-unity:
+    name: Update MagicOnion.Client.SourceGenerator.Unity
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Not supported in v7 or later." && exit 1
