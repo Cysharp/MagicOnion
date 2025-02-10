@@ -13,29 +13,49 @@ namespace TempProject
                 class ClientCore
                 {
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.List<global::TempProject.MyResponse>> MethodList;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.LinkedList<global::System.Int32>, global::System.Collections.Generic.LinkedList<global::TempProject.MyResponse>> MethodLinkedList;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.Queue<global::TempProject.MyResponse>> MethodQueue;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.Stack<global::TempProject.MyResponse>> MethodStack;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.HashSet<global::TempProject.MyResponse>> MethodHashSet;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.ObjectModel.ReadOnlyCollection<global::TempProject.MyResponse>> MethodROCollection;
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IList<global::TempProject.MyResponse>> MethodIList;
-                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>> MethodIROList;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>> MethodICollection;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>> MethodIEnumerable;
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.Dictionary<global::System.String, global::TempProject.MyResponse>> MethodDictionary;
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IDictionary<global::System.String, global::TempProject.MyResponse>> MethodIDictionary;
-                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodIRODictionary;
-                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>> MethodIEnumerable;
-                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>> MethodICollection;
-                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>> MethodIROCollection;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.SortedDictionary<global::System.String, global::TempProject.MyResponse>> MethodSortedDictionary;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.SortedList<global::System.Int32, global::TempProject.MyResponse>> MethodSortedList;
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Linq.ILookup<global::System.Int32, global::TempProject.MyResponse>> MethodILookup;
                     public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Linq.IGrouping<global::System.Int32, global::TempProject.MyResponse>> MethodIGrouping;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.ISet<global::TempProject.MyResponse>> MethodISet;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlySet<global::TempProject.MyResponse>> MethodIROSet;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>> MethodIROCollection;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>> MethodIROList;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodIRODictionary;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Collections.ObjectModel.ReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodRODictionary;
                     public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
                     {
                         this.MethodList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.List<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodList", serializerProvider);
+                        this.MethodLinkedList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::System.Collections.Generic.LinkedList<global::System.Int32>, global::System.Collections.Generic.LinkedList<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodLinkedList", serializerProvider);
+                        this.MethodQueue = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.Queue<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodQueue", serializerProvider);
+                        this.MethodStack = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.Stack<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodStack", serializerProvider);
+                        this.MethodHashSet = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.HashSet<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodHashSet", serializerProvider);
+                        this.MethodROCollection = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.ObjectModel.ReadOnlyCollection<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodROCollection", serializerProvider);
                         this.MethodIList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IList<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIList", serializerProvider);
-                        this.MethodIROList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIROList", serializerProvider);
+                        this.MethodICollection = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodICollection", serializerProvider);
+                        this.MethodIEnumerable = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIEnumerable", serializerProvider);
                         this.MethodDictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.Dictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodDictionary", serializerProvider);
                         this.MethodIDictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IDictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIDictionary", serializerProvider);
-                        this.MethodIRODictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIRODictionary", serializerProvider);
-                        this.MethodIEnumerable = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIEnumerable", serializerProvider);
-                        this.MethodICollection = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodICollection", serializerProvider);
-                        this.MethodIROCollection = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIROCollection", serializerProvider);
+                        this.MethodSortedDictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.SortedDictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodSortedDictionary", serializerProvider);
+                        this.MethodSortedList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.SortedList<global::System.Int32, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodSortedList", serializerProvider);
                         this.MethodILookup = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Linq.ILookup<global::System.Int32, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodILookup", serializerProvider);
                         this.MethodIGrouping = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Linq.IGrouping<global::System.Int32, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIGrouping", serializerProvider);
+                        this.MethodISet = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.ISet<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodISet", serializerProvider);
+                        this.MethodIROSet = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlySet<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIROSet", serializerProvider);
+                        this.MethodIROCollection = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIROCollection", serializerProvider);
+                        this.MethodIROList = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIROList", serializerProvider);
+                        this.MethodIRODictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodIRODictionary", serializerProvider);
+                        this.MethodRODictionary = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::System.Collections.ObjectModel.ReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>>(global::Grpc.Core.MethodType.Unary, "IMyService", "MethodRODictionary", serializerProvider);
                     }
                  }
 
@@ -56,26 +76,46 @@ namespace TempProject
 
                 public global::MagicOnion.UnaryResult<global::System.Collections.Generic.List<global::TempProject.MyResponse>> MethodList(global::System.Collections.Generic.List<global::System.Int32> args)
                     => this.core.MethodList.InvokeUnary(this, "IMyService/MethodList", args);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.LinkedList<global::TempProject.MyResponse>> MethodLinkedList(global::System.Collections.Generic.LinkedList<global::System.Int32> args)
+                    => this.core.MethodLinkedList.InvokeUnary(this, "IMyService/MethodLinkedList", args);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.Queue<global::TempProject.MyResponse>> MethodQueue()
+                    => this.core.MethodQueue.InvokeUnary(this, "IMyService/MethodQueue", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.Stack<global::TempProject.MyResponse>> MethodStack()
+                    => this.core.MethodStack.InvokeUnary(this, "IMyService/MethodStack", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.HashSet<global::TempProject.MyResponse>> MethodHashSet()
+                    => this.core.MethodHashSet.InvokeUnary(this, "IMyService/MethodHashSet", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.ObjectModel.ReadOnlyCollection<global::TempProject.MyResponse>> MethodROCollection()
+                    => this.core.MethodROCollection.InvokeUnary(this, "IMyService/MethodROCollection", global::MessagePack.Nil.Default);
                 public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IList<global::TempProject.MyResponse>> MethodIList()
                     => this.core.MethodIList.InvokeUnary(this, "IMyService/MethodIList", global::MessagePack.Nil.Default);
-                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>> MethodIROList()
-                    => this.core.MethodIROList.InvokeUnary(this, "IMyService/MethodIROList", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>> MethodICollection()
+                    => this.core.MethodICollection.InvokeUnary(this, "IMyService/MethodICollection", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>> MethodIEnumerable()
+                    => this.core.MethodIEnumerable.InvokeUnary(this, "IMyService/MethodIEnumerable", global::MessagePack.Nil.Default);
                 public global::MagicOnion.UnaryResult<global::System.Collections.Generic.Dictionary<global::System.String, global::TempProject.MyResponse>> MethodDictionary()
                     => this.core.MethodDictionary.InvokeUnary(this, "IMyService/MethodDictionary", global::MessagePack.Nil.Default);
                 public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IDictionary<global::System.String, global::TempProject.MyResponse>> MethodIDictionary()
                     => this.core.MethodIDictionary.InvokeUnary(this, "IMyService/MethodIDictionary", global::MessagePack.Nil.Default);
-                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodIRODictionary()
-                    => this.core.MethodIRODictionary.InvokeUnary(this, "IMyService/MethodIRODictionary", global::MessagePack.Nil.Default);
-                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IEnumerable<global::TempProject.MyResponse>> MethodIEnumerable()
-                    => this.core.MethodIEnumerable.InvokeUnary(this, "IMyService/MethodIEnumerable", global::MessagePack.Nil.Default);
-                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.ICollection<global::TempProject.MyResponse>> MethodICollection()
-                    => this.core.MethodICollection.InvokeUnary(this, "IMyService/MethodICollection", global::MessagePack.Nil.Default);
-                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>> MethodIROCollection()
-                    => this.core.MethodIROCollection.InvokeUnary(this, "IMyService/MethodIROCollection", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.SortedDictionary<global::System.String, global::TempProject.MyResponse>> MethodSortedDictionary()
+                    => this.core.MethodSortedDictionary.InvokeUnary(this, "IMyService/MethodSortedDictionary", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.SortedList<global::System.Int32, global::TempProject.MyResponse>> MethodSortedList()
+                    => this.core.MethodSortedList.InvokeUnary(this, "IMyService/MethodSortedList", global::MessagePack.Nil.Default);
                 public global::MagicOnion.UnaryResult<global::System.Linq.ILookup<global::System.Int32, global::TempProject.MyResponse>> MethodILookup()
                     => this.core.MethodILookup.InvokeUnary(this, "IMyService/MethodILookup", global::MessagePack.Nil.Default);
                 public global::MagicOnion.UnaryResult<global::System.Linq.IGrouping<global::System.Int32, global::TempProject.MyResponse>> MethodIGrouping()
                     => this.core.MethodIGrouping.InvokeUnary(this, "IMyService/MethodIGrouping", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.ISet<global::TempProject.MyResponse>> MethodISet()
+                    => this.core.MethodISet.InvokeUnary(this, "IMyService/MethodISet", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlySet<global::TempProject.MyResponse>> MethodIROSet()
+                    => this.core.MethodIROSet.InvokeUnary(this, "IMyService/MethodIROSet", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyCollection<global::TempProject.MyResponse>> MethodIROCollection()
+                    => this.core.MethodIROCollection.InvokeUnary(this, "IMyService/MethodIROCollection", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyResponse>> MethodIROList()
+                    => this.core.MethodIROList.InvokeUnary(this, "IMyService/MethodIROList", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.Generic.IReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodIRODictionary()
+                    => this.core.MethodIRODictionary.InvokeUnary(this, "IMyService/MethodIRODictionary", global::MessagePack.Nil.Default);
+                public global::MagicOnion.UnaryResult<global::System.Collections.ObjectModel.ReadOnlyDictionary<global::System.String, global::TempProject.MyResponse>> MethodRODictionary()
+                    => this.core.MethodRODictionary.InvokeUnary(this, "IMyService/MethodRODictionary", global::MessagePack.Nil.Default);
             }
         }
     }
