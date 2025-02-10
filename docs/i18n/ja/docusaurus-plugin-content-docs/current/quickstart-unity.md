@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 - Windows または macOS
 - .NET 8 SDK またはそれ以降
-- Unity 6000.0.36f (Standalone Player)
+- Unity 2022.2.44f 以降または Unity 6 (6000.0.34f1) 以降
 
 :::note
 Unity 6 の一部バージョンでは Source Generator に関する不具合があるため 6000.0.34f1 以降を使用してください
@@ -187,16 +187,18 @@ namespace MyApp.Shared
 :::
 
 ## サーバーを実装する
-### サーバーの初期構成
+
 サービスのインターフェースを定義した後はサーバープロジェクト `MyApp.Server` でサービスを実装する必要があります。
+
+### サーバーの初期構成
 
 まず初めにテンプレートで作成した際にデフォルトで追加される gRPC のサンプル実装を削除します。サンプル実装は `Protos` フォルダーと `Services` フォルダーに含まれているのでフォルダーごと削除します。
 
-次にサーバーの起動構成を設定します。
+次にサーバーの起動構成を設定します。ASP.NET Core アプリケーションは `Program.cs` でサーバーの機能に関する構成を行っています。
 
-ASP.NET Core アプリケーションは `Program.cs` でサーバーの機能に関する構成を行っています。`Program.cs` 内で `builder.Service.AddMagicOnion()` と `app.MapMagicOnionService()` を呼び出すことで MagicOnion のサーバー機能を有効化します。作成時に記述されている `using MyApp.Server.Services` と `builder.Services.AddGrpc();` と `app.MapGrpcService<GreeterService>();` は削除してください。
+`Program.cs` 内で `builder.Services.AddMagicOnion()` と `app.MapMagicOnionService()` を呼び出すことで MagicOnion のサーバー機能を有効化します。作成時に記述されている `using MyApp.Server.Services` と `builder.Services.AddGrpc();` と `app.MapGrpcService<GreeterService>();` は削除してください。
 
-この結果 `Program.cs` は下記のようになります。
+これらを踏まえた `Program.cs` は下記のようになります。
 
 ```csharp title="src/MyApp.Server/Program.cs"
 var builder = WebApplication.CreateBuilder(args);
@@ -231,7 +233,7 @@ MyApp.Server.csproj に Protobuf アイテムが残ってしまう場合があ�
 
 次にクライアントからのリクエストを受けて処理を行う API サービスを実装します。
 
-ここではサービスの定義として `IMyFirstService` インターフェースを定義しているので、実装クラスは `IMyFirstService` インターフェースを実装したものとなります。また API サービス (Unary サービス) の実装は基底のクラスとして `ServiceBase<T>` を継承する必要があります。
+ここではサービスの定義として `IMyFirstService` インターフェースを定義しているので、API サービス (Unary サービス) の実装クラスは `IMyFirstService` インターフェースを実装する必要があり、同時に基底のクラスとして `ServiceBase<T>` を継承する必要もあります。
 
 この二点を踏まえて `MyFirstService` クラスを作成します。下記はクラスの実装例です。
 
@@ -240,7 +242,7 @@ using MagicOnion;
 using MagicOnion.Server;
 using MyApp.Shared;
 
-namespace MyApp.Services;
+namespace MyApp.Server.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
@@ -376,7 +378,7 @@ Unity クライアントから API を呼び出すためにサービス定義を
 この手法のメリットはファイルコピーで済むことから試すことがとても簡単であることです。デメリットはファイルのコピーが手動で行われるため、ファイルの変更があった場合に手動でコピーする必要があります。
 
 #### 手法2: ローカルパッケージとして共有する
-2つ目の共有方法は `MyApp.Shared` プロジェクトを Unity のパッケージとして取り扱えるようにする方法です。これは1つ目の方法と異なり実体が同じファイルを指すことになるのでファイルの変更があった場合に同期をとる必要がありません。MagicOnion の開発ではこの手法を推奨しているため、このガイドではこの手法を前提として進めていきます。
+2つ目の共有方法は `MyApp.Shared` プロジェクトを Unity のパッケージとして取り扱えるようにする方法です。これは1つ目の方法と異なり実体が同じファイルを指すことになるのでファイルの変更があった場合に同期をとる必要がありません。MagicOnion の開発ではこの手法を推奨しているため、このガイドではこの手法による共有を採用します。
 
 .NET クラスライブラリープロジェクトを Unity のローカルパッケージとして扱うためにはいくつかの追加の手順が必要です。
 
@@ -387,7 +389,7 @@ Unity クライアントから API を呼び出すためにサービス定義を
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
   "displayName": "MyApp.Shared.Unity",
-  "description": "MyApp.Shared.Unity",
+  "description": "MyApp.Shared.Unity"
 }
 ```
 
@@ -472,7 +474,7 @@ Unity クライアントから API を呼び出すためにサービス定義を
 ```
 
 :::note
-Package Manager の `Install package from disk...` を使用してインストールすると `manifest.json` に絶対パスで保存されるため注意してください。
+Unity Editor の Package Manager の `Install package from disk...` を使用してインストールすると `manifest.json` に絶対パスで保存されるため注意してください。
 :::
 
 ![](/img/docs/fig-quickstart-unity-localpackage.png)
@@ -506,7 +508,7 @@ public class MagicOnionInitializer
 }
 ```
 
-詳しくは [Unity との統合](/integration/unity) を参照してください。
+Unity との統合について詳しくは [Unity との統合](/integration/unity) を参照してください。
 
 ### サーバーに接続して API を呼び出す
 
@@ -515,7 +517,7 @@ public class MagicOnionInitializer
 初めにサーバーに接続するのに必要な gRPC のチャンネルを作成します。MagicOnion では `GrpcChannelx` クラスを使用してチャンネルを作成できます。ここでは `GrpcChannelx.ForAddress` メソッドを使用して指定したアドレスに接続するチャンネルを作成します。指定するアドレスはサーバーを実装するセクションで起動した際に表示された `http://...` を使用します。
 
 ```csharp
-var channel = GrpcChannelx.ForAddress("https://localhost:7071");
+var channel = GrpcChannelx.ForAddress("http://localhost:5210");
 ```
 
 作成したチャンネルを使用して MagicOnion のクライアントを作成します。これは `MagicOnionClient` クラスの `Create` メソッドで行います。`Create` メソッドには作成したチャンネルと API サービスのインターフェースを指定します。これによって `IMyFirstService` インターフェースを実装したクライアントが作成されます。
@@ -524,13 +526,13 @@ var channel = GrpcChannelx.ForAddress("https://localhost:7071");
 var client = MagicOnionClient.Create<IMyFirstService>(channel);
 ```
 
-最後に作成されたクライアントを使用してメソッドを呼び出します。これは通常のインターフェースのメソッド呼び出しと同様に行えます。
+最後に作成されたクライアントを使用してメソッドを呼び出します。これは通常のインターフェースのメソッド呼び出しと同様に行えます。メソッドは非同期メソッドなので呼び出し結果の `UnaryResult` を `await` で待機する必要があります。
 
 ```csharp
 var result = await client.SumAsync(100, 200);
 ```
 
-ここまでの手順をまとめ、MonoBehaviour に実装すると下記のようになります。
+ここまでの手順をまとめ、MonoBehaviour に実装すると下記のようになります。ここでは SampleScene で使用する MonoBehaviour として `SampleScene` クラスを作成しています。
 
 ```csharp title="src/MyApp.Unity/Assets/Scripts/SampleScene.cs"
 using System;
@@ -546,11 +548,13 @@ public class SampleScene : MonoBehaviour
     {
         try
         {
+            // highlight-start
             var channel = GrpcChannelx.ForAddress("http://localhost:5210");
             var client = MagicOnionClient.Create<IMyFirstService>(channel);
 
             var result = await client.SumAsync(100, 200);
             Debug.Log($"100 + 200 = {result}");
+            // highlight-end
         }
         catch (Exception e)
         {
@@ -566,12 +570,22 @@ public class SampleScene : MonoBehaviour
 }
 ```
 
+:::tip
+`async void` の使用については `Start` のようなイベントなど一部を除いて使用を避けることをお勧めします。また UniTask を導入している場合には `async void` の代わりに `async UniTaskVoid` を使用することをお勧めします。
+:::
+
+最後にシーンに GameObject を追加し、その GameObject に `SampleScene` スクリプトをアタッチします。これで Unity クライアントからサーバーに接続して API を呼び出す準備が整いました。
+
+Unity Editor で Play モードに入ることで `Start` メソッドが呼び出され、サーバーに接続して API を呼び出す処理が実行されます。Console ログに `100 + 200 = 300` と表示されれば正常にサーバーに接続できて API を呼び出すことができています。
+
+![](/img/docs/fig-quickstart-unity-unarydebuglog.png)
+
 
 #### トラブルシューティング
 - `IOException: client error (Connect): tcp connect error: No connection could be made because the target machine actively refused it. (os error 10061)`
   - サーバーに接続できない状態です。サーバーが起動しているか、ポート番号が正しい確認してください
 - `IOException: client error (Connect): invalid peer certificate: UnknownIssuer`
-  - `https://` に接続しようとしてる場合に発生するエラーです。開発向け証明書を認識できないため発生します。`http://...` で接続してください(ポート番号に注意してください)。
+  - `https://` に接続しようとしてる場合に発生するエラーです。開発向け証明書を認識できないため発生します。`http://...` で接続してください(その際ポート番号には注意してください)。
 
 ## 関連リソース
 - [Unity での利用](/installation/unity)
