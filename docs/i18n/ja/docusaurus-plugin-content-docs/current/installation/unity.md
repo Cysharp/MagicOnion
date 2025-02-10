@@ -50,6 +50,7 @@ var channel = GrpcChannel.ForAddress("https://localhost:5000", new GrpcChannelOp
 var client = MagicOnionClient.Create<IMyFirstService>(channel);
 ```
 
+### Unity 統合
 Unity 向けに GrpcChannel をラップした、より開発に役立つ機能を提供する拡張も提供しています。詳しくは [Unity インテグレーション](../integration/unity) ページを参照してください。
 
 ## UnityEngine.Vector3 などの Unity 固有型を使用する
