@@ -1,0 +1,11 @@
+name: "(Legacy) Release"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    name: Not Supported
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Not supported in v7 or later." && exit 1

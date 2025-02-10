@@ -1,4 +1,4 @@
-name: Update pre-built SourceGenerator for Unity (Legacy)
+name: "(Legacy) Update pre-built SourceGenerator for Unity"
 
 on:
   workflow_dispatch:
