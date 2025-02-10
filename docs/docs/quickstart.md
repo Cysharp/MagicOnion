@@ -1,4 +1,4 @@
-# Quick Start
+# Start with a client and server in .NET
 This guide shows how to create a simple MagicOnion server and client. The server provides a simple service that adds two numbers, and the client calls the service to get the result.
 
 MagicOnion provides RPC services like Web API and StreamingHub for real-time communication. This section implements an RPC service like Web API.
@@ -23,11 +23,15 @@ using MagicOnion.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// highlight-start
 builder.Services.AddMagicOnion(); // Add this line(MagicOnion.Server)
+// highlight-end
 
 var app = builder.Build();
 
+// highlight-start
 app.MapMagicOnionService(); // Add this line
+// highlight-end
 
 app.Run();
 ```

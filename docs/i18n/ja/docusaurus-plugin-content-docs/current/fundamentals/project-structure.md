@@ -26,10 +26,11 @@ MyApp は任意の名前で、プロジェクト名やソリューション名�
 下記は上記の構成でのファイルの配置例です。
 
 ```plaintext
-MyApp.sln
+MyApp.Server.sln
 |─ src
 |  ├─ MyApp.Server
 |  │  ├─ MyApp.Server.csproj
+|  │  ├─ Program.cs
 |  |  ├─ Hubs
 |  |  |  ├─ ChatHub.cs
 |  |  └─ Services

@@ -19,7 +19,15 @@ const sidebars: SidebarsConfig = {
     'index',
     'features',
     'supported-platforms',
-    'quickstart',
+    {
+      type: 'category',
+      label: 'Quick Start',
+      collapsed: false,
+      items: [
+        'quickstart',
+        'quickstart-unity',
+      ]
+    },
     {
       type: 'category',
       label: 'Installation',

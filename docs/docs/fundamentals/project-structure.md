@@ -24,10 +24,11 @@ Replace `MyApp` with your project name or solution name.
 The following is an example of directory structure for the above project structure.
 
 ```plaintext
-MyApp.sln
+MyApp.Server.sln
 |─ src
 |  ├─ MyApp.Server
 |  │  ├─ MyApp.Server.csproj
+|  │  ├─ Program.cs
 |  |  ├─ Hubs
 |  |  |  ├─ ChatHub.cs
 |  |  └─ Services
