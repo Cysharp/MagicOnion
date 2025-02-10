@@ -684,7 +684,9 @@ public class GenerateGenericsTest
     {
         var source = """
         using System;
+        using System.Collections;
         using System.Collections.Generic;
+        using System.Collections.ObjectModel;
         using System.Linq;
         using System.Threading.Tasks;
         using MessagePack;
@@ -695,20 +697,35 @@ public class GenerateGenericsTest
         {
             public interface IMyService : IService<IMyService>
             {
+                // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/v3.0.300/src/MessagePack/Resolvers/DynamicGenericResolver.cs#L52
                 UnaryResult<List<MyResponse>>                        MethodList(List<int> args);
+                UnaryResult<LinkedList<MyResponse>>                  MethodLinkedList(LinkedList<int> args);
+                UnaryResult<Queue<MyResponse>>                       MethodQueue();
+                //UnaryResult<PriorityQueue<int,MyResponse>>           MethodPriorityQueue();
+                UnaryResult<Stack<MyResponse>>                       MethodStack();
+                UnaryResult<HashSet<MyResponse>>                     MethodHashSet();
+                UnaryResult<ReadOnlyCollection<MyResponse>>          MethodROCollection();
+        
                 UnaryResult<IList<MyResponse>>                       MethodIList();
-                UnaryResult<IReadOnlyList<MyResponse>>               MethodIROList();
+                UnaryResult<ICollection<MyResponse>>                 MethodICollection();
+                UnaryResult<IEnumerable<MyResponse>>                 MethodIEnumerable();
         
                 UnaryResult<Dictionary<string, MyResponse>>          MethodDictionary();
                 UnaryResult<IDictionary<string, MyResponse>>         MethodIDictionary();
-                UnaryResult<IReadOnlyDictionary<string, MyResponse>> MethodIRODictionary();
-        
-                UnaryResult<IEnumerable<MyResponse>>                 MethodIEnumerable();
-                UnaryResult<ICollection<MyResponse>>                 MethodICollection();
-                UnaryResult<IReadOnlyCollection<MyResponse>>         MethodIROCollection();
+                UnaryResult<SortedDictionary<string, MyResponse>>    MethodSortedDictionary();
+                UnaryResult<SortedList<int, MyResponse>>             MethodSortedList();
         
                 UnaryResult<ILookup<int, MyResponse>>                MethodILookup();
                 UnaryResult<IGrouping<int, MyResponse>>              MethodIGrouping();
+        
+                UnaryResult<ISet<MyResponse>>                        MethodISet();
+                UnaryResult<IReadOnlySet<MyResponse>>                MethodIROSet();
+        
+                UnaryResult<IReadOnlyCollection<MyResponse>>         MethodIROCollection();
+                UnaryResult<IReadOnlyList<MyResponse>>               MethodIROList();
+                UnaryResult<IReadOnlyDictionary<string, MyResponse>> MethodIRODictionary();
+                UnaryResult<ReadOnlyDictionary<string, MyResponse>>  MethodRODictionary();
+        
             }
             public class MyResponse
             {
