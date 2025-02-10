@@ -128,8 +128,6 @@ Next, add the following two setting files (`Directory.Build.props` and `Director
 <Project>
   <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
   <ItemGroup>
-    <None Remove="**\package.json" />
-    <None Remove="**\*.asmdef" />
     <None Remove="**\*.meta" />
   </ItemGroup>
 
@@ -152,7 +150,7 @@ Next, add a reference to `MyApp.Shared` in the Unity project's `Packages/manifes
 ```json title="src/MyApp.Unity/Packages/manifest.json"
 {
   "dependencies": {
-    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../MyApp.Shared/MyApp.Shared.Unity",
+    "com.cysharp.magiconion.samples.myapp.shared.unity": "file:../../MyApp.Shared",
     ...
   }
 }
