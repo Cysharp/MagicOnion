@@ -107,7 +107,7 @@ Here is an example of a minimal `package.json` file for a Unity local package.
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
   "displayName": "MyApp.Shared.Unity",
-  "description": "MyApp.Shared.Unity",
+  "description": "MyApp.Shared.Unity"
 }
 ```
 

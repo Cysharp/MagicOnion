@@ -108,7 +108,7 @@ MyApp.Shared プロジェクトは .NET クラスライブラリーとして作�
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
   "displayName": "MyApp.Shared.Unity",
-  "description": "MyApp.Shared.Unity",
+  "description": "MyApp.Shared.Unity"
 }
 ```
 
