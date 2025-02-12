@@ -66,13 +66,13 @@ Unity 애플리케이션의 구성은 Unity 프로젝트와 서버(.NET) 프로�
 
 권장하는 구성은 다음과 같습니다.
 
-- **MyApp.Server.sln**: 솔루션 파일
+- **MyApp.sln**: 솔루션 파일
 - **MyApp.Server**: MagicOnion 서버 애플리케이션 (ASP.NET Core gRPC Server)
 - **MyApp.Unity**: Unity 클라이언트 애플리케이션
 - **MyApp.Shared**: 공유 인터페이스 라이브러리 (.NET 라이브러리 프로젝트와 Unity 로컬 패키지)
 
 ```plaintext
-MyApp.Server.sln
+MyApp.sln
 |─ src
 |   ├─ MyApp.Server
 |   │  ├─ MyApp.Server.csproj
@@ -108,7 +108,7 @@ MyApp.Server.sln
   "name": "com.cysharp.magiconion.samples.myapp.shared.unity",
   "version": "1.0.0",
   "displayName": "MyApp.Shared.Unity",
-  "description": "MyApp.Shared.Unity",
+  "description": "MyApp.Shared.Unity"
 }
 ```
 
@@ -158,6 +158,6 @@ MyApp.Server.sln
 
 [SlnMerge](https://github.com/Cysharp/SlnMerge)라는 Unity용 에디터 확장을 사용하면 Unity가 생성하는 솔루션과 .NET 프로젝트의 솔루션을 통합할 수 있습니다.
 
-예를 들어 MyApp.Server.sln에는 MyApp.Server와 MyApp.Shared 프로젝트가 포함되지만, Unity에서 생성되는 솔루션에는 Unity용 프로젝트(Assembly-CSharp, Assembly-CSharp-Editor 등)만 포함됩니다. SlnMerge를 사용하면 이러한 솔루션들을 통합하여, Unity에서 솔루션을 열었을 때도 원활하게 서버 프로젝트를 참조할 수 있게 됩니다.
+예를 들어 MyApp.sln에는 MyApp.Server와 MyApp.Shared 프로젝트가 포함되지만, Unity에서 생성되는 솔루션에는 Unity용 프로젝트(Assembly-CSharp, Assembly-CSharp-Editor 등)만 포함됩니다. SlnMerge를 사용하면 이러한 솔루션들을 통합하여, Unity에서 솔루션을 열었을 때도 원활하게 서버 프로젝트를 참조할 수 있게 됩니다.
 
 이를 통해 Unity와 .NET 프로젝트 사이에서 참조 검색이나 디버거 스텝인 같은 기능을 사용할 수 있어 개발 효율성이 향상될 수 있습니다.
