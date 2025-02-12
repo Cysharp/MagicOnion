@@ -52,8 +52,8 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new classlib -f netstandard2.1 -o src/%MO_PROJECT_NAME%.Shared -n %MO_PROJECT_NAME%.Shared
 
     dotnet new sln -n %MO_PROJECT_NAME%
-    dotnet sln add src/%MO_PROJECT_NAME%.Server
-    dotnet sln add src/%MO_PROJECT_NAME%.Shared
+    dotnet sln add src/%MO_PROJECT_NAME%.Server --in-root
+    dotnet sln add src/%MO_PROJECT_NAME%.Shared --in-root
 
     pushd src\%MO_PROJECT_NAME%.Server
     dotnet remove package Grpc.AspNetCore
@@ -75,8 +75,8 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new classlib -f netstandard2.1 -o "src/$MO_PROJECT_NAME.Shared" -n "$MO_PROJECT_NAME.Shared"
 
     dotnet new sln -n "$MO_PROJECT_NAME"
-    dotnet sln add "src/$MO_PROJECT_NAME.Server"
-    dotnet sln add "src/$MO_PROJECT_NAME.Shared"
+    dotnet sln add "src/$MO_PROJECT_NAME.Server" --in-root
+    dotnet sln add "src/$MO_PROJECT_NAME.Shared" --in-root
 
     pushd "src/$MO_PROJECT_NAME.Server"
     dotnet remove package Grpc.AspNetCore
@@ -98,8 +98,8 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new classlib -f netstandard2.1 -o src/$MO_PROJECT_NAME.Shared -n $MO_PROJECT_NAME.Shared
 
     dotnet new sln -n $MO_PROJECT_NAME
-    dotnet sln add src/$MO_PROJECT_NAME.Server
-    dotnet sln add src/$MO_PROJECT_NAME.Shared
+    dotnet sln add src/$MO_PROJECT_NAME.Server --in-root
+    dotnet sln add src/$MO_PROJECT_NAME.Shared --in-root
 
     pushd src/$MO_PROJECT_NAME.Server
     dotnet remove package Grpc.AspNetCore
@@ -400,6 +400,10 @@ Unity クライアントから API を呼び出すためにサービス定義を
 }
 ```
 
+:::note
+Assembly Definition ファイルのファイル名は Unity から IDE を開く際のプロジェクト名として使用されます。そのためサーバー向けの `MyApp.Shared` と区別がつくよう `.Unity` サフィックスを付けることを推奨します。
+:::
+
 最後に `MyApp.Shared` プロジェクトに `Directory.Build.props` と `Directory.Build.targets` を追加します。これは .NET プロジェクトで `bin`, `obj` フォルダーを出力しないように構成(代わりに `.artifacts` に出力)し、Unity 向けの .meta などのファイルを IDE 上から非表示にします。
 
 
@@ -459,7 +463,7 @@ macOS の Finder ではデフォルトで `.` から始まるファイルを非�
 
 `MyApp.Shared` をローカルパッケージとして共有できるようにしたので Unity プロジェクトでローカルパッケージの参照を追加する必要があります。
 
-ローカルパッケージの参照を追加するには `MyApp.Unity/Packages/manifest.json` にパッケージへのパスを追加します。ここでは `file:../../MyApp.Shared` として追加します。
+ローカルパッケージの参照を追加するには `MyApp.Unity/Packages/manifest.json` にパッケージへのパスを追加します。ここでは `file:../../MyApp.Shared` として相対パスで追加します。
 
 ```json title="src/MyApp.Unity/Packages/manifest.json"
 {

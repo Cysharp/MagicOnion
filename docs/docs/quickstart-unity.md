@@ -52,8 +52,8 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new classlib -f netstandard2.1 -o src/%MO_PROJECT_NAME%.Shared -n %MO_PROJECT_NAME%.Shared
 
     dotnet new sln -n %MO_PROJECT_NAME%
-    dotnet sln add src/%MO_PROJECT_NAME%.Server
-    dotnet sln add src/%MO_PROJECT_NAME%.Shared
+    dotnet sln add src/%MO_PROJECT_NAME%.Server --in-root
+    dotnet sln add src/%MO_PROJECT_NAME%.Shared --in-root
 
     pushd src\%MO_PROJECT_NAME%.Server
     dotnet remove package Grpc.AspNetCore
@@ -75,8 +75,8 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new classlib -f netstandard2.1 -o "src/$MO_PROJECT_NAME.Shared" -n "$MO_PROJECT_NAME.Shared"
 
     dotnet new sln -n "$MO_PROJECT_NAME"
-    dotnet sln add "src/$MO_PROJECT_NAME.Server"
-    dotnet sln add "src/$MO_PROJECT_NAME.Shared"
+    dotnet sln add "src/$MO_PROJECT_NAME.Server" --in-root
+    dotnet sln add "src/$MO_PROJECT_NAME.Shared" --in-root
 
     pushd "src/$MO_PROJECT_NAME.Server"
     dotnet remove package Grpc.AspNetCore
@@ -98,8 +98,8 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new classlib -f netstandard2.1 -o src/$MO_PROJECT_NAME.Shared -n $MO_PROJECT_NAME.Shared
 
     dotnet new sln -n $MO_PROJECT_NAME
-    dotnet sln add src/$MO_PROJECT_NAME.Server
-    dotnet sln add src/$MO_PROJECT_NAME.Shared
+    dotnet sln add src/$MO_PROJECT_NAME.Server --in-root
+    dotnet sln add src/$MO_PROJECT_NAME.Shared --in-root
 
     pushd src/$MO_PROJECT_NAME.Server
     dotnet remove package Grpc.AspNetCore
@@ -402,6 +402,10 @@ Next, add an Assembly Definition file to make it a separate assembly in Unity. A
 }
 ```
 
+:::note
+The file name of the Assembly Definition file is used as the project name when opening the project from Unity. Therefore, it is recommended to add a `.Unity` suffix to distinguish it from `MyApp.Shared`.
+:::
+
 Finally, add `Directory.Build.props` and `Directory.Build.targets` to the `MyApp.Shared` project. These files are used to configure the project not to output folders such as `bin` and `obj` (instead, output to `.artifacts`) and to hide Unity-specific files from the IDE.
 
 ```xml title="src/MyApp.Shared/Directory.Build.props"
@@ -460,7 +464,7 @@ With these steps, the `MyApp.Shared` project should have the following file stru
 
 `MyApp.Shared` has been made available as a local package, so you need to add a reference to the local package in the Unity project.
 
-To add a reference to a local package, add the path to the package in `MyApp.Unity/Packages/manifest.json`. Here, add `file:../../MyApp.Shared` as the path to the package.
+To add a reference to a local package, add the path to the package in `MyApp.Unity/Packages/manifest.json`. Here, add `file:../../MyApp.Shared` as the relative path to the package.
 
 ```json title="src/MyApp.Unity/Packages/manifest.json"
 {
