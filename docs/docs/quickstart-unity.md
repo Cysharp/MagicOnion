@@ -23,7 +23,7 @@ The directory structure of the project to be created in this guide follows the s
 
 ```plaintext
 (Repository Root)
-├─ MyApp.Server.sln
+├─ MyApp.sln
 └─ src
    ├─ MyApp.Server
    │  ├─ MyApp.Server.csproj
@@ -51,7 +51,7 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new grpc -o src/%MO_PROJECT_NAME%.Server -n %MO_PROJECT_NAME%.Server
     dotnet new classlib -f netstandard2.1 -o src/%MO_PROJECT_NAME%.Shared -n %MO_PROJECT_NAME%.Shared
 
-    dotnet new sln -n %MO_PROJECT_NAME%.Server
+    dotnet new sln -n %MO_PROJECT_NAME%
     dotnet sln add src/%MO_PROJECT_NAME%.Server
     dotnet sln add src/%MO_PROJECT_NAME%.Shared
 
@@ -74,7 +74,7 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new grpc -o "src/$MO_PROJECT_NAME.Server" -n "$MO_PROJECT_NAME.Server"
     dotnet new classlib -f netstandard2.1 -o "src/$MO_PROJECT_NAME.Shared" -n "$MO_PROJECT_NAME.Shared"
 
-    dotnet new sln -n "$MO_PROJECT_NAME.Server"
+    dotnet new sln -n "$MO_PROJECT_NAME"
     dotnet sln add "src/$MO_PROJECT_NAME.Server"
     dotnet sln add "src/$MO_PROJECT_NAME.Shared"
 
@@ -97,7 +97,7 @@ You can create a solution, server project, and shared library project, and add M
     dotnet new grpc -o src/$MO_PROJECT_NAME.Server -n $MO_PROJECT_NAME.Server
     dotnet new classlib -f netstandard2.1 -o src/$MO_PROJECT_NAME.Shared -n $MO_PROJECT_NAME.Shared
 
-    dotnet new sln -n $MO_PROJECT_NAME.Server
+    dotnet new sln -n $MO_PROJECT_NAME
     dotnet sln add src/$MO_PROJECT_NAME.Server
     dotnet sln add src/$MO_PROJECT_NAME.Shared
 
@@ -119,7 +119,7 @@ The commands shown here are a series of commands that perform the following oper
 
 - Create an ASP.NET Core gRPC server project (MyApp.Server)
 - Create a class library project for shared libraries (MyApp.Shared)
-- Create a solution file (MyApp.Server.sln)
+- Create a solution file (MyApp.sln)
 - Add MyApp.Server and MyApp.Shared to the solution
 - MyApp.Server
   - Add the MagicOnion.Server package
@@ -139,7 +139,7 @@ After creating the Unity project, the directory structure should look like this:
 
 ```plaintext
 (Repository Root)
-│  MyApp.Server.sln
+│  MyApp.sln
 └─src
     ├─MyApp.Server
     ├─MyApp.Shared
@@ -148,7 +148,7 @@ After creating the Unity project, the directory structure should look like this:
 
 ### Open the project in an IDE
 
-You can open `MyApp.Server.sln` in Visual Studio or Rider to open the `MyApp.Server` and `MyApp.Shared` projects.
+You can open `MyApp.sln` in Visual Studio or Rider to open the `MyApp.Server` and `MyApp.Shared` projects.
 
 :::info{title="For developers who are not familiar with the .NET ecosystem"}
 `.sln` files are called solutions and bundle multiple projects together. By opening a solution in an IDE such as Visual Studio or Rider, you can manage multiple projects such as servers, clients, and class libraries together.
@@ -160,7 +160,7 @@ In MagicOnion, the API services provided by the server to the client are defined
 
 Add an interface definition that defines the service to the project `MyApp.Shared`. This project is a project for sharing code between the server and the client.
 
-In this section, we define a simple calculation service interface `IMyFirstService`. The interface takes two `int` values `x` and `y` and returns the sum of the two values in the `SumAsync` method (APIs are always asynchronous methods).
+In this section, we define a simple calculation service interface `IMyFirstService`. The interface takes two `int` values `x` and `y` and returns the sum of the two values in the `SumAsync` method.
 
 ```csharp title="src/MyApp.Shared/IMyFirstService.cs"
 using MagicOnion;
@@ -179,7 +179,7 @@ This is a typical .NET interface definition and is almost the same as a general 
 
 `IService<T>` is an interface that indicates that this interface is a Unary service. A Unary service is an API service that returns one response for one request. For more information, see [Unary Fundamentals](/unary/fundamentals).
 
-The return type must be `UnaryResult` or `UnaryResult<T>`, which is treated as an asynchronous method like `Task` or `ValueTask`. `UnaryResult<int>` indicates that the method returns an `int` value.
+The return type must be `UnaryResult<T>` or `UnaryResult`, which is treated as an asynchronous method like `Task` or `ValueTask`. `UnaryResult<int>` here indicates that it receives an `int` value from the server. Since the API is always asynchronous, you need to use `UnaryResult`, and it is recommended to add the `Async` suffix to the method name.
 
 :::tip
 The project created from the template already contains a `Class1.cs`, so delete it from the project.
@@ -287,7 +287,7 @@ The directory and file structure should look like follows. The server-related wo
 ![](/img/docs/fig-quickstart-unity-server-sln.png)
 ```plaintext
 (Repository Root)
-├─ MyApp.Server.sln
+├─ MyApp.sln
 └─ src
    ├─ MyApp.Server
    │  ├─ MyApp.Server.csproj

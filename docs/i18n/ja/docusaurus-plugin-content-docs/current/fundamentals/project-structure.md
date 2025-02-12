@@ -26,7 +26,7 @@ MyApp は任意の名前で、プロジェクト名やソリューション名�
 下記は上記の構成でのファイルの配置例です。
 
 ```plaintext
-MyApp.Server.sln
+MyApp.sln
 |─ src
 |  ├─ MyApp.Server
 |  │  ├─ MyApp.Server.csproj
@@ -67,13 +67,13 @@ Unity アプリケーションでの構成は Unity プロジェクトとサー�
 
 推奨する構成は以下のようになります。
 
-- **MyApp.Server.sln**: ソリューションファイル
+- **MyApp.sln**: ソリューションファイル
 - **MyApp.Server**: MagicOnion サーバーアプリケーション (ASP.NET Core gRPC Server)
 - **MyApp.Unity**: Unity クライアントアプリケーション
 - **MyApp.Shared**: インターフェース共有ライブラリー (.NET ライブラリープロジェクト兼 Unity ローカルパッケージ)
 
 ```plaintext
-MyApp.Server.sln
+MyApp.sln
 |─ src
 |   ├─ MyApp.Server
 |   │  ├─ MyApp.Server.csproj
@@ -163,6 +163,6 @@ MyApp.Server プロジェクトからは MyApp.Shared プロジェクトをプ�
 
 Unity 向けのエディター拡張の [SlnMerge](https://github.com/Cysharp/SlnMerge) を使用することで Unity が生成するソリューションと .NET プロジェクトのソリューションを統合できます。
 
-例えば MyApp.Server.sln には MyApp.Server と MyApp.Shared プロジェクトが含まれますが、Unity で生成されるソリューションには Unity 向けのプロジェクト (Assembly-CSharp, Assembly-CSharp-Editor など) のみが含まれます。SlnMerge を使用することでこれらのソリューションを統合し、Unity からソリューションを開いた場合でもシームレスにサーバープロジェクトを参照できるようになります。
+例えば MyApp.sln には MyApp.Server と MyApp.Shared プロジェクトが含まれますが、Unity で生成されるソリューションには Unity 向けのプロジェクト (Assembly-CSharp, Assembly-CSharp-Editor など) のみが含まれます。SlnMerge を使用することでこれらのソリューションを統合し、Unity からソリューションを開いた場合でもシームレスにサーバープロジェクトを参照できるようになります。
 
 これにより Unity と .NET プロジェクト間での参照検索やデバッガーステップインなどが可能となりより良い開発体験を得られます。

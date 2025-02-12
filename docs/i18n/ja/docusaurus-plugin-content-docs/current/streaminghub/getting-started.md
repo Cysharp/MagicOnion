@@ -6,18 +6,18 @@
 
 StreamingHub を定義、実装、利用するには下記の手順が必要となります。
 
-- サーバーとクライアントの間で共有する StreamingHub インターフェイスを定義する
-- サーバープロジェクトで定義した StreamingHub インターフェイスを実装する
+- サーバーとクライアントの間で共有する StreamingHub インターフェースを定義する
+- サーバープロジェクトで定義した StreamingHub インターフェースを実装する
 - クライアントプロジェクトで定義した StreamingHub レシーバーを実装する
 - クライアントプロジェクトで定義した StreamingHub を呼び出すためのクライアントプロキシーを作成する
 
-## サーバーとクライアントの間で共有する StreamingHub インターフェイスを定義する
+## サーバーとクライアントの間で共有する StreamingHub インターフェースを定義する
 
-共有ライブラリープロジェクトに StreamingHub のインターフェイスを定義します (Unity の場合はソースコードコピーやファイルリンクで対応します)。
+共有ライブラリープロジェクトに StreamingHub のインターフェースを定義します (Unity の場合はソースコードコピーやファイルリンクで対応します)。
 
-StreamingHub のインターフェースは `IStreamingHub<TSelf, TReceiver>` を継承する必要があります。`TSelf` にはインターフェース自身、`TReceiver` にはレシーバーインターフェイスを指定します。レシーバーインターフェースはサーバーからクライアントにメッセージを送信し、受信するためのインターフェースです。
+StreamingHub のインターフェースは `IStreamingHub<TSelf, TReceiver>` を継承する必要があります。`TSelf` にはインターフェース自身、`TReceiver` にはレシーバーインターフェースを指定します。レシーバーインターフェースはサーバーからクライアントにメッセージを送信し、受信するためのインターフェースです。
 
-以下はチャットアプリケーションの StreamingHub インターフェイスの例です。クライアントはメッセージの受信や参加、退出イベントを送るレシーバーインターフェースを持っています。
+以下はチャットアプリケーションの StreamingHub インターフェースの例です。クライアントはメッセージの受信や参加、退出イベントを送るレシーバーインターフェースを持っています。
 
 ```csharp
 // A hub must inherit `IStreamingHub<TSelf, TReceiver>`.
@@ -42,7 +42,7 @@ StreamingHub が提供するメソッドを **Hub メソッド** と呼びます
 
 ## サーバープロジェクトで StreamingHub を実装する
 
-サーバー上にクライアントから呼び出せる StreamingHub を実装する必要があります。サーバー実装は `StreamingHubBase<THub, TReceiver>` を継承し、定義した StreamingHub インターフェイスを実装する必要があります。
+サーバー上にクライアントから呼び出せる StreamingHub を実装する必要があります。サーバー実装は `StreamingHubBase<THub, TReceiver>` を継承し、定義した StreamingHub インターフェースを実装する必要があります。
 
 ```csharp
 public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
