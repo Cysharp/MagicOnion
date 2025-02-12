@@ -10,7 +10,7 @@ Unified Realtime/API framework for .NET platform and Unity.
 
 MagicOnion は SignalR や Socket.io、WCF、Web ベースの API などの RPC メカニズムと同様に、.NET プラットフォーム向けの双方向リアルタイム通信を提供するモダンな RPC フレームワークです。
 
-このフレームワークは gRPC を元にしており、高速でコンパクトなネットワークトランスポートである HTTP/2 に基づいています。ただし、通常の gRPC とは異なり、C# インターフェイスをプロトコルスキーマとして扱い、`.proto` (Protocol Buffers IDL) なしで C# プロジェクト間でのコード共有を実現します。
+このフレームワークは gRPC を元にしており、高速でコンパクトなネットワークトランスポートである HTTP/2 に基づいています。ただし、通常の gRPC とは異なり、C# インターフェースをプロトコルスキーマとして扱い、`.proto` (Protocol Buffers IDL) なしで C# プロジェクト間でのコード共有を実現します。
 
 インターフェースはスキーマであり、プレーンな C# コードと同様に API サービスを提供します。
 

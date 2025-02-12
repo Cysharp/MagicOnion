@@ -23,7 +23,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 
 ```plaintext
 (Repository Root)
-├─ MyApp.Server.sln
+├─ MyApp.sln
 └─ src
    ├─ MyApp.Server
    │  ├─ MyApp.Server.csproj
@@ -51,7 +51,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new grpc -o src/%MO_PROJECT_NAME%.Server -n %MO_PROJECT_NAME%.Server
     dotnet new classlib -f netstandard2.1 -o src/%MO_PROJECT_NAME%.Shared -n %MO_PROJECT_NAME%.Shared
 
-    dotnet new sln -n %MO_PROJECT_NAME%.Server
+    dotnet new sln -n %MO_PROJECT_NAME%
     dotnet sln add src/%MO_PROJECT_NAME%.Server
     dotnet sln add src/%MO_PROJECT_NAME%.Shared
 
@@ -74,7 +74,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new grpc -o "src/$MO_PROJECT_NAME.Server" -n "$MO_PROJECT_NAME.Server"
     dotnet new classlib -f netstandard2.1 -o "src/$MO_PROJECT_NAME.Shared" -n "$MO_PROJECT_NAME.Shared"
 
-    dotnet new sln -n "$MO_PROJECT_NAME.Server"
+    dotnet new sln -n "$MO_PROJECT_NAME"
     dotnet sln add "src/$MO_PROJECT_NAME.Server"
     dotnet sln add "src/$MO_PROJECT_NAME.Shared"
 
@@ -97,7 +97,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
     dotnet new grpc -o src/$MO_PROJECT_NAME.Server -n $MO_PROJECT_NAME.Server
     dotnet new classlib -f netstandard2.1 -o src/$MO_PROJECT_NAME.Shared -n $MO_PROJECT_NAME.Shared
 
-    dotnet new sln -n $MO_PROJECT_NAME.Server
+    dotnet new sln -n $MO_PROJECT_NAME
     dotnet sln add src/$MO_PROJECT_NAME.Server
     dotnet sln add src/$MO_PROJECT_NAME.Shared
 
@@ -119,7 +119,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 
 - ASP.NET Core gRPC サーバープロジェクトの作成 (MyApp.Server)
 - 共有ライブラリー用クラスライブラリープロジェクトの作成 (MyApp.Shared)
-- ソリューションファイルの作成 (MyApp.Server.sln)
+- ソリューションファイルの作成 (MyApp.sln)
 - MyApp.Server と MyApp.Shared をソリューションに追加
 - MyApp.Server
   - MagicOnion.Server のパッケージの追加
@@ -139,7 +139,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 
 ```plaintext
 (Repository Root)
-│  MyApp.Server.sln
+│  MyApp.sln
 └─src
     ├─MyApp.Server
     ├─MyApp.Shared
@@ -148,7 +148,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 
 ## IDE でプロジェクトを開く
 
-Visual Studio や Rider で MyApp.Server.sln を開くことで、MyApp.Server と MyApp.Shared プロジェクトを開けます。
+Visual Studio や Rider で MyApp.sln を開くことで、MyApp.Server と MyApp.Shared プロジェクトを開けます。
 
 :::info{title=".NET エコシステムにあまり詳しくない開発者の方向け"}
 `.sln` ファイルはソリューションと呼ばれ、複数のプロジェクトを束ねる役割を担います。Visual Studio や Rider などの開発環境でソリューションを開くことで、サーバーやクライアント、クラスライブラリーなど複数のプロジェクトを一括で操作、管理できます。
@@ -160,8 +160,7 @@ MagicOnion ではサーバーがクライアントに提供する API サービ�
 
 サービス定義となるインターフェースをプロジェクト `MyApp.Shared` に追加します。このプロジェクトはサーバーとクライアントでコードを共有するためのプロジェクトです。
 
-ここでは単純な計算サービス `IMyFirstService` インターフェースを定義します。インターフェースは `x` と `y` の二つの `int` を受け取り、その合計値を返す `SumAsync` メソッドを持つものとします (API は常に非同期メソッド)。
-
+ここでは単純な計算サービス `IMyFirstService` インターフェースを定義します。インターフェースは `x` と `y` の二つの `int` を受け取り、その合計値を返す `SumAsync` メソッドを持つものとします。
 
 ```csharp title="src/MyApp.Shared/IMyFirstService.cs"
 using MagicOnion;
@@ -180,7 +179,7 @@ namespace MyApp.Shared
 
 `IService<T>` はこのインターフェースが Unary サービスであることを表すインターフェースです。Unary サービスとは 1 つのリクエストに対して 1 つのレスポンスを返す API サービスのことです。詳しくは [Unary の基礎](/unary/fundamentals) を参照してください。
 
-戻り値は `UnaryResult` または `UnaryResult<T>` 型である必要があります。これは Task や ValueTask と同様に非同期メソッドとして扱われる MagicOnion 固有の特殊な型です。ここでの `UnaryResult<int>` は `int` 型の値を返すことを表します。
+戻り値は `UnaryResult` または `UnaryResult<T>` 型である必要があります。これは Task や ValueTask と同様に非同期メソッドとして扱われる MagicOnion 固有の特殊な型で、ここでの `UnaryResult<int>` は `int` 型の値をサーバーから受け取ることを表します。また API は常に非同期であるため `UnaryResult` を使う必要があり、メソッド名には `Async` サフィックスを付けることを推奨します。
 
 :::tip
 このプロジェクトにはテンプレートで作成された `Class1.cs` があらかじめ含まれているので削除してください。
@@ -288,7 +287,7 @@ info: Microsoft.Hosting.Lifetime[0]
 ![](/img/docs/fig-quickstart-unity-server-sln.png)
 ```plaintext
 (Repository Root)
-├─ MyApp.Server.sln
+├─ MyApp.sln
 └─ src
    ├─ MyApp.Server
    │  ├─ MyApp.Server.csproj
