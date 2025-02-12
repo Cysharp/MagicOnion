@@ -19,7 +19,15 @@ const sidebars: SidebarsConfig = {
     'index',
     'features',
     'supported-platforms',
-    'quickstart',
+    {
+      type: 'category',
+      label: 'Quick Start',
+      collapsed: false,
+      items: [
+        'quickstart',
+        'quickstart-unity',
+      ]
+    },
     {
       type: 'category',
       label: 'Installation',
@@ -100,6 +108,14 @@ const sidebars: SidebarsConfig = {
         'filter/streaminghub-filter',
         'filter/extensibility',
         'filter/dependency-injection',
+      ]
+    },
+    {
+      type: 'category',
+      label: 'Best practices',
+      items: [
+        'best-practices/load-tests',
+        'best-practices/hub-context-pattern',
       ]
     },
     {

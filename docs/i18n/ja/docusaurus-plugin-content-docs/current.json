@@ -3,6 +3,10 @@
     "message": "Next",
     "description": "The label for version current"
   },
+  "sidebar.docsSidebar.category.Quick Start": {
+    "message": "クイックスタート",
+    "description": "The label for category Quick Start in sidebar docsSidebar"
+  },
   "sidebar.docsSidebar.category.Installation": {
     "message": "インストール",
     "description": "The label for category Installation in sidebar docsSidebar"

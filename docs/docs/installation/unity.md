@@ -52,7 +52,13 @@ var channel = GrpcChannel.ForAddress("https://localhost:5000", new GrpcChannelOp
 var client = MagicOnionClient.Create<IMyFirstService>(channel);
 ```
 
+### Unity Integration
 For Unity, we also provide extensions that wrap GrpcChannel and provide more useful features for development. For more information, see the [Unity Integration](/integration/unity) page.
+
+## Using Unity-specific types such as UnityEngine.Vector3
+If you want to use Unity-specific types such as `UnityEngine.Vector2` and `UnityEngine.Vector3`, you need to install additional packages.
+
+To use Unity-specific types in a Unity project, you need to install the Unity-specific package of MessagePack-CSharp, and in the server or shared library, you need to install an extension NuGet package. For more information, see the [Unity support](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#unity-support) and [Extensions](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#extensions) sections of MessagePack-CSharp.
 
 ## Works with IL2CPP
 

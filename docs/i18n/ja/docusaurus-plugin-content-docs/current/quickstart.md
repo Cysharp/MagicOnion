@@ -1,5 +1,5 @@
-# クイックスタート
-このガイドではシンプルな MagicOnion サーバーとクライアントを作成する方法を示します。サーバーは、2 つの数値を加算するシンプルなサービスを提供し、クライアントはサービスを呼び出して結果を取得します。
+# .NET クライアントとサーバーで始める
+このガイドではシンプルな MagicOnion サーバーとクライアントを作成する手順を解説します。サーバーは、2 つの数値を加算するシンプルなサービスを提供し、クライアントはサービスを呼び出して結果を取得します。
 
 MagicOnion は Web API のような RPC サービスとリアルタイム通信の StreamingHub を提供します。このセクションでは Web API のような RPC サービスを実装します。
 
@@ -23,11 +23,15 @@ using MagicOnion.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// highlight-start
 builder.Services.AddMagicOnion(); // Add this line(MagicOnion.Server)
+// highlight-end
 
 var app = builder.Build();
 
+// highlight-start
 app.MapMagicOnionService(); // Add this line
+// highlight-end
 
 app.Run();
 ```
