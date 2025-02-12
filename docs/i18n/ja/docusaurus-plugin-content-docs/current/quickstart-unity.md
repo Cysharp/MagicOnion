@@ -3,13 +3,13 @@ import TabItem from '@theme/TabItem';
 
 # Unity と .NET サーバーで始める
 
-このガイドでは MagicOnion を使用したシンプルな Unity アプリケーションによるクライアントと .NET サーバーを作成する手順を解説します。ここでは .NET サーバーに実装された2つの数値を加算する API サービスを Unity クライアントから呼び出す、ごく単純な実装を行います。
+このガイドでは MagicOnion を使用したシンプルな Unity アプリケーションによるクライアントと .NET サーバーを作成する手順を解説します。ここでは .NET サーバーに実装された2つの数値を加算する API サービスを Unity クライアントから呼び出す、単純な実装を行います。
 
 このガイドではサーバーとクライアントを作成するために下記の環境を想定しています。
 
 - Windows または macOS
 - .NET 8 SDK またはそれ以降
-- Unity 2022.2.44f 以降または Unity 6 (6000.0.34f1) 以降
+- Unity 2022.3 以降または Unity 6 (6000.0.34f1) 以降
 
 :::note
 Unity 6 の一部バージョンでは Source Generator に関する不具合があるため 6000.0.34f1 以降を使用してください
@@ -220,7 +220,7 @@ app.Run();
 ```
 
 :::note
-MyApp.Server.csproj に Protobuf アイテムが残ってしまう場合があります。残っている場合にはこの項目は不要ですので削除してください。
+MyApp.Server.csproj に `Protobuf` アイテムが残ってしまう場合があります。残っている場合にはこの項目は不要ですので削除してください。
 
 ```xml
   <ItemGroup>
@@ -331,13 +331,13 @@ MagicOnion のクライアントライブラリーである MagicOnion.Client �
 次に Unity 向けの拡張が含まれる Unity パッケージをインストールします。Unity Package Manager の `Add package from git URL...` に下記の URL を指定してください。
 
 ```
-https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity#7.0.1
+https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity#7.0.2
 ```
 
 ![](/img/docs/fig-quickstart-unity-upm-magiconion.png)
 
 :::info
-`7.0.1` の部分はインストールバージョンとなり、リリースされているバージョンによってはより新しいものを利用できる場合があります。
+`7.0.2` の部分はインストールバージョンとなり、リリースされているバージョンによってはより新しいものを利用できる場合があります。
 :::
 
 #### YetAnotherHttpHandler のインストール
@@ -434,6 +434,10 @@ Unity クライアントから API を呼び出すためにサービス定義を
 
 :::warning
 これらのファイルを追加した後、プロジェクトをビルドして `bin` および `obj` フォルダーが残っている場合は必ず削除してください。ファイルが残り続けていると Unity から認識されて問題を引き起こす可能性があります。
+:::
+
+:::warning
+macOS の Finder ではデフォルトで `.` から始まるファイルを非表示にする設定がされているため、`.artifacts` フォルダーが表示されない場合があります。Finder で表示するには `Command + Shift + .` を押すか、`defaults` コマンドで設定を変更する必要があります。
 :::
 
 ここまでの手順で `MyApp.Shared` プロジェクトは下記のようなファイル構成となります。
@@ -588,7 +592,7 @@ Unity Editor で Play モードに入ることで `Start` メソッドが呼び�
   - `https://` に接続しようとしてる場合に発生するエラーです。開発向け証明書を認識できないため発生します。`http://...` で接続してください(その際ポート番号には注意してください)。
 
 ## 関連リソース
-- [Unity での利用](/installation/unity)
-- [プロジェクト構成](/fundamentals/project-structure)
+- [Unity での利用](/installation/unity): Unity でのセットアップ手順
+- [プロジェクト構成](/fundamentals/project-structure): Unity と .NET のプロジェクト構成について
 - [IL2CPP ビルドでの注意事項](/fundamentals/aot)
-- [Unity 統合](/integration/unity)
+- [Unity 統合](/integration/unity): Unity エディター拡張について
