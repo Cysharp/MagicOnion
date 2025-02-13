@@ -16,7 +16,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 :::
 
 ## セットアップ済みテンプレートを使用する (オプション)
-このガイドではプロジェクトの作成やパッケージのインストールといった手順を解説しています。すべての手順が完了した状態のテンプレートを [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) リポジトリから取得できます。
+このガイドではプロジェクトの作成やパッケージのインストールといったセットアップの手順を解説しています。これらのセットアップをスキップしてすぐに始めたい方のために、セットアップ完了済みのテンプレートとなる [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) リポジトリを公開しています。
 
 テンプレートを使用した開発は GitHub からリポジトリをアーカイブファイルとしてダウンロードするか、[GitHub のテンプレートからリポジトリーを作成する方法](https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)で開始できます。
 
@@ -53,7 +53,7 @@ GitHub からアーカイブファイルをダウンロードして展開する�
   </TabItem>
 </Tabs>
 
-ソースコードを手元に用意した後、リポジトリールートに含まれる `init.cmd` または `init.sh` に任意のプロジェクト名 (例 `MyApp` など) 指定して実行してください。このスクリプトはリポジトリのプロジェクトやファイルのリネームなどの準備処理を行います。
+ソースコードを手元に用意した後、リポジトリールートに含まれる `init.cmd` または `init.sh` に任意のプロジェクト名 (例 `MyApp` など) 指定して実行してください。このスクリプトはリポジトリーのプロジェクトやファイルのリネームなどの準備処理を行います。
 
 <Tabs groupId="shell">
   <TabItem value="cmd" label="Windows (cmd.exe)" default>
@@ -73,7 +73,13 @@ GitHub からアーカイブファイルをダウンロードして展開する�
   </TabItem>
 </Tabs>
 
-実行後は `init.sh` および `init.cmd`、実際の書き換え処理を行う `tools/RepoInitializer` を削除できます。
+実行後は `init.sh` および `init.cmd`、準備処理を行う `tools/RepoInitializer` を削除できます。準備処理を行った後は Unity Hub から `src/MyApp.Unity` ディレクトリを Unity プロジェクトとして開いてください。
+
+- サンプル実装は `SampleScene` に含まれています
+- Unity Editor 起動後にメニューから `Assets` -> `Open C# Project` で Visual Studio または Rider でサーバーも含めたプロジェクトを開けます
+- サーバーの起動は Visual Studio または Rider で `MyApp.Server` を実行してください
+
+テンプレートはこのクイックスタートガイドの内容に準じた構成となっているため、詳細についてはこのガイドを参照してください。
 
 ### ライセンス
 テンプレートは [CC0 - パブリックドメイン](https://creativecommons.org/publicdomain/zero/1.0/) で提供されます。
