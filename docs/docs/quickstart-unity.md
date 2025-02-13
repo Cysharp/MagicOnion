@@ -76,6 +76,13 @@ After extracting the source code, run `init.cmd` or `init.sh` with an arbitrary 
 
 After running the script, you can delete `init.sh` and `init.cmd` and `tools/RepoInitializer` that actually perform the rewriting process.
 
+- Open `src/MyApp.Unity` as a Unity project from Unity Hub.
+- Sample implementation is included in `SampleScene`.
+- To open the project, select `Assets` -> `Open C# Project` from the menu in the Unity Editor.
+- To run the server, start the `MyApp.Server` project in Visual Studio or Rider.
+
+The template is configured based on the contents of this quick start guide, so refer to this guide for details.
+
 ### License
 The repository is provided under the [CC0 - Public Domain](https://creativecommons.org/publicdomain/zero/1.0/) license.
 
