@@ -15,6 +15,72 @@ import TabItem from '@theme/TabItem';
 Unity 6 の一部バージョンでは Source Generator に関する不具合があるため 6000.0.34f1 以降を使用してください
 :::
 
+## セットアップ済みテンプレートを使用する (オプション)
+このガイドではプロジェクトの作成やパッケージのインストールといった手順を解説しています。この手順を完了した状態のテンプレートを [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) リポジトリから取得できます。
+
+テンプレートを使用した開発は GitHub からリポジトリをアーカイブファイルとしてダウンロードするか、[GitHub のテンプレートからリポジトリーを作成する方法](https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)で開始できます。
+
+<details>
+<summary>テンプレートを使用する手順</summary>
+
+このテンプレートの Unity プロジェクトは Unity 6000.0.36f1 を使用した "Universal 3D" テンプレートをベースとしています。
+
+### 使用方法
+
+GitHub からアーカイブファイルをダウンロードして展開するか、GitHub のテンプレート機能からリポジトリーを作成してください。下記は `MyApp` ディレクトリーにテンプレートを展開するコマンド例です。
+
+<Tabs groupId="shell">
+  <TabItem value="cmd" label="Windows (cmd.exe)" default>
+    ```bash
+    mkdir MyApp
+    cd MyApp
+    curl.exe -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+    <TabItem value="pwsh" label="Windows (PowerShell)" default>
+    ```powershell
+    mkdir MyApp
+    cd MyApp
+    curl.exe -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+  <TabItem value="unix-shell" label="Bash, zsh">
+    ```bash
+    mkdir MyApp
+    cd MyApp
+    curl -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+</Tabs>
+
+ソースコードを手元に用意した後、リポジトリールートに含まれる `init.cmd` または `init.sh` に任意のプロジェクト名 (例 `MyApp` など) 指定して実行してください。このスクリプトはリポジトリのプロジェクトやファイルのリネームなどの準備処理を行います。
+
+<Tabs groupId="shell">
+  <TabItem value="cmd" label="Windows (cmd.exe)" default>
+    ```bash
+    init.cmd MyApp
+    ```
+  </TabItem>
+    <TabItem value="pwsh" label="Windows (PowerShell)" default>
+    ```bash
+    init.cmd MyApp
+    ```
+  </TabItem>
+  <TabItem value="unix-shell" label="Bash, zsh">
+    ```bash
+    bash init.sh MyApp
+    ```
+  </TabItem>
+</Tabs>
+
+実行後は `init.sh` および `init.cmd`、実際の書き換え処理を行う `tools/RepoInitializer` を削除できます。
+
+### ライセンス
+テンプレートは [CC0 - パブリックドメイン](https://creativecommons.org/publicdomain/zero/1.0/) で提供されます。
+
+</details>
+
+
 ## プロジェクトの準備
 
 まず初めに .NET サーバーと Unity クライアント、そしてそれらでコードを共有するためのプロジェクトを作成します。.NET サーバーは一般的な .NET アプリケーションと同様にソリューション (`.sln`) とプロジェクト (`.csproj`) を作成し、Unity クライアントは Unity Hub から Unity プロジェクトとして作成します。
@@ -42,7 +108,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 
 下記のコマンドを実行することでソリューション、サーバープロジェクト、共有ライブラリープロジェクトの作成とMagicOnion 関連のパッケージの参照、プロジェクト間の参照設定を一度に行えます。
 
-<Tabs>
+<Tabs groupId="shell">
   <TabItem value="cmd" label="Windows (cmd.exe)" default>
     ```cmd
     Set MO_PROJECT_NAME=MyApp
@@ -593,6 +659,43 @@ Unity Editor で Play モードに入ることで `Start` メソッドが呼び�
   - サーバーに接続できない状態です。サーバーが起動しているか、ポート番号が正しい確認してください
 - `IOException: client error (Connect): invalid peer certificate: UnknownIssuer`
   - `https://` に接続しようとしてる場合に発生するエラーです。開発向け証明書を認識できないため発生します。`http://...` で接続してください(その際ポート番号には注意してください)。
+
+## Unity と .NET サーバーのソリューションを統合する
+
+Unity Editor から C# コードやプロジェクトを Visual Studio や Rider など開発環境で開くと、Unity Editor の生成したソリューションが開かれます (例:`MyApp.Unity.sln`)。
+
+しかし Unity Editor の生成されたソリューションには .NET サーバーのプロジェクトが含まれていないため、サーバーの開発やデバッグ実行を行うためには別途ソリューション (例:`MyApp.sln`)を開く必要があります。
+[SlnMerge](https://github.com/Cysharp/SlnMerge) エディター拡張を使用すると Unity と .NET サーバーのソリューションを統合し、シームレスな開発が行えるようになります。
+
+![](/img/docs/fig-quickstart-unity-slnmerge.png)
+
+### SlnMerge のインストール
+
+SlnMerge をインストールするには Package Manager の `Add package from git URL...` に下記の URL を指定します。
+
+```plaintext
+https://github.com/Cysharp/SlnMerge.git?path=src
+```
+
+![](/img/docs/fig-quickstart-unity-upm-slnmerge.png)
+
+### SlnMerge の設定
+
+SlnMerge をインストールした後、ソリューションの統合について SlnMerge の設定を作成する必要があります。
+SlnMerge の設定は Unity Editor の生成するソリューションファイル名の `.mergesettings` を付けた名前のファイルを作成します。
+
+これは例えば `MyApp.Unity` プロジェクトであれば `MyApp.Unity.sln` が生成されるので、`MyApp.Unity.sln.mergesettings` という名前で設定ファイルを作成します。
+
+```xml title="src/MyApp.Unity/MyApp.Unity.sln.mergesettings"
+<SlnMergeSettings>
+    <MergeTargetSolution>..\..\MyApp.sln</MergeTargetSolution>
+</SlnMergeSettings>
+```
+
+### ソリューションを開く
+
+ソリューションを開くには Unity Editor から C# ファイルを選択してダブルクリックで開くか、メニューの `Assets` → `Open C# Project` を選択してください。
+
 
 ## 関連リソース
 - [Unity での利用](/installation/unity): Unity でのセットアップ手順
