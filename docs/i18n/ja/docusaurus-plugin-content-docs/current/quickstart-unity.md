@@ -16,7 +16,7 @@ Unity 6 の一部バージョンでは Source Generator に関する不具合が
 :::
 
 ## セットアップ済みテンプレートを使用する (オプション)
-このガイドではプロジェクトの作成やパッケージのインストールといった手順を解説しています。この手順を完了した状態のテンプレートを [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) リポジトリから取得できます。
+このガイドではプロジェクトの作成やパッケージのインストールといった手順を解説しています。すべての手順が完了した状態のテンプレートを [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) リポジトリから取得できます。
 
 テンプレートを使用した開発は GitHub からリポジトリをアーカイブファイルとしてダウンロードするか、[GitHub のテンプレートからリポジトリーを作成する方法](https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)で開始できます。
 
@@ -696,9 +696,17 @@ SlnMerge の設定は Unity Editor の生成するソリューションファイ
 
 ソリューションを開くには Unity Editor から C# ファイルを選択してダブルクリックで開くか、メニューの `Assets` → `Open C# Project` を選択してください。
 
+## 次のステップ
 
-## 関連リソース
-- [Unity での利用](/installation/unity): Unity でのセットアップ手順
-- [プロジェクト構成](/fundamentals/project-structure): Unity と .NET のプロジェクト構成について
-- [IL2CPP ビルドでの注意事項](/fundamentals/aot)
-- [Unity 統合](/integration/unity): Unity エディター拡張について
+このガイドでは MagicOnion を使用して API サービスを構築し、疎通するところまでを説明しました。次のステップとして以下のリンク先のドキュメントを参照してください。
+
+- [Unity での利用](/installation/unity)
+  - `Vector3` など Unity 固有の型を使用する場合のセットアップについて
+- [StreamingHub の基礎](/streaminghub/fundamentals)
+  - サーバー、クライアント間でリアルタイム通信を行うための StreamingHub についての基本的な使い方について
+- [AOT サポート (IL2CPP, Native AOT)](/fundamentals/aot)
+  - iOS や Android, Windows 向けの AOT ビルドでの注意事項や対応が必要な点について
+- [Unity 統合](/integration/unity)
+  - MagicOnion の Unity エディター拡張について
+- [プロジェクト構成](/fundamentals/project-structure)
+  - Unity と .NET のプロジェクト構成について

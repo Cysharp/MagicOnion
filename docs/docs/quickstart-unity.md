@@ -697,8 +697,17 @@ For example, if you have `MyApp.Unity` project, `MyApp.Unity.sln` will be genera
 
 To open the solution, double-click the C# file in the Unity Editor or select `Assets` → `Open C# Project` from the menu.
 
-## Related resources
-- [Works with Unity](/installation/unity): Setting up MagicOnion in Unity
-- [Project structure](/fundamentals/project-structure): A guide to the project structure
-- [Works with IL2CPP](/fundamentals/aot)
-- [Unity Integration](/integration/unity): About Unity Editor integration
+## Next steps
+
+This guide has shown how to build an API service using MagicOnion and communicate with it. For the next steps, refer to the following documents:
+
+- [Works with Unity](/installation/unity)
+  - If you want to use `Vector3` and other Unity-specific types, refer to this document.
+- [StreamingHub Fundamentals](/streaminghub/fundamentals)
+  - Basic usage of StreamingHub for real-time communication between servers and clients
+- [AOT Support (IL2CPP, Native AOT)](/fundamentals/aot)
+  - Information for AOT builds for iOS, Android, and Windows
+- [Unity Integration](/integration/unity)
+  - Information on Unity Editor extensions for MagicOnion
+- [Project structure](/fundamentals/project-structure)
+  - Recommended project structure for MagicOnion projects
