@@ -15,6 +15,78 @@ import TabItem from '@theme/TabItem';
 Unity 6의 일부 버전에서는 Source Generator 관련 문제가 있으므로 6000.0.34f1 이상을 사용해 주세요.
 :::
 
+## 미리 구성된 템플릿 사용하기 (선택사항)
+이 가이드는 프로젝트 생성, 패키지 설치 및 기타 단계들을 보여줍니다. 이 가이드의 완성된 상태의 템플릿을 [MagicOnion.Template.Unity](https://github.com/Cysharp/MagicOnion.Template.Unity) 리포지토리에서 확인 하실 수 있습니다.
+
+템플릿을 사용한 개발을 시작하려면 GitHub에서 리포지토리를 아카이브 파일로 다운로드하거나 GitHub 템플릿에서 리포지토리를 생성하면 됩니다. 자세한 내용은 [GitHub에서 템플릿으로 리포지토리를 생성하는 방법](https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)을 참조하세요.
+
+<details>
+<summary>템플릿 사용 방법</summary>
+
+이 템플릿은 Unity 6000.0.36f1을 사용한 "Universal 3D" 템플릿을 기반으로 합니다.
+
+### 설정 방법
+
+GitHub에서 아카이브 파일을 다운로드하여 압축을 풀거나 GitHub 템플릿 기능으로 리포지토리를 생성할 수 있습니다. 다음은 `MyApp` 디렉터리에 템플릿을 압축 해제하는 명령어 예시입니다.
+
+<Tabs groupId="shell">
+  <TabItem value="cmd" label="Windows (cmd.exe)" default>
+    ```bash
+    mkdir MyApp
+    cd MyApp
+    curl.exe -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+    <TabItem value="pwsh" label="Windows (PowerShell)" default>
+    ```powershell
+    mkdir MyApp
+    cd MyApp
+    curl.exe -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+  <TabItem value="unix-shell" label="Bash, zsh">
+    ```bash
+    mkdir MyApp
+    cd MyApp
+    curl -L -o - https://github.com/Cysharp/MagicOnion.Template.Unity/archive/refs/heads/main.tar.gz | tar xz -C . --strip-component 1
+    ```
+  </TabItem>
+</Tabs>
+
+소스 코드를 압축 해제한 후, `init.cmd` 또는 `init.sh`를 임의의 프로젝트 이름(예: `MyApp`)과 함께 실행하세요. 이 스크립트는 리포지토리 루트에서 프로젝트와 파일의 이름 변경과 같은 준비 작업을 수행합니다.
+
+<Tabs groupId="shell">
+  <TabItem value="cmd" label="Windows (cmd.exe)" default>
+    ```bash
+    init.cmd MyApp
+    ```
+  </TabItem>
+    <TabItem value="pwsh" label="Windows (PowerShell)" default>
+    ```bash
+    init.cmd MyApp
+    ```
+  </TabItem>
+  <TabItem value="unix-shell" label="Bash, zsh">
+    ```bash
+    bash init.sh MyApp
+    ```
+  </TabItem>
+</Tabs>
+
+스크립트 실행 후에는 `init.sh` 및 `init.cmd`, 준비 작업을 수행하는 `tools/RepoInitializer`를 삭제할 수 있습니다. 준비 작업을 완료한 후에는 Unity Hub에서 `src/MyApp.Unity` 디렉터리를 Unity 프로젝트로 열어주세요.
+
+- Unity Hub에서 `src/MyApp.Unity`를 Unity 프로젝트로 열어주세요.
+- 샘플 구현은 `SampleScene`에 포함되어 있습니다.
+- 프로젝트를 열려면 Unity Editor의 메뉴에서 `Assets` -> `Open C# Project`를 선택하세요.
+- 서버를 실행하려면 Visual Studio 또는 Rider에서 `MyApp.Server` 프로젝트를 시작하세요.
+
+템플릿은 이 퀵스타트 가이드의 내용을 기반으로 구성되어 있으므로, 자세한 내용은 이 가이드를 참조하세요.
+
+### 라이선스
+이 리포지토리는 [CC0 - Public Domain](https://creativecommons.org/publicdomain/zero/1.0/) 라이선스로 제공됩니다.
+
+</details>
+
 ## 프로젝트 준비
 
 우선 .NET 서버와 Unity 클라이언트, 그리고 이들 간의 코드를 공유하기 위한 프로젝트를 생성합니다. .NET 서버는 일반적인 .NET 애플리케이션처럼 솔루션(`.sln`)과 프로젝트(`.csproj`)로 생성하고, Unity 클라이언트는 Unity Hub에서 Unity 프로젝트로 생성합니다.
@@ -42,7 +114,7 @@ Unity 6의 일부 버전에서는 Source Generator 관련 문제가 있으므로
 
 다음 명령어를 실행하면 솔루션, 서버 프로젝트, 공유 라이브러리 프로젝트를 생성하고, MagicOnion 관련 패키지와 프로젝트 간의 참조를 한 번에 추가할 수 있습니다.
 
-<Tabs>
+<Tabs groupId="shell">
   <TabItem value="cmd" label="Windows (cmd.exe)" default>
     ```cmd
     Set MO_PROJECT_NAME=MyApp
@@ -593,8 +665,55 @@ Unity Editor에서 Play 모드를 시작하면 `Start` 메서드가 호출되어
 - `IOException: client error (Connect): invalid peer certificate: UnknownIssuer`
   - `https://`로 연결을 시도할 때 발생하는 오류입니다. 개발 인증서를 인식할 수 없어서 발생합니다. `http://...`를 사용하여 연결하세요(포트 번호를 주의해서 확인하세요).
 
-## 관련 리소스
-- [Unity에서 사용하기](/installation/unity): Unity에서 MagicOnion 설정하기
-- [프로젝트 구조](/fundamentals/project-structure): 프로젝트 구조 가이드
-- [IL2CPP 작업하기](/fundamentals/aot)
-- [Unity 통합](/integration/unity): Unity 에디터 통합에 대하여
+## Unity와 .NET 서버 솔루션 통합하기
+
+Unity Editor에서 Visual Studio나 Rider와 같은 개발 환경에서 C# 코드나 프로젝트를 열면, Unity Editor가 생성한 솔루션이 열립니다(예: `MyApp.Unity.sln`).
+
+하지만 Unity Editor가 생성한 솔루션에는 .NET 서버 프로젝트가 포함되어 있지 않으므로, 서버 개발과 디버깅을 위해서는 별도의 솔루션(예: `MyApp.sln`)을 열어야 합니다.
+
+[SlnMerge](https://github.com/Cysharp/SlnMerge) 에디터 확장을 사용하면 Unity와 .NET 서버 솔루션을 통합하여 원활한 개발이 가능해집니다.
+
+![](/img/docs/fig-quickstart-unity-slnmerge.png)
+
+### SlnMerge 설치하기
+
+SlnMerge를 설치하려면 Package Manager의 `Add package from git URL...`에 다음 URL을 지정합니다.
+
+```plaintext
+https://github.com/Cysharp/SlnMerge.git?path=src
+```
+
+![](/img/docs/fig-quickstart-unity-upm-slnmerge.png)
+
+### SlnMerge 설정하기
+
+SlnMerge를 설치한 후, 솔루션 통합을 위한 SlnMerge 설정을 생성해야 합니다.
+
+Unity Editor가 생성한 솔루션 파일 이름에 `.mergesettings`를 붙인 설정 파일을 생성해야 합니다.
+
+예를 들어 `MyApp.Unity` 프로젝트가 있는 경우 `MyApp.Unity.sln`이 생성되므로, `MyApp.Unity.sln.mergesettings`라는 이름의 설정 파일을 생성합니다.
+
+```xml title="src/MyApp.Unity/MyApp.Unity.sln.mergesettings"
+<SlnMergeSettings>
+    <MergeTargetSolution>..\..\MyApp.sln</MergeTargetSolution>
+</SlnMergeSettings>
+```
+
+### 솔루션 열기
+
+솔루션을 열려면 Unity Editor에서 C# 파일을 더블클릭하거나 메뉴에서 `Assets` → `Open C# Project`를 선택하세요.
+
+## 다음 단계
+
+이 가이드에서는 MagicOnion을 사용하여 API 서비스를 구축하고 통신하는 방법을 설명했습니다. 다음 단계는 다음 문서들을 참조하세요:
+
+- [Unity 환경에서 사용하기](/installation/unity)
+    - `Vector3`와 기타 Unity 특화 타입을 사용하고 싶은 경우 이 문서를 참조하세요.
+- [StreamingHub 서비스 기본 사항](/streaminghub/fundamentals)
+    - 서버와 클라이언트 간 실시간 통신을 위한 StreamingHub의 기본 사용법
+- [AOT 지원 (IL2CPP, Native AOT)](/fundamentals/aot)
+    - iOS나 Android, Windows용 AOT 빌드 시 주의사항과 대응이 필요한 부분에 대해
+- [Unity 통합](/integration/unity)
+    - MagicOnion용 Unity 에디터 확장 관련 정보
+- [프로젝트 구성](/fundamentals/project-structure)
+    - MagicOnion 프로젝트의 권장 프로젝트 구조
