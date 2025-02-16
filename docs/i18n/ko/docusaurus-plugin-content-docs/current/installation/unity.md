@@ -50,7 +50,7 @@ var channel = GrpcChannel.ForAddress("https://localhost:5000", new GrpcChannelOp
 var client = MagicOnionClient.Create<IMyFirstService>(channel);
 ```
 
-Unity의 경우, GrpcChannel을 래핑하고 개발에 더 유용한 기능들을 제공하는 확장기능들을 제공합니다. 자세한 내용은 [Unity](../integration/unity) 페이지를 참조하시기 바랍니다.
+Unity의 경우, GrpcChannel을 래핑하고 개발에 더 유용한 기능들을 제공하는 확장기능들을 제공합니다. 자세한 내용은 [Unity 통합](../integration/unity) 페이지를 참조하시기 바랍니다.
 
 ## IL2CPP에서 작동
 
