@@ -8,14 +8,14 @@ export const acceptLocales = ['en'];
 # Resources
 
 :::info
-The resources on this page are not provided by the MagicOnion project, and we do not guarantee the accuracy of the content linked to.
+The resources listed on this page include slides, blog posts, and documents related to MagicOnion provided by the community, not just the MagicOnion project and Cysharp, Inc. The project does not guarantee the accuracy of the resources linked to.
 :::
 
 ## Presentations {#presentations}
 <ul>
 {sortAndFilterResources('slide', acceptLocales).map(x =>
     <li>
-        <a href={x.url}>{x.title}</a>
+        <a href={x.url}>{x.title}</a> {x.official && <span className={'badge badge--secondary'}>Official</span>}
         <div><span>({formatDate(x.year, x.month)})</span> {x.description}</div>
     </li>
 )}
@@ -25,7 +25,7 @@ The resources on this page are not provided by the MagicOnion project, and we do
 <ul>
 {sortAndFilterResources('article', acceptLocales).map(x =>
     <li>
-        <a href={x.url}>{x.title}</a> <span>({formatDate(x.year, x.month)})</span>
+        <a href={x.url}>{x.title}</a> <span>({formatDate(x.year, x.month)})</span> {x.official && <span className={'badge badge--secondary'}>Official</span>}
     </li>
 )}
 </ul>

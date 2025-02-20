@@ -6,15 +6,17 @@ export const acceptLocales = ['ja', 'en'];
 
 # 関連リソース
 
+このページでは MagicOnion に関連するスライドやブログ記事、ドキュメントなどのリソースを紹介しています。
+
 :::info
-このページで紹介している関連リソースは MagicOnion プロジェクトが提供するものではなく、リンク先のコンテンツの正確性について保証しません。
+紹介している関連リソースは MagicOnion プロジェクトおよび Cysharp によるものだけでなく、コミュニティーによって提供されているものを含みます。プロジェクトはリンク先のリソースの正確性については保証していません。
 :::
 
 ## スライド {#presentations}
 <ul>
 {sortAndFilterResources('slide', acceptLocales).map(x =>
     <li>
-        <a href={x.url}>{x.title}</a>
+        <a href={x.url}>{x.title}</a> {x.official && <span className={'badge badge--secondary'}>Official</span>}
         <div><span>({formatDate(x.year, x.month)})</span> {x.description}</div>
     </li>
 )}
@@ -24,7 +26,7 @@ export const acceptLocales = ['ja', 'en'];
 <ul>
 {sortAndFilterResources('article', acceptLocales).map(x =>
     <li>
-        <a href={x.url}>{x.title}</a> <span>({formatDate(x.year, x.month)})</span>
+        <a href={x.url}>{x.title}</a> <span>({formatDate(x.year, x.month)}) {x.description} {x.official && <span className={'badge badge--secondary'}>Official</span>}</span>
     </li>
 )}
 </ul>
