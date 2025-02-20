@@ -98,6 +98,13 @@ const config: Config = {
           docId: 'support',
         },
         {
+          type: 'doc',
+          position: 'left',
+          label: 'Resources',
+          docId: 'resources',
+          locale: ['ja'],
+        },
+        {
           href: 'https://cysharp.co.jp/en/',
           label: 'Cysharp, Inc.',
           position: 'right',
