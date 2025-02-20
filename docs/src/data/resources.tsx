@@ -18,6 +18,7 @@ const Slides: Resource[] = [
         description: 'Cysharp x Sansan: イマドキのC#/.NET開発 〜最新の言語とフレームワークの使い方〜',
         year: 2024,
         month: 11,
+        official: true,
     },
     {
         type: 'slide',
@@ -36,6 +37,7 @@ const Slides: Resource[] = [
         description: 'CEDEC 2023',
         year: 2023,
         month: 9,
+        official: true,
     },
     {
         type: 'slide',
@@ -63,6 +65,7 @@ const Slides: Resource[] = [
         description: 'CEDEC 2019',
         year: 2019,
         month: 9,
+        official: true,
     },
     {
         type: 'slide',
@@ -186,6 +189,7 @@ const Articles: Resource[] = [
         url: 'https://tech.cygames.co.jp/archives/3181/',
         year: 2018,
         month: 12,
+        official: true,
     },
 ];
 
@@ -197,7 +201,8 @@ export type Resource = {
     url: string,
     description?: string,
     year: number,
-    month: number
+    month: number,
+    official?: boolean,
 };
 
 export const resources = [...Slides, ...Articles];
