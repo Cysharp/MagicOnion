@@ -71,7 +71,7 @@ const config: Config = {
   themes: ['@docusaurus/theme-mermaid'],
   themeConfig: {
     // Replace with your project's social card
-    //image: 'img/docusaurus-social-card.jpg',
+    image: 'img/OG_img_en.png',
     navbar: {
       title: 'MagicOnion',
       logo: {
