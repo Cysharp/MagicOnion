@@ -4,16 +4,20 @@
     "description": "The title in the navbar"
   },
   "item.label.Documents": {
-    "message": "Documents",
+    "message": "ドキュメント",
     "description": "Navbar item with label Documents"
   },
   "item.label.License": {
-    "message": "License",
+    "message": "ライセンス",
     "description": "Navbar item with label License"
   },
   "item.label.Support": {
-    "message": "Support",
+    "message": "サポート",
     "description": "Navbar item with label Support"
+  },
+  "item.label.Resources": {
+    "message": "関連リソース",
+    "description": "Navbar item with label Resources"
   },
   "item.label.GitHub": {
     "message": "GitHub",

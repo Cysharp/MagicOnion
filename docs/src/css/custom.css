@@ -32,6 +32,9 @@
 [lang='ja-Jp'] .theme-doc-sidebar-container nav {
   font-size: 0.85rem;
 }
+[lang='ja-Jp'] .navbar__link {
+  font-weight: var(--ifm-font-weight-bold);
+}
 
 header .theme-last-updated {
   font-size: 0.85rem;
