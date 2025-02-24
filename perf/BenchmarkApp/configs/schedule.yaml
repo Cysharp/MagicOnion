@@ -11,14 +11,11 @@ branch-configs:
     branch: main
     config: ./perf/BenchmarkApp/configs/schedule_serverstreaming.yaml
   - suffix: "-3"
-    branch: feature/ImprovePerformance
-    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
-  - suffix: "-4"
     branch: main
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetclient.yaml
-  - suffix: "-5"
+  - suffix: "-4"
     branch: main
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetserver.yaml
-  - suffix: "-6"
+  - suffix: "-5"
     branch: experimental/NoUsePayloadPoolOnServer
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
