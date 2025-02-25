@@ -72,6 +72,7 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: 'img/OG_img_en.png',
+    metadata: [{name: 'twitter:card', content: 'summary'}],
     navbar: {
       title: 'MagicOnion',
       logo: {
