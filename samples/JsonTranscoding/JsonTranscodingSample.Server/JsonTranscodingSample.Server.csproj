@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Server.JsonTranscoding.Swagger\MagicOnion.Server.JsonTranscoding.Swagger.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server.JsonTranscoding\MagicOnion.Server.JsonTranscoding.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
