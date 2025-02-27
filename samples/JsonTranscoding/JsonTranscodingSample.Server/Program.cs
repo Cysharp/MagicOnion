@@ -12,7 +12,7 @@ builder.Services.AddMagicOnionJsonTranscodingSwagger();
 builder.Services.AddEndpointsApiExplorer();
 
 // // JwtBearer authentication
-// builder.Services.AddAuthentication();
+// builder.Services.AddAuthentication().AddJwtBearer();
 // builder.Services.AddAuthorization();
 
 // Add Swagger generator services.
