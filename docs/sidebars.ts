@@ -123,6 +123,7 @@ const sidebars: SidebarsConfig = {
       label: 'Integration',
       items: [
         'integration/unity',
+        'integration/blazor',
         'integration/dependency-injection',
         'integration/json-transcoding',
       ]
