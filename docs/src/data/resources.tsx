@@ -81,6 +81,14 @@ const Articles: Resource[] = [
     {
         type: 'article',
         locale: 'ja',
+        title: '【.NET8】MagicOnionでAPIサーバを立てる #C# - Qiita',
+        url: 'https://qiita.com/inco-cyber/items/3253235a0a9d5fda2b1e',
+        year: 2025,
+        month: 3
+    },
+    {
+        type: 'article',
+        locale: 'ja',
         title: 'ASP.NETでMagicOnionに認証機能を実装する',
         url: 'https://qiita.com/ANIZA_15/items/862d53832ab152bebc35',
         year: 2024,
@@ -154,7 +162,7 @@ const Articles: Resource[] = [
         type: 'article',
         locale: 'ja',
         title: 'VRメタバースのリアルタイム通信サーバーの技術にMagicOnionとNATSを選んだ話 - ambr Tech Blog',
-        url: 'https://ambr-inc.hatenablog.com/entry/20230512/1683882000',
+        url: 'https://zenn.dev/ambr_inc/articles/c2cd63556eed88',
         year: 2023,
         month: 5,
     },
