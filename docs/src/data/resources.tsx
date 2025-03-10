@@ -238,5 +238,5 @@ export function formatDate(year, month) {
         year: 'numeric',
         timeZone: 'UTC',
     });
-    return formatter.format(new Date(year, month - 1));
+    return formatter.format(new Date(year, month));
 }
