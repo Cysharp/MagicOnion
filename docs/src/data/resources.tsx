@@ -81,6 +81,14 @@ const Articles: Resource[] = [
     {
         type: 'article',
         locale: 'ja',
+        title: 'MagicOnionでgRPC-Webを使う #C# - Qiita',
+        url: 'https://qiita.com/inco-cyber/items/74715318a7f40d819d64',
+        year: 2025,
+        month: 3
+    },
+    {
+        type: 'article',
+        locale: 'ja',
         title: '【.NET8】MagicOnionでAPIサーバを立てる #C# - Qiita',
         url: 'https://qiita.com/inco-cyber/items/3253235a0a9d5fda2b1e',
         year: 2025,
