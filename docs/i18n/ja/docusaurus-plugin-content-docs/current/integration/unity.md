@@ -1,4 +1,4 @@
-# Unity
+# Unity 拡張
 MagicOnion は Unity との統合をサポートしています。これは IL2CPP のサポートだけでなく、Unity アプリケーション上で MagicOnion をより使いやすくするための機能も含まれます。
 
 ## Unity での gRPC チャンネル管理の統合

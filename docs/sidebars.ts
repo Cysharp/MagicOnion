@@ -122,7 +122,15 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Integration',
       items: [
-        'integration/unity',
+        {
+          type: 'category',
+          label: 'Unity',
+          items: [
+            'integration/unity',
+            'integration/unity-webgl',
+          ]
+        },
+        'integration/blazor',
         'integration/dependency-injection',
         'integration/json-transcoding',
       ]
