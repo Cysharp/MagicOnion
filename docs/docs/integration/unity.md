@@ -1,4 +1,4 @@
-# Unity
+# Unity extensions
 MagicOnion also supports integration with Unity. This includes support for IL2CPP as well as features to make it easier to use MagicOnion in Unity applications.
 
 ## gRPC channel management integration for Unity

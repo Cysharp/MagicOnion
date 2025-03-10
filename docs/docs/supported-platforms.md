@@ -19,3 +19,4 @@ MagicOnion client supports a wide range of platforms, including .NET Framework 4
 - Unity 2022.3 (LTS) or newer
     - Windows, macOS, iOS, Android
     - IL2CPP, Mono
+    - WebGL (Experimental)

@@ -19,3 +19,4 @@ MagicOnion クライアントは、.NET Framework 4.6.1 から .NET 8 および 
 - Unity 2022.3 (LTS) 以降
     - Windows, macOS, iOS, Android
     - IL2CPP, Mono
+    - WebGL (Experimental)
