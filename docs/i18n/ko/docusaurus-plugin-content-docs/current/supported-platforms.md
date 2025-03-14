@@ -13,7 +13,10 @@ MagicOnion 서버에서 사용하려면 .NET 8 이상이 필요합니다.
 MagicOnion 클라이언트는 .NET Framework 4.6.1부터 .NET 8 및 Unity를 포함한 폭넓은 플랫폼을 지원합니다.
 
 - .NET 8+
+    - Windows, macOS, Linux
+    - Blazor Server/WebAssembly
 - .NET Standard 2.1, 2.0
 - Unity 2022.3 (LTS) 이상
     - Windows, macOS, iOS, Android
     - IL2CPP, Mono
+    - WebGL (Experimental)

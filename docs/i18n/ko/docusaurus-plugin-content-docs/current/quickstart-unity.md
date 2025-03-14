@@ -585,7 +585,7 @@ public class MagicOnionInitializer
 }
 ```
 
-Unity 통합에 대한 자세한 내용은 [Unity 통합](/integration/unity) 페이지를 참조하십시오.
+Unity 확장에 대한 자세한 내용은 [Unity 확장](/integration/unity) 페이지를 참조하십시오.
 
 ### 서버에 연결하여 API 호출하기
 
@@ -713,7 +713,7 @@ Unity Editor가 생성한 솔루션 파일 이름에 `.mergesettings`를 붙인 
     - 서버와 클라이언트 간 실시간 통신을 위한 StreamingHub의 기본 사용법
 - [AOT 지원 (IL2CPP, Native AOT)](/fundamentals/aot)
     - iOS나 Android, Windows용 AOT 빌드 시 주의사항과 대응이 필요한 부분에 대해
-- [Unity 통합](/integration/unity)
+- [Unity 확장](/integration/unity)
     - MagicOnion용 Unity 에디터 확장 관련 정보
 - [프로젝트 구성](/fundamentals/project-structure)
     - MagicOnion 프로젝트의 권장 프로젝트 구조
