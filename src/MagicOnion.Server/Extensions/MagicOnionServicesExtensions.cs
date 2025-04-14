@@ -11,6 +11,7 @@ using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -65,10 +66,11 @@ public static class MagicOnionServicesExtensions
         services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
         services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
         services.TryAddSingleton<IRemoteSerializer, MagicOnionRemoteSerializer>();
-        services.TryAddSingleton<IRemoteClientResultPendingTaskRegistry, RemoteClientResultPendingTaskRegistry>();
         services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
         services.TryAddSingleton<MagicOnionManagedGroupProvider>();
-
+        services.TryAddTransient<IRemoteClientResultPendingTaskRegistry>( // We need to create the instance per request.
+            sp => new RemoteClientResultPendingTaskRegistry(
+                sp.GetRequiredService<IOptions<MagicOnionOptions>>().Value.ClientResultsDefaultTimeout));
 
         return new MagicOnionServerBuilder(services);
     }

@@ -6,9 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Integration.Tests;
 
-public class StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory) : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
+public class StreamingHubClientResultTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
 {
-    readonly MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory = factory;
+    readonly MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory;
+
+    public StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory)
+    {
+        this.factory = factory;
+        this.factory.Initialize();
+    }
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
@@ -289,6 +295,121 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
         Assert.Empty(receiver.Received);
         Assert.Equal("System.NotSupportedException", ((string)serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Not_SingleTarget))!));
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_Zero_Via_Group(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Group_Parameter_Zero();
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero)), serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_Zero)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CancelPendingTasksOnDisconnect(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: false);
+        await Task.Delay(150); // Give some time to process the request.
+        await client.DisposeAsync(); // Disconnect from the server.
+        await Task.Delay(150); // Give some time to process the request.
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Never), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
+        Assert.Equal("Canceled", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_CancelPendingTasksOnDisconnect)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CancelPendingTasksOnDisconnect_Group(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: true);
+        await Task.Delay(150); // Give some time to process the request.
+        await client.DisposeAsync(); // Disconnect from the server.
+        await Task.Delay(150); // Give some time to process the request.
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Never), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
+        Assert.Equal("Canceled", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_CancelPendingTasksOnDisconnect)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task MultipleOperations(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var callOptions = new CallOptions(headers: new Metadata()
+        {
+            { "x-mo-integration-test-group", "MultipleOperations" }
+        });
+        var receiverA = new FakeStreamingHubClientResultTestHubReceiver();
+        var clientA = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiverA, callOptions: callOptions);
+        var receiverB = new FakeStreamingHubClientResultTestHubReceiver();
+        var clientB = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiverB, callOptions: callOptions);
+
+        // Act & Assert
+        // Call the first client
+        {
+            await clientA.Invoke_Parameter_Zero();
+            Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiverA.Received[0]);
+            Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero)), serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_Zero)));
+        }
+        // Call the second client
+        {
+            await clientB.Invoke_Parameter_One();
+            Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_One), "Hello"), receiverB.Received[0]);
+            Assert.Equal($"{nameof(IStreamingHubClientResultTestHubReceiver.Parameter_One)}:Hello", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_One)));
+        }
+
+        receiverA.Received.Clear();
+        receiverB.Received.Clear();
+        serverItems.Clear();
+
+        var receiverC = new FakeStreamingHubClientResultTestHubReceiver();
+        var clientC = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiverC, callOptions: callOptions);
+
+        // Call the third client
+        {
+            await clientC.Invoke_Group_Parameter_Zero();
+            Assert.Empty(receiverA.Received);
+            Assert.Empty(receiverB.Received);
+            Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiverC.Received[0]);
+            Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_Zero)), serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_Zero)));
+        }
+    }
 }
 
 file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResultTestHubReceiver
@@ -377,6 +498,12 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
         await Task.Delay(1000);
         return $"{nameof(Parameter_Many_With_Cancellation_Optional)}:{arg1},{arg2},{arg3},{cancellationToken.CanBeCanceled}";
     }
+
+    public async Task Never(CancellationToken cancellationToken = default)
+    {
+        Received.Add((nameof(Never), (ArgumentEmpty)));
+        await Task.Delay(Timeout.Infinite);
+    }
 }
 
 
@@ -396,6 +523,8 @@ public interface IStreamingHubClientResultTestHub : IStreamingHub<IStreamingHubC
     Task Invoke_Parameter_Many_With_Cancellation_Optional();
     Task Invoke_After_Disconnected();
     Task Invoke_Not_SingleTarget();
+    Task Invoke_Group_Parameter_Zero();
+    Task Invoke_CancelPendingTasksOnDisconnect(bool useGroup);
 }
 
 public interface IStreamingHubClientResultTestHubReceiver
@@ -412,12 +541,27 @@ public interface IStreamingHubClientResultTestHubReceiver
     Task<string> Parameter_One_With_Cancellation_Optional(string arg1, CancellationToken cancellationToken = default);
     Task<string> Parameter_Many_With_Cancellation(string arg1, int arg2, bool arg3, CancellationToken cancellationToken);
     Task<string> Parameter_Many_With_Cancellation_Optional(string arg1, int arg2, bool arg3, CancellationToken cancellationToken = default);
+    Task Never(CancellationToken cancellationToken = default);
 }
 
 public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplicationFactory<StreamingHubClientResultTestHub>.ItemsKey)]ConcurrentDictionary<string, object> Items)
     : StreamingHubBase<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>, IStreamingHubClientResultTestHub
 {
     public static readonly object Empty = new();
+
+    IGroup<IStreamingHubClientResultTestHubReceiver> _group = default!;
+
+    protected override async ValueTask OnConnected()
+    {
+        if (Context.CallContext.GetHttpContext().Request.Headers.TryGetValue("x-mo-integration-test-group", out var groupName))
+        {
+            _group = await Group.AddAsync(groupName.ToString());
+        }
+        else
+        {
+            _group = await Group.AddAsync(Guid.NewGuid().ToString());
+        }
+    }
 
     public async Task Invoke_Parameter_Zero_NoResultValue()
     {
@@ -427,8 +571,15 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_Zero()
     {
-        var result = await Client.Parameter_Zero();
-        Items.TryAdd(nameof(Invoke_Parameter_Zero), result);
+        try
+        {
+            var result = await Client.Parameter_Zero();
+            Items.TryAdd(nameof(Invoke_Parameter_Zero), result);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     public async Task Invoke_Parameter_One()
@@ -583,6 +734,32 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
         catch (Exception e)
         {
             Items.TryAdd(nameof(Invoke_Not_SingleTarget), (e.GetType().FullName!));
+        }
+    }
+
+    public async Task Invoke_Group_Parameter_Zero()
+    {
+        var result = await _group.Single(ConnectionId).Parameter_Zero();
+        Items.TryAdd(nameof(Invoke_Parameter_Zero), result);
+    }
+
+    public async Task Invoke_CancelPendingTasksOnDisconnect(bool useGroup)
+    {
+        var cts = new CancellationTokenSource();
+        try
+        {
+            if (useGroup)
+            {
+                await _group.Single(ConnectionId).Never(cts.Token /* Disable timeout */);
+            }
+            else
+            {
+                await Client.Never(cts.Token /* Disable timeout */);
+            }
+        }
+        catch
+        {
+            Items.TryAdd(nameof(Invoke_CancelPendingTasksOnDisconnect), "Canceled");
         }
     }
 }

@@ -61,4 +61,10 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Progr
             });
         });
     }
+
+    public void Initialize()
+    {
+        Items.Clear();
+        Logs.Clear();
+    }
 }
