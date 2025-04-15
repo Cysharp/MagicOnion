@@ -63,4 +63,5 @@ jobs:
   actions-timeline:
     needs: [canary-build, canary-push]
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
-    secrets: inherit
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}

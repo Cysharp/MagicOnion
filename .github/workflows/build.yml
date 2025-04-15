@@ -118,8 +118,8 @@ jobs:
       #    path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
       #    retention-days: 1
 
-#  actions-timeline:
-#    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
-#    uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
-#    secrets: inherit
-#
+  actions-timeline:
+    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
+    uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
