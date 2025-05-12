@@ -60,8 +60,7 @@ This is a minimal configuration example, and in actual projects, you may have pr
 
 Here is an example of a project structure for sharing interfaces between Unity client and server projects.
 
-The structure of a Unity application is different from a typical .NET project in that Unity projects cannot reference .NET library projects.
-This is because Unity projects cannot reference .NET library projects.
+The structure of a Unity application is different from a typical .NET project. This is because Unity projects cannot reference .NET library projects.
 
 The recommended configuration is as follows:
 
