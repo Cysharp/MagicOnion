@@ -20,7 +20,9 @@ env:
 
 jobs:
   canary-build:
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: Cysharp/Actions/.github/actions/checkout@main
@@ -39,7 +41,9 @@ jobs:
 
   canary-push:
     needs: [canary-build]
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: true
@@ -62,6 +66,8 @@ jobs:
 
   actions-timeline:
     needs: [canary-build, canary-push]
+    permissions:
+      contents: read
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -6,6 +6,9 @@ on:
 jobs:
   update-sourcegenerator-unity:
     name: Update MagicOnion.Client.SourceGenerator.Unity
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - run: echo "Not supported in v7 or later." && exit 1

@@ -1,0 +1,14 @@
+name: "(Legacy) Release"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    name: Not Supported
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - run: echo "Not supported in v7 or later." && exit 1

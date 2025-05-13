@@ -40,15 +40,12 @@ on:
           - issue
           - schedule
 
-permissions:
-  actions: read
-  contents: read
-  id-token: write
-  issues: write
-  pull-requests: write
-
 jobs:
   loader:
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     uses: Cysharp/Actions/.github/workflows/benchmark-loader.yaml@main
     with:
       benchmark-name-prefix: "magiconion-${{ github.event.issue.number || (inputs.reuse && inputs.reuse_runid || github.run_number) }}"
@@ -58,6 +55,12 @@ jobs:
   benchmark:
     needs: [loader]
     if: ${{ needs.loader.outputs.is-benchmarkable }}
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      issues: write
+      pull-requests: write
     strategy:
       max-parallel: 3 # 3 parallel max
       fail-fast: false # no care about other benchmark
@@ -72,11 +75,19 @@ jobs:
   cleanup-failed:
     if: ${{ failure() || success() }}
     needs: [benchmark]
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      issues: write
+      pull-requests: write
     uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
     secrets: inherit
 
   actions-timeline:
     needs: [loader, benchmark, cleanup-failed]
+    permissions:
+      contents: read
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}

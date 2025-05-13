@@ -10,5 +10,7 @@ on:
 jobs:
   post:
     if: ${{ startsWith(github.event.head_commit.message, 'Merge pull request ') }}
+    permissions:
+      contents: read
     uses: Cysharp/Actions/.github/workflows/dd-event-post.yaml@main
     secrets: inherit

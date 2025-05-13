@@ -23,7 +23,9 @@ on:
 jobs:
   build-dotnet:
     name: "Build .NET projects"
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: Cysharp/Actions/.github/actions/checkout@main
@@ -33,7 +35,9 @@ jobs:
 
   run-tests:
     name: "Run tests"
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: Cysharp/Actions/.github/actions/checkout@main
@@ -44,7 +48,9 @@ jobs:
 
   run-client-nativeaot-tests:
     name: "Run Client Native AOT tests"
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: Cysharp/Actions/.github/actions/checkout@main
@@ -58,7 +64,9 @@ jobs:
     strategy:
       matrix:
         unity: ["2022.3.0f1"]
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Load secrets
@@ -120,6 +128,8 @@ jobs:
 
   actions-timeline:
     needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
+    permissions:
+      contents: read
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
