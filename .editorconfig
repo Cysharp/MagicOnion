@@ -1,16 +1,38 @@
+# top-most EditorConfig file
 root = true
 
 [*]
+charset = utf-8
+end_of_line = lf
 indent_style = space
+indent_size = 2
 insert_final_newline = true
-indent_style = space
 trim_trailing_whitespace = true
 
-[*.cs]
-charset = utf-8
-indent_style = space
-indent_size = 4
+# Visual Studio Spell checker configs (https://learn.microsoft.com/en-us/visualstudio/ide/text-spell-checker?view=vs-2022#how-to-customize-the-spell-checker)
+spelling_exclusion_path  = ./exclusion.dic
 
+[*.cs]
+indent_size = 4
+charset = utf-8-bom
+end_of_line = unset
+
+# Solution files
+[*.{sln,slnx}]
+end_of_line = unset
+
+# MSBuild project files
+[*.{csproj,props,targets}]
+end_of_line = unset
+
+# Xml config files
+[*.{ruleset,config,nuspec,resx,runsettings,DotSettings}]
+end_of_line = unset
+
+###############################
+# .NET Coding Conventions     #
+###############################
+[*.{cs,vb}]
 csharp_style_namespace_declarations = file_scoped:warning
 #dotnet_style_require_accessibility_modifiers = never:suggestion
 
@@ -54,20 +76,3 @@ dotnet_diagnostic.cs8614.severity = error
 [{src/MagicOnion.Client/**.cs,src/MagicOnion.Shared/**.cs,src/MagicOnion.Abstractions/**.cs}]
 # Lower language support for code shared with code for Unity
 csharp_style_namespace_declarations = block_scoped
-
-[*.{csproj,props,targets}]
-charset = utf-8
-indent_style = space
-indent_size = 2
-
-[Dockerfile]
-charset = utf-8
-indent_style = space
-indent_size = 4
-end_of_line = lf
-
-[*.{sh,yaml,yml,rules}]
-charset = utf-8
-indent_style = space
-indent_size = 2
-end_of_line = lf
