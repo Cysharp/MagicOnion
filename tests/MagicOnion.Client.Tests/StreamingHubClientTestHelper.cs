@@ -18,7 +18,7 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     public TReceiver Receiver => receiver;
     public CallInvoker CallInvoker => callInvokerMock;
 
-    public StreamingHubClientTestHelper(IStreamingHubClientFactoryProvider? factoryProvider = null)
+    public StreamingHubClientTestHelper(IStreamingHubClientFactoryProvider? factoryProvider = null, Func<Metadata, Task>? onResponseHeaderAsync = null, Action? onDuplexStreamingCallDisposeAction = null)
     {
         requestChannel = Channel.CreateUnbounded<StreamingHubPayload>();
         var requestStream = new ChannelClientStreamWriter<StreamingHubPayload>(requestChannel);
@@ -34,10 +34,21 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
             return new AsyncDuplexStreamingCall<StreamingHubPayload, StreamingHubPayload>(
                 requestStream,
                 responseStream,
-                _ => Task.FromResult(new Metadata { { "x-magiconion-streaminghub-version", "2" } }),
+                async _ =>
+                {
+                    var metadata = new Metadata { { "x-magiconion-streaminghub-version", "2" } };
+                    if (onResponseHeaderAsync != null)
+                    {
+                        await onResponseHeaderAsync(metadata).ConfigureAwait(false);
+                    }
+                    return metadata;
+                },
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
-                _ => { },
+                _ =>
+                {
+                    onDuplexStreamingCallDisposeAction?.Invoke();
+                },
                 new object());
         });
 

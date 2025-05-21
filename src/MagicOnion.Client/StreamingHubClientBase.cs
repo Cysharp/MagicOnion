@@ -1,10 +1,10 @@
+using Grpc.Core;
+using MagicOnion.Client.Internal;
+using MagicOnion.Internal;
+using MagicOnion.Internal.Buffers;
+using MagicOnion.Serialization;
 using System.Buffers;
 using System.Threading.Channels;
-using Grpc.Core;
-using MagicOnion.Internal;
-using MagicOnion.Serialization;
-using MagicOnion.Internal.Buffers;
-using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client;
 
@@ -173,6 +173,12 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         this.writer = callResult.RequestStream;
         this.reader = callResult.ResponseStream;
 
+        var cancelTcs = new TaskCompletionSource<bool>();
+        using var cancelRegistration = connectAndSubscribeCancellationToken.Register(static cancelTcs =>
+        {
+            ((TaskCompletionSource<bool>)cancelTcs!).SetCanceled();
+        }, cancelTcs);
+
         // Establish StreamingHub connection between the client and the server.
         Metadata.Entry? messageVersion;
         try
@@ -183,10 +189,22 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
             //           If the channel can not be connected, ResponseHeadersAsync will throw an exception.
             //       C-core:
             //           If the channel can not be connected, ResponseHeadersAsync will **return** an empty metadata.
-            var headers = await callResult.ResponseHeadersAsync.ConfigureAwait(false);
-            messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
-            connectAndSubscribeCancellationToken.ThrowIfCancellationRequested();
+            // ResponseHeadersAsync does not accept CancellationToken, so use TaskCompletionSource to wait for CancellationToken.
+            var responseHeadersTask = callResult.ResponseHeadersAsync;
+            var completedTask = await Task.WhenAny(responseHeadersTask, cancelTcs.Task).ConfigureAwait(false);
+
+            // If cancellation is requested before the connection is established, the connection will be maintained, so callResult must be disposed.
+            // After this, the only thing that passes connectAndSubscribeCancellationToken is MoveNext of Stream, so it doesn't need to be disposed.
+            if (completedTask == cancelTcs.Task)
+            {
+                connectAndSubscribeCancellationToken.ThrowIfCancellationRequested();
+                callResult.Dispose();
+                return;
+            }
+
+            var headers = responseHeadersTask.Result;
+            messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
             // Check message version of StreamingHub.
             if (messageVersion != null && messageVersion.Value != StreamingHubVersionHeaderValue)
