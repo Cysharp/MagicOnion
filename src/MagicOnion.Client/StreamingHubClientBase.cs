@@ -198,8 +198,14 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
             // After this, the only thing that passes connectAndSubscribeCancellationToken is MoveNext of Stream, so it doesn't need to be disposed.
             if (completedTask == cancelTcs.Task)
             {
-                connectAndSubscribeCancellationToken.ThrowIfCancellationRequested();
-                callResult.Dispose();
+                try
+                {
+                    connectAndSubscribeCancellationToken.ThrowIfCancellationRequested();
+                }
+                finally
+                {
+                    callResult.Dispose();
+                }
                 return;
             }
 
