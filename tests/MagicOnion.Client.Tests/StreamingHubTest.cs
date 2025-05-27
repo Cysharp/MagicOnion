@@ -1,6 +1,7 @@
 using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace MagicOnion.Client.Tests;
@@ -732,6 +733,56 @@ public class StreamingHubTest
             await client.DisposeAsync();
         }
     }
+
+    [Fact]
+    public async Task ConnectAsync_Failure()
+    {
+        // Arrange
+        var disposed = false;
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
+            factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
+            onResponseHeaderAsync: metadata => throw new HttpRequestException());
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () => await helper.ConnectAsync(timeout.Token));
+
+        // Assert
+        Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public async Task ConnectAsync_CancellationToken_Timeout()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var connectTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+        var disposed = true;
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
+            factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
+            onResponseHeaderAsync: async metadata =>
+            {
+                // Simulate a long time to response
+                await Task.Delay(1500);
+            },
+            onDuplexStreamingCallDisposeAction: () =>
+            {
+                disposed = true;
+            });
+
+        // Act
+        var begin = Stopwatch.GetTimestamp();
+        var ex = await Record.ExceptionAsync(async () => await helper.ConnectAsync(connectTimeout.Token));
+        var elapsed = Stopwatch.GetElapsedTime(begin);
+        await Task.Delay(2000); // Wait for the ConnectAsync to complete.
+
+        // Assert
+        Assert.IsType<OperationCanceledException>(ex);
+        //Assert.Equal(connectTimeout.Token, timeout.Token);
+        Assert.InRange(elapsed.TotalSeconds, 0.9, 1.1);
+        Assert.True(disposed);
+    }
+
 }
 
 public interface IGreeterHubReceiver
