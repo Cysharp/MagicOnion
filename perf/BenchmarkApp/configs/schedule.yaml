@@ -16,6 +16,3 @@ branch-configs:
   - suffix: "-4"
     branch: main
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetserver.yaml
-  - suffix: "-5"
-    branch: experimental/NoUsePayloadPoolOnServer
-    config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c.yaml
