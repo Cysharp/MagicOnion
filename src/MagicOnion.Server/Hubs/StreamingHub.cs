@@ -26,6 +26,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     TimeProvider timeProvider = default!;
     bool isReturnExceptionStackTraceInErrorDetail = false;
     UniqueHashDictionary<StreamingHubHandler> handlers = default!;
+    Task consumingRequestQueueTask = default!;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -56,7 +57,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     protected Guid ConnectionId
         => Context.ContextId;
-    
+
     /// <summary>
     /// Called before connect, instead of constructor.
     /// </summary>
@@ -142,6 +143,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             StreamingServiceContext.CompleteStreamingHub();
             heartbeatHandle.Unregister(); // NOTE: To be able to use CancellationToken within OnDisconnected event, separate the calls to Dispose and Unregister.
 
+            // Wait for the request queue to be consumed/completed.
+            await consumingRequestQueueTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+
             await OnDisconnected();
 
             await this.Group.DisposeAsync();
@@ -172,7 +176,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         await OnConnected();
 
         // Starts a loop that consumes the request queue.
-        _ = ConsumeRequestQueueAsync();
+        consumingRequestQueueTask = ConsumeRequestQueueAsync(ct);
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
@@ -187,7 +191,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    async ValueTask ConsumeRequestQueueAsync()
+    async Task ConsumeRequestQueueAsync(CancellationToken cancellationToken)
     {
         // Create and reuse a single StreamingHubContext for each hub connection.
         var hubContext = new StreamingHubContext();
@@ -198,6 +202,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (handlers.TryGetValue(request.MethodId, out var handler))
                 {
                     hubContext.Initialize(
