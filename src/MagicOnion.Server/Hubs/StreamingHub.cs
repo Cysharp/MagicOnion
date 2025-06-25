@@ -152,8 +152,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
             // User code or network backed Group provider may throw an exception while cleaning up.
-            await CleanupSafeAsync(static async hub => await hub.OnDisconnected(), this);
-            await CleanupSafeAsync(static async hub => await hub.Group.DisposeAsync(), this);
+            await CleanupSafeAsync(static hub => hub.OnDisconnected(), this);
+            await CleanupSafeAsync(static hub => hub.Group.DisposeAsync(), this);
 
             heartbeatHandle.Dispose();
             remoteClientResultPendingTasks.Dispose();
