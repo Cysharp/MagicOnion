@@ -148,18 +148,30 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             // Complete the request queue.
             requests.Writer.Complete();
 
-
             // Wait for the request queue to be consumed/completed.
             await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
-            await OnDisconnected();
+            // User code or network backed Group provider may throw an exception while cleaning up.
+            await CleanupSafeAsync(static async hub => await hub.OnDisconnected(), this);
+            await CleanupSafeAsync(static async hub => await hub.Group.DisposeAsync(), this);
 
-            await this.Group.DisposeAsync();
             heartbeatHandle.Dispose();
             remoteClientResultPendingTasks.Dispose();
         }
 
         return default;
+
+        static async ValueTask CleanupSafeAsync(Func<StreamingHubBase<THubInterface, TReceiver>, ValueTask> action, StreamingHubBase<THubInterface, TReceiver> hub)
+        {
+            try
+            {
+                await action(hub);
+            }
+            catch (Exception e)
+            {
+                MagicOnionServerLog.Error(hub.Context.Logger, e, hub.Context.CallContext);
+            }
+        }
     }
 
     async Task HandleMessageAsync()

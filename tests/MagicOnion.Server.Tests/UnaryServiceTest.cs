@@ -14,13 +14,13 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
     public UnaryServiceTest_ReturnExceptionStackTrace(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
+        factory.Initialize();
         this.factory = factory.WithMagicOnionOptions(options =>
         {
             options.IsReturnExceptionStackTraceInErrorDetail = true;
         });
 
         this.logs = factory.Logs;
-        this.logs.Clear();
     }
 
     [Fact]
@@ -79,9 +79,9 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
     public UnaryServiceTest(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
+        factory.Initialize();
         this.factory = factory;
         this.logs = factory.Logs;
-        this.logs.Clear();
     }
 
     [Fact]
