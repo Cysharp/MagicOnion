@@ -18,13 +18,12 @@ public class StreamingHubDisconnectionTest : IClassFixture<MagicOnionApplication
     {
         this.factory = factory;
         this.logs = factory.Logs;
+        this.logs.Clear();
     }
 
     [Fact]
     public async Task DisconnectWhileConsumingHubMethodQueue()
     {
-        logs.Clear();
-
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() {HttpClient = httpClient});
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubDisconnectionTestHub, IStreamingHubDisconnectionTestHubReceiver>(

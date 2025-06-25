@@ -20,6 +20,8 @@ namespace MagicOnion.Server.Hubs;
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>, IStreamingHubBase
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
+    static readonly TimeSpan RequestQueueShutdownTimeout = TimeSpan.FromSeconds(1);
+
     IStreamingHubFeature streamingHubFeature = default!;
     IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = default!;
     StreamingHubHeartbeatHandle heartbeatHandle = default!;
@@ -143,8 +145,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             StreamingServiceContext.CompleteStreamingHub();
             heartbeatHandle.Unregister(); // NOTE: To be able to use CancellationToken within OnDisconnected event, separate the calls to Dispose and Unregister.
 
+            // Complete the request queue.
+            requests.Writer.Complete();
+
+
             // Wait for the request queue to be consumed/completed.
-            await consumingRequestQueueTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
             await OnDisconnected();
 

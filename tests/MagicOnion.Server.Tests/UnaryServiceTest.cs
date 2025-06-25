@@ -20,6 +20,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         });
 
         this.logs = factory.Logs;
+        this.logs.Clear();
     }
 
     [Fact]
@@ -27,7 +28,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
         Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
@@ -40,7 +40,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -53,7 +52,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -66,7 +64,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -84,6 +81,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         this.factory = factory;
         this.logs = factory.Logs;
+        this.logs.Clear();
     }
 
     [Fact]
@@ -91,7 +89,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -104,7 +101,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -117,7 +113,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient })); logs.Clear();
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
