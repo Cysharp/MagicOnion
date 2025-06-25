@@ -20,7 +20,7 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Progr
 {
     public const string ItemsKey = "MagicOnionApplicationFactory.Items";
     public ConcurrentDictionary<string, object> Items => Services.GetRequiredKeyedService<ConcurrentDictionary<string, object>>(ItemsKey);
-    public List<string> Logs { get; } = new();
+    public ConcurrentBag<string> Logs { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion.Client;
@@ -8,7 +9,7 @@ namespace MagicOnion.Server.Tests;
 
 public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
-    readonly List<string> logs;
+    readonly ConcurrentBag<string> logs;
     readonly WebApplicationFactory<Program> factory;
 
     public UnaryServiceTest_ReturnExceptionStackTrace(MagicOnionApplicationFactory<UnaryTestService> factory)
@@ -19,6 +20,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         });
 
         this.logs = factory.Logs;
+        this.logs.Clear();
     }
 
     [Fact]
@@ -26,7 +28,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
         Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
@@ -39,7 +40,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -52,7 +52,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -65,7 +64,6 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -76,13 +74,14 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
 public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
-    readonly List<string> logs;
+    readonly ConcurrentBag<string> logs;
     readonly WebApplicationFactory<Program> factory;
 
     public UnaryServiceTest(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
         this.factory = factory;
         this.logs = factory.Logs;
+        this.logs.Clear();
     }
 
     [Fact]
@@ -90,7 +89,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -103,7 +101,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
@@ -116,7 +113,6 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     {
         var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IUnaryTestService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient })); logs.Clear();
-        logs.Clear();
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
