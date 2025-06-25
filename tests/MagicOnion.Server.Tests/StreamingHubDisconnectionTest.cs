@@ -16,9 +16,9 @@ public class StreamingHubDisconnectionTest : IClassFixture<MagicOnionApplication
 
     public StreamingHubDisconnectionTest(MagicOnionApplicationFactory<StreamingHubDisconnectionTestHub> factory)
     {
+        factory.Initialize();
         this.factory = factory;
         this.logs = factory.Logs;
-        this.logs.Clear();
     }
 
     [Fact]
