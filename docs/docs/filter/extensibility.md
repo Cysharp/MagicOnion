@@ -40,7 +40,7 @@ class SampleFilterAttribute : IMagicOnionServiceFilter, IStreamingHubFilter, Att
 
 ```csharp
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-class SampleFilterAttribute : Attrubute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>
+class SampleFilterAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>
 {
     public string Name { get; set; }
 
