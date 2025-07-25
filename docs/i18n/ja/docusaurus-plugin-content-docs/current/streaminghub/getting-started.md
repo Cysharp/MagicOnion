@@ -32,7 +32,7 @@ public interface IChatHubReceiver
 {
     void OnJoin(string userName);
     void OnLeave(string userName);
-    void OnSendMessage(string userName, string message);
+    void OnMessage(string userName, string message);
 }
 ```
 
@@ -125,7 +125,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 
     public async ValueTask LeaveAsync()
     {
-        room.All.OnLeave(Context.ConnectionId);
+        room.All.OnLeave(ConnectionId.toString());
         await room.RemoveAsync(Context);
     }
 
@@ -151,7 +151,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 
     public async ValueTask LeaveAsync()
     {
-        room.All.OnLeave(Context.ConnectionId);
+        room.All.OnLeave(ConnectionId.toString());
         await room.RemoveAsync(Context);
     }
 
