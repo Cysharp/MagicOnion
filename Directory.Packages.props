@@ -10,7 +10,7 @@
     <MessagePackVersion>3.1.1</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
-    <MulticasterVersion>2.1.0</MulticasterVersion>
+    <MulticasterVersion>2.1.1</MulticasterVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
