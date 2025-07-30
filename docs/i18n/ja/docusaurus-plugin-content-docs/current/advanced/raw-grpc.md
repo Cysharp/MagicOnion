@@ -1,21 +1,21 @@
-# Raw gRPC APIs
+# Raw gRPC API
 
-MagicOnion can define and use primitive gRPC APIs (ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
+MagicOnion はプリミティブな gRPC API（ClientStreaming、ServerStreaming、DuplexStreaming）を定義して使用することができます。特に DuplexStreaming は StreamingHub の基礎となって使用されています。特別な理由がない限り、StreamingHub の使用を推奨します。
 
-## ServerStreaming
+## ServerStreaming の使い方
 
-ServerStreaming is a streaming pattern where the server sends multiple values to the client. The client sends a single request, and the server can return multiple responses.
+ServerStreaming はサーバーからクライアントへ複数の値を送信するストリーミングパターンです。クライアントは単一のリクエストを送信し、サーバーは複数のレスポンスを返すことができます。
 
-### Server-side implementation
+### サーバー側の実装
 
-To implement ServerStreaming, use `GetServerStreamingContext<T>()` to get the streaming context.
+ServerStreaming を実装するには、`GetServerStreamingContext<T>()` を使用してストリーミングコンテキストを取得します。
 
 ```csharp
 public async Task<ServerStreamingResult<WeatherData>> GetWeatherUpdatesAsync(string location, int count)
 {
     var stream = GetServerStreamingContext<WeatherData>();
 
-    // Send weather data for the specified count
+    // 指定された回数だけ天気データを送信
     for (int i = 0; i < count; i++)
     {
         var weatherData = new WeatherData
@@ -27,7 +27,7 @@ public async Task<ServerStreamingResult<WeatherData>> GetWeatherUpdatesAsync(str
 
         await stream.WriteAsync(weatherData);
         
-        // Wait for 1 second (simulating real-time data)
+        // 1秒待機（リアルタイムデータのシミュレーション）
         await Task.Delay(1000);
     }
 
@@ -35,9 +35,9 @@ public async Task<ServerStreamingResult<WeatherData>> GetWeatherUpdatesAsync(str
 }
 ```
 
-### Client-side implementation
+### クライアント側の実装
 
-On the client side, use `ResponseStream.ReadAllAsync()` to receive all values sent from the server.
+クライアント側では、`ResponseStream.ReadAllAsync()` を使用してサーバーから送信されるすべての値を受信します。
 
 ```csharp
 var client = MagicOnionClient.Create<IWeatherService>(channel);
@@ -45,26 +45,26 @@ var stream = await client.GetWeatherUpdatesAsync("Tokyo", 5);
 
 await foreach (var weatherData in stream.ResponseStream.ReadAllAsync())
 {
-    Console.WriteLine($"Temperature: {weatherData.Temperature}°C, Humidity: {weatherData.Humidity}%, Time: {weatherData.Timestamp}");
+    Console.WriteLine($"気温: {weatherData.Temperature}°C, 湿度: {weatherData.Humidity}%, 時刻: {weatherData.Timestamp}");
 }
 ```
 
-### Use cases
+### 使用例
 
-ServerStreaming is useful in scenarios such as:
+ServerStreaming は以下のようなシナリオで有用です：
 
-- Real-time data feeds (stock prices, sensor data, etc.)
-- Sending large amounts of data in chunks
-- Progress update notifications
-- Log streaming
+- リアルタイムデータフィード（株価、センサーデータなど）
+- 大量データの分割送信
+- プログレス更新の通知
+- ログのストリーミング
 
-## ClientStreaming
+## ClientStreaming の使い方
 
-ClientStreaming is a streaming pattern where the client sends multiple values to the server. The client sends multiple messages, and the server returns a single response.
+ClientStreaming はクライアントからサーバーへ複数の値を送信するストリーミングパターンです。クライアントは複数のメッセージを送信し、サーバーは単一のレスポンスを返します。
 
-### Server-side implementation
+### サーバー側の実装
 
-To implement ClientStreaming, use `GetClientStreamingContext<TRequest, TResponse>()` to get the streaming context.
+ClientStreaming を実装するには、`GetClientStreamingContext<TRequest, TResponse>()` を使用してストリーミングコンテキストを取得します。
 
 ```csharp
 public async Task<ClientStreamingResult<SensorData, AnalysisResult>> AnalyzeSensorDataAsync()
@@ -73,14 +73,14 @@ public async Task<ClientStreamingResult<SensorData, AnalysisResult>> AnalyzeSens
 
     var allData = new List<SensorData>();
     
-    // Receive all data from the client
+    // クライアントからのすべてのデータを受信
     await foreach (var data in stream.ReadAllAsync())
     {
         Logger.Debug($"Received sensor data: {data.Value} at {data.Timestamp}");
         allData.Add(data);
     }
 
-    // Analyze the received data
+    // 受信したデータを分析
     var result = new AnalysisResult
     {
         Average = allData.Average(d => d.Value),
@@ -93,15 +93,15 @@ public async Task<ClientStreamingResult<SensorData, AnalysisResult>> AnalyzeSens
 }
 ```
 
-### Client-side implementation
+### クライアント側の実装
 
-On the client side, use `RequestStream.WriteAsync()` to send multiple values and call `CompleteAsync()` at the end to complete the stream.
+クライアント側では、`RequestStream.WriteAsync()` を使用して複数の値を送信し、最後に `CompleteAsync()` を呼び出してストリームを完了します。
 
 ```csharp
 var client = MagicOnionClient.Create<ISensorService>(channel);
 var stream = await client.AnalyzeSensorDataAsync();
 
-// Send sensor data
+// センサーデータを送信
 for (int i = 0; i < 10; i++)
 {
     var sensorData = new SensorData
@@ -111,47 +111,47 @@ for (int i = 0; i < 10; i++)
     };
     
     await stream.RequestStream.WriteAsync(sensorData);
-    await Task.Delay(100); // Simulate sensor reading interval
+    await Task.Delay(100); // センサー読み取り間隔のシミュレーション
 }
 
-// Complete the stream
+// ストリームを完了
 await stream.RequestStream.CompleteAsync();
 
-// Receive analysis result from server
+// サーバーからの分析結果を受信
 var result = await stream.ResponseAsync;
-Console.WriteLine($"Average: {result.Average}, Max: {result.Max}, Min: {result.Min}, Count: {result.Count}");
+Console.WriteLine($"平均: {result.Average}, 最大: {result.Max}, 最小: {result.Min}, 件数: {result.Count}");
 ```
 
-### Use cases
+### 使用例
 
-ClientStreaming is useful in scenarios such as:
+ClientStreaming は以下のようなシナリオで有用です：
 
-- File uploads (in chunks)
-- Batch data submission
-- Sensor data collection
-- Bulk log submission
+- ファイルアップロード（チャンク単位）
+- バッチデータの送信
+- センサーデータの収集
+- ログの一括送信
 
-## DuplexStreaming
+## DuplexStreaming の使い方
 
-DuplexStreaming is a bidirectional streaming pattern where both client and server can send and receive multiple messages simultaneously. This is the underlying technology for MagicOnion's StreamingHub.
+DuplexStreaming は双方向のストリーミングパターンで、クライアントとサーバーが同時に複数のメッセージを送受信できます。これは MagicOnion の StreamingHub の基礎となる技術です。
 
-### Server-side implementation
+### サーバー側の実装
 
-To implement DuplexStreaming, use `GetDuplexStreamingContext<TRequest, TResponse>()` to get the streaming context.
+DuplexStreaming を実装するには、`GetDuplexStreamingContext<TRequest, TResponse>()` を使用してストリーミングコンテキストを取得します。
 
 ```csharp
 public async Task<DuplexStreamingResult<ChatMessage, ChatMessage>> ChatAsync()
 {
     var stream = GetDuplexStreamingContext<ChatMessage, ChatMessage>();
 
-    // Task to receive messages from the client
+    // クライアントからのメッセージを受信するタスク
     var receiveTask = Task.Run(async () =>
     {
         await foreach (var message in stream.ReadAllAsync())
         {
             Logger.Debug($"Received: {message.User}: {message.Content}");
             
-            // Echo back (return received message with server response)
+            // エコーバック（受信したメッセージにサーバー応答を付けて返す）
             var response = new ChatMessage
             {
                 User = "Server",
@@ -163,11 +163,11 @@ public async Task<DuplexStreamingResult<ChatMessage, ChatMessage>> ChatAsync()
         }
     });
 
-    // Send welcome message
+    // ウェルカムメッセージを送信
     await stream.WriteAsync(new ChatMessage
     {
         User = "Server",
-        Content = "Welcome to the chat!",
+        Content = "チャットへようこそ！",
         Timestamp = DateTime.UtcNow
     });
 
@@ -177,15 +177,15 @@ public async Task<DuplexStreamingResult<ChatMessage, ChatMessage>> ChatAsync()
 }
 ```
 
-### Client-side implementation
+### クライアント側の実装
 
-On the client side, handle sending and receiving in parallel.
+クライアント側では、送信と受信を並行して処理します。
 
 ```csharp
 var client = MagicOnionClient.Create<IChatService>(channel);
 var stream = await client.ChatAsync();
 
-// Task to receive messages from the server
+// サーバーからのメッセージを受信するタスク
 var receiveTask = Task.Run(async () =>
 {
     await foreach (var message in stream.ResponseStream.ReadAllAsync())
@@ -194,7 +194,7 @@ var receiveTask = Task.Run(async () =>
     }
 });
 
-// Send user input
+// ユーザー入力を送信
 while (true)
 {
     var input = Console.ReadLine();
@@ -210,36 +210,36 @@ while (true)
     await stream.RequestStream.WriteAsync(message);
 }
 
-// Complete the stream
+// ストリームを完了
 await stream.RequestStream.CompleteAsync();
 await receiveTask;
 ```
 
-### Use cases
+### 使用例
 
-DuplexStreaming is useful in scenarios such as:
+DuplexStreaming は以下のようなシナリオで有用です：
 
-- Real-time chat
-- Bidirectional game communication
-- Collaboration tools
-- Real-time monitoring systems
+- リアルタイムチャット
+- ゲームの双方向通信
+- コラボレーションツール
+- リアルタイム監視システム
 
-### Notes
+### 注意事項
 
-1. **Consider StreamingHub**: When you need DuplexStreaming, StreamingHub is often more suitable in many cases. StreamingHub provides a higher-level API built on top of DuplexStreaming.
+1. **StreamingHub の検討**: DuplexStreaming が必要な場合、多くのケースで StreamingHub の方が適しています。StreamingHub は DuplexStreaming の上に構築された、より高レベルな API を提供します。
 
-2. **Error handling**: Exceptions during streaming need to be handled properly. Implement measures for connection drops and timeouts.
+2. **エラーハンドリング**: ストリーミング中の例外は適切に処理する必要があります。接続の切断やタイムアウトに対する対策を実装してください。
 
-3. **Resource management**: Long-running streaming connections should manage resources properly and set timeouts as needed.
+3. **リソース管理**: 長時間実行されるストリーミング接続は、適切にリソースを管理し、必要に応じてタイムアウトを設定してください。
 
-4. **Concurrent processing**: In DuplexStreaming, sending and receiving happen concurrently, so pay attention to thread safety.
+4. **並行処理**: DuplexStreaming では送信と受信が並行して行われるため、スレッドセーフティに注意してください。
 
-## Sample Code
+## サンプルコード
 
-### Server Sample
+### サーバーのサンプル
 
 ```csharp
-// Definitions
+// 定義
 public interface IMyFirstService : IService<IMyFirstService>
 {
     UnaryResult<string> SumAsync(int x, int y);
@@ -249,7 +249,7 @@ public interface IMyFirstService : IService<IMyFirstService>
     Task<DuplexStreamingResult<int, string>> DuplexStreamingSampleAsync();
 }
 
-// Server
+// サーバー
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
     public async UnaryResult<string> SumAsync(int x, int y)
@@ -263,16 +263,16 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     {
         Logger.Debug($"Called ClientStreamingSampleAsync");
 
-        // If ClientStreaming, use GetClientStreamingContext.
+        // ClientStreaming の場合は、GetClientStreamingContext を使用します。
         var stream = GetClientStreamingContext<int, string>();
 
-        // receive from client asynchronously
+        // クライアントから非同期で受信
         await foreach (var x in stream.ReadAllAsync())
         {
             Logger.Debug("Client Stream Received:" + x);
         }
 
-        // StreamingContext.Result() for result value.
+        // StreamingContext.Result() で結果値を返します。
         return stream.Result("finished");
     }
 
@@ -296,19 +296,19 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     {
         Logger.Debug($"Called DuplexStreamingSampleAsync");
 
-        // DuplexStreamingContext represents both server and client streaming.
+        // DuplexStreamingContext はサーバーとクライアントの両方のストリーミングを表します。
         var stream = GetDuplexStreamingContext<int, string>();
 
         var waitTask = Task.Run(async () =>
         {
-            // ForEachAsync(MoveNext, Current) can receive client streaming.
+            // ForEachAsync(MoveNext, Current) でクライアントストリーミングを受信できます。
             await foreach (var x in stream.ReadAllAsync())
             {
                 Logger.Debug($"Duplex Streaming Received:" + x);
             }
         });
 
-        // WriteAsync is ServerStreaming.
+        // WriteAsync は ServerStreaming です。
         await stream.WriteAsync("test1");
         await stream.WriteAsync("test2");
         await stream.WriteAsync("finish");
@@ -320,7 +320,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 }
 ```
 
-### Client sample
+### クライアントのサンプル
 
 ```csharp
 static async Task ClientStreamRun(IMyFirstService client)
