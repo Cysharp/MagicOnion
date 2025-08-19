@@ -94,3 +94,90 @@ public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerP
         => new XorMessagePackMagicOnionSerializer(serializerOptions);
 }
 ```
+
+## Example code 2
+Introducing the AES256 encryption method.
+
+At first I wanted to handle it by putting the IV in the header.
+
+
+But I can't find a proper way to parse the header from 'IMagicOnionSerializerProvider'.
+
+So I processed it using the iv prepend method. I created an example because I wanted to share it with you.
+
+IV was created during serialization and decoding.
+Place the IV value at the front of the byte array, and place the encrypted data at the back.
+
+```csharp
+public class AES256SerializerProvider : IMagicOnionSerializerProvider
+{
+    private static readonly int IV_LENGTH = 16;
+ 
+
+    public AES256SerializerProvider()
+    {
+    }
+    
+    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
+        => new AESSerializer();
+    
+    class AESSerializer : IMagicOnionSerializer
+    {
+        readonly MessagePackSerializerOptions serializerOptions;
+
+        public AESSerializer()
+        {
+            this.serializerOptions = MessagePackSerializer.DefaultOptions;
+        }
+
+        public T Deserialize<T>(in ReadOnlySequence<byte> bytes)
+        {
+            var array = ArrayPool<byte>.Shared.Rent((int)bytes.Length);
+            try
+            {
+                bytes.CopyTo(array);
+                int bodySize = array.Length - IV_LENGTH;
+
+                ArraySegment<byte> nonce = new ArraySegment<byte>(array, 0, IV_LENGTH);
+                ArraySegment<byte> body = new ArraySegment<byte>(array, IV_LENGTH, bodySize);
+
+                // The AESCipher object is an AES encryption object that uses the .net core native library.
+                AESCipher cipher = new AESCipher();
+                var packet = cipher.Decrypt(nonce.ToArray(), body.ToArray());
+                
+                return MessagePackSerializer.Deserialize<T>(packet.AsMemory(0, (int)packet.Length), serializerOptions);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(array);
+            }
+        }
+
+        public void Serialize<T>(IBufferWriter<byte> buffer, in T value)
+        {
+            var planBytes = MessagePackSerializer.Serialize(value, serializerOptions);
+
+            byte[] nonce = new byte[IV_LENGTH];
+            RandomNumberGenerator.Fill(nonce);
+            
+            AESCipher cipher = new AESCipher();
+            var encryptData = cipher.Encrypt(nonce, planBytes);
+
+            int totalSize = planBytes.Length + IV_LENGTH;
+            
+            var span = buffer.GetSpan(totalSize);
+            int offset = 0;
+            
+            nonce.AsSpan().CopyTo(span.Slice(offset)); 
+            offset += IV_LENGTH;
+
+            encryptData.AsSpan().CopyTo(span.Slice(offset)); 
+            offset += encryptData.Length;
+            
+            buffer.Advance(offset);
+        }
+    }
+}
+
+```
+
