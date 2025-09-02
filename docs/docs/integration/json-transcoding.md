@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     // Reflect the XML documentation comments of the service definition in Swagger.
     // To use this feature, you must enable the Generate XML Comments option in project options.
-    options.IncludeMagicOnionXmlComments(Path.Combine(AppContext.BaseDirectory, "JsonTranscodingSample.Shared.xml"));
+    options.IncludeMagicOnionXmlComments(typeof(IMyService).Assembly);
 });
 
 var app = builder.Build();
@@ -62,8 +62,8 @@ System.AggregateException: Some services are not able to be constructed (Error w
 ```
 
 
-Reference  
-MSDN documentation for the usage of Swashbuckle.AspNetCore.Swagger used in MagicOnion.  
+Reference
+MSDN documentation for the usage of Swashbuckle.AspNetCore.Swagger used in MagicOnion.
 https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-8.0&tabs=visual-studio
 
 ```csharp

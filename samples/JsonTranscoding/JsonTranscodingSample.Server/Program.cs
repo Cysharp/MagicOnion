@@ -1,3 +1,5 @@
+using JsonTranscodingSample.Shared;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -19,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     // Reflect the XML documentation comments of the service definition in Swagger.
-    options.IncludeMagicOnionXmlComments(Path.Combine(AppContext.BaseDirectory, "JsonTranscodingSample.Shared.xml"));
+    options.IncludeMagicOnionXmlComments(typeof(IMyFirstService).Assembly);
 
     // // Add JWT security scheme to Swagger. 
     // options.AddJwtSecurityScheme();
