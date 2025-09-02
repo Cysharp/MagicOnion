@@ -18,7 +18,8 @@ public static class MagicOnionSwaggerGenOptionsExtensions
 
     public static void IncludeMagicOnionXmlComments(this SwaggerGenOptions options, Assembly sharedAssembly)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, $"{sharedAssembly.GetName().Name}.xml");
-        IncludeMagicOnionXmlComments(options, XDocument.Load(path));
+        IncludeMagicOnionXmlComments(options, XDocument.Load(
+            Path.Combine(AppContext.BaseDirectory, $"{sharedAssembly.GetName().Name}.xml")
+        ));
     }
 }
