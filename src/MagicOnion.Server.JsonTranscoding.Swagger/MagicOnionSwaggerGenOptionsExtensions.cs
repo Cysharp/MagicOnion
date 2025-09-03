@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Xml.Linq;
 using MagicOnion.Server.JsonTranscoding.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -13,5 +14,12 @@ public static class MagicOnionSwaggerGenOptionsExtensions
     public static void IncludeMagicOnionXmlComments(this SwaggerGenOptions options, XDocument xmlDoc)
     {
         options.AddOperationFilterInstance(new MagicOnionXmlCommentsOperationFilter(xmlDoc));
+    }
+
+    public static void IncludeMagicOnionXmlComments(this SwaggerGenOptions options, Assembly sharedAssembly)
+    {
+        IncludeMagicOnionXmlComments(options, XDocument.Load(
+            Path.Combine(AppContext.BaseDirectory, $"{sharedAssembly.GetName().Name}.xml")
+        ));
     }
 }
