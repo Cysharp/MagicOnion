@@ -6,6 +6,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion</PackageId>
     <Description>$(MagicOnionPackageDescription) This package is meta package that includes MagicOnion.Server and MagicOnion.Client.</Description>
 

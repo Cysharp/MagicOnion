@@ -9,6 +9,7 @@
     <DefineConstants>$(DefineConstants);USE_OBJECTPOOL_STREAMINGHUBPAYLOADPOOL</DefineConstants>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Server</PackageId>
     <Description>MagicOnion server built on top of ASP.NET Core. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>

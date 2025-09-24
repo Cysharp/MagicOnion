@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Server.JsonTranscoding.Swagger</PackageId>
     <Description>Provides Swagger support for MagicOnion JSON transcoding on the server.</Description>
   </PropertyGroup>

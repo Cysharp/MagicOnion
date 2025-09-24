@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <!--
-    Override the output path of build artifacts.
-    This is necessary to change the path to one with a dot(.) prefix to hide generated items from Unity.
+  <Import Project="..\..\../Directory.Build.props" />
+
+  <!--
+  Override the output path of build artifacts.
+  This is necessary to change the path to one with a dot(.) prefix to hide generated items from Unity.
   -->
   <PropertyGroup>
     <!-- Using .NET 8 and later, use ArtifactsPath property. -->
