@@ -6,11 +6,6 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)\..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
   <!-- Prevent local path leakage by artifacts -->
   <PropertyGroup>
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
