@@ -9,6 +9,7 @@
     <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Server.Redis</PackageId>
     <Description>Redis backplane for MagicOnion.</Description>
   </PropertyGroup>

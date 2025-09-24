@@ -5,8 +5,10 @@
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <RootNamespace>MagicOnion</RootNamespace>
+
+    <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <Description>Provides shared classes and interfaces used by MagicOnion server and client. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 

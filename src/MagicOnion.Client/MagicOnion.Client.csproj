@@ -8,6 +8,7 @@
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))">true</IsTrimmable>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Client</PackageId>
     <Description>MagicOnion client-side runtime library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>

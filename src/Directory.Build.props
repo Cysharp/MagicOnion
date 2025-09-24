@@ -17,7 +17,4 @@
     <PathMap>$(RepoRoot)=.</PathMap>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="$(MSBuildProjectDirectory)\..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
-  </ItemGroup>
 </Project>

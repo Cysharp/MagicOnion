@@ -9,6 +9,7 @@
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Serialization.MessagePack</PackageId>
     <Description>MagicOnion extension package for serialization using MessagePack.</Description>
   </PropertyGroup>

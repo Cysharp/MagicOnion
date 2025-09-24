@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
 
     <!-- NuGet -->
+    <IsPackable>true</IsPackable>
     <PackageId>MagicOnion.Server.JsonTranscoding</PackageId>
     <Description>Provides JSON transcoding support to the MagicOnion server.</Description>
   </PropertyGroup>
