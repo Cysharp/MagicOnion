@@ -1,4 +1,4 @@
-using MagicOnion;
+﻿using MagicOnion;
 using MemoryPack;
 using MessagePack;
 using System.Runtime.InteropServices;
