@@ -24,7 +24,6 @@ jobs:
         ./Directory.Build.props
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
-      push-tag: false
       ref: ${{ github.ref }}
 
   build-dotnet:
