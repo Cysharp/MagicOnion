@@ -32,7 +32,7 @@ public interface IChatHubReceiver
 {
     void OnJoin(string userName);
     void OnLeave(string userName);
-    void OnMessage(string userName, string message);
+    void OnSendMessage(string userName, string message);
 }
 ```
 
@@ -97,7 +97,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
         this.userName = userName;
         room.All.OnJoin(userName);
 
-        Client.OnMessage("System", $"Welcome, hello {userName}!");
+        Client.OnSendMessage("System", $"Welcome, hello {userName}!");
     }
 
     public async ValueTask LeaveAsync()
@@ -134,7 +134,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 }
 ```
 
-Finally, implement the `SendMessageAsync` method to deliver messages to the group when the server receives a message from the client. In this method, notify the group by calling the `OnMessage` method of the clients who have joined the group through the `All` property of the group.
+Finally, implement the `SendMessageAsync` method to deliver messages to the group when the server receives a message from the client. In this method, notify the group by calling the `OnSendMessage` method of the clients who have joined the group through the `All` property of the group.
 
 ```csharp
 public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
@@ -151,13 +151,13 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 
     public async ValueTask LeaveAsync()
     {
-        room.All.OnLeave(ConnectionId.toString());
+        room.All.OnLeave(userName);
         await room.RemoveAsync(Context);
     }
 
     public async ValueTask SendMessageAsync(string message)
     {
-        room.All.OnMessage(userName, message);
+        room.All.OnSendMessage(userName, message);
     }
 }
 ```
@@ -175,7 +175,7 @@ class ChatHubReceiver : IChatHubReceiver
         => Console.WriteLine($"{userName} joined.");
     public void OnLeave(string userName)
         => Console.WriteLine($"{userName} left.");
-    public void OnMessage(string userName, string message)
+    public void OnSendMessage(string userName, string message)
         => Console.WriteLine($"{userName}: {message}");
 }
 ```
