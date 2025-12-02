@@ -1,8 +1,9 @@
-using MagicOnion.Client.DynamicClient;
+﻿using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 
 namespace MagicOnion.Client.Tests;
 
@@ -783,6 +784,40 @@ public class StreamingHubTest
         Assert.True(disposed);
     }
 
+    [Fact]
+    public async Task ConnectAsync_CancellationToken_Timeout_On_FirstMoveNext()
+    {
+        // Verify that there is no problem when the CancellationToken passed to ConnectAsync is canceled after ConnectAsync and before the first message arrives.
+
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var connectTimeout = new CancellationTokenSource();
+        var disposed = true;
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
+            factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
+            onResponseHeaderAsync: metadata => Task.CompletedTask,
+            onDuplexStreamingCallDisposeAction: () =>
+            {
+                disposed = true;
+            });
+
+        // Act
+        var client = await helper.ConnectAsync(connectTimeout.Token);
+        connectTimeout.Cancel();
+
+        // Invoke Hub Method
+        var t = client.Parameter_Zero().WaitAsync(timeout.Token);
+        {
+            // Read a hub method request payload
+            var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<Nil>();
+            // Write a response to the stream
+            helper.WriteResponse(messageId, methodId, 123);
+        }
+        var result = await t;
+
+        // Assert
+        Assert.Equal(123, result);
+    }
 }
 
 public interface IGreeterHubReceiver

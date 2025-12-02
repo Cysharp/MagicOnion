@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Client.Internal;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
@@ -242,20 +242,16 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
             subscriptionToken = CancellationTokenSource.CreateLinkedTokenSource(heartbeatManager.TimeoutToken, subscriptionCts.Token).Token;
         }
 
-        var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(connectAndSubscribeCancellationToken, subscriptionToken).Token);
+        var firstMoveNextTask = reader.MoveNext(subscriptionToken);
         if (firstMoveNextTask.IsFaulted || messageVersion == null)
         {
             // NOTE: Grpc.Net:
             //           If an error is returned from `StreamingHub.Connect` method on a server-side,
             //           ResponseStream.MoveNext synchronously returns a task that is `IsFaulted = true`.
             //           `ConnectAsync` method should throw an exception here immediately.
-            //       C-core:
-            //           `firstMoveNextTask` is incomplete task (`IsFaulted = false`) whether ResponseHeadersAsync is failed or not.
-            //           If the channel is disconnected or the server returns an error (StatusCode != OK), awaiting the Task will throw an exception.
             await firstMoveNextTask.ConfigureAwait(false);
 
-            // NOTE: C-core: If the execution reaches here, Connect method returns without any error (StatusCode = OK). but MessageVersion isn't provided from the server.
-            throw new RpcException(new Status(StatusCode.Internal, $"The request started successfully (StatusCode = OK), but the StreamingHub client has failed to negotiate with the server."));
+            throw new RpcException(new Status(StatusCode.Internal, $"The request started successfully (StatusCode = OK), but the StreamingHub client has failed to negotiate with the server. ServerVersion is missing."));
         }
 
         this.subscription = StartSubscribe(syncContext, firstMoveNextTask, subscriptionToken);
