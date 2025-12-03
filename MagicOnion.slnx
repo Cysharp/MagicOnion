@@ -1,0 +1,82 @@
+<Solution>
+  <Folder Name="/build/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/build/workflows/">
+    <File Path=".github/workflows/build-canary.yaml" />
+    <File Path=".github/workflows/build-docs.yaml" />
+    <File Path=".github/workflows/build.yaml" />
+    <File Path=".github/workflows/prevent-github-change.yaml" />
+    <File Path=".github/workflows/release.yaml" />
+    <File Path=".github/workflows/stale.yaml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="NuGet.Config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/perf/" />
+  <Folder Name="/perf/BenchmarkApp/">
+    <Project Path="perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" />
+    <Project Path="perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj" />
+    <Project Path="perf/BenchmarkApp/PerformanceTest.Shared/PerformanceTest.Shared.csproj" />
+  </Folder>
+  <Folder Name="/perf/Microbenchmark/">
+    <Project Path="perf/Microbenchmark/Microbenchmark.Client/Microbenchmark.Client.csproj" />
+  </Folder>
+  <Folder Name="/perf/SourceGeneratorPerf/">
+    <Project Path="perf/SourceGeneratorPerf/SourceGeneratorPerf/SourceGeneratorPerf.csproj" />
+  </Folder>
+  <Folder Name="/samples/" />
+  <Folder Name="/samples/ChatApp/">
+    <Project Path="samples/ChatApp/ChatApp.Console/ChatApp.Console.csproj" />
+    <Project Path="samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj" />
+    <Project Path="samples/ChatApp/ChatApp.Shared/ChatApp.Shared.csproj" />
+  </Folder>
+  <Folder Name="/samples/JsonTranscoding/">
+    <Project Path="samples/JsonTranscoding/JsonTranscodingSample.Server/JsonTranscodingSample.Server.csproj" />
+    <Project Path="samples/JsonTranscoding/JsonTranscodingSample.Shared/JsonTranscodingSample.Shared.csproj" />
+  </Folder>
+  <Folder Name="/samples/JwtAuthentication/">
+    <Project Path="samples/JwtAuthentication/JwtAuthApp.Client/JwtAuthApp.Client.csproj" />
+    <Project Path="samples/JwtAuthentication/JwtAuthApp.Server/JwtAuthApp.Server.csproj" />
+    <Project Path="samples/JwtAuthentication/JwtAuthApp.Shared/JwtAuthApp.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj" />
+    <Project Path="src/MagicOnion.Client.SourceGenerator/MagicOnion.Client.SourceGenerator.csproj" />
+    <Project Path="src/MagicOnion.Client/MagicOnion.Client.csproj" />
+    <Project Path="src/MagicOnion.Internal/MagicOnion.Internal.csproj" />
+    <Project Path="src/MagicOnion.Serialization.MemoryPack/MagicOnion.Serialization.MemoryPack.csproj" />
+    <Project Path="src/MagicOnion.Serialization.MessagePack/MagicOnion.Serialization.MessagePack.csproj" />
+    <Project Path="src/MagicOnion.Server.JsonTranscoding.Swagger/MagicOnion.Server.JsonTranscoding.Swagger.csproj" />
+    <Project Path="src/MagicOnion.Server.JsonTranscoding/MagicOnion.Server.JsonTranscoding.csproj" />
+    <Project Path="src/MagicOnion.Server.Redis/MagicOnion.Server.Redis.csproj" />
+    <Project Path="src/MagicOnion.Server/MagicOnion.Server.csproj" />
+    <Project Path="src/MagicOnion.Shared/MagicOnion.Shared.csproj" />
+    <Project Path="src/MagicOnion/MagicOnion.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MagicOnion.Abstractions.Tests/MagicOnion.Abstractions.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Client.NativeAot.Tests/MagicOnion.Client.NativeAot.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Client.SourceGenerator.Tests/MagicOnion.Client.SourceGenerator.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Client.Tests/MagicOnion.Client.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Integration.Tests/MagicOnion.Integration.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Serialization.MemoryPack.Tests/MagicOnion.Serialization.MemoryPack.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Serialization.MessagePack.Tests/MagicOnion.Serialization.MessagePack.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Server.InternalTesting/MagicOnion.Server.InternalTesting.csproj" />
+    <Project Path="tests/MagicOnion.Server.JsonTranscoding.Tests/MagicOnion.Server.JsonTranscoding.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Server.Redis.Tests/MagicOnion.Server.Redis.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Server.Tests/MagicOnion.Server.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/samples/">
+    <Project Path="tests/samples/AuthSample/AuthSample.csproj" />
+    <Project Path="tests/samples/MagicOnionEngineTest/MagicOnionEngineTest.csproj" />
+    <Project Path="tests/samples/MagicOnionTestServer/MagicOnionTestServer.csproj" />
+    <Project Path="tests/samples/SampleServiceDefinitions/SampleServiceDefinitions.csproj" />
+  </Folder>
+</Solution>
