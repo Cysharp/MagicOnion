@@ -44,8 +44,8 @@ jobs:
       - uses: Cysharp/Actions/.github/actions/checkout@main
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet tool restore
-      - run: dotnet retest -- -c Debug MagicOnion.sln
-      - run: dotnet retest -- -c Release MagicOnion.sln
+      - run: dotnet retest -- -c Debug MagicOnion.slnx
+      - run: dotnet retest -- -c Release MagicOnion.slnx
 
   run-client-nativeaot-tests:
     name: "Run Client Native AOT tests"
