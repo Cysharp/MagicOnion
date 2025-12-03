@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "MagicOnion.sln",
+    "path": "MagicOnion.slnx",
     "projects": [
       "src\\MagicOnion.Abstractions\\MagicOnion.Abstractions.csproj",
       "src\\MagicOnion.Client\\MagicOnion.Client.csproj",

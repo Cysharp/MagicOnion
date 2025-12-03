@@ -38,7 +38,7 @@ jobs:
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - run: dotnet build -c Release ./MagicOnion.sln
+      - run: dotnet build -c Release ./MagicOnion.slnx
       # pack nuget
       - run: dotnet pack -c Release ./MagicOnion.Packaging.slnf --no-build -o ./publish
       - uses: Cysharp/Actions/.github/actions/upload-artifact@main
