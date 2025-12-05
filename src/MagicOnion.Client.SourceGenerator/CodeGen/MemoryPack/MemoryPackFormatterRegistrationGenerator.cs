@@ -11,6 +11,7 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
 
         EmitPreamble(generationContext, ctx, writer);
         EmitBody(generationContext, ctx, writer);
+        EmitTypeHints(generationContext, ctx, writer);
         EmitPostscript(generationContext, ctx, writer);
 
         return (".MemoryPack", writer.ToString());
@@ -59,6 +60,7 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
                     /// </summary>
                     public static void RegisterMemoryPackFormatters()
                     {
+                        TypeHints.Register();
             """);
         foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
         {
@@ -67,6 +69,29 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
             """);
         }
         writer.AppendLineWithFormat($$"""
+                    }
+                }
+            """);
+    }
+
+    static void EmitTypeHints(GenerationContext generationContext, SerializationFormatterCodeGenContext ctx, StringBuilder writer)
+    {
+        writer.AppendLineWithFormat($$"""
+                /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+                static class TypeHints
+                {
+            #if NET8_0_OR_GREATER
+            """);
+        foreach (var typeHint in ctx.TypeHints.Where(x => !x.FullName.StartsWith("global::System.")))
+        {
+            writer.AppendLineWithFormat($$"""
+                    [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods, typeof({{typeHint.FullName}}))]
+            """);
+        }
+        writer.AppendLineWithFormat($$"""
+            #endif
+                    internal static void Register()
+                    {
                     }
                 }
             """);
