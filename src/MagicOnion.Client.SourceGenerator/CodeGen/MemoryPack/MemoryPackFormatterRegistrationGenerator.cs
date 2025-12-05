@@ -85,7 +85,7 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
         foreach (var typeHint in ctx.TypeHints.Where(x => !x.FullName.StartsWith("global::System.")))
         {
             writer.AppendLineWithFormat($$"""
-                    [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.AllMethods, typeof({{typeHint.FullName}}))]
+                    [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods, typeof({{typeHint.FullName}}))]
             """);
         }
         writer.AppendLineWithFormat($$"""
