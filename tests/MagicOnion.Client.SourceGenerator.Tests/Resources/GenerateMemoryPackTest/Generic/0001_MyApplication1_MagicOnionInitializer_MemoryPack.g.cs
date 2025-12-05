@@ -12,8 +12,20 @@ namespace MyApplication1
         /// </summary>
         public static void RegisterMemoryPackFormatters()
         {
+            TypeHints.Register();
             global::MemoryPack.MemoryPackFormatterProvider.Register(new global::MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>());
             global::MemoryPack.MemoryPackFormatterProvider.Register(new global::MemoryPack.Formatters.ValueTupleFormatter<global::System.String, global::System.Int32>());
         }
     }
 }
+    /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+    static class TypeHints
+    {
+#if NET8_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.AllMethods, typeof(global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32>))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.AllMethods, typeof(global::MyApplication1.MyGenericObject<global::System.ValueTuple<global::System.String, global::System.Int32>>))]
+#endif
+        internal static void Register()
+        {
+        }
+    }
