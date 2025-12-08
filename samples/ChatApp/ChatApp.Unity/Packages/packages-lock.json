@@ -12,6 +12,13 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.cysharp.slnmerge": {
+      "version": "https://github.com/Cysharp/SlnMerge.git?path=src#2.0.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "7849e3abfc3e33025d38b92cbc5fc0b978c69442"
+    },
     "com.cysharp.yetanotherhttphandler": {
       "version": "https://github.com/Cysharp/YetAnotherHttpHandler.git?path=src/YetAnotherHttpHandler#1.2.0",
       "depth": 0,
