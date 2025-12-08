@@ -22,8 +22,8 @@ namespace MyApplication1
     static class TypeHints
     {
 #if NET8_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.AllMethods, typeof(global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32>))]
-        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.AllMethods, typeof(global::MyApplication1.MyGenericObject<global::System.ValueTuple<global::System.String, global::System.Int32>>))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods, typeof(global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32>))]
+        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods, typeof(global::MyApplication1.MyGenericObject<global::System.ValueTuple<global::System.String, global::System.Int32>>))]
 #endif
         internal static void Register()
         {
