@@ -28,7 +28,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     TimeProvider timeProvider = default!;
     bool isReturnExceptionStackTraceInErrorDetail = false;
     UniqueHashDictionary<StreamingHubHandler> handlers = default!;
-    Task consumingRequestQueueTask = default!;
+    Task? consumingRequestQueueTask = default;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -149,7 +149,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             requests.Writer.Complete();
 
             // Wait for the request queue to be consumed/completed.
-            await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            if (consumingRequestQueueTask is not null)
+            {
+                await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            }
 
             // User code or network backed Group provider may throw an exception while cleaning up.
             await CleanupSafeAsync(static hub => hub.OnDisconnected(), this);
