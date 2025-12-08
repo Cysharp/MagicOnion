@@ -5,9 +5,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <GrpcVersion>2.57.0</GrpcVersion>
-    <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
-    <MemoryPackVersion>1.21.1</MemoryPackVersion>
-    <MessagePackVersion>3.1.1</MessagePackVersion>
+    <MemoryPackVersion>1.21.4</MemoryPackVersion>
+    <MessagePackVersion>3.1.4</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
     <MulticasterVersion>2.1.1</MulticasterVersion>
