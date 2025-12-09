@@ -17,7 +17,7 @@ jobs:
           export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
-          COPILOT_GITHUB_ACTIONS: "op://${{ vars.OP_VAULT_ACTIONS_INTERNAL }}/COPILOT_GITHUB_ACTIONS/credential"
+          COPILOT_GITHUB_ACTIONS: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/COPILOT_GITHUB_ACTIONS/credential"
 
       - name: Create Issue body
         run: |
