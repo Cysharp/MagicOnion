@@ -6,7 +6,7 @@ on:
 
 jobs:
   issue:
-    if: ${{ github.event_type == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: read
       issues: write
@@ -48,7 +48,7 @@ jobs:
   # Split assign job
   # When issue creation and assignment are in the same job, copilot agent task won't trigger. This is unexpected behavior, and trying workaround.
   assign:
-    if: ${{ github.event_type == 'issue' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
+    if: ${{ github.event_name == 'issue' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
     permissions:
       contents: read
       issues: write
