@@ -8,7 +8,7 @@ on:
     tags:
       - "!*" # not a tag push
     paths-ignore:
-      - '**.md'
+      - "**.md"
       - .github/**
       - docs/**
   pull_request:
@@ -16,7 +16,7 @@ on:
       - main
       - release/**
     paths-ignore:
-      - '**.md'
+      - "**.md"
       - .github/**
       - docs/**
 
@@ -77,9 +77,9 @@ jobs:
           export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
-          UNITY_EMAIL: "op://${{ vars.OP_VAULT_ACTIONS_INTERNAL }}/UNITY_LICENSE/username"
-          UNITY_PASSWORD: "op://${{ vars.OP_VAULT_ACTIONS_INTERNAL }}/UNITY_LICENSE/credential"
-          UNITY_SERIAL: "op://${{ vars.OP_VAULT_ACTIONS_INTERNAL }}/UNITY_LICENSE/serial"
+          UNITY_EMAIL: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/UNITY_LICENSE/username"
+          UNITY_PASSWORD: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/UNITY_LICENSE/credential"
+          UNITY_SERIAL: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/UNITY_LICENSE/serial"
 
       - uses: Cysharp/Actions/.github/actions/checkout@main
 
