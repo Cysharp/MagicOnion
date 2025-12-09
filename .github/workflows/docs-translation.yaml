@@ -46,7 +46,8 @@ jobs:
           GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
 
   # Split assign job
-  # When issue creation and assignment are in the same job, copilot agent task won't trigger. This is unexpected behavior, and trying workaround.
+  # When issue creation and assignment are performed within the same job, the Copilot agent task does not trigger. This is unexpected behavior.
+  # As a workaround, splitting the GitHub Actions job into separate jobs for issue creation and assignment.
   assign:
     if: ${{ github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
     permissions:
@@ -65,8 +66,7 @@ jobs:
           COPILOT_GITHUB_ACTIONS: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/COPILOT_GITHUB_ACTIONS/credential"
 
       - name: Assign copilot agent
-        run: |
-          gh issue edit ${{ github.event.issue.number }} --add-assignee @copilot
+        run: gh issue edit ${{ github.event.issue.number }} --add-assignee @copilot
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
