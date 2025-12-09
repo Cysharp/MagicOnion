@@ -70,16 +70,3 @@ jobs:
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
-
-  dump:
-    if: ${{ github.event_name == 'issues' }}
-    permissions:
-      contents: read
-      issues: write
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - name: Dump event payload
-        run: echo "$CONTEXT"
-        env:
-          CONTEXT: ${{ toJson(github) }}
