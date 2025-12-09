@@ -48,7 +48,7 @@ jobs:
   # Split assign job
   # When issue creation and assignment are in the same job, copilot agent task won't trigger. This is unexpected behavior, and trying workaround.
   assign:
-    if: ${{ github.event_name == 'issue' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
+    if: ${{ github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
     permissions:
       contents: read
       issues: write
@@ -72,7 +72,7 @@ jobs:
           GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
 
   dump:
-    if: ${{ github.event_name == 'issue' }}
+    if: ${{ github.event_name == 'issues' }}
     permissions:
       contents: read
       issues: write
