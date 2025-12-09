@@ -1,9 +1,12 @@
 name: Document translation update
 on:
   workflow_dispatch:
+  issues:
+    types: [opened, labeled]
 
 jobs:
   issue:
+    if: ${{ github.event_type == 'workflow_dispatch' }}
     permissions:
       contents: read
       issues: write
@@ -37,8 +40,33 @@ jobs:
           gh issue create \
             --title "[Automate] Apply the fixes from pull requests to the doc for each language." \
             --body-file body.txt \
-            --label "area-Docs" \
-            --assignee @copilot
+            --label "area-Docs"
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
+
+  # Split assign job
+  # When issue creation and assignment are in the same job, copilot agent task won't trigger. This is unexpected behavior, and trying workaround.
+  assign:
+    if: ${{ github.event_type == 'issue' && contains(github.event.issue.labels.*.name, 'area-Docs') && startsWith(github.event.issue.title, '[Automate]') }}
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Load secrets
+        id: op-load-secret
+        uses: 1password/load-secrets-action@13f58eec611f8e5db52ec16247f58c508398f3e6 # v3.0.0
+        with:
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
+          COPILOT_GITHUB_ACTIONS: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/COPILOT_GITHUB_ACTIONS/credential"
+
+      - name: Assign copilot agent
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --add-assignee @copilot
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
