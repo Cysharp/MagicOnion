@@ -1,0 +1,44 @@
+name: Document translation update
+on:
+  workflow_dispatch:
+
+jobs:
+  issue:
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Load secrets
+        id: op-load-secret
+        uses: 1password/load-secrets-action@13f58eec611f8e5db52ec16247f58c508398f3e6 # v3.0.0
+        with:
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
+          COPILOT_GITHUB_ACTIONS: "op://${{ vars.OP_VAULT_ACTIONS_PUBLIC }}/COPILOT_GITHUB_ACTIONS/credential"
+
+      - name: Create Issue body
+        run: |
+          cat << 'EOF' > body.txt
+          Apply the pull request fixes that have been applied to recently updated documents to each language's documentation.
+
+          - docs/docs: English (en-us)
+          - docs/i18n/ja/docusaurus-plugin-content-docs: Japanese
+          - docs/i18n/ko/docusaurus-plugin-content-docs: Korean
+
+          ---
+
+          Issue created by GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+      - name: Create issue
+        run: |
+          gh issue create \
+            --title "[Automate] Apply the fixes from pull requests to the doc for each language." \
+            --body-file body.txt \
+            --label "area-Docs" \
+            --assignee @copilot
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ steps.op-load-secret.outputs.COPILOT_GITHUB_ACTIONS }}
