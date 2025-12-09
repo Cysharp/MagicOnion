@@ -27,6 +27,8 @@ jobs:
           - docs/docs: English (en-us)
           - docs/i18n/ja/docusaurus-plugin-content-docs: Japanese
           - docs/i18n/ko/docusaurus-plugin-content-docs: Korean
+
+          Created by GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EOF
       - name: Create issue
         run: |
