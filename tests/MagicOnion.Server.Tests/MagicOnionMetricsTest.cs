@@ -25,6 +25,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
                 services.AddSingleton<MagicOnionMetrics>(new MagicOnionMetrics(meterFactory));
             });
         });
+        this.factory.Initialize();
     }
 
     [Fact]

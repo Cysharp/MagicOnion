@@ -7,18 +7,17 @@ using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
 public class StreamingHubThrowOnDisconnectTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubThrowOnDisconnectTestHub>>
 {
-    readonly ConcurrentBag<string> logs;
     readonly WebApplicationFactory<Program> factory;
 
     public StreamingHubThrowOnDisconnectTest(MagicOnionApplicationFactory<StreamingHubThrowOnDisconnectTestHub> factory)
     {
-        factory.Initialize();
         this.factory = factory.WithWebHostBuilder(builder =>
         {
             builder.ConfigureServices(services =>
@@ -31,7 +30,7 @@ public class StreamingHubThrowOnDisconnectTest : IClassFixture<MagicOnionApplica
                         (IRemoteClientResultPendingTaskRegistry)(desc.ImplementationInstance ?? desc.ImplementationFactory(sp))));
             });
         });
-        this.logs = factory.Logs;
+        this.factory.Initialize();
     }
 
     [Fact]
@@ -52,7 +51,8 @@ public class StreamingHubThrowOnDisconnectTest : IClassFixture<MagicOnionApplica
 
         await Task.Delay(100);
 
-        Assert.True(logs.Any(x => x.Contains("OnDisconnected")));
+        var logs = this.factory.Logs.GetSnapshot();
+        Assert.True(logs.Any(x => x.Message == "OnDisconnected"));
         Assert.True(pendingTaskRegistry.IsDisposed);
     }
 }

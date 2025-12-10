@@ -5,20 +5,19 @@ using MagicOnion.Client;
 using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
 public class StreamingHubDisconnectionTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubDisconnectionTestHub>>
 {
-    readonly ConcurrentBag<string> logs;
     readonly WebApplicationFactory<Program> factory;
 
     public StreamingHubDisconnectionTest(MagicOnionApplicationFactory<StreamingHubDisconnectionTestHub> factory)
     {
-        factory.Initialize();
         this.factory = factory;
-        this.logs = factory.Logs;
+        this.factory.Initialize();
     }
 
     [Fact]
@@ -42,8 +41,9 @@ public class StreamingHubDisconnectionTest : IClassFixture<MagicOnionApplication
 
         await Task.Delay(500);
 
-        var doWorkAsyncCallCount = logs.Count(x => x.Contains("DoWorkAsync:Begin"));
-        var doWorkAsyncDoneCallCount = logs.Count(x => x.Contains("DoWorkAsync:Done"));
+        var logs = factory.Logs.GetSnapshot();
+        var doWorkAsyncCallCount = logs.Count(x => x.Message == "DoWorkAsync:Begin");
+        var doWorkAsyncDoneCallCount = logs.Count(x => x.Message == "DoWorkAsync:Done");
         Assert.True(doWorkAsyncCallCount < 3);
         Assert.True(doWorkAsyncCallCount == doWorkAsyncDoneCallCount);
     }

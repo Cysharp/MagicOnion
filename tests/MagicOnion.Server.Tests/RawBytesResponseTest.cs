@@ -15,6 +15,7 @@ public class RawBytesResponseTest : IClassFixture<MagicOnionApplicationFactory<R
     public RawBytesResponseTest(MagicOnionApplicationFactory<RawBytesResponseTestService> factory)
     {
         this.factory = factory.WithMagicOnionOptions(options => {});
+        this.factory.Initialize();
     }
 
     [Fact]
