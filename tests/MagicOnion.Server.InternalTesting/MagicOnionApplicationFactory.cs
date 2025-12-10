@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace MagicOnion.Server.InternalTesting;
 
@@ -19,18 +20,12 @@ public class MagicOnionApplicationFactory<TServiceImplementation> : MagicOnionAp
 public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Program>
 {
     public const string ItemsKey = "MagicOnionApplicationFactory.Items";
-    public ConcurrentDictionary<string, object> Items => Services.GetRequiredKeyedService<ConcurrentDictionary<string, object>>(ItemsKey);
-    public ConcurrentBag<string> Logs { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureLogging(logger =>
         {
-            logger.AddFakeLogging(options =>
-            {
-                options.OutputFormatter = x => $"{x.Timestamp}\t{x.Level}\t{x.Id}\t{x.Message}\t{x.Exception}";
-                options.OutputSink = x => Logs.Add(x);
-            });
+            logger.AddFakeLogging();
         });
         builder.ConfigureServices(services =>
         {
@@ -53,18 +48,28 @@ public abstract class MagicOnionApplicationFactory : WebApplicationFactory<Progr
 
     public WebApplicationFactory<Program> WithMagicOnionOptions(Action<MagicOnionOptions> configure)
     {
-        return this.WithWebHostBuilder(x =>
+        return WithWebHostBuilder(builder =>
         {
-            x.ConfigureServices(services =>
+            builder.ConfigureServices(services =>
             {
                 services.Configure<MagicOnionOptions>(configure);
             });
         });
     }
+}
 
-    public void Initialize()
+
+public static class WebApplicationBuilderExtensions
+{
+    extension(WebApplicationFactory<Program> @this)
     {
-        Items.Clear();
-        Logs.Clear();
+        public ConcurrentDictionary<string, object> Items => @this.Services.GetRequiredKeyedService<ConcurrentDictionary<string, object>>(MagicOnionApplicationFactory.ItemsKey);
+        public FakeLogCollector Logs => @this.Services.GetRequiredService<FakeLogCollector>();
+
+        public void Initialize()
+        {
+            @this.Logs.Clear();
+            @this.Items.Clear();
+        }
     }
 }

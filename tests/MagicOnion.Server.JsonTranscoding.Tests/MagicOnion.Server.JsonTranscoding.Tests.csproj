@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
 
     <IsTestProject>true</IsTestProject>
+
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

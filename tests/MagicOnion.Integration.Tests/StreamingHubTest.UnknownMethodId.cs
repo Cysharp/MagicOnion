@@ -23,7 +23,7 @@ namespace MagicOnion.Integration.Tests
             Assert.NotNull(ex);
             var rpcException = Assert.IsType<RpcException>(ex);
             Assert.Equal(StatusCode.Unimplemented, rpcException.Status.StatusCode);
-            Assert.Contains(factory.Logs, x => x.Contains("HubMethodNotFound\tStreamingHub method '-1'"));
+            Assert.Contains(factory.Logs.GetSnapshot(), x =>  x.Id.Name == "HubMethodNotFound" && x.Message.Contains("StreamingHub method '-1'"));
         }
     }
 

@@ -6,6 +6,7 @@ using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
@@ -13,15 +14,11 @@ namespace MagicOnion.Server.Tests;
 public class StreamingHubConnectionEventsTest: IClassFixture<MagicOnionApplicationFactory<StreamingHubConnectionEventsTestHub>>
 {
     readonly WebApplicationFactory<Program> factory;
-    readonly ConcurrentBag<string> logs;
-    readonly ConcurrentDictionary<string, object> items;
 
     public StreamingHubConnectionEventsTest(MagicOnionApplicationFactory<StreamingHubConnectionEventsTestHub> factory)
     {
-        factory.Initialize();
         this.factory = factory;
-        this.logs = factory.Logs;
-        this.items = factory.Items;
+        this.factory.Initialize();
     }
 
     [Fact]
@@ -37,10 +34,10 @@ public class StreamingHubConnectionEventsTest: IClassFixture<MagicOnionApplicati
         await client.DisposeAsync();
         await Task.Delay(100, TestContext.Current.CancellationToken);
 
-        Assert.True((bool)items.GetValueOrDefault("OnConnecting", false));
-        Assert.True((bool)items.GetValueOrDefault("OnConnected", false));
-        Assert.True((bool)items.GetValueOrDefault("OnDisconnected", false));
-        Assert.Equal(["E/OnDisconnected", "E/OnConnected", "E/OnConnecting"], logs.Select(x => x.Split('\t')[3]).Where(x => x.StartsWith("E")));
+        Assert.True((bool)factory.Items.GetValueOrDefault("OnConnecting", false));
+        Assert.True((bool)factory.Items.GetValueOrDefault("OnConnected", false));
+        Assert.True((bool)factory.Items.GetValueOrDefault("OnDisconnected", false));
+        Assert.Equal(["E/OnConnecting", "E/OnConnected", "E/OnDisconnected"], factory.Logs.GetSnapshot().Select(x => x.Message).Where(x => x.StartsWith("E/")));
     }
 
     [Fact]
@@ -56,10 +53,11 @@ public class StreamingHubConnectionEventsTest: IClassFixture<MagicOnionApplicati
                 option: new CallOptions(new Metadata(){ { "ThrowsRSEOnConnecting", "1" }}),
                 cancellationToken: TestContext.Current.CancellationToken));
 
+        var logSnapshot = factory.Logs.GetSnapshot();
         Assert.Equal(StatusCode.FailedPrecondition, ex.StatusCode);
-        Assert.True(logs.Any(x => x.Contains("\tE/OnConnecting\t")));
-        Assert.False(logs.Any(x => x.Contains("\tE/OnConnected\t")));
-        Assert.False(logs.Any(x => x.Contains("\tError\t")));
+        Assert.Contains(logSnapshot.Select(x => x.Message), x => x == "E/OnConnecting");
+        Assert.DoesNotContain(logSnapshot.Select(x => x.Message), x => x == "E/OnConnected");
+        Assert.DoesNotContain(logSnapshot.Select(x => x.Message), x => x == "Error");
     }
 
     [Fact]
@@ -78,11 +76,13 @@ public class StreamingHubConnectionEventsTest: IClassFixture<MagicOnionApplicati
                 cancellationToken: TestContext.Current.CancellationToken);
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.HelloAsync());
+        var logSnapshot = factory.Logs.GetSnapshot();
         Assert.Contains("StreamingHubClient has already been disconnected from the server", ex.Message);
         Assert.Equal(StatusCode.Unavailable, ex.StatusCode);
-        Assert.True(logs.Any(x => x.Contains("\tE/OnConnecting\t")));
-        Assert.True(logs.Any(x => x.Contains("\tE/OnConnected\t")));
-        Assert.False(logs.Any(x => x.Contains("\tError\t")));
+        Assert.Contains(logSnapshot.Select(x => x.Message), x => x == "E/OnConnecting");
+        Assert.Contains(logSnapshot.Select(x => x.Message), x => x == "E/OnConnected");
+        Assert.DoesNotContain(logSnapshot.Select(x => x.Message), x => x == "Error");
+
     }
 }
 

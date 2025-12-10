@@ -4,23 +4,24 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace MagicOnion.Server.Tests;
 
 public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
-    readonly ConcurrentBag<string> logs;
     readonly WebApplicationFactory<Program> factory;
+    readonly FakeLogCollector logs;
 
     public UnaryServiceTest_ReturnExceptionStackTrace(MagicOnionApplicationFactory<UnaryTestService> factory)
     {
-        factory.Initialize();
         this.factory = factory.WithMagicOnionOptions(options =>
         {
             options.IsReturnExceptionStackTraceInErrorDetail = true;
         });
 
-        this.logs = factory.Logs;
+        this.factory.Initialize();
+        this.logs = this.factory.Logs;
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
         Assert.Equal(StatusCode.AlreadyExists, ex.StatusCode);
         Assert.Equal(nameof(IUnaryTestService.ReturnTypeIsNilAndNonSuccessResponseAsync), ex.Status.Detail);
-        Assert.Single(logs);
+        Assert.Equal(1, logs.Count);
     }
 
     [Fact]
@@ -43,7 +44,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Equal(1, logs.Count);
         Assert.Contains("Something went wrong", ex.Message);
     }
 
@@ -55,7 +56,7 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Equal(1, factory.Logs.Count);
         Assert.Contains("Something went wrong", ex.Message);
     }
 
@@ -67,14 +68,14 @@ public class UnaryServiceTest_ReturnExceptionStackTrace : IClassFixture<MagicOni
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Equal(1, logs.Count);
         Assert.Contains("Something went wrong", ex.Message);
     }
 }
 
 public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<UnaryTestService>>
 {
-    readonly ConcurrentBag<string> logs;
+    readonly FakeLogCollector logs;
     readonly WebApplicationFactory<Program> factory;
 
     public UnaryServiceTest(MagicOnionApplicationFactory<UnaryTestService> factory)
@@ -92,7 +93,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Single(logs.GetSnapshot());
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
@@ -104,7 +105,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowOneValueTypeParameterReturnNilAsync(1234));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Single(logs.GetSnapshot());
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
@@ -116,7 +117,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowTwoValueTypeParameterReturnNilAsync(1234, 5678));
         Assert.Equal(StatusCode.Unknown, ex.StatusCode);
-        Assert.Single(logs);
+        Assert.Single(logs.GetSnapshot());
         Assert.DoesNotContain("Something went wrong", ex.Message);
     }
 
