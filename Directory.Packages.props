@@ -45,6 +45,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="NSubstitute" Version="5.0.0" />
     <PackageVersion Include="Testcontainers" Version="2.3.0" />
+    <PackageVersion Include="TUnit" Version="0.4.105" />
     <PackageVersion Include="xunit.v3" Version="1.0.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
   </ItemGroup>
