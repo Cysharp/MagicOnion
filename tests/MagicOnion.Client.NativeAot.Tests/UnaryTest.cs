@@ -3,11 +3,10 @@ using MessagePack.Resolvers;
 
 namespace MagicOnion.Client.NativeAot.Tests;
 
-[TestClass]
 public sealed class UnaryTest
 {
-    [TestMethod]
-    public void Create()
+    [Test]
+    public async Task Create()
     {
         // Arrange
         var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
@@ -18,10 +17,10 @@ public sealed class UnaryTest
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
         // Assert
-        Assert.IsNotNull(client);
+        await Assert.That(client).IsNotNull();
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoke_With_Arguments()
     {
         // Arrange
@@ -36,12 +35,12 @@ public sealed class UnaryTest
         var result = await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
-        Assert.AreEqual(67890, result);
-        Assert.AreEqual(1, callInvokerMock.RequestPayloads.Count);
-        Assert.AreEqual("0x92, 0xcd, 0x30, 0x39, 0xa5, 0x48, 0x65, 0x6c, 0x6c, 0x6f", string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}")));
+        await Assert.That(result).IsEqualTo(67890);
+        await Assert.That(callInvokerMock.RequestPayloads.Count).IsEqualTo(1);
+        await Assert.That(string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}"))).IsEqualTo("0x92, 0xcd, 0x30, 0x39, 0xa5, 0x48, 0x65, 0x6c, 0x6c, 0x6f");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoke_Enum()
     {
         // Arrange
@@ -56,11 +55,11 @@ public sealed class UnaryTest
         await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
-        Assert.AreEqual(1, callInvokerMock.RequestPayloads.Count);
-        Assert.AreEqual("0x02", string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}")));
+        await Assert.That(callInvokerMock.RequestPayloads.Count).IsEqualTo(1);
+        await Assert.That(string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}"))).IsEqualTo("0x02");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoke_Enum_Return()
     {
         // Arrange
@@ -75,12 +74,12 @@ public sealed class UnaryTest
         var result = await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
-        Assert.AreEqual(1, callInvokerMock.RequestPayloads.Count);
-        Assert.AreEqual(MyEnumValue.C, result);
+        await Assert.That(callInvokerMock.RequestPayloads.Count).IsEqualTo(1);
+        await Assert.That(result).IsEqualTo(MyEnumValue.C);
     }
 
 
-    [TestMethod]
+    [Test]
     public async Task Invoke_BuiltInGeneric()
     {
         // Arrange
@@ -95,11 +94,11 @@ public sealed class UnaryTest
         await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
-        Assert.AreEqual(1, callInvokerMock.RequestPayloads.Count);
-        Assert.AreEqual("0x95, 0x91, 0x01, 0x91, 0x02, 0x91, 0x03, 0x91, 0x04, 0x91, 0x05", string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}")));
+        await Assert.That(callInvokerMock.RequestPayloads.Count).IsEqualTo(1);
+        await Assert.That(string.Join(", ", callInvokerMock.RequestPayloads[0].Select(x => $"0x{x:x2}"))).IsEqualTo("0x95, 0x91, 0x01, 0x91, 0x02, 0x91, 0x03, 0x91, 0x04, 0x91, 0x05");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoke_BuiltInGeneric_Return()
     {
         // Arrange
@@ -114,14 +113,14 @@ public sealed class UnaryTest
         var result = await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
-        Assert.AreEqual(1, callInvokerMock.RequestPayloads.Count);
-        Assert.IsTrue(result.ContainsKey(new(12)));
-        Assert.AreEqual("FooBar", result[new(12)]);
-        Assert.IsTrue(result.ContainsKey(new(34)));
-        Assert.AreEqual("Baz", result[new(34)]);
+        await Assert.That(callInvokerMock.RequestPayloads.Count).IsEqualTo(1);
+        await Assert.That(result.ContainsKey(new(12))).IsTrue();
+        await Assert.That(result[new(12)]).IsEqualTo("FooBar");
+        await Assert.That(result.ContainsKey(new(34))).IsTrue();
+        await Assert.That(result[new(34)]).IsEqualTo("Baz");
     }
 
-    //[TestMethod]
+    //[Test]
     //public async Task Invoke_With_Arguments_ResolverUnregistered()
     //{
     //    // Arrange
@@ -143,8 +142,8 @@ public sealed class UnaryTest
     //    }
 
     //    // Assert
-    //    Assert.IsNotNull(ex);
-    //    Assert.IsInstanceOfType<MessagePackSerializationException>(ex);
+    //    await Assert.That(ex).IsNotNull();
+    //    await Assert.That(ex).IsTypeOf<MessagePackSerializationException>();
     //}
 }
 
