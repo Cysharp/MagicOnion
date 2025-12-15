@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MagicOnion.Client.Internal;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
@@ -720,7 +720,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 {
                     try
                     {
-                        item.Value.TrySetCanceled();
+                        item.Value.TrySetCanceled("A task was canceled because the client has disposed.");
                     }
                     catch (Exception ex)
                     {

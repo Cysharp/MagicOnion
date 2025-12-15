@@ -1,4 +1,4 @@
-using MagicOnion.Internal;
+﻿using MagicOnion.Internal;
 using System.Diagnostics;
 using System.Threading.Tasks.Sources;
 
@@ -27,6 +27,7 @@ internal interface IStreamingHubResponseTaskSource
 {
     bool TrySetException(Exception error);
     bool TrySetCanceled();
+    bool TrySetCanceled(string message);
 }
 
 internal class StreamingHubResponseTaskSource<T> : IValueTaskSource<T>, IValueTaskSource, IStreamingHubResponseTaskSource
@@ -53,6 +54,12 @@ internal class StreamingHubResponseTaskSource<T> : IValueTaskSource<T>, IValueTa
     public bool TrySetCanceled()
     {
         core.SetException(new TaskCanceledException());
+        return true;
+    }
+
+    public bool TrySetCanceled(string message)
+    {
+        core.SetException(new TaskCanceledException(message));
         return true;
     }
 
