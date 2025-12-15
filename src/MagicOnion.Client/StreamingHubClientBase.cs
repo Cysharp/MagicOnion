@@ -515,6 +515,10 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                         await writer.WriteAsync(payload).ConfigureAwait(false);
                     }
                 }
+                else
+                {
+                    break; // The writer has completed.
+                }
             }
         }
         catch { /* Ignore */ }
