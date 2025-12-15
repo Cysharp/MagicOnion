@@ -24,7 +24,7 @@ jobs:
           version: 9
       - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
-          node-version: 18
+          node-version: 20
           cache: 'pnpm'
           cache-dependency-path: 'docs/pnpm-lock.yaml'
       - name: Install dependencies
