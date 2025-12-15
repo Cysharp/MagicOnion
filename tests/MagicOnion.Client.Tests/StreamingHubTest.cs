@@ -757,7 +757,7 @@ public class StreamingHubTest
     {
         // Arrange
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        var connectTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+        var connectTimeout = new CancellationTokenSource();
         var disposed = true;
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
             factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
@@ -772,6 +772,7 @@ public class StreamingHubTest
             });
 
         // Act
+        connectTimeout.CancelAfter(TimeSpan.FromSeconds(1));
         var begin = Stopwatch.GetTimestamp();
         var ex = await Record.ExceptionAsync(async () => await helper.ConnectAsync(connectTimeout.Token));
         var elapsed = Stopwatch.GetElapsedTime(begin);
