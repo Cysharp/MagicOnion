@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -213,6 +213,7 @@ namespace MagicOnion
             {
                 DisposeAllManagedStreamingHubs();
                 Forget(ShutdownInternalAsync());
+                (channel as IDisposable)?.Dispose();
             }
             finally
             {
@@ -229,6 +230,7 @@ namespace MagicOnion
             {
                 DisposeAllManagedStreamingHubs();
                 await ShutdownInternalAsync();
+                (channel as IDisposable)?.Dispose();
             }
             finally
             {
