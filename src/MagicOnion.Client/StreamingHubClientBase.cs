@@ -4,6 +4,7 @@ using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 
 namespace MagicOnion.Client;
@@ -126,6 +127,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
 #pragma warning disable IDE1006 // Naming Styles
     const string StreamingHubVersionHeaderKey = "x-magiconion-streaminghub-version";
     const string StreamingHubVersionHeaderValue = "2";
+    static readonly TimeSpan CleanupSubscriptionWait = TimeSpan.FromMilliseconds(100);
 #pragma warning restore IDE1006 // Naming Styles
 
     readonly CallInvoker callInvoker;
@@ -146,11 +148,11 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
 
     readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = false });
     Task? writerTask;
-    IClientStreamWriter<StreamingHubPayload> writer = default!;
-    IAsyncStreamReader<StreamingHubPayload> reader = default!;
+    IClientStreamWriter<StreamingHubPayload>? writer;
+    IAsyncStreamReader<StreamingHubPayload>? reader;
 
-    StreamingHubClientHeartbeatManager heartbeatManager = default!;
-    Task subscription = default!;
+    StreamingHubClientHeartbeatManager? heartbeatManager;
+    Task? subscription;
 
     protected readonly TReceiver receiver;
 
@@ -272,8 +274,21 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
     static Method<StreamingHubPayload, StreamingHubPayload> CreateConnectMethod(string serviceName)
         => new (MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.StreamingHubMarshaller, MagicOnionMarshallers.StreamingHubMarshaller);
 
+    [MemberNotNull(nameof(reader))]
+    [MemberNotNull(nameof(writer))]
+    [MemberNotNull(nameof(heartbeatManager))]
+    void EnsureConnected()
+    {
+        if (reader is null || writer is null || heartbeatManager is null)
+        {
+            throw new InvalidOperationException("The client must be connected to the server before subscribing.");
+        }
+    }
+
     async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext, CancellationToken subscriptionToken)
     {
+        EnsureConnected();
+
         var disconnectionReason = new DisconnectionReason(DisconnectionType.CompletedNormally, null);
         writerTask = RunWriterLoopAsync(subscriptionToken);
 
@@ -373,10 +388,10 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 ProcessClientResultRequest(syncContext, payload, ref messageReader);
                 break;
             case StreamingHubMessageType.ServerHeartbeat:
-                heartbeatManager.ProcessServerHeartbeat(payload);
+                heartbeatManager!.ProcessServerHeartbeat(payload);
                 break;
             case StreamingHubMessageType.ClientHeartbeatResponse:
-                heartbeatManager.ProcessClientHeartbeatResponse(payload);
+                heartbeatManager!.ProcessClientHeartbeatResponse(payload);
                 break;
         }
     }
@@ -487,6 +502,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
 
     async Task RunWriterLoopAsync(CancellationToken cancellationToken)
     {
+        EnsureConnected();
         try
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -681,7 +697,9 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         catch { } // ignore error?
         finally
         {
-            subscriptionCts.Cancel();
+            // When it is necessary to wait for subscription (message reading) completion, add a small delay before cancellation.
+            // This prevents throwing an IOException (non-error) on the server side when the stream is reset if `Cancel` is performed immediately while message reading is incomplete.
+            subscriptionCts.CancelAfter(CleanupSubscriptionWait);
             try
             {
                 if (waitSubscription)
@@ -698,7 +716,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 {
                     try
                     {
-                        (item.Value as IStreamingHubResponseTaskSource).TrySetCanceled();
+                        item.Value.TrySetCanceled();
                     }
                     catch (Exception ex)
                     {
