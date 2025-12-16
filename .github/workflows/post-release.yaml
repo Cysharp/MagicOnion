@@ -1,0 +1,31 @@
+name: Post Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  new-version:
+    permissions:
+      actions: read
+      contents: read
+    uses: Cysharp/Actions/.github/workflows/increment-version.yaml@main
+    with:
+      ref: ${{ github.event.repository.default_branch }}
+      tag: ${{ github.ref_name }} # tag value will here. 1.2.1
+      type: patch
+      suffix: "-dev"
+
+  update-packagejson:
+    needs: [new-version]
+    permissions:
+      actions: read
+      contents: write
+    uses: Cysharp/Actions/.github/workflows/update-packagejson.yaml@main
+    with:
+      ref: ${{ github.event.repository.default_branch }}
+      file-path: |
+        ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity/package.json
+        ./Directory.Build.props
+      tag: ${{ needs.new-version.outputs.version }}
+      dry-run: false
