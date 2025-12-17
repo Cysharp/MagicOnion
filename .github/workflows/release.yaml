@@ -25,6 +25,8 @@ jobs:
       tag: ${{ inputs.tag }}
       dry-run: ${{ inputs.dry-run }}
       ref: ${{ github.ref }}
+      use-bot-token: true
+    secrets: inherit
 
   build-dotnet:
     needs: [update-packagejson]
