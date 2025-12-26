@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.CodeGen;
@@ -125,11 +125,11 @@ public class StaticStreamingHubClientGenerator
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message);
+                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
                                     return;
                                 }
 
@@ -156,11 +156,11 @@ public class StaticStreamingHubClientGenerator
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                                    await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
                                     return;
                                 }
 
@@ -255,12 +255,17 @@ public class StaticStreamingHubClientGenerator
             var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
             var writeMessageTarget = isFireAndForget ? "parent" : "this";
             var writeMessageAsyncPrefix = ctx.EnableStreamingHubDiagnosticHandler
-                ? isFireAndForget || isReturnTypeVoid
+                ? isFireAndForget || isReturnTypeVoid || method.IsUnreliable
                     ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnostic"
                     : $"{writeMessageTarget}.WriteMessageWithResponseDiagnostic"
-                : isFireAndForget || isReturnTypeVoid
+                : isFireAndForget || isReturnTypeVoid || method.IsUnreliable
                     ? $"{writeMessageTarget}.WriteMessageFireAndForget"
                     : $"{writeMessageTarget}.WriteMessageWithResponse";
+
+            if (method.IsUnreliable)
+            {
+                writeMessageParameters += ", allowUnreliable: true";
+            }
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""
@@ -273,6 +278,13 @@ public class StaticStreamingHubClientGenerator
                 // ValueTask
                 ctx.Writer.AppendLineWithFormat($"""
                                 => {writeMessageAsyncPrefix}ValueTaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+            """);
+            }
+            else if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task)
+            {
+                // Task
+                ctx.Writer.AppendLineWithFormat($"""
+                                => {writeMessageAsyncPrefix}TaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
             else if (isReturnTypeVoid)
@@ -291,7 +303,7 @@ public class StaticStreamingHubClientGenerator
             }
             else
             {
-                // Task, Task<T>
+                // Task<T>
                 ctx.Writer.AppendLineWithFormat($"""
                                 => {writeMessageAsyncPrefix}TaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
@@ -18,12 +18,14 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         Receiver = receiver;
     }
 
-    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}")]
+    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsUnreliable={IsUnreliable,nq}")]
     public class MagicOnionHubMethodInfo
     {
         public int HubId { get; }
         public string MethodName { get; }
         public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; }
+
+        public bool IsUnreliable { get; }
 
         /// <summary>
         /// Gets a type of method return value in the interface.
@@ -68,7 +70,7 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         /// </summary>
         public MagicOnionTypeInfo ResponseType { get; }
 
-        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType)
+        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, bool isUnreliable)
         {
             HubId = hubId;
             MethodName = methodName;
@@ -76,16 +78,17 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
             MethodReturnType = methodReturnType;
             RequestType = requestType;
             ResponseType = responseType;
+            IsUnreliable = isUnreliable;
         }
     }
 
-    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsClientResult={IsClientResult,nq}")]
+    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsClientResult={IsClientResult,nq}; IsUnreliable={IsUnreliable,nq}")]
     public class MagicOnionHubReceiverMethodInfo : MagicOnionHubMethodInfo
     {
         public bool IsClientResult { get; }
 
-        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType)
-            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType)
+        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, bool isUnreliable)
+            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType, isUnreliable)
         {
             IsClientResult = methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void;
         }

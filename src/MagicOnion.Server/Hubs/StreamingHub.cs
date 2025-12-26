@@ -1,6 +1,4 @@
-using System.Buffers;
-using System.Threading.Channels;
-using Cysharp.Runtime.Multicast.Remoting;
+﻿using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
@@ -8,12 +6,17 @@ using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Features;
 using MagicOnion.Server.Features.Internal;
 using MagicOnion.Server.Hubs.Internal;
+using MagicOnion.Server.Hubs.Internal.DataChannel;
 using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Buffers;
+using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -29,6 +32,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     bool isReturnExceptionStackTraceInErrorDetail = false;
     UniqueHashDictionary<StreamingHubHandler> handlers = default!;
     Task? consumingRequestQueueTask = default;
+    ServerDataChannel? dataChannel;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -158,6 +162,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             await CleanupSafeAsync(static hub => hub.OnDisconnected(), this);
             await CleanupSafeAsync(static hub => hub.Group.DisposeAsync(), this);
 
+            dataChannel?.Dispose();
             heartbeatHandle.Dispose();
             remoteClientResultPendingTasks.Dispose();
         }
@@ -183,13 +188,49 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var reader = StreamingServiceContext.RequestStream!;
         var writer = StreamingServiceContext.ResponseStream!;
 
+        var responseHeaders = ResponseHeaders;
+        if (Context.CallContext.RequestHeaders.GetValueOrDefault("x-magiconion-streaminghub-datachannel") is { Length: > 0 } dataChannelHeaderValue)
+        {
+            if (dataChannelHeaderValue.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Contains("enabled"))
+            {
+                var dataChannelService = Context.ServiceProvider.GetRequiredService<DataChannelService>();
+                dataChannel = dataChannelService.CreateChannel();
+                var newResponseHeaders = new Metadata();
+                foreach (var header in responseHeaders)
+                {
+                    newResponseHeaders.Add(header);
+                }
+                newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-session-id", dataChannel.SessionId.ToString());
+
+                responseHeaders = newResponseHeaders;
+            }
+        }
+
         // Send a hint to the client to start sending messages.
         // The client can read the response headers before any StreamingHub's message.
-        await Context.CallContext.WriteResponseHeadersAsync(ResponseHeaders);
+        await Context.CallContext.WriteResponseHeadersAsync(responseHeaders);
 
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
         await writer.WriteAsync(StreamingHubPayloadPool.Shared.RentOrCreate(MarkerResponseBytes));
+
+        // Wait for DataChannel to connected.
+        if (dataChannel is not null)
+        {
+            var connectTimeout = Debugger.IsAttached ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(1);
+
+            try
+            {
+                // TODO: Since the gRPC side may be disconnected, it is necessary to also check RequestAborted.
+                await dataChannel.Connected.WaitAsync(connectTimeout); 
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                Context.Logger.LogDebug("DataChannel connection was timed out.");
+                dataChannel.Dispose();
+                dataChannel = null;
+            }
+        }
 
         // Call OnConnected after sending the headers and marker.
         // The server can send messages or broadcast to client after OnConnected.
@@ -199,8 +240,19 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // Starts a loop that consumes the request queue.
         consumingRequestQueueTask = ConsumeRequestQueueAsync(ct);
 
-        // Main loop of StreamingHub.
-        // Be careful to allocation and performance.
+        // TODO(DataChannel):
+        if (dataChannel is not null)
+        {
+            _ = Task.Run(async () =>
+            {
+                await foreach (var payload in dataChannel.DataReader.ReadAllAsync())
+                {
+                    await ProcessMessageAsync(payload, ct);
+                }
+            });
+        }
+
+        // Reads messages from the gRPC stream. This loop needs to be careful about allocation and performance.
         while (await reader.MoveNext(ct))
         {
             var payload = reader.Current;

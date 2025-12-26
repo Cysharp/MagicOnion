@@ -5,6 +5,7 @@ using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Threading.Channels;
 
 namespace MagicOnion.Client;
@@ -21,13 +22,24 @@ public class StreamingHubClientOptions
     public Action<ServerHeartbeatEvent>? OnServerHeartbeatReceived { get; }
     public Action<ClientHeartbeatEvent>? OnClientHeartbeatResponseReceived { get; }
     public TimeProvider? TimeProvider { get; }
+    public DnsEndPoint? DataChannelEndpoint { get; }
 
     public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
-        : this(host, callOptions, serializerProvider, logger, default, default, default, default, default)
+        : this(host, callOptions, serializerProvider, logger, default, default, default, default, default, default)
     {
     }
 
-    public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
+    public StreamingHubClientOptions(
+        string? host,
+        CallOptions callOptions,
+        IMagicOnionSerializerProvider serializerProvider,
+        IMagicOnionClientLogger logger,
+        TimeSpan? clientHeartbeatInterval,
+        TimeSpan? clientHeartbeatTimeout,
+        Action<ServerHeartbeatEvent>? onServerHeartbeatReceived,
+        Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,
+        TimeProvider? timeProvider,
+        DnsEndPoint? dataChannelEndpoint)
     {
         Host = host;
         CallOptions = callOptions;
@@ -38,6 +50,7 @@ public class StreamingHubClientOptions
         OnServerHeartbeatReceived = onServerHeartbeatReceived;
         OnClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
         TimeProvider = timeProvider;
+        DataChannelEndpoint = dataChannelEndpoint;
     }
 
     public static StreamingHubClientOptions CreateWithDefault(string? host = default, CallOptions callOptions = default, IMagicOnionSerializerProvider? serializerProvider = default, IMagicOnionClientLogger? logger = default)
@@ -46,23 +59,23 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithHost(string? host)
         => new(host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
     public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
         => new(Host, callOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
     public StreamingHubClientOptions WithSerializerProvider(IMagicOnionSerializerProvider serializerProvider)
         => new(
             Host, CallOptions, serializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
     public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
         => new(Host, CallOptions, SerializerProvider, logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
 
     /// <summary>
@@ -73,7 +86,7 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithClientHeartbeatInterval(TimeSpan? interval)
         => new(Host, CallOptions, SerializerProvider, Logger
             , interval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
 
     /// <summary>
@@ -84,7 +97,7 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithClientHeartbeatTimeout(TimeSpan? timeout)
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, timeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
 
     /// <summary>
@@ -95,7 +108,7 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithServerHeartbeatReceived(Action<ServerHeartbeatEvent>? onServerHeartbeatReceived)
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, onServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
 
     /// <summary>
@@ -106,7 +119,7 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithClientHeartbeatResponseReceived(Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived)
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, onClientHeartbeatResponseReceived
-            , TimeProvider
+            , TimeProvider, DataChannelEndpoint
         );
 
     /// <summary>
@@ -117,7 +130,18 @@ public class StreamingHubClientOptions
     public StreamingHubClientOptions WithTimeProvider(TimeProvider timeProvider)
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
-            , timeProvider
+            , timeProvider, DataChannelEndpoint
+        );
+
+    /// <summary>
+    /// Sets a <see cref="DataChannelEndpoint"/>
+    /// </summary>
+    /// <param name="dataChannelEndpoint"></param>
+    /// <returns></returns>
+    public StreamingHubClientOptions WithDataChannelEndpoint(DnsEndPoint dataChannelEndpoint)
+        => new(Host, CallOptions, SerializerProvider, Logger
+            , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+            , TimeProvider, dataChannelEndpoint
         );
 }
 
@@ -150,6 +174,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
     Task? writerTask;
     IClientStreamWriter<StreamingHubPayload>? writer;
     IAsyncStreamReader<StreamingHubPayload>? reader;
+    ClientDataChannel? dataChannel;
 
     StreamingHubClientHeartbeatManager? heartbeatManager;
     Task? subscription;
@@ -170,7 +195,22 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
     internal async Task __ConnectAndSubscribeAsync(CancellationToken connectAndSubscribeCancellationToken)
     {
         var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
-        var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, options.CallOptions);
+
+        var requestHeaders = new Metadata();
+        if (options.CallOptions.Headers is not null)
+        {
+            foreach (var requestHeader in options.CallOptions.Headers)
+            {
+                requestHeaders.Add(requestHeader);
+            }
+        }
+        if (options.DataChannelEndpoint != null)
+        {
+            requestHeaders.Add("x-magiconion-streaminghub-datachannel", "enabled;encryption-mode=none");
+        }
+
+        var callOptions = options.CallOptions.WithHeaders(requestHeaders);
+        var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, callOptions);
 
         this.writer = callResult.RequestStream;
         this.reader = callResult.ResponseStream;
@@ -183,6 +223,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
 
         // Establish StreamingHub connection between the client and the server.
         Metadata.Entry? messageVersion;
+        Metadata responseHeaders;
         try
         {
             // The client can read the response headers before any StreamingHub's message.
@@ -211,8 +252,8 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 return;
             }
 
-            var headers = await responseHeadersTask.ConfigureAwait(false);
-            messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
+            responseHeaders = await responseHeadersTask.ConfigureAwait(false);
+            messageVersion = responseHeaders.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
             // Check message version of StreamingHub.
             if (messageVersion != null && messageVersion.Value != StreamingHubVersionHeaderValue)
@@ -223,6 +264,22 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         catch (RpcException e)
         {
             throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
+        }
+
+        // Try to establish DataChannel
+        if (options.DataChannelEndpoint != null && responseHeaders.FirstOrDefault(x => x.Key == "x-magiconion-streaminghub-datachannel-session-id") is {} dataChannelSessionId)
+        {
+            var sessionId = ulong.Parse(dataChannelSessionId.Value);
+            dataChannel = new ClientDataChannel(options.DataChannelEndpoint, sessionId);
+            try
+            {
+                await dataChannel.ConnectAsync(subscriptionCts.Token).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                dataChannel.Dispose();
+                dataChannel = null;
+            }
         }
 
         // Set up the Heartbeat Manager
@@ -524,23 +581,41 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         catch { /* Ignore */ }
     }
 
+    #region for API binary backward compatibility
+    protected ValueTask<TResponse> WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
+        => WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message, allowUnreliable: false);
+
     protected Task<TResponse> WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+        => WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable: false);
+
+    protected ValueTask WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+        => WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable: false);
+    #endregion
+
+    protected Task<TResponse> WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable)
         => WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message).AsTask();
 
-    protected ValueTask<TResponse> WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
+    protected ValueTask<TResponse> WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable)
     {
         ThrowIfDisposed();
         ThrowIfDisconnected();
 
         var v = BuildRequestMessage(methodId, message);
-        _ = writerQueue.Writer.TryWrite(v);
+        if (allowUnreliable && dataChannel is not null)
+        {
+            dataChannel.SendPayload(v);
+        }
+        else
+        {
+            _ = writerQueue.Writer.TryWrite(v);
+        }
 
         return default;
     }
 
-    protected ValueTask WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+    protected ValueTask WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable)
     {
-        WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+        WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
         return default;
     }
 
