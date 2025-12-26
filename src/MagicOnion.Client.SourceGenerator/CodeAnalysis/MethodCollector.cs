@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Internal;
 using Microsoft.CodeAnalysis;
@@ -118,6 +118,8 @@ public static class MethodCollector
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+        var isUnreliable = methodSymbol.GetAttributes().Any(x => x.AttributeClass?.Name is "Unreliable" or "UnreliableAttribute");
+
         switch (methodReturnType.FullNameOpenType)
         {
             case "global::System.Threading.Tasks.Task":
@@ -144,7 +146,8 @@ public static class MethodCollector
             methodParameters,
             methodReturnType,
             requestType,
-            responseType
+            responseType,
+            isUnreliable
         );
         diagnostic = null;
         return true;
@@ -156,6 +159,8 @@ public static class MethodCollector
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters.Where(x => x.Type != MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken).ToArray());
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+        var isUnreliable = methodSymbol.GetAttributes().Any(x => x.AttributeClass?.Name is "Unreliable" or "UnreliableAttribute");
+
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void &&
             methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
             methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask &&
@@ -181,7 +186,8 @@ public static class MethodCollector
             methodParameters,
             methodReturnType,
             requestType,
-            responseType
+            responseType,
+            isUnreliable
         );
         diagnostic = null;
         return true;
