@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Cysharp.Runtime.Multicast;
 using Cysharp.Runtime.Multicast.InMemory;
 using Cysharp.Runtime.Multicast.Remoting;
@@ -8,6 +8,7 @@ using MagicOnion.Server.Binder;
 using MagicOnion.Server.Binder.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs.Internal;
+using MagicOnion.Server.Hubs.Internal.DataChannel;
 using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -50,6 +51,10 @@ public static class MagicOnionServicesExtensions
         services.AddSingleton(typeof(StreamingHubRegistry<>));
         services.AddSingleton(typeof(IServiceMethodProvider<>), typeof(MagicOnionGrpcServiceMethodProvider<>));
         services.TryAddSingleton<IMagicOnionGrpcMethodProvider, DynamicMagicOnionMethodProvider>();
+
+        // MagicOnion: DataChannel
+        services.AddSingleton<DataChannelService>();
+        services.AddHostedService<DataChannelServer>();
 
         // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();

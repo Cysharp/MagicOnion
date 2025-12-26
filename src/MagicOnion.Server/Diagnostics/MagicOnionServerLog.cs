@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Logging;
 
@@ -90,6 +90,15 @@ public static partial class MagicOnionServerLog
 
     [LoggerMessage(EventId = 17, Level = LogLevel.Information, EventName = nameof(HubMethodNotFound), Message = "StreamingHub method '{methodId}' was not found in '{hubName}'.")]
     public static partial void HubMethodNotFound(ILogger logger, string hubName, int methodId);
+
+    [LoggerMessage(EventId = 18, Level = LogLevel.Debug, EventName = nameof(DataChannelConnectRequest), Message = "DataChannel Connect Request received. SessionId: {sessionId}; RemoteEndPoint: {remoteEndPoint}")]
+    public static partial void DataChannelConnectRequest(ILogger logger, ulong sessionId, string? remoteEndPoint);
+
+    [LoggerMessage(EventId = 19, Level = LogLevel.Debug, EventName = nameof(DataChannelConnectRequest), Message = "DataChannel Connect (Ack) received. SessionId: {sessionId}; RemoteEndPoint: {remoteEndPoint}")]
+    public static partial void DataChannelConnectAckReceived(ILogger logger, ulong sessionId, string? remoteEndPoint);
+
+    [LoggerMessage(EventId = 20, Level = LogLevel.Debug, EventName = nameof(DataChannelConnectRequest), Message = "Data received. SessionId: {sessionId}; Sequence: {sequence}; DataLength: {dataLength}")]
+    public static partial void DataChannelDataReceived(ILogger logger, ulong sessionId, ulong sequence, int dataLength);
 
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
