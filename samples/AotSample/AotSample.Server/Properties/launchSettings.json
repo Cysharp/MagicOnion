@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AotSample.Server": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:51950;http://localhost:51951"
+    }
+  }
+}

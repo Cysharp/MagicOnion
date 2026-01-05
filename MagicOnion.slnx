@@ -31,6 +31,10 @@
     <Project Path="perf/SourceGeneratorPerf/SourceGeneratorPerf/SourceGeneratorPerf.csproj" />
   </Folder>
   <Folder Name="/samples/" />
+  <Folder Name="/samples/AotSample/">
+    <Project Path="samples/AotSample/AotSample.Server/AotSample.Server.csproj" />
+    <Project Path="samples/AotSample/AotSample.Shared/AotSample.Shared.csproj" />
+  </Folder>
   <Folder Name="/samples/ChatApp/">
     <Project Path="samples/ChatApp/ChatApp.Console/ChatApp.Console.csproj" />
     <Project Path="samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj" />
@@ -50,6 +54,7 @@
     <Project Path="src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj" />
     <Project Path="src/MagicOnion.Client.SourceGenerator/MagicOnion.Client.SourceGenerator.csproj" />
     <Project Path="src/MagicOnion.Client/MagicOnion.Client.csproj" />
+    <Project Path="src/MagicOnion.Server.SourceGenerator/MagicOnion.Server.SourceGenerator.csproj" />
     <Project Path="src/MagicOnion.Internal/MagicOnion.Internal.csproj" />
     <Project Path="src/MagicOnion.Serialization.MemoryPack/MagicOnion.Serialization.MemoryPack.csproj" />
     <Project Path="src/MagicOnion.Serialization.MessagePack/MagicOnion.Serialization.MessagePack.csproj" />
@@ -71,6 +76,7 @@
     <Project Path="tests/MagicOnion.Server.InternalTesting/MagicOnion.Server.InternalTesting.csproj" />
     <Project Path="tests/MagicOnion.Server.JsonTranscoding.Tests/MagicOnion.Server.JsonTranscoding.Tests.csproj" />
     <Project Path="tests/MagicOnion.Server.Redis.Tests/MagicOnion.Server.Redis.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Server.SourceGenerator.Tests/MagicOnion.Server.SourceGenerator.Tests.csproj" />
     <Project Path="tests/MagicOnion.Server.Tests/MagicOnion.Server.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/samples/">
