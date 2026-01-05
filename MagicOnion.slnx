@@ -18,6 +18,10 @@
     <File Path="NuGet.Config" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Multicast/">
+    <Project Path="../Multicaster/src/Multicaster.SourceGenerator/Multicaster.SourceGenerator.csproj" />
+    <Project Path="../Multicaster/src/Multicaster/Multicaster.csproj" />
+  </Folder>
   <Folder Name="/perf/" />
   <Folder Name="/perf/BenchmarkApp/">
     <Project Path="perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj" />

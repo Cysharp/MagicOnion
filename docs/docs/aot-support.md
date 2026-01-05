@@ -60,6 +60,108 @@ app.MapMagicOnionService([typeof(GreeterService), typeof(ChatHub)]);
 app.Run();
 ```
 
+## StreamingHub Broadcast Support (Multicaster)
+
+If your application uses StreamingHub with broadcast features (like `Broadcast.All.OnMessage(...)`), you also need to configure the Multicaster proxy factory for AOT.
+
+### 1. Install Multicaster.SourceGenerator
+
+Add the `Multicaster.SourceGenerator` package:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Multicaster.SourceGenerator" 
+                    OutputItemType="Analyzer" 
+                    ReferenceOutputAssembly="false" />
+</ItemGroup>
+```
+
+### 2. Create a Proxy Factory Class
+
+Create a partial class decorated with `[MulticasterProxyGeneration]` that lists all your StreamingHub receiver interfaces:
+
+```csharp
+using Cysharp.Runtime.Multicast;
+
+[MulticasterProxyGeneration(typeof(IChatHubReceiver), typeof(IGameHubReceiver))]
+public partial class MulticasterProxyFactory { }
+```
+
+### 3. Configure Both Providers
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddGrpc();
+builder.Services.AddMagicOnion()
+    .UseStaticMethodProvider<MagicOnionMethodProvider>()
+    .UseStaticProxyFactory<MulticasterProxyFactory>();  // Add this for StreamingHub broadcast
+
+var app = builder.Build();
+
+app.MapMagicOnionService([typeof(GreeterService), typeof(ChatHub)]);
+
+app.Run();
+```
+
+### Complete AOT Example
+
+Here's a complete example for a chat application:
+
+```csharp
+// Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddGrpc();
+builder.Services.AddMagicOnion()
+    .UseStaticMethodProvider<MagicOnionMethodProvider>()
+    .UseStaticProxyFactory<MulticasterProxyFactory>();
+
+var app = builder.Build();
+app.MapMagicOnionService([typeof(ChatHub)]);
+app.Run();
+
+// MagicOnionMethodProvider.cs
+[MagicOnionServerGeneration(typeof(ChatHub))]
+public partial class MagicOnionMethodProvider { }
+
+// MulticasterProxyFactory.cs
+[MulticasterProxyGeneration(typeof(IChatHubReceiver))]
+public partial class MulticasterProxyFactory { }
+
+// ChatHub.cs
+public interface IChatHubReceiver
+{
+    void OnMessage(string user, string message);
+    void OnUserJoined(string user);
+}
+
+public interface IChatHub : IStreamingHub<IChatHub, IChatHubReceiver>
+{
+    Task JoinAsync(string roomName, string userName);
+    Task SendMessageAsync(string message);
+}
+
+public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
+{
+    IGroup<IChatHubReceiver>? room;
+    string userName = "";
+
+    public async Task JoinAsync(string roomName, string userName)
+    {
+        this.userName = userName;
+        room = await Group.AddAsync(roomName);
+        Broadcast(room).OnUserJoined(userName);
+    }
+
+    public Task SendMessageAsync(string message)
+    {
+        Broadcast(room!).OnMessage(userName, message);
+        return Task.CompletedTask;
+    }
+}
+```
+
 ### 4. Enable AOT Publishing
 
 Add the following properties to your project file:

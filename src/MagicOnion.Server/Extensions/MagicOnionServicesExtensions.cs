@@ -63,8 +63,10 @@ public static class MagicOnionServicesExtensions
             });
 
         // Add: Multicaster
-        services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
-        services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
+        // Use factory methods to defer initialization until actually needed.
+        // This allows UseStaticProxyFactory to replace these before they are accessed.
+        services.TryAddSingleton<IInMemoryProxyFactory>(sp => DynamicInMemoryProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteProxyFactory>(sp => DynamicRemoteProxyFactory.Instance);
         services.TryAddSingleton<IRemoteSerializer, MagicOnionRemoteSerializer>();
         services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
         services.TryAddSingleton<MagicOnionManagedGroupProvider>();

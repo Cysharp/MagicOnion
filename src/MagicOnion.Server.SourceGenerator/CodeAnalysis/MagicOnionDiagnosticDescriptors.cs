@@ -36,7 +36,7 @@ public static class MagicOnionDiagnosticDescriptors
     public static readonly DiagnosticDescriptor ServiceImplementationNotFound = new(
         id: "MOCS004",
         title: "Service implementation not found",
-        messageFormat: "No service implementation found for the specified types.",
+        messageFormat: "No service implementation found for the specified types",
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true
@@ -54,7 +54,7 @@ public static class MagicOnionDiagnosticDescriptors
     public static readonly DiagnosticDescriptor ServiceTypeMustBeNonAbstract = new(
         id: "MOCS006",
         title: "Service type must be non-abstract",
-        messageFormat: "The service type '{0}' must be a non-abstract class.",
+        messageFormat: "The service type '{0}' must be a non-abstract class",
         category: Category,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true
@@ -63,7 +63,7 @@ public static class MagicOnionDiagnosticDescriptors
     public static readonly DiagnosticDescriptor GenerationAttributeRequiresPartialClass = new(
         id: "MOCS007",
         title: "Generation attribute requires partial class",
-        messageFormat: "The class '{0}' with [MagicOnionServerGeneration] attribute must be declared as partial.",
+        messageFormat: "The class '{0}' with [MagicOnionServerGeneration] attribute must be declared as partial",
         category: Category,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true

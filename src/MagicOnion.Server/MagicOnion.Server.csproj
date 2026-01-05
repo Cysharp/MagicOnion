@@ -21,11 +21,18 @@
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore.Server" />
     <PackageReference Include="Grpc.Core.Api" />
-    <PackageReference Include="Multicaster" />
     <PackageReference Include="PolySharp">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <!-- Use local Multicaster project when available, otherwise use NuGet package -->
+  <ItemGroup Condition="Exists('..\..\..\Multicaster\src\Multicaster\Multicaster.csproj')">
+    <ProjectReference Include="..\..\..\Multicaster\src\Multicaster\Multicaster.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('..\..\..\Multicaster\src\Multicaster\Multicaster.csproj')">
+    <PackageReference Include="Multicaster" />
   </ItemGroup>
 
   <ItemGroup>

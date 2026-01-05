@@ -75,14 +75,21 @@ namespace MagicOnion.Serialization.MessagePack
 #endif
         MessagePackSerializerOptions WrapFallbackResolverIfNeeded(ParameterInfo[] parameters)
         {
-#if !NETSTANDARD2_0
-            if (!RuntimeFeature.IsDynamicCodeSupported) throw new NotSupportedException("When running with AOT runtime, DynamicArgumentTupleFormatter does not support fallback resolver fro optional parameters.");
-#endif
             // If the method has no parameter or one parameter, we don't need to create fallback resolver for optional parameters.
             if (parameters.Length < 2)
             {
                 return SerializerOptions;
             }
+
+            // Only need fallback resolver if any parameter has a default value
+            if (!parameters.Any(x => x.HasDefaultValue))
+            {
+                return SerializerOptions;
+            }
+
+#if !NETSTANDARD2_0
+            if (!RuntimeFeature.IsDynamicCodeSupported) throw new NotSupportedException("When running with AOT runtime, DynamicArgumentTupleFormatter does not support fallback resolver for optional parameters.");
+#endif
 
             // start from T2
             var tupleTypeBase = DynamicArgumentTupleTypeCache.Types[parameters.Length - 2];

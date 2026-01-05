@@ -12,7 +12,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AotSample.Shared\AotSample.Shared.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
-    <ProjectReference Include="..\..\..\src\MagicOnion.Server.SourceGenerator\MagicOnion.Server.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <!-- MagicOnion Source Generator for AOT-compatible service methods -->
+    <ProjectReference Include="..\..\..\src\MagicOnion.Server.SourceGenerator\MagicOnion.Server.SourceGenerator.csproj" OutputItemType="Analyzer" />
+    <!-- Multicaster Source Generator for AOT-compatible StreamingHub broadcast -->
+    <ProjectReference Include="..\..\..\..\Multicaster\src\Multicaster.SourceGenerator\Multicaster.SourceGenerator.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>
