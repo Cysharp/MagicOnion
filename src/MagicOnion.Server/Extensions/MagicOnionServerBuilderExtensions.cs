@@ -1,6 +1,7 @@
+﻿using Cysharp.Runtime.Multicast.InMemory;
+using Cysharp.Runtime.Multicast.Remoting;
 using MagicOnion.Server;
 using MagicOnion.Server.Binder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable once CheckNamespace
@@ -85,16 +86,16 @@ public static class MagicOnionServerBuilderExtensions
     /// </code>
     /// </example>
     public static IMagicOnionServerBuilder UseStaticProxyFactory<TProxyFactory>(this IMagicOnionServerBuilder builder)
-        where TProxyFactory : class, Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory, Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory, new()
+        where TProxyFactory : class, IInMemoryProxyFactory, IRemoteProxyFactory, new()
     {
         var factory = new TProxyFactory();
 
         // Remove the default dynamic factories and replace with the static one
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory>();
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory>();
+        builder.Services.RemoveAll<IInMemoryProxyFactory>();
+        builder.Services.RemoveAll<IRemoteProxyFactory>();
 
-        builder.Services.AddSingleton<Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory>(factory);
-        builder.Services.AddSingleton<Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory>(factory);
+        builder.Services.AddSingleton<IInMemoryProxyFactory>(factory);
+        builder.Services.AddSingleton<IRemoteProxyFactory>(factory);
 
         return builder;
     }
@@ -107,16 +108,16 @@ public static class MagicOnionServerBuilderExtensions
     /// <param name="factory">The static proxy factory instance.</param>
     /// <returns>The MagicOnion server builder for chaining.</returns>
     public static IMagicOnionServerBuilder UseStaticProxyFactory<TProxyFactory>(this IMagicOnionServerBuilder builder, TProxyFactory factory)
-        where TProxyFactory : class, Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory, Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory
+        where TProxyFactory : class, IInMemoryProxyFactory, IRemoteProxyFactory
     {
         if (factory is null) throw new ArgumentNullException(nameof(factory));
 
         // Remove the default dynamic factories and replace with the static one
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory>();
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory>();
+        builder.Services.RemoveAll<IInMemoryProxyFactory>();
+        builder.Services.RemoveAll<IRemoteProxyFactory>();
 
-        builder.Services.AddSingleton<Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory>(factory);
-        builder.Services.AddSingleton<Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory>(factory);
+        builder.Services.AddSingleton<IInMemoryProxyFactory>(factory);
+        builder.Services.AddSingleton<IRemoteProxyFactory>(factory);
 
         return builder;
     }
@@ -134,8 +135,8 @@ public static class MagicOnionServerBuilderExtensions
     public static IMagicOnionServerBuilder DisableDynamicMulticaster(this IMagicOnionServerBuilder builder)
     {
         // Remove dynamic Multicaster factories that use System.Reflection.Emit
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.InMemory.IInMemoryProxyFactory>();
-        builder.Services.RemoveAll<Cysharp.Runtime.Multicast.Remoting.IRemoteProxyFactory>();
+        builder.Services.RemoveAll<IInMemoryProxyFactory>();
+        builder.Services.RemoveAll<IRemoteProxyFactory>();
 
         return builder;
     }

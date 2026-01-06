@@ -27,15 +27,8 @@
     </PackageReference>
   </ItemGroup>
 
-  <!-- Use local Multicaster project when available, otherwise use NuGet package -->
-  <ItemGroup Condition="Exists('..\..\..\Multicaster\src\Multicaster\Multicaster.csproj')">
-    <ProjectReference Include="..\..\..\Multicaster\src\Multicaster\Multicaster.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="!Exists('..\..\..\Multicaster\src\Multicaster\Multicaster.csproj')">
-    <PackageReference Include="Multicaster" />
-  </ItemGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Multicaster\src\Multicaster\Multicaster.csproj" />
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />

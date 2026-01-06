@@ -15,10 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Multicaster.Distributed.Redis" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\..\Multicaster\src\Multicaster.Distributed.Redis\Multicaster.Distributed.Redis.csproj" />
     <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
   </ItemGroup>
 

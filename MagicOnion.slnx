@@ -19,6 +19,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Multicast/">
+    <Project Path="../Multicaster/src/Multicaster.Distributed.Redis/Multicaster.Distributed.Redis.csproj" />
     <Project Path="../Multicaster/src/Multicaster.SourceGenerator/Multicaster.SourceGenerator.csproj" />
     <Project Path="../Multicaster/src/Multicaster/Multicaster.csproj" />
   </Folder>
