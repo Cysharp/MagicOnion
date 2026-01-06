@@ -125,11 +125,11 @@ public class StaticStreamingHubClientGenerator
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
+                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message);
                                     return;
                                 }
 
@@ -146,17 +146,17 @@ public class StaticStreamingHubClientGenerator
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
                             }
 
-                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                                    return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
                                 }
 
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
@@ -167,13 +167,13 @@ public class StaticStreamingHubClientGenerator
                                 await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                             }
 
-                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                                    return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
                                 }
-                            
+
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                             }
             """);
