@@ -29,6 +29,15 @@ public class MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRaw
         this.invoker = invoker;
     }
 
+    public MagicOnionDuplexStreamingMethod(string serviceName, string methodName, MethodHandlerMetadata metadata, Func<TService, ServiceContext, Task> invoker)
+    {
+        ServiceName = serviceName;
+        MethodName = methodName;
+        Metadata = metadata;
+
+        this.invoker = invoker;
+    }
+
     public MagicOnionDuplexStreamingMethod(MagicOnionStreamingHubConnectMethod<TService> hubConnectMethod, Func<TService, ServiceContext, Task> invoker)
     {
         ServiceName = hubConnectMethod.ServiceName;

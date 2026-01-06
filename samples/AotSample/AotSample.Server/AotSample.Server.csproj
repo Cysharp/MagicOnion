@@ -1,17 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Enable AOT publishing -->
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Suppress AOT/Trim warnings - we use static providers so dynamic code paths are not executed -->
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <NoWarn>$(NoWarn);IL3050;IL3053</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AotSample.Shared\AotSample.Shared.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
     <!-- MagicOnion Source Generator for AOT-compatible service methods -->
     <ProjectReference Include="..\..\..\src\MagicOnion.Server.SourceGenerator\MagicOnion.Server.SourceGenerator.csproj" OutputItemType="Analyzer" />
     <!-- Multicaster Source Generator for AOT-compatible StreamingHub broadcast -->

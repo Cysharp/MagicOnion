@@ -13,12 +13,20 @@ public class MagicOnionStreamingHubConnectMethod<TService> : IMagicOnionGrpcMeth
     public string ServiceName { get; }
     public string MethodName { get; }
 
-    public MethodHandlerMetadata Metadata { get; } = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>("MagicOnion.Server.Internal.IStreamingHubBase.Connect");
+    public MethodHandlerMetadata Metadata { get; }
 
     public MagicOnionStreamingHubConnectMethod(string serviceName)
     {
         ServiceName = serviceName;
         MethodName = nameof(IStreamingHubBase.Connect);
+        Metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>("MagicOnion.Server.Internal.IStreamingHubBase.Connect");
+    }
+
+    public MagicOnionStreamingHubConnectMethod(string serviceName, MethodHandlerMetadata metadata)
+    {
+        ServiceName = serviceName;
+        MethodName = nameof(IStreamingHubBase.Connect);
+        Metadata = metadata;
     }
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)

@@ -71,18 +71,68 @@ public class StreamingHubMethodHandlerMetadata
     }
 }
 
-internal class MethodHandlerMetadataFactory
+public class MethodHandlerMetadataFactory
 {
 
     public static MethodHandlerMetadata CreateServiceMethodHandlerMetadata<T>(string methodName)
     {
-        var methods = typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Where(x => x.Name == methodName).ToArray();
+        // Search in the type and all base types for the method
+        var type = typeof(T);
+        MethodInfo[] methods = [];
+        
+        while (type != null && methods.Length == 0)
+        {
+            methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .Where(x => x.Name == methodName)
+                .ToArray();
+            type = type.BaseType;
+        }
+        
         switch (methods.Length)
         {
             case 0: throw new InvalidOperationException($"The method '{methodName}' was not found in the Service '{typeof(T).Name}'");
             case 1: return CreateServiceMethodHandlerMetadata(typeof(T), methods[0]);
             default: throw new InvalidOperationException($"There are two or more methods with the same name in the Service '{typeof(T).Name}' (Method: {methodName}). Service does not support method overloading.");
         }
+    }
+
+    /// <summary>
+    /// Creates metadata for the StreamingHub Connect method.
+    /// This method is designed for AOT scenarios where the Connect method (an explicit interface implementation) 
+    /// cannot be found by name through normal reflection.
+    /// </summary>
+    public static MethodHandlerMetadata CreateStreamingHubConnectMethodHandlerMetadata<TService, THubInterface>()
+        where TService : class
+    {
+        var serviceType = typeof(TService);
+        var hubInterfaceType = typeof(THubInterface);
+        
+        // Get the Connect method directly from the IStreamingHubBase interface
+        var interfaceType = typeof(IStreamingHubBase);
+        var interfaceMethod = interfaceType.GetMethod(nameof(IStreamingHubBase.Connect), BindingFlags.Instance | BindingFlags.Public)!;
+        
+        // The implementation method is the interface method itself when accessed through the service type
+        // For explicit interface implementations, we use the interface method directly
+        // This works because the runtime knows how to dispatch to the correct implementation
+        var methodInfo = interfaceMethod;
+        
+        var parameters = methodInfo.GetParameters();
+        var metadata = serviceType.GetCustomAttributes(true).ToList();
+        metadata.Add(new HttpMethodMetadata(new[] { "POST" }, acceptCorsPreflight: true));
+        
+        // Connect method returns DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>
+        var responseType = typeof(StreamingHubPayload);
+        var requestType = typeof(StreamingHubPayload);
+        
+        return new MethodHandlerMetadata(
+            serviceType,
+            methodInfo,
+            MethodType.DuplexStreaming,
+            responseType,
+            requestType,
+            parameters,
+            hubInterfaceType,
+            metadata);
     }
 
     public static MethodHandlerMetadata CreateServiceMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)

@@ -22,13 +22,17 @@ public static class StaticMethodProviderGenerator
 
             using System;
             using System.Collections.Generic;
+            using System.Reflection;
             using System.Threading.Tasks;
+            using Grpc.Core;
             using MagicOnion;
             using MagicOnion.Server;
             using MagicOnion.Server.Binder;
             using MagicOnion.Server.Hubs;
+            using MagicOnion.Server.Internal;
             using MagicOnion.Internal;
             using MessagePack;
+            using Microsoft.AspNetCore.Routing;
 
             """);
 
@@ -124,9 +128,18 @@ public static class StaticMethodProviderGenerator
         var safeTypeName = GetSafeTypeName(service.ImplementationType);
         var implTypeName = service.ImplementationType.FullName;
         var serviceName = service.ServiceInterfaceType.Name;
+        var serviceInterfaceTypeName = service.ServiceInterfaceType.FullName;
 
         sb.AppendLine($"{indent}file static class __{safeTypeName}_ServiceMethods");
         sb.AppendLine($"{indent}{{");
+
+        // Generate static metadata fields for each method
+        foreach (var method in service.Methods)
+        {
+            GenerateServiceMethodMetadataField(sb, service, method, indent + "    ");
+        }
+        sb.AppendLine();
+
         sb.AppendLine($"{indent}    public static readonly global::System.Collections.Generic.IReadOnlyList<global::MagicOnion.Server.Binder.IMagicOnionGrpcMethod> Methods = new global::MagicOnion.Server.Binder.IMagicOnionGrpcMethod[]");
         sb.AppendLine($"{indent}    {{");
 
@@ -140,12 +153,74 @@ public static class StaticMethodProviderGenerator
         sb.AppendLine();
     }
 
+    static void GenerateServiceMethodMetadataField(StringBuilder sb, ServiceImplementationInfo service, ServiceMethodInfo method, string indent)
+    {
+        var implTypeName = service.ImplementationType.FullName;
+        var serviceInterfaceTypeName = service.ServiceInterfaceType.FullName;
+        var requestType = method.RequestType.FullName;
+        var responseType = method.ResponseType.FullName;
+        var methodType = GetGrpcMethodType(method.MethodType);
+        var safeMethodName = GetSafeMethodName(method.MethodName);
+
+        // Generate parameter types array
+        var paramTypes = method.Parameters.Count > 0
+            ? string.Join(", ", method.Parameters.Select(p => $"typeof({p.Type.FullName})"))
+            : "";
+
+        sb.AppendLine($"{indent}static readonly global::MagicOnion.Server.Internal.MethodHandlerMetadata __{safeMethodName}_Metadata = CreateMethodMetadata_{safeMethodName}();");
+        sb.AppendLine($"{indent}static global::MagicOnion.Server.Internal.MethodHandlerMetadata CreateMethodMetadata_{safeMethodName}()");
+        sb.AppendLine($"{indent}{{");
+        sb.AppendLine($"{indent}    var serviceType = typeof({implTypeName});");
+        if (method.Parameters.Count > 0)
+        {
+            sb.AppendLine($"{indent}    var paramTypes = new global::System.Type[] {{ {paramTypes} }};");
+            sb.AppendLine($"{indent}    var methodInfo = serviceType.GetMethod(\"{method.MethodName}\", global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic, null, paramTypes, null)!;");
+        }
+        else
+        {
+            sb.AppendLine($"{indent}    var methodInfo = serviceType.GetMethod(\"{method.MethodName}\", global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic, null, global::System.Type.EmptyTypes, null)!;");
+        }
+        sb.AppendLine($"{indent}    var parameters = methodInfo.GetParameters();");
+        sb.AppendLine($"{indent}    var metadata = new global::System.Collections.Generic.List<object>();");
+        sb.AppendLine($"{indent}    metadata.AddRange(serviceType.GetCustomAttributes(true));");
+        sb.AppendLine($"{indent}    metadata.AddRange(methodInfo.GetCustomAttributes(true));");
+        sb.AppendLine($"{indent}    metadata.Add(new global::Microsoft.AspNetCore.Routing.HttpMethodMetadata(new[] {{ \"POST\" }}, acceptCorsPreflight: true));");
+        sb.AppendLine($"{indent}    return new global::MagicOnion.Server.Internal.MethodHandlerMetadata(");
+        sb.AppendLine($"{indent}        serviceType,");
+        sb.AppendLine($"{indent}        methodInfo,");
+        sb.AppendLine($"{indent}        global::Grpc.Core.MethodType.{methodType},");
+        sb.AppendLine($"{indent}        typeof({responseType}),");
+        sb.AppendLine($"{indent}        typeof({requestType}),");
+        sb.AppendLine($"{indent}        parameters,");
+        sb.AppendLine($"{indent}        typeof({serviceInterfaceTypeName}),");
+        sb.AppendLine($"{indent}        metadata);");
+        sb.AppendLine($"{indent}}}");
+    }
+
+    static string GetGrpcMethodType(MethodType methodType)
+    {
+        return methodType switch
+        {
+            MethodType.Unary => "Unary",
+            MethodType.ClientStreaming => "ClientStreaming",
+            MethodType.ServerStreaming => "ServerStreaming",
+            MethodType.DuplexStreaming => "DuplexStreaming",
+            _ => "Unary"
+        };
+    }
+
+    static string GetSafeMethodName(string methodName)
+    {
+        return methodName.Replace(".", "_").Replace("<", "_").Replace(">", "_").Replace(",", "_").Replace(" ", "");
+    }
+
     static void GenerateServiceMethodInstance(StringBuilder sb, ServiceImplementationInfo service, ServiceMethodInfo method, string indent)
     {
         var implTypeName = service.ImplementationType.FullName;
         var serviceName = service.ServiceInterfaceType.Name;
         var requestType = method.RequestType.FullName;
         var responseType = method.ResponseType.FullName;
+        var safeMethodName = GetSafeMethodName(method.MethodName);
 
         // Determine raw types (Box<T> for value types)
         var rawRequestType = method.RequestType.IsValueType
@@ -162,27 +237,27 @@ public static class StaticMethodProviderGenerator
         {
             case MethodType.Unary when method.ResponseType == MagicOnionTypeInfo.KnownTypes.MessagePack_Nil:
                 // MagicOnionUnaryMethod<TService, TRequest, TRawRequest>
-                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionUnaryMethod<{implTypeName}, {requestType}, {rawRequestType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionUnaryMethod<{implTypeName}, {requestType}, {rawRequestType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
                 break;
 
             case MethodType.Unary:
                 // MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
-                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionUnaryMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionUnaryMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
                 break;
 
             case MethodType.ClientStreaming:
                 // MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
-                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionClientStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionClientStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
                 break;
 
             case MethodType.ServerStreaming:
                 // MagicOnionServerStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
-                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionServerStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionServerStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
                 break;
 
             case MethodType.DuplexStreaming:
                 // MagicOnionDuplexStreamingMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
-                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+                sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionDuplexStreamingMethod<{implTypeName}, {requestType}, {responseType}, {rawRequestType}, {rawResponseType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
                 break;
         }
     }
@@ -221,13 +296,19 @@ public static class StaticMethodProviderGenerator
         var safeTypeName = GetSafeTypeName(service.ImplementationType);
         var implTypeName = service.ImplementationType.FullName;
         var serviceName = service.ServiceInterfaceType.Name;
+        var serviceInterfaceTypeName = service.ServiceInterfaceType.FullName;
 
         // Hub connect method (for GetGrpcMethods)
         sb.AppendLine($"{indent}file static class __{safeTypeName}_HubConnectMethods");
         sb.AppendLine($"{indent}{{");
+        
+        // Generate metadata for Connect method using the AOT-friendly helper method
+        sb.AppendLine($"{indent}    static readonly global::MagicOnion.Server.Internal.MethodHandlerMetadata __Connect_Metadata = global::MagicOnion.Server.Internal.MethodHandlerMetadataFactory.CreateStreamingHubConnectMethodHandlerMetadata<{implTypeName}, {serviceInterfaceTypeName}>();");
+        sb.AppendLine();
+        
         sb.AppendLine($"{indent}    public static readonly global::System.Collections.Generic.IReadOnlyList<global::MagicOnion.Server.Binder.IMagicOnionGrpcMethod> Methods = new global::MagicOnion.Server.Binder.IMagicOnionGrpcMethod[]");
         sb.AppendLine($"{indent}    {{");
-        sb.AppendLine($"{indent}        new global::MagicOnion.Server.Binder.MagicOnionStreamingHubConnectMethod<{implTypeName}>(\"{serviceName}\"),");
+        sb.AppendLine($"{indent}        new global::MagicOnion.Server.Binder.MagicOnionStreamingHubConnectMethod<{implTypeName}>(\"{serviceName}\", __Connect_Metadata),");
         sb.AppendLine($"{indent}    }};");
         sb.AppendLine($"{indent}}}");
         sb.AppendLine();
@@ -235,6 +316,14 @@ public static class StaticMethodProviderGenerator
         // Hub methods (for GetStreamingHubMethods)
         sb.AppendLine($"{indent}file static class __{safeTypeName}_HubMethods");
         sb.AppendLine($"{indent}{{");
+
+        // Generate static metadata fields for each hub method
+        foreach (var method in service.HubMethods)
+        {
+            GenerateStreamingHubMethodMetadataField(sb, service, method, indent + "    ");
+        }
+        sb.AppendLine();
+
         sb.AppendLine($"{indent}    public static readonly global::System.Collections.Generic.IReadOnlyList<global::MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod> Methods = new global::MagicOnion.Server.Binder.IMagicOnionStreamingHubMethod[]");
         sb.AppendLine($"{indent}    {{");
 
@@ -248,12 +337,64 @@ public static class StaticMethodProviderGenerator
         sb.AppendLine();
     }
 
+    static void GenerateStreamingHubMethodMetadataField(StringBuilder sb, ServiceImplementationInfo service, StreamingHubMethodInfo method, string indent)
+    {
+        var implTypeName = service.ImplementationType.FullName;
+        var serviceInterfaceTypeName = service.ServiceInterfaceType.FullName;
+        var requestType = method.RequestType.FullName;
+        var responseType = method.ResponseType.FullName;
+        var safeMethodName = GetSafeMethodName(method.MethodName);
+
+        // Generate parameter types array
+        var paramTypes = method.Parameters.Count > 0
+            ? string.Join(", ", method.Parameters.Select(p => $"typeof({p.Type.FullName})"))
+            : "";
+
+        sb.AppendLine($"{indent}static readonly global::MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata __{safeMethodName}_Metadata = CreateHubMethodMetadata_{safeMethodName}();");
+        sb.AppendLine($"{indent}static global::MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata CreateHubMethodMetadata_{safeMethodName}()");
+        sb.AppendLine($"{indent}{{");
+        sb.AppendLine($"{indent}    var serviceType = typeof({implTypeName});");
+        sb.AppendLine($"{indent}    var hubInterfaceType = typeof({serviceInterfaceTypeName});");
+        if (method.Parameters.Count > 0)
+        {
+            sb.AppendLine($"{indent}    var paramTypes = new global::System.Type[] {{ {paramTypes} }};");
+            sb.AppendLine($"{indent}    var implMethodInfo = serviceType.GetMethod(\"{method.MethodName}\", global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic, null, paramTypes, null)!;");
+        }
+        else
+        {
+            sb.AppendLine($"{indent}    var implMethodInfo = serviceType.GetMethod(\"{method.MethodName}\", global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic, null, global::System.Type.EmptyTypes, null)!;");
+        }
+        sb.AppendLine($"{indent}    var interfaceMethodInfo = hubInterfaceType.GetMethod(\"{method.MethodName}\")!;");
+        sb.AppendLine($"{indent}    var parameters = implMethodInfo.GetParameters();");
+        sb.AppendLine($"{indent}    var metadata = new global::System.Collections.Generic.List<object>();");
+        sb.AppendLine($"{indent}    metadata.AddRange(serviceType.GetCustomAttributes(true));");
+        sb.AppendLine($"{indent}    metadata.AddRange(implMethodInfo.GetCustomAttributes(true));");
+        
+        // Response type handling - null for void methods
+        var responseTypeExpr = method.ResponseType == MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
+            ? "null"
+            : $"typeof({responseType})";
+        
+        sb.AppendLine($"{indent}    return new global::MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata(");
+        sb.AppendLine($"{indent}        {method.MethodId},");
+        sb.AppendLine($"{indent}        serviceType,");
+        sb.AppendLine($"{indent}        interfaceMethodInfo,");
+        sb.AppendLine($"{indent}        implMethodInfo,");
+        sb.AppendLine($"{indent}        {responseTypeExpr},");
+        sb.AppendLine($"{indent}        typeof({requestType}),");
+        sb.AppendLine($"{indent}        parameters,");
+        sb.AppendLine($"{indent}        hubInterfaceType,");
+        sb.AppendLine($"{indent}        metadata);");
+        sb.AppendLine($"{indent}}}");
+    }
+
     static void GenerateStreamingHubMethodInstance(StringBuilder sb, ServiceImplementationInfo service, StreamingHubMethodInfo method, string indent)
     {
         var implTypeName = service.ImplementationType.FullName;
         var serviceName = service.ServiceInterfaceType.Name;
         var requestType = method.RequestType.FullName;
         var responseType = method.ResponseType.FullName;
+        var safeMethodName = GetSafeMethodName(method.MethodName);
 
         // Generate invoker lambda
         var invokerLambda = GenerateHubInvokerLambda(service, method);
@@ -261,12 +402,12 @@ public static class StaticMethodProviderGenerator
         if (method.ResponseType == MagicOnionTypeInfo.KnownTypes.MessagePack_Nil)
         {
             // MagicOnionStreamingHubMethod<TService, TRequest>
-            sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionStreamingHubMethod<{implTypeName}, {requestType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+            sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionStreamingHubMethod<{implTypeName}, {requestType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
         }
         else
         {
             // MagicOnionStreamingHubMethod<TService, TRequest, TResponse>
-            sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionStreamingHubMethod<{implTypeName}, {requestType}, {responseType}>(\"{serviceName}\", \"{method.MethodName}\", {invokerLambda}),");
+            sb.AppendLine($"{indent}new global::MagicOnion.Server.Binder.MagicOnionStreamingHubMethod<{implTypeName}, {requestType}, {responseType}>(\"{serviceName}\", \"{method.MethodName}\", __{safeMethodName}_Metadata, {invokerLambda}),");
         }
     }
 

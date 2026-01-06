@@ -29,6 +29,15 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
         this.invoker = invoker;
     }
 
+    public MagicOnionClientStreamingMethod(string serviceName, string methodName, MethodHandlerMetadata metadata, Func<TService, ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>> invoker)
+    {
+        ServiceName = serviceName;
+        MethodName = methodName;
+        Metadata = metadata;
+
+        this.invoker = invoker;
+    }
+
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
         => binder.BindClientStreaming(this);
 

@@ -10,4 +10,9 @@
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- MessagePack 3.x includes Source Generator built-in -->
+    <PackageReference Include="MessagePack" />
+  </ItemGroup>
+
 </Project>

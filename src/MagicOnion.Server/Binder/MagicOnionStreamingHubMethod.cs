@@ -44,11 +44,40 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
         }
     }
 
+    // for Static (AOT)
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Delegate invoker)
+    {
+        Debug.Assert(invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> or Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>>);
+
+        this.ServiceName = serviceName;
+        this.MethodName  = methodName;
+        this.Metadata = metadata;
+
+        if (invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invokerTask)
+        {
+            this.invoker = InvokeTask;
+            ValueTask<TResponse> InvokeTask(TService instance, StreamingHubContext context, TRequest request)
+                => new(invokerTask(instance, context, request));
+        }
+        else
+        {
+            this.invoker = (Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>>)invoker;
+        }
+    }
+
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>> invoker) : this(serviceName, methodName, (Delegate)invoker)
     {
     }
 
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invoker) : this(serviceName, methodName, (Delegate)invoker)
+    {
+    }
+
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>> invoker) : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invoker) : this(serviceName, methodName, metadata, (Delegate)invoker)
     {
     }
 
@@ -99,6 +128,36 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
         }
     }
 
+    // for Static (AOT)
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Delegate invoker)
+    {
+        Debug.Assert(invoker is Func<TService, StreamingHubContext, TRequest, Task> or Func<TService, StreamingHubContext, TRequest, ValueTask> or Action<TService, StreamingHubContext, TRequest>);
+
+        this.ServiceName = serviceName;
+        this.MethodName = methodName;
+        this.Metadata = metadata;
+
+        if (invoker is Func<TService, StreamingHubContext, TRequest, Task> invokerTask)
+        {
+            this.invoker = InvokeTask;
+            ValueTask InvokeTask(TService instance, StreamingHubContext context, TRequest request)
+                => new(invokerTask(instance, context, request));
+        }
+        else if (invoker is Action<TService, StreamingHubContext, TRequest> invokerVoid)
+        {
+            this.invoker = InvokeVoid;
+            ValueTask InvokeVoid(TService instance, StreamingHubContext context, TRequest request)
+            {
+                invokerVoid(instance, context, request);
+                return default;
+            }
+        }
+        else
+        {
+            this.invoker = (Func<TService, StreamingHubContext, TRequest, ValueTask>)invoker;
+        }
+    }
+
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Func<TService, StreamingHubContext, TRequest, ValueTask> invoker) : this(serviceName, methodName, (Delegate)invoker)
     {
     }
@@ -108,6 +167,18 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
     }
 
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Action<TService, StreamingHubContext, TRequest> invoker) : this(serviceName, methodName, (Delegate)invoker)
+    {
+    }
+
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, ValueTask> invoker) : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, Task> invoker) : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Action<TService, StreamingHubContext, TRequest> invoker) : this(serviceName, methodName, metadata, (Delegate)invoker)
     {
     }
 
