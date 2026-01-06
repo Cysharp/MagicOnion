@@ -736,11 +736,11 @@ internal
         public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseValueTaskAsync
             = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
         public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetValueTaskOfTAsync
-            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetValueTaskOfTAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == "WriteMessageFireAndForgetValueTaskOfTAsync" && x.GetParameters().Length == 2)!; // TODO(DataChannel):
         public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetValueTaskAsync
-            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == "WriteMessageFireAndForgetValueTaskAsync" && x.GetParameters().Length == 2)!; // TODO(DataChannel):
         public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync
-            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == "WriteMessageFireAndForgetTaskAsync" && x.GetParameters().Length == 2)!; // TODO(DataChannel):
         // ReSharper restore StaticMemberInGenericType
         // ReSharper restore InconsistentNaming
 #pragma warning restore IDE1006 // Naming Styles
