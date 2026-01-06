@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: Cysharp/Actions/.github/actions/checkout@main
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - run: echo "MAGICONION_VERSION=ci-${GITHUB_REF_NAME//\//_}-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+      - run: echo "MAGICONION_VERSION=ci-${GITHUB_REF_NAME//\//-}-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.slnx
