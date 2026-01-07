@@ -211,7 +211,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 return;
             }
 
-            var headers = responseHeadersTask.Result;
+            var headers = await responseHeadersTask.ConfigureAwait(false);
             messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
             // Check message version of StreamingHub.
