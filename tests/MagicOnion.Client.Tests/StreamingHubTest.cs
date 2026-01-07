@@ -743,13 +743,14 @@ public class StreamingHubTest
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
             factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
-            onResponseHeaderAsync: metadata => throw new HttpRequestException());
+            onResponseHeaderAsync: metadata => throw new RpcException(new Status(StatusCode.Internal, "Something went wrong.")));
 
         // Act
         var ex = await Record.ExceptionAsync(async () => await helper.ConnectAsync(timeout.Token));
 
         // Assert
         Assert.NotNull(ex);
+        Assert.IsType<RpcException>(ex);
     }
 
     [Fact]
