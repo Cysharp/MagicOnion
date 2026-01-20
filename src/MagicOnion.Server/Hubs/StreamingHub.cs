@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 
 namespace MagicOnion.Server.Hubs;
@@ -37,7 +38,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
 
-    static readonly Metadata ResponseHeaders = new Metadata()
+    static readonly Metadata DefaultResponseHeaders = new()
     {
         { "x-magiconion-streaminghub-version", "2" },
     };
@@ -104,6 +105,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         handlers = streamingHubFeature.Handlers;
 
+        var isDataChannelCreated = TryCreateDataChannel();
+
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
         this.remoteClientResultPendingTasks = serviceProvider.GetRequiredService<IRemoteClientResultPendingTaskRegistry>();
@@ -117,6 +120,14 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         try
         {
             await OnConnecting();
+
+            await EstablishConnectionAsync();
+
+            // Call OnConnected after sending the headers and marker.
+            // The server can send messages or broadcast to client after OnConnected.
+            // eg: Send the current game state to the client.
+            await OnConnected();
+
             await HandleMessageAsync();
         }
         catch (OperationCanceledException)
@@ -182,47 +193,35 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    async Task HandleMessageAsync()
+    async Task EstablishConnectionAsync()
     {
-        var ct = CancellationTokenSource.CreateLinkedTokenSource(Context.CallContext.CancellationToken, heartbeatHandle.TimeoutToken).Token;
-        var reader = StreamingServiceContext.RequestStream!;
-        var writer = StreamingServiceContext.ResponseStream!;
-
-        var responseHeaders = ResponseHeaders;
-        if (Context.CallContext.RequestHeaders.GetValueOrDefault("x-magiconion-streaminghub-datachannel") is { Length: > 0 } dataChannelHeaderValue)
-        {
-            if (dataChannelHeaderValue.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Contains("enabled"))
-            {
-                var dataChannelService = Context.ServiceProvider.GetRequiredService<DataChannelService>();
-                dataChannel = dataChannelService.CreateChannel();
-                var newResponseHeaders = new Metadata();
-                foreach (var header in responseHeaders)
-                {
-                    newResponseHeaders.Add(header);
-                }
-                newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-session-id", dataChannel.SessionId.ToString());
-
-                responseHeaders = newResponseHeaders;
-            }
-        }
-
         // Send a hint to the client to start sending messages.
         // The client can read the response headers before any StreamingHub's message.
-        await Context.CallContext.WriteResponseHeadersAsync(responseHeaders);
+        await Context.CallContext.WriteResponseHeadersAsync(CreateResponseHeaders());
 
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
-        await writer.WriteAsync(StreamingHubPayloadPool.Shared.RentOrCreate(MarkerResponseBytes));
+        await StreamingServiceContext.ResponseStream!.WriteAsync(StreamingHubPayloadPool.Shared.RentOrCreate(MarkerResponseBytes));
 
         // Wait for DataChannel to connected.
         if (dataChannel is not null)
         {
-            var connectTimeout = Debugger.IsAttached ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(1);
+            await EstablishDataChannelAsync();
+        }
 
+
+        async ValueTask EstablishDataChannelAsync()
+        {
+            if (dataChannel is null)
+            {
+                throw new InvalidOperationException("DataChannel is not initialized.");
+            }
+
+            var connectTimeout = Debugger.IsAttached ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(1);
             try
             {
                 // TODO: Since the gRPC side may be disconnected, it is necessary to also check RequestAborted.
-                await dataChannel.Connected.WaitAsync(connectTimeout); 
+                await dataChannel.Connected.WaitAsync(connectTimeout);
             }
             catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
             {
@@ -231,28 +230,55 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 dataChannel = null;
             }
         }
+    }
 
-        // Call OnConnected after sending the headers and marker.
-        // The server can send messages or broadcast to client after OnConnected.
-        // eg: Send the current game state to the client.
-        await OnConnected();
+    bool TryCreateDataChannel()
+    {
+        if (Context.CallContext.RequestHeaders.GetValueOrDefault("x-magiconion-streaminghub-datachannel") is { Length: > 0 } dataChannelHeaderValue)
+        {
+            if (dataChannelHeaderValue.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Contains("enabled"))
+            {
+                var dataChannelService = Context.ServiceProvider.GetRequiredService<DataChannelService>();
+                dataChannel = dataChannelService.CreateChannel();
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    Metadata CreateResponseHeaders()
+    {
+        var responseHeaders = DefaultResponseHeaders;
+        if (dataChannel is not null)
+        {
+            var newResponseHeaders = new Metadata();
+            foreach (var header in responseHeaders)
+            {
+                newResponseHeaders.Add(header);
+            }
+            newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-session-id", dataChannel.SessionId.ToString());
+
+            responseHeaders = newResponseHeaders;
+        }
+
+        return responseHeaders;
+    }
+
+    async Task HandleMessageAsync()
+    {
+        var ct = CancellationTokenSource.CreateLinkedTokenSource(Context.CallContext.CancellationToken, heartbeatHandle.TimeoutToken).Token;
         // Starts a loop that consumes the request queue.
         consumingRequestQueueTask = ConsumeRequestQueueAsync(ct);
 
         // TODO(DataChannel):
         if (dataChannel is not null)
         {
-            _ = Task.Run(async () =>
-            {
-                await foreach (var payload in dataChannel.DataReader.ReadAllAsync())
-                {
-                    await ProcessMessageAsync(payload, ct);
-                }
-            });
+            _ = ReadMessagesFromDataChannelAsync(ct);
         }
 
         // Reads messages from the gRPC stream. This loop needs to be careful about allocation and performance.
+        var reader = StreamingServiceContext.RequestStream!;
         while (await reader.MoveNext(ct))
         {
             var payload = reader.Current;
@@ -261,6 +287,18 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
             // NOTE: DO NOT return the StreamingHubPayload to the pool here.
             //       Client requests may be pending at this point.
+        }
+
+
+        async Task ReadMessagesFromDataChannelAsync(CancellationToken cancellationToken)
+        {
+            if (dataChannel is null) return;
+            await foreach (var payload in dataChannel.DataReader.ReadAllAsync())
+            {
+                await ProcessMessageAsync(payload, cancellationToken);
+                // NOTE: DO NOT return the StreamingHubPayload to the pool here.
+                //       Client requests may be pending at this point.
+            }
         }
     }
 
