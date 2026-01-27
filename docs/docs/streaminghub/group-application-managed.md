@@ -74,7 +74,7 @@ The following is an example of creating a single group in advance, adding/removi
 public class GroupService(IMulticastGroupProvider groupProvider) : IDisposable
 {
     // NOTE: You can also manage multiple groups using a dictionary, etc.
-    private readonly IMulticastSyncGroup<Guid, IMyReceiver> _group = groupProvider.GetOrAddSynchronousGroup<Guid, IMyHubReceiver>();
+    private readonly IMulticastSyncGroup<Guid, IMyReceiver> _group = groupProvider.GetOrAddSynchronousGroup<Guid, IMyHubReceiver>("MyGroup");
 
     public void SendMessageToAll(string message) => _group.All.OnMessage(message);
 
