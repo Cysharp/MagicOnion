@@ -1,11 +1,11 @@
-using MagicOnion;
+﻿using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
 using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(PerfGroupService group) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -78,5 +78,41 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
         }
 
         return stream.Result();
+    }
+
+    private int broadcastLock = 0;
+    public async UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout)
+    {
+        // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
+        if (Interlocked.CompareExchange(ref broadcastLock, 1, 0) != 0)
+        {
+            // another broadcast is in progress.
+            return SimpleResponse.Cached;
+        }
+
+        try
+        {
+            var response = SimpleResponse.Cached;
+            using var cts = new CancellationTokenSource(timeout);
+            var ct = cts.Token;
+            var start = TimeProvider.System.GetTimestamp();
+            try
+            {
+                while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+                {
+                    group.SendMessageToAll(response);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // do nothing.
+            }
+
+            return SimpleResponse.Cached;
+        }
+        finally
+        {
+            Interlocked.Exchange(ref broadcastLock, 0);
+        }
     }
 }

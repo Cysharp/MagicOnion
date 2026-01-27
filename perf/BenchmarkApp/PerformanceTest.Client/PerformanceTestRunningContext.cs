@@ -1,4 +1,4 @@
-using PerformanceTest.Shared.Reporting;
+﻿using PerformanceTest.Shared.Reporting;
 using System.Diagnostics;
 
 public class PerformanceTestRunningContext
@@ -107,6 +107,10 @@ public class PerformanceTestRunningContext
         }
         static double GetPercentile(int percent, IReadOnlyList<double> sortedData)
         {
+            if (sortedData.Count == 0)
+            {
+                return 0.0;
+            }
             if (percent == 100)
             {
                 return sortedData[^1];

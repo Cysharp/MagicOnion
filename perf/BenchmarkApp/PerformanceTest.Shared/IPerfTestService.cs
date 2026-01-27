@@ -1,4 +1,4 @@
-using MagicOnion;
+﻿using MagicOnion;
 using MessagePack;
 
 namespace PerformanceTest.Shared;
@@ -15,4 +15,6 @@ public interface IPerfTestService : IService<IPerfTestService>
 
     // ServerStreaming
     Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync(TimeSpan timeout);
+    // Broadcast
+    UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout);
 }

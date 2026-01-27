@@ -198,6 +198,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
         ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
+        ScenarioType.Broadcast => () => new BroadcastScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 

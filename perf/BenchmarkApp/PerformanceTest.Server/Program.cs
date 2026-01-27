@@ -1,4 +1,4 @@
-using MagicOnion.Serialization;
+﻿using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using PerformanceTest.Server;
 
@@ -32,6 +32,7 @@ builder.ConfigureEndpoint();
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<PerfGroupService>();
 builder.Services.AddHostedService<StartupService>();
 builder.Services.AddHostedService<ProfileService>();
 
