@@ -1,4 +1,4 @@
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
@@ -474,9 +474,7 @@ public class ScenarioConfiguration
         {
             var basePath = Path.GetDirectoryName(AppContext.BaseDirectory);
             var certPath = Path.Combine(basePath!, TlsFile.Default.PfxFileName);
-            // .NET 9 API....
-            //var clientCertificates = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
-            var clientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection(new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, TlsFile.Default.Password));
+            var clientCertificates = System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, TlsFile.Default.Password);
             httpClientHandler.SslOptions.ClientCertificates = clientCertificates;
         }
 
