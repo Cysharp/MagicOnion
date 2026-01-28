@@ -212,7 +212,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
 
     WriteLog($"Starting scenario '{scenario}'");
     var tasks = new List<Task>();
-    var scenarios = new List<IScenario>();
+    var scenarios = new System.Collections.Concurrent.ConcurrentBag<IScenario>();
     for (var i = 0; i < config.Channels; i++)
     {
         for (var j = 0; j < config.Streams; j++)
