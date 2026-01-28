@@ -30,10 +30,16 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         this.connectionId = connectionId;
         begin = timeProvider.GetTimestamp();
         await hubClient.JoinGroupAsync();
-        await client.BroadcastAsync(ctx.Timeout);
+        
+        // Only the first client triggers broadcast
+        if (connectionId == 0)
+        {
+            await client.BroadcastAsync(ctx.Timeout);
+        }
+        
         while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
         {
-            await Task.Delay(10, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            await Task.Delay(100, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
         }
     }
 
