@@ -12,7 +12,7 @@ public class PerfGroupService(IMulticastGroupProvider groupProvider, TimeProvide
     public ServerBroadcastMetricsContext MetricsContext => metricsContext;
     public int MemberCount => memberCount;
 
-    public void SendMessageToAll(SimpleResponse response)
+    public void SendMessageToAll(BroadcastPositionMessage response)
     {
         group.All.OnMessage(response);
         metricsContext.IncrementMessageCount();

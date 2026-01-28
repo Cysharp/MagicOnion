@@ -11,5 +11,5 @@ public interface IPerTestBroadcastHub : IStreamingHub<IPerTestBroadcastHub, IPer
 
 public interface IPerTestBroadcastHubReceiver
 {
-    void OnMessage(SimpleResponse response);
+    void OnMessage(BroadcastPositionMessage message);
 }

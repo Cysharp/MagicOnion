@@ -82,18 +82,18 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
     }
 
     int broadcastLock = 0;
-    public async UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout, int targetFps)
+    public async UnaryResult<BroadcastPositionMessage> BroadcastAsync(TimeSpan timeout, int targetFps)
     {
         // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
         if (Interlocked.CompareExchange(ref broadcastLock, 1, 0) != 0)
         {
             // another broadcast is in progress.
-            return SimpleResponse.Cached;
+            return BroadcastPositionMessage.Cached;
         }
 
         try
         {
-            var response = SimpleResponse.Cached;
+            var response = BroadcastPositionMessage.Cached;
             using var cts = new CancellationTokenSource(timeout);
             // Combine server timeout and client cancellation (when client disconnects)
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, Context.CallContext.CancellationToken);
@@ -190,7 +190,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 group.MetricsContext.Reset();
             }
 
-            return SimpleResponse.Cached;
+            return BroadcastPositionMessage.Cached;
         }
         finally
         {

@@ -16,5 +16,5 @@ public interface IPerfTestService : IService<IPerfTestService>
     // ServerStreaming
     Task<ServerStreamingResult<SimpleResponse>> ServerStreamingAsync(TimeSpan timeout);
     // Broadcast
-    UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout, int targetFps);
+    UnaryResult<BroadcastPositionMessage> BroadcastAsync(TimeSpan timeout, int targetFps);
 }

@@ -56,7 +56,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         }
     }
 
-    public void OnMessage(SimpleResponse response)
+    public void OnMessage(BroadcastPositionMessage message)
     {
         // Collect only Count
         context.Increment();
