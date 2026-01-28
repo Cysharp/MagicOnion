@@ -8,6 +8,7 @@ public class ServerBroadcastMetricsContext
     bool isRunning;
     long startTimestamp;
     TimeSpan elapsed;
+    int targetFps;
     int clientCountAtStart;
     int clientCountAtEnd;
     int minClientCount;
@@ -20,9 +21,10 @@ public class ServerBroadcastMetricsContext
         this.timeProvider = timeProvider;
     }
 
-    public void Start()
+    public void Start(int targetFps)
     {
         isRunning = true;
+        this.targetFps = targetFps;
         Interlocked.Exchange(ref messageCount, 0);
         startTimestamp = timeProvider.GetTimestamp();
         
@@ -84,7 +86,7 @@ public class ServerBroadcastMetricsContext
     {
         var count = Interlocked.Read(ref messageCount);
         var currentElapsed = isRunning ? timeProvider.GetElapsedTime(startTimestamp) : elapsed;
-        var rps = currentElapsed.TotalSeconds > 0 ? count / currentElapsed.TotalSeconds : 0;
+        var actualFps = currentElapsed.TotalSeconds > 0 ? count / currentElapsed.TotalSeconds : 0;
 
         lock (clientCountLock)
         {
@@ -93,7 +95,8 @@ public class ServerBroadcastMetricsContext
 
             return new ServerBroadcastMetricsResult(
                 count,
-                rps,
+                targetFps,
+                actualFps,
                 currentElapsed,
                 clientCountAtStart,
                 clientCountAtEnd,
@@ -106,7 +109,7 @@ public class ServerBroadcastMetricsContext
     public ServerBroadcastMetricsResult GetResult()
     {
         var count = Interlocked.Read(ref messageCount);
-        var rps = elapsed.TotalSeconds > 0 ? count / elapsed.TotalSeconds : 0;
+        var actualFps = elapsed.TotalSeconds > 0 ? count / elapsed.TotalSeconds : 0;
 
         lock (clientCountLock)
         {
@@ -115,7 +118,8 @@ public class ServerBroadcastMetricsContext
 
             return new ServerBroadcastMetricsResult(
                 count,
-                rps,
+                targetFps,
+                actualFps,
                 elapsed,
                 clientCountAtStart,
                 clientCountAtEnd,
@@ -129,6 +133,7 @@ public class ServerBroadcastMetricsContext
     {
         Interlocked.Exchange(ref messageCount, 0);
         elapsed = TimeSpan.Zero;
+        targetFps = 0;
         
         lock (clientCountLock)
         {
@@ -143,12 +148,13 @@ public class ServerBroadcastMetricsContext
 }
 
 public record ServerBroadcastMetricsResult(
-    long TotalMessages, 
-    double MessagesPerSecond, 
-    TimeSpan Duration, 
-    int ClientCountAtStart,
-    int ClientCountAtEnd,
-    int MinClientCount,
-    int MaxClientCount,
-    double AvgClientCount);
+long TotalMessages, 
+int TargetFps,
+double ActualFps, 
+TimeSpan Duration, 
+int ClientCountAtStart,
+int ClientCountAtEnd,
+int MinClientCount,
+int MaxClientCount,
+double AvgClientCount);
 

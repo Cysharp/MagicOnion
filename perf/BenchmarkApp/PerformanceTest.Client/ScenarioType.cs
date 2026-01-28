@@ -28,4 +28,7 @@
     ServerStreaming,
 
     Broadcast,
+    Broadcast60Fps,
+    Broadcast30Fps,
+    Broadcast15Fps,
 }

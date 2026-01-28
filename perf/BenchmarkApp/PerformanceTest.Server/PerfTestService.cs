@@ -82,7 +82,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
     }
 
     int broadcastLock = 0;
-    public async UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout)
+    public async UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout, int targetFps)
     {
         // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
         if (Interlocked.CompareExchange(ref broadcastLock, 1, 0) != 0)
@@ -98,10 +98,13 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
             var ct = cts.Token;
             var start = TimeProvider.System.GetTimestamp();
 
+            // Calculate interval from target FPS
+            var intervalMs = targetFps > 0 ? 1000.0 / targetFps : 0;
+            var interval = intervalMs > 0 ? TimeSpan.FromMilliseconds(intervalMs) : TimeSpan.Zero;
 
             // Start metrics collection
-            group.MetricsContext.Start();
-            
+            group.MetricsContext.Start(targetFps);
+
             // Record initial client count
             group.MetricsContext.UpdateClientCount(group.MemberCount);
 
@@ -113,23 +116,37 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 {
                     var currentResult = group.MetricsContext.GetCurrentResult();
                     logger.LogInformation(
-                        "[Server Broadcast Metrics (Periodic)] Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Messages/sec: {MessagesPerSecond:N2}, Duration: {Duration}",
+                        "[Server Broadcast Metrics (Periodic)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Duration: {Duration}",
+                        currentResult.TargetFps,
+                        currentResult.ActualFps,
                         currentResult.ClientCountAtStart,
                         currentResult.ClientCountAtEnd,
                         currentResult.MinClientCount,
                         currentResult.MaxClientCount,
                         currentResult.AvgClientCount,
                         currentResult.TotalMessages,
-                        currentResult.MessagesPerSecond,
                         currentResult.Duration);
                 }
             }, ct);
 
             try
             {
-                while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+                if (interval > TimeSpan.Zero)
                 {
-                    group.SendMessageToAll(response);
+                    // FPS-controlled broadcast
+                    using var timer = new PeriodicTimer(interval, TimeProvider.System);
+                    while (await timer.WaitForNextTickAsync(ct) && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    {
+                        group.SendMessageToAll(response);
+                    }
+                }
+                else
+                {
+                    // Maximum speed broadcast (no delay)
+                    while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    {
+                        group.SendMessageToAll(response);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -154,14 +171,15 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
 
                 // Log final server-side broadcast metrics
                 logger.LogInformation(
-                    "[Server Broadcast Metrics (Final)] Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Messages/sec: {MessagesPerSecond:N2}, Duration: {Duration}",
+                    "[Server Broadcast Metrics (Final)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Duration: {Duration}",
+                    result.TargetFps,
+                    result.ActualFps,
                     result.ClientCountAtStart,
                     result.ClientCountAtEnd,
                     result.MinClientCount,
                     result.MaxClientCount,
                     result.AvgClientCount,
                     result.TotalMessages,
-                    result.MessagesPerSecond,
                     result.Duration);
 
                 group.MetricsContext.Reset();

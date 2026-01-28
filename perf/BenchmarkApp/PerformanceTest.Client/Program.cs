@@ -199,6 +199,9 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
         ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
         ScenarioType.Broadcast => () => new BroadcastScenario(),
+        ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(),
+        ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(),
+        ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
@@ -437,7 +440,7 @@ public class ScenarioConfiguration
                 }
             default:
                 throw new NotImplementedException(protocol);
-        };
+        }
 
         Url = url;
         Protocol = protocol;

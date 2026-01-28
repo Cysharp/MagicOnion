@@ -1,6 +1,4 @@
-﻿using Grpc.Core;
-using Grpc.Net.Client;
-using MagicOnion;
+﻿using Grpc.Net.Client;
 using MagicOnion.Client;
 using PerformanceTest.Shared;
 
@@ -14,6 +12,8 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     PerformanceTestRunningContext context = default!;
     int connectionId;
     long begin;
+
+    protected virtual int TargetFps => 0; // 0 means maximum speed
 
     public async ValueTask PrepareAsync(GrpcChannel channel)
     {
@@ -30,13 +30,13 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         this.connectionId = connectionId;
         begin = timeProvider.GetTimestamp();
         await hubClient.JoinGroupAsync();
-        
+
         // Only the first client triggers broadcast
         if (connectionId == 0)
         {
-            await client.BroadcastAsync(ctx.Timeout);
+            await client.BroadcastAsync(ctx.Timeout, TargetFps);
         }
-        
+
         while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
         {
             await Task.Delay(100, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
@@ -55,4 +55,19 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         //context.LatencyThrottled(connectionId, timeProvider.GetElapsedTime(begin), 100); // avoid OOM
         //begin = timeProvider.GetTimestamp();
     }
+}
+
+public class Broadcast60FpsScenario : BroadcastScenario
+{
+    protected override int TargetFps => 60;
+}
+
+public class Broadcast30FpsScenario : BroadcastScenario
+{
+    protected override int TargetFps => 30;
+}
+
+public class Broadcast15FpsScenario : BroadcastScenario
+{
+    protected override int TargetFps => 15;
 }
