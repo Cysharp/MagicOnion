@@ -3,10 +3,11 @@ using MagicOnion.Server;
 using MessagePack;
 using Microsoft.Extensions.Logging;
 using PerformanceTest.Shared;
+using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger, DatadogMetricsRecorder datadogRecorder) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -186,6 +187,9 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                     result.TotalMessages,
                     result.TotalMessagesSent,
                     result.Duration);
+
+                // Send metrics to Datadog
+                await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
 
                 group.MetricsContext.Reset();
             }
