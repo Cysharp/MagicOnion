@@ -5,6 +5,7 @@ public class ServerBroadcastMetricsContext
     readonly TimeProvider timeProvider;
     readonly Lock clientCountLock = new();
     long messageCount;
+    long lastPeriodicMessageCount;
     bool isRunning;
     long startTimestamp;
     TimeSpan elapsed;
@@ -26,8 +27,9 @@ public class ServerBroadcastMetricsContext
         isRunning = true;
         this.targetFps = targetFps;
         Interlocked.Exchange(ref messageCount, 0);
+        Interlocked.Exchange(ref lastPeriodicMessageCount, 0);
         startTimestamp = timeProvider.GetTimestamp();
-        
+
         lock (clientCountLock)
         {
             clientCountAtStart = 0;
@@ -66,7 +68,7 @@ public class ServerBroadcastMetricsContext
             }
 
             clientCountAtEnd = count;
-            
+
             if (count < minClientCount)
             {
                 minClientCount = count;
@@ -82,9 +84,13 @@ public class ServerBroadcastMetricsContext
         }
     }
 
-    public ServerBroadcastMetricsResult GetCurrentResult()
+    public ServerBroadcastMetricsResult GetPeriodicResult()
     {
         var count = Interlocked.Read(ref messageCount);
+        var lastCount = Interlocked.Read(ref lastPeriodicMessageCount);
+        var periodicMessages = count - lastCount;
+        Interlocked.Exchange(ref lastPeriodicMessageCount, count);
+
         var currentElapsed = isRunning ? timeProvider.GetElapsedTime(startTimestamp) : elapsed;
         var actualFps = currentElapsed.TotalSeconds > 0 ? count / currentElapsed.TotalSeconds : 0;
 
@@ -92,9 +98,11 @@ public class ServerBroadcastMetricsContext
         {
             var avgClientCount = clientCountSampleCount > 0 ? (double)totalClientCountSamples / clientCountSampleCount : 0;
             var finalMinClientCount = minClientCount == int.MaxValue ? 0 : minClientCount;
+            var totalMessagesSent = (long)(count * avgClientCount);
 
             return new ServerBroadcastMetricsResult(
                 count,
+                totalMessagesSent,
                 targetFps,
                 actualFps,
                 currentElapsed,
@@ -102,7 +110,8 @@ public class ServerBroadcastMetricsContext
                 clientCountAtEnd,
                 finalMinClientCount,
                 maxClientCount,
-                avgClientCount);
+                avgClientCount,
+                periodicMessages);
         }
     }
 
@@ -115,9 +124,11 @@ public class ServerBroadcastMetricsContext
         {
             var avgClientCount = clientCountSampleCount > 0 ? (double)totalClientCountSamples / clientCountSampleCount : 0;
             var finalMinClientCount = minClientCount == int.MaxValue ? 0 : minClientCount;
+            var totalMessagesSent = (long)(count * avgClientCount);
 
             return new ServerBroadcastMetricsResult(
                 count,
+                totalMessagesSent,
                 targetFps,
                 actualFps,
                 elapsed,
@@ -125,7 +136,8 @@ public class ServerBroadcastMetricsContext
                 clientCountAtEnd,
                 finalMinClientCount,
                 maxClientCount,
-                avgClientCount);
+                avgClientCount,
+                0); // periodicMessages (not used for final result)
         }
     }
 
@@ -134,7 +146,7 @@ public class ServerBroadcastMetricsContext
         Interlocked.Exchange(ref messageCount, 0);
         elapsed = TimeSpan.Zero;
         targetFps = 0;
-        
+
         lock (clientCountLock)
         {
             clientCountAtStart = 0;
@@ -148,13 +160,14 @@ public class ServerBroadcastMetricsContext
 }
 
 public record ServerBroadcastMetricsResult(
-long TotalMessages, 
+long TotalMessages,
+long TotalMessagesSent,
 int TargetFps,
-double ActualFps, 
-TimeSpan Duration, 
+double ActualFps,
+TimeSpan Duration,
 int ClientCountAtStart,
 int ClientCountAtEnd,
 int MinClientCount,
 int MaxClientCount,
-double AvgClientCount);
-
+double AvgClientCount,
+long PeriodicMessages);
