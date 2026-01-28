@@ -9,7 +9,7 @@ namespace PerformanceTest.Client;
 public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 {
     IPerfTestService client = default!;
-    IPerTestBroadcastHub groupClient = default!;
+    IPerTestBroadcastHub hubClient = default!;
     readonly TimeProvider timeProvider = TimeProvider.System;
     PerformanceTestRunningContext context = default!;
     int connectionId;
@@ -17,8 +17,8 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 
     public async ValueTask PrepareAsync(GrpcChannel channel)
     {
-        this.client = MagicOnionClient.Create<IPerfTestService>(channel);
-        this.groupClient = await StreamingHubClient.ConnectAsync<IPerTestBroadcastHub, IPerTestBroadcastHubReceiver>(channel, this);
+        client = MagicOnionClient.Create<IPerfTestService>(channel);
+        hubClient = await StreamingHubClient.ConnectAsync<IPerTestBroadcastHub, IPerTestBroadcastHubReceiver>(channel, this);
     }
 
     // Follow what the grpc-dotnet benchmark does, but this ServerStreaming benchmark seems meaningless as MoveNext may concatenate multiple responses from the server.
@@ -29,7 +29,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         context = ctx;
         this.connectionId = connectionId;
         begin = timeProvider.GetTimestamp();
-        await groupClient.JoinGroupAsync();
+        await hubClient.JoinGroupAsync();
         await client.BroadcastAsync(ctx.Timeout);
         while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
         {
@@ -39,6 +39,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 
     public async Task CompleteAsync()
     {
+        await hubClient.DisposeAsync();
     }
 
     public void OnMessage(SimpleResponse response)

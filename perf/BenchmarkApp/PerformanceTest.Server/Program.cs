@@ -20,7 +20,10 @@ builder.Configuration.AddCommandLine(args, new Dictionary<string, string>()
     { "--validate", "Validate" },
 });
 
-builder.Logging.ClearProviders();
+if (builder.Environment.IsProduction())
+{
+    builder.Logging.ClearProviders();
+}
 
 // HTTP/HTTPS Configuration
 builder.ConfigureEndpoint();

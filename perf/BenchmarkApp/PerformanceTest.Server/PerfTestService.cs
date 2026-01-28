@@ -1,11 +1,12 @@
 ﻿using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -80,7 +81,7 @@ public class PerfTestService(PerfGroupService group) : ServiceBase<IPerfTestServ
         return stream.Result();
     }
 
-    private int broadcastLock = 0;
+    int broadcastLock = 0;
     public async UnaryResult<SimpleResponse> BroadcastAsync(TimeSpan timeout)
     {
         // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
@@ -96,6 +97,34 @@ public class PerfTestService(PerfGroupService group) : ServiceBase<IPerfTestServ
             using var cts = new CancellationTokenSource(timeout);
             var ct = cts.Token;
             var start = TimeProvider.System.GetTimestamp();
+
+
+            // Start metrics collection
+            group.MetricsContext.Start();
+            
+            // Record initial client count
+            group.MetricsContext.UpdateClientCount(group.MemberCount);
+
+            // Start periodic metrics logging task
+            var metricsLoggingTask = Task.Run(async () =>
+            {
+                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10), TimeProvider.System);
+                while (await timer.WaitForNextTickAsync(ct))
+                {
+                    var currentResult = group.MetricsContext.GetCurrentResult();
+                    logger.LogInformation(
+                        "[Server Broadcast Metrics (Periodic)] Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Messages/sec: {MessagesPerSecond:N2}, Duration: {Duration}",
+                        currentResult.ClientCountAtStart,
+                        currentResult.ClientCountAtEnd,
+                        currentResult.MinClientCount,
+                        currentResult.MaxClientCount,
+                        currentResult.AvgClientCount,
+                        currentResult.TotalMessages,
+                        currentResult.MessagesPerSecond,
+                        currentResult.Duration);
+                }
+            }, ct);
+
             try
             {
                 while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
@@ -106,6 +135,36 @@ public class PerfTestService(PerfGroupService group) : ServiceBase<IPerfTestServ
             catch (OperationCanceledException)
             {
                 // do nothing.
+            }
+            finally
+            {
+                // Wait for metrics logging task to complete
+                try
+                {
+                    await metricsLoggingTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+                }
+                catch
+                {
+                    // Ignore exceptions from metrics logging task
+                }
+
+                // Stop metrics collection and get result
+                group.MetricsContext.Stop();
+                var result = group.MetricsContext.GetResult();
+
+                // Log final server-side broadcast metrics
+                logger.LogInformation(
+                    "[Server Broadcast Metrics (Final)] Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Messages/sec: {MessagesPerSecond:N2}, Duration: {Duration}",
+                    result.ClientCountAtStart,
+                    result.ClientCountAtEnd,
+                    result.MinClientCount,
+                    result.MaxClientCount,
+                    result.AvgClientCount,
+                    result.TotalMessages,
+                    result.MessagesPerSecond,
+                    result.Duration);
+
+                group.MetricsContext.Reset();
             }
 
             return SimpleResponse.Cached;

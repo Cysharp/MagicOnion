@@ -3,13 +3,34 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class PerfGroupService(IMulticastGroupProvider groupProvider) : IDisposable
+public class PerfGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider) : IDisposable
 {
-    private readonly IMulticastSyncGroup<Guid, IPerTestBroadcastHubReceiver> group = groupProvider.GetOrAddSynchronousGroup<Guid, IPerTestBroadcastHubReceiver>("PerformanceTest");
+    readonly IMulticastSyncGroup<Guid, IPerTestBroadcastHubReceiver> group = groupProvider.GetOrAddSynchronousGroup<Guid, IPerTestBroadcastHubReceiver>("PerformanceTest");
+    readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);
+    int memberCount;
 
-    public void SendMessageToAll(SimpleResponse response) => group.All.OnMessage(response);
-    public void AddMember(Guid id, IPerTestBroadcastHubReceiver receiver) => group.Add(id, receiver);
-    public void RemoveMember(Guid id) => group.Remove(id);
+    public ServerBroadcastMetricsContext MetricsContext => metricsContext;
+    public int MemberCount => memberCount;
+
+    public void SendMessageToAll(SimpleResponse response)
+    {
+        group.All.OnMessage(response);
+        metricsContext.IncrementMessageCount();
+    }
+
+    public void AddMember(Guid id, IPerTestBroadcastHubReceiver receiver)
+    {
+        group.Add(id, receiver);
+        var newCount = Interlocked.Increment(ref memberCount);
+        metricsContext.UpdateClientCount(newCount);
+    }
+
+    public void RemoveMember(Guid id)
+    {
+        group.Remove(id);
+        var newCount = Interlocked.Decrement(ref memberCount);
+        metricsContext.UpdateClientCount(newCount);
+    }
 
     public void Dispose() => group.Dispose();
 }

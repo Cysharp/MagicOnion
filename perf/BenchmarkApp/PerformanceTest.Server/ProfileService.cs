@@ -1,9 +1,9 @@
-using PerformanceTest.Shared;
+﻿using PerformanceTest.Shared;
 using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-class ProfileService : BackgroundService
+public class ProfileService : BackgroundService
 {
     private DatadogMetricsRecorder datadog;
     private readonly HardwarePerformanceReporter hardwarehardwarePerformanceReporter;
