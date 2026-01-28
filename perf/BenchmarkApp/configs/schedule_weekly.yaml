@@ -1,0 +1,6 @@
+type: loader
+# max 3 items are allowed
+branch-configs:
+  - suffix: "" # suffix should be unique with others
+    branch: main
+    config: ./perf/BenchmarkApp/configs/schedule_broadcast.yaml
