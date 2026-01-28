@@ -30,14 +30,19 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
         this.connectionId = connectionId;
         begin = timeProvider.GetTimestamp();
         await hubClient.JoinGroupAsync();
-
-        // Only the first client triggers broadcast
+        
+        // Only the first client triggers broadcast after warmup completes
         if (connectionId == 0)
         {
-            await client.BroadcastAsync(ctx.Timeout, TargetFps);
+            // Wait for warmup to complete
+            await ctx.WaitForReadyAsync();
+            
+            // Use exact duration to match client-side metrics collection period
+            var duration = TimeSpan.FromSeconds(ctx.DurationSeconds);
+            _ = client.BroadcastAsync(duration, TargetFps);
         }
-
-        while (!cancellationToken.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < ctx.Timeout)
+        
+        while (!cancellationToken.IsCancellationRequested)
         {
             await Task.Delay(100, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
         }
@@ -45,7 +50,10 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 
     public async Task CompleteAsync()
     {
-        await hubClient.DisposeAsync();
+        if (hubClient is not null)
+        {
+            await hubClient.DisposeAsync();
+        }
     }
 
     public void OnMessage(SimpleResponse response)

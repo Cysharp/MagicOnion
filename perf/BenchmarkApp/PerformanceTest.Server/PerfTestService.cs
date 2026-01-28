@@ -95,7 +95,9 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
         {
             var response = SimpleResponse.Cached;
             using var cts = new CancellationTokenSource(timeout);
-            var ct = cts.Token;
+            // Combine server timeout and client cancellation (when client disconnects)
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, Context.CallContext.CancellationToken);
+            var ct = linkedCts.Token;
             var start = TimeProvider.System.GetTimestamp();
 
             // Calculate interval from target FPS

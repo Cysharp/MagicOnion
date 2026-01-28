@@ -10,12 +10,15 @@ public class PerformanceTestRunningContext
     List<List<double>> latencyPerConnection;
     int errorsPerConnection;
     List<object> locks;
+    readonly TaskCompletionSource readyTcs = new();
 
     public TimeSpan Timeout { get; }
+    public int DurationSeconds { get; }
 
     public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout)
     {
         Timeout = TimeSpan.FromSeconds(serverTimeout.WarmupSec + serverTimeout.RunSec + 3); // add some sec for safely complete serverstreaming
+        DurationSeconds = serverTimeout.RunSec;
         stopwatch = new Stopwatch();
         hardwarePerformanceReporter = new HardwarePerformanceReporter();
         latencyPerConnection = new(connectionCount);
@@ -28,11 +31,14 @@ public class PerformanceTestRunningContext
         }
     }
 
+    public Task WaitForReadyAsync() => readyTcs.Task;
+
     public void Ready()
     {
         isRunning = true;
         stopwatch.Start();
         hardwarePerformanceReporter.Start();
+        readyTcs.TrySetResult();
     }
 
     public void Complete()
