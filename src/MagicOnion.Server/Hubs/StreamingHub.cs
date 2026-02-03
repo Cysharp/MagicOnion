@@ -106,11 +106,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         handlers = streamingHubFeature.Handlers;
 
         var isDataChannelCreated = TryCreateDataChannel();
+        var reliabilityMap = HubReceiverMethodReliabilityMap.Create<TReceiver>();
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
         this.remoteClientResultPendingTasks = serviceProvider.GetRequiredService<IRemoteClientResultPendingTaskRegistry>();
-        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext, remoteClientResultPendingTasks), remoteSerializer);
+        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext, remoteClientResultPendingTasks, reliabilityMap), remoteSerializer);
 
         this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, streamingHubFeature.GroupProvider);
 
