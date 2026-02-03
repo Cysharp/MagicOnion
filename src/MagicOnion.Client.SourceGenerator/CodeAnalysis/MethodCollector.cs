@@ -128,7 +128,7 @@ public static class MethodCollector
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
-        var isUnreliable = methodSymbol.GetAttributes().Any(x => x.AttributeClass?.Name is "Unreliable" or "UnreliableAttribute");
+        var transportReliability = methodSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name is "Transport" or "TransportAttribute");
 
         switch (methodReturnType.FullNameOpenType)
         {
@@ -157,7 +157,7 @@ public static class MethodCollector
             methodReturnType,
             requestType,
             responseType,
-            isUnreliable
+            MagicOnionStreamingHubInfo.TransportReliability.Reliable // TODO:
         );
         diagnostic = null;
         return true;
@@ -169,7 +169,7 @@ public static class MethodCollector
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters.Where(x => x.Type != MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken).ToArray());
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
-        var isUnreliable = methodSymbol.GetAttributes().Any(x => x.AttributeClass?.Name is "Unreliable" or "UnreliableAttribute");
+        var transportReliability = methodSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name is "Transport" or "TransportAttribute");
 
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void &&
             methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
@@ -197,7 +197,7 @@ public static class MethodCollector
             methodReturnType,
             requestType,
             responseType,
-            isUnreliable
+            MagicOnionStreamingHubInfo.TransportReliability.Reliable // TODO:
         );
         diagnostic = null;
         return true;

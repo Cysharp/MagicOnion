@@ -115,63 +115,63 @@ public class StaticStreamingHubClientGenerator
         if (ctx.EnableStreamingHubDiagnosticHandler)
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                            global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(methodId, message);
+                                    return base.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(methodId, message, reliability);
                                 }
 
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message);
+                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message, reliability);
                                     return;
                                 }
 
                                 await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
                             }
 
-                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageWithResponseDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageWithResponseDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                                    return base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message, reliability);
                                 }
 
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
                             }
 
-                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
+                                    return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, reliability);
                                 }
 
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
+                                    await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message, reliability);
                                     return;
                                 }
 
                                 await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                             }
 
-                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, bool allowUnreliable = false, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, global::MagicOnion.TransportReliability reliability = global::MagicOnion.TransportReliability.Reliable, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message, allowUnreliable);
+                                    return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message, reliability);
                                 }
 
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
@@ -255,16 +255,16 @@ public class StaticStreamingHubClientGenerator
             var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
             var writeMessageTarget = isFireAndForget ? "parent" : "this";
             var writeMessageAsyncPrefix = ctx.EnableStreamingHubDiagnosticHandler
-                ? isFireAndForget || isReturnTypeVoid || method.IsUnreliable
+                ? isFireAndForget || isReturnTypeVoid
                     ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnostic"
                     : $"{writeMessageTarget}.WriteMessageWithResponseDiagnostic"
-                : isFireAndForget || isReturnTypeVoid || method.IsUnreliable
+                : isFireAndForget || isReturnTypeVoid
                     ? $"{writeMessageTarget}.WriteMessageFireAndForget"
                     : $"{writeMessageTarget}.WriteMessageWithResponse";
 
-            if (method.IsUnreliable)
+            if (method.TransportReliability != MagicOnionStreamingHubInfo.TransportReliability.Reliable)
             {
-                writeMessageParameters += ", allowUnreliable: true";
+                writeMessageParameters += $", reliability: global::MagicOnion.TransportReliability.{method.TransportReliability}";
             }
 
             if (isFireAndForget) ctx.Writer.Append("    ");

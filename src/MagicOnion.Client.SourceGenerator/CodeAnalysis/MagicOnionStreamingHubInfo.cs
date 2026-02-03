@@ -18,14 +18,14 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         Receiver = receiver;
     }
 
-    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsUnreliable={IsUnreliable,nq}")]
+    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; TransportReliability={TransportReliability,nq}")]
     public class MagicOnionHubMethodInfo
     {
         public int HubId { get; }
         public string MethodName { get; }
         public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; }
 
-        public bool IsUnreliable { get; }
+        public TransportReliability TransportReliability { get; }
 
         /// <summary>
         /// Gets a type of method return value in the interface.
@@ -70,7 +70,7 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         /// </summary>
         public MagicOnionTypeInfo ResponseType { get; }
 
-        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, bool isUnreliable)
+        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, TransportReliability transportReliability)
         {
             HubId = hubId;
             MethodName = methodName;
@@ -78,17 +78,17 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
             MethodReturnType = methodReturnType;
             RequestType = requestType;
             ResponseType = responseType;
-            IsUnreliable = isUnreliable;
+            TransportReliability = transportReliability;
         }
     }
 
-    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsClientResult={IsClientResult,nq}; IsUnreliable={IsUnreliable,nq}")]
+    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsClientResult={IsClientResult,nq}; TransportReliability={TransportReliability,nq}")]
     public class MagicOnionHubReceiverMethodInfo : MagicOnionHubMethodInfo
     {
         public bool IsClientResult { get; }
 
-        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, bool isUnreliable)
-            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType, isUnreliable)
+        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, TransportReliability transportReliability)
+            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType, transportReliability)
         {
             IsClientResult = methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void;
         }
@@ -105,5 +105,26 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
             ReceiverType = receiverType;
             Methods = methods;
         }
+    }
+
+    // This enum must be kept in sync with the one in Abstractions
+    public enum TransportReliability
+    {
+        /// <summary>
+        /// The method may be invoked over reliable transports such as gRPC.
+        /// </summary>
+        Reliable,
+        /// <summary>
+        /// The method may be invoked over reliable transports such as RUDP. However, the order of calls may be unordered.
+        /// </summary>
+        ReliableUnordered,
+        /// <summary>
+        /// The method may be invoked over unreliable transports such as UDP, and therefore calls may be lost.
+        /// </summary>
+        Unreliable,
+        /// <summary>
+        /// The method may be invoked over unreliable transports such as UDP, and therefore calls may be lost. However, the order of calls is preserved.
+        /// </summary>
+        UnreliableOrdered,
     }
 }
