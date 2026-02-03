@@ -86,10 +86,10 @@ jobs:
   #   uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
   #   secrets: inherit
 
-  actions-timeline:
-    needs: [loader, benchmark, cleanup-failed]
-    permissions:
-      contents: read
-    uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+  # actions-timeline:
+  #   needs: [loader, benchmark, cleanup-failed]
+  #   permissions:
+  #     contents: read
+  #   uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main
+  #   secrets:
+  #     github-token: ${{ secrets.GITHUB_TOKEN }}
