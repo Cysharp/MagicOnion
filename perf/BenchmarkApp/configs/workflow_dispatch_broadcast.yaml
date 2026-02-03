@@ -2,7 +2,7 @@
 # config2args script: https://github.com/Cysharp/Actions/tree/main/.github/scripts/benchmark_config2args.sh
 apt-tools: ""
 dotnet-version: 9.0
-benchmark-expire-min: 15
+benchmark-expire-min: 20
 benchmark-location: "japaneast"
 benchmark-timeout-min: 10
 benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
