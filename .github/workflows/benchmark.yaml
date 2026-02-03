@@ -74,17 +74,17 @@ jobs:
       branch: "${{ matrix.branch }}"
     secrets: inherit
 
-  cleanup-failed:
-    if: ${{ failure() || success() }}
-    needs: [benchmark]
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-      issues: write
-      pull-requests: write
-    uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
-    secrets: inherit
+  # cleanup-failed:
+  #   if: ${{ failure() || success() }}
+  #   needs: [benchmark]
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #     id-token: write
+  #     issues: write
+  #     pull-requests: write
+  #   uses: Cysharp/Actions/.github/workflows/benchmark-cleanup.yaml@main
+  #   secrets: inherit
 
   actions-timeline:
     needs: [loader, benchmark, cleanup-failed]
