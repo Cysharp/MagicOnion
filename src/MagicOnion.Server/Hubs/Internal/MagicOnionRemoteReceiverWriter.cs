@@ -1,4 +1,4 @@
-using Cysharp.Runtime.Multicast.Remoting;
+﻿using Cysharp.Runtime.Multicast.Remoting;
 using MagicOnion.Internal;
 
 namespace MagicOnion.Server.Hubs.Internal;
@@ -6,13 +6,15 @@ namespace MagicOnion.Server.Hubs.Internal;
 internal class MagicOnionRemoteReceiverWriter : IRemoteReceiverWriter
 {
     readonly StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> writer;
+    readonly HubReceiverMethodReliabilityMap reliabilityMap;
 
     public IRemoteClientResultPendingTaskRegistry PendingTasks { get; }
 
-    public MagicOnionRemoteReceiverWriter(StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> writer, IRemoteClientResultPendingTaskRegistry pendingTasks)
+    public MagicOnionRemoteReceiverWriter(StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> writer, IRemoteClientResultPendingTaskRegistry pendingTasks, HubReceiverMethodReliabilityMap reliabilityMap)
     {
         this.writer = writer;
         PendingTasks = pendingTasks;
+        this.reliabilityMap = reliabilityMap;
     }
 
     public void Write(ReadOnlyMemory<byte> payload)
