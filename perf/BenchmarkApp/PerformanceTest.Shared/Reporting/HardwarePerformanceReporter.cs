@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace PerformanceTest.Shared.Reporting;
@@ -31,7 +31,7 @@ public class HardwarePerformanceReporter
     public void Start()
     {
         running = true;
-        var prevMemory = currentProcess.WorkingSet64;
+
         Task.Run(async () =>
         {
             while (running)
@@ -53,8 +53,8 @@ public class HardwarePerformanceReporter
                 var cpuUsagePercentage = (cpuUsedMs / totalMsPassed) * 100 / cpuCores;
                 cpuUsages.Add(cpuUsagePercentage);
 
-                // Memory usage = working set
-                var currentMemory = currentProcess.WorkingSet64;
+                // Memory usage = working set (Don't use Process.WorkingSet64 because it may be cached)
+                var currentMemory = Environment.WorkingSet;
                 memoryUsages.Add(currentMemory);
             }
         }, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
