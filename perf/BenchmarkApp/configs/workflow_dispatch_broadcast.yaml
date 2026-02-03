@@ -32,6 +32,24 @@ jobs:
     scenario: Broadcast60Fps
   - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
     protocol: h2c
+    channels: 2000
+    streams: 1
+    serialization: messagepack
+    scenario: Broadcast60Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 3000
+    streams: 1
+    serialization: messagepack
+    scenario: Broadcast60Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 4000
+    streams: 1
+    serialization: messagepack
+    scenario: Broadcast60Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+    protocol: h2c
     channels: 5000
     streams: 1
     serialization: messagepack
