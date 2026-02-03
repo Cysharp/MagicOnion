@@ -7,7 +7,7 @@ benchmark-expire-min: 15
 benchmark-location: "eastus"
 benchmark-timeout-min: 10
 benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
-benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s {{ ci }} --rounds 1 -d 180 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
+benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s {{ scenario }} --rounds 1 -d 180 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
 benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
@@ -19,54 +19,54 @@ jobs:
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast60Fps
+    scenario: Broadcast60Fps
   - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast30Fps
+    scenario: Broadcast30Fps
   - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast15Fps
+    scenario: Broadcast15Fps
   # h2
   - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast60Fps
+    scenario: Broadcast60Fps
   - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast30Fps
+    scenario: Broadcast30Fps
   - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
     protocol: h2
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast15Fps
+    scenario: Broadcast15Fps
   # h3
   - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast60Fps
+    scenario: Broadcast60Fps
   - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast30Fps
+    scenario: Broadcast30Fps
   - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 100
     streams: 1
     serialization: messagepack
-    ci: Broadcast15Fps
+    scenario: Broadcast15Fps
