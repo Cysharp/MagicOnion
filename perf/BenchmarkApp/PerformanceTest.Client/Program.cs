@@ -94,6 +94,7 @@ async Task Main(
                 results = new List<PerformanceResult>(10000);
                 resultsByScenario[scenario2] = results;
             }
+            _ = await controlServiceClient.ExchangeScenarioAsync(scenario2.ToString());
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient, datadog);
             results.Add(result);
 

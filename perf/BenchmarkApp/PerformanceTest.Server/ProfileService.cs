@@ -54,16 +54,28 @@ static class DatadogMetricsRecorderExtensions
         static void Post(DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result, bool isMagicOnionLatest)
         {
             var magicOnionTag = isMagicOnionLatest ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
-            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo), static x => [
-                $"legend:{x.TagLegend}{x.TagStreams}",
-                $"branch:{x.TagBranch}",
-                $"magiconion:{x.magicOnionTag}",
-                $"protocol:{x.TagProtocol}",
-                $"process_arch:{x.applicationInfo.ProcessArchitecture}",
-                $"process_count:{x.applicationInfo.ProcessorCount}",
-                $"serialization:{x.TagSerialization}",
-                $"streams:{x.TagStreams}",
-            ]);
+            var tags = string.IsNullOrEmpty(recorder.TagScenario)
+                ? MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo), static x => [
+                    $"legend:{x.TagLegend}{x.TagStreams}",
+                    $"branch:{x.TagBranch}",
+                    $"magiconion:{x.magicOnionTag}",
+                    $"protocol:{x.TagProtocol}",
+                    $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                    $"process_count:{x.applicationInfo.ProcessorCount}",
+                    $"serialization:{x.TagSerialization}",
+                    $"streams:{x.TagStreams}",
+                ])
+                : MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo, recorder.TagScenario), static x => [
+                    $"legend:{x.TagLegend}{x.TagStreams}",
+                    $"branch:{x.TagBranch}",
+                    $"magiconion:{x.magicOnionTag}",
+                    $"protocol:{x.TagProtocol}",
+                    $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                    $"process_count:{x.applicationInfo.ProcessorCount}",
+                    $"scenario:{x.TagScenario}",
+                    $"serialization:{x.TagSerialization}",
+                    $"streams:{x.TagStreams}",
+                ]);
 
             // Don't want to await each put. Let's send it to queue and await when benchmark ends.
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_max", result.MaxCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
@@ -93,17 +105,18 @@ static class DatadogMetricsRecorderExtensions
         static void Post(DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, ServerBroadcastMetricsResult result, bool isMagicOnionLatest)
         {
             var magicOnionTag = isMagicOnionLatest ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
-            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo, result.TargetFps), static x => [
+            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo, recorder.TagScenario, result.TargetFps), static x => [
                 $"legend:{x.TagLegend}{x.TagStreams}",
                 $"branch:{x.TagBranch}",
                 $"magiconion:{x.magicOnionTag}",
                 $"protocol:{x.TagProtocol}",
                 $"process_arch:{x.applicationInfo.ProcessArchitecture}",
                 $"process_count:{x.applicationInfo.ProcessorCount}",
+                $"scenario:{x.TagScenario}",
                 $"serialization:{x.TagSerialization}",
                 $"streams:{x.TagStreams}",
                 $"fps:{x.TargetFps}",
-            ]);          
+            ]);
 
             // Send broadcast-specific metrics
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.broadcast.total_messages", result.TotalMessages, DatadogMetricsType.Gauge, tags, "message"));
