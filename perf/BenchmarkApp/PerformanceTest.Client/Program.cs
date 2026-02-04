@@ -357,6 +357,10 @@ public class ProfileService
                 while (await timer.WaitForNextTickAsync(ct))
                 {
                     var result = hardwareReporter.GetResultAndClear();
+                    // Skip on 0 value
+                    if (result.AvgCpuUsagePercent == 0 || result.AvgMemoryUsageMB == 0)
+                        continue;
+
                     aggregator.AddResult(result);
                     await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
                 }
