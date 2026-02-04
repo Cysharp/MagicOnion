@@ -22,7 +22,7 @@ public class ProfileService : BackgroundService
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             var result = hardwarehardwarePerformanceReporter.GetResultAndClear();
-            await datadog.PutServerBenchmarkMetricsAsync(ApplicationInformation.Current, result);
+            await datadog.PutServerHardwareMetricsAsync(ApplicationInformation.Current, result);
         }
 
         hardwarehardwarePerformanceReporter.Stop();
@@ -32,12 +32,12 @@ public class ProfileService : BackgroundService
 static class DatadogMetricsRecorderExtensions
 {
     /// <summary>
-    /// Put Server Benchmark metrics to background. 
+    /// Put Server Hardware metrics to background. 
     /// </summary>
     /// <param name="recorder"></param>
     /// <param name="applicationInfo"></param>
     /// <param name="result"></param>
-    public static async Task PutServerBenchmarkMetricsAsync(this DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
+    public static async Task PutServerHardwareMetricsAsync(this DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
     {
         if (string.IsNullOrEmpty(recorder.TagMagicOnion))
             return;

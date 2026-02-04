@@ -6,24 +6,25 @@ public class PerformanceTestRunningContext
     int count;
     bool isRunning;
     Stopwatch stopwatch;
-    HardwarePerformanceReporter hardwarePerformanceReporter;
     List<List<double>> latencyPerConnection;
     int errorsPerConnection;
-    List<object> locks;
+    List<Lock> locks;
     readonly TaskCompletionSource readyTcs = new();
+    readonly ProfileService profileService;
 
     public TimeSpan Timeout { get; }
     public int DurationSeconds { get; }
 
-    public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout)
+    public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout, DatadogMetricsRecorder recoder, ScenarioType scenario)
     {
         Timeout = TimeSpan.FromSeconds(serverTimeout.WarmupSec + serverTimeout.RunSec + 3); // add some sec for safely complete serverstreaming
         DurationSeconds = serverTimeout.RunSec;
         stopwatch = new Stopwatch();
-        hardwarePerformanceReporter = new HardwarePerformanceReporter();
         latencyPerConnection = new(connectionCount);
         errorsPerConnection = 0;
         locks = new(connectionCount);
+        profileService = new ProfileService(TimeProvider.System, recoder, scenario);
+
         for (var i = 0; i < connectionCount; i++)
         {
             latencyPerConnection.Add([]);
@@ -37,15 +38,15 @@ public class PerformanceTestRunningContext
     {
         isRunning = true;
         stopwatch.Start();
-        hardwarePerformanceReporter.Start();
+        profileService.Start();
         readyTcs.TrySetResult();
     }
 
-    public void Complete()
+    public async Task CompleteAsync()
     {
         isRunning = false;
+        await profileService.StopAsync();
         stopwatch.Stop();
-        hardwarePerformanceReporter.Stop();
     }
 
     public void Increment()
@@ -75,11 +76,13 @@ public class PerformanceTestRunningContext
         Interlocked.Increment(ref errorsPerConnection);
     }
 
-    public PerformanceResult GetResult()
+    public PerformanceResult GetResultAndClear()
     {
         var latency = MeasureLatency(latencyPerConnection);
+        var hardware = profileService.GetResultAndClear();
+
         Clear();
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, errorsPerConnection, stopwatch.Elapsed, latency, hardwarePerformanceReporter.GetResultAndClear());
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, errorsPerConnection, stopwatch.Elapsed, latency, hardware);
 
         static Latency MeasureLatency(List<List<double>> latencyPerConnection)
         {
@@ -140,5 +143,5 @@ public class PerformanceTestRunningContext
     }
 }
 
-public record PerformanceResult(int TotalRequests, double RequestsPerSecond, int errors, TimeSpan Duration, Latency Latency, HardwarePerformanceResult hardware);
+public record PerformanceResult(int TotalRequests, double RequestsPerSecond, int Error, TimeSpan Duration, Latency Latency, HardwarePerformanceResult Hardware);
 public record Latency(double Mean, double P50, double P75, double P90, double P99, double Max);

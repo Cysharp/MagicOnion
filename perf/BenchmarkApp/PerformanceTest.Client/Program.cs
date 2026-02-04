@@ -94,7 +94,7 @@ async Task Main(
                 results = new List<PerformanceResult>(10000);
                 resultsByScenario[scenario2] = results;
             }
-            var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient);
+            var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient, datadog);
             results.Add(result);
 
             WriteLog($"Interval 1s for next scenario...");
@@ -155,10 +155,10 @@ async Task Main(
                 writer.WriteLine($"p50 latency        : {result.Latency.P50:0.###} ms");
                 writer.WriteLine($"p90 latency        : {result.Latency.P90:0.###} ms");
                 writer.WriteLine($"p99 latency        : {result.Latency.P99:0.###} ms");
-                writer.WriteLine($"Max CPU Usage      : {result.hardware.MaxCpuUsagePercent:0.00} %");
-                writer.WriteLine($"Avg CPU Usage      : {result.hardware.AvgCpuUsagePercent:0.00} %");
-                writer.WriteLine($"Max Memory Usage   : {result.hardware.MaxMemoryUsageMB} MB");
-                writer.WriteLine($"Avg Memory Usage   : {result.hardware.AvgMemoryUsageMB} MB");
+                writer.WriteLine($"Max CPU Usage      : {result.Hardware.MaxCpuUsagePercent:0.00} %");
+                writer.WriteLine($"Avg CPU Usage      : {result.Hardware.AvgCpuUsagePercent:0.00} %");
+                writer.WriteLine($"Max Memory Usage   : {result.Hardware.MaxMemoryUsageMB} MB");
+                writer.WriteLine($"Avg Memory Usage   : {result.Hardware.AvgMemoryUsageMB} MB");
                 writer.WriteLine($"========================================");
             }
         }
@@ -173,7 +173,7 @@ async Task Main(
     WriteLog($"Benchmark completed");
 }
 
-async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IReadOnlyList<GrpcChannel> channels, IPerfTestControlService controlService)
+async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IReadOnlyList<GrpcChannel> channels, IPerfTestControlService controlService, DatadogMetricsRecorder datadog)
 {
     Func<IScenario> scenarioFactory = scenario switch
     {
@@ -205,7 +205,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
-    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration));
+    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration), datadog, scenario);
     using var cts = new CancellationTokenSource();
     var cleanIndex = 0;
     var threadBefore = ThreadPool.ThreadCount;
@@ -240,7 +240,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Running...");
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
-    ctx.Complete();
+    await ctx.CompleteAsync();
     var threadAfter = ThreadPool.ThreadCount;
     WriteLog("Completed");
 
@@ -260,11 +260,11 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
     WriteLog("Cleanup completed");
 
-    var result = ctx.GetResult();
+    var result = ctx.GetResultAndClear();
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
     WriteLog($"Duration: {result.Duration.TotalSeconds} s");
     WriteLog($"Total Requests: {result.TotalRequests} requests");
-    WriteLog($"Total Errors: {result.errors} errors");
+    WriteLog($"Total Errors: {result.Error} errors");
     WriteLog($"Mean latency: {result.Latency.Mean:0.###} ms");
     WriteLog($"Max latency: {result.Latency.Max:0.###} ms");
     WriteLog($"p50 latency: {result.Latency.P50:0.###} ms");
@@ -272,10 +272,10 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"p90 latency: {result.Latency.P90:0.###} ms");
     WriteLog($"p99 latency: {result.Latency.P99:0.###} ms");
 
-    WriteLog($"Max CPU Usage: {result.hardware.MaxCpuUsagePercent:0.000} %");
-    WriteLog($"Avg CPU Usage: {result.hardware.AvgCpuUsagePercent:0.000} %");
-    WriteLog($"Max Memory Usage: {result.hardware.MaxMemoryUsageMB} MB");
-    WriteLog($"Avg Memory Usage: {result.hardware.AvgMemoryUsageMB} MB");
+    WriteLog($"Max CPU Usage: {result.Hardware.MaxCpuUsagePercent:0.000} %");
+    WriteLog($"Avg CPU Usage: {result.Hardware.AvgCpuUsagePercent:0.000} %");
+    WriteLog($"Max Memory Usage: {result.Hardware.MaxMemoryUsageMB} MB");
+    WriteLog($"Avg Memory Usage: {result.Hardware.AvgMemoryUsageMB} MB");
 
     WriteLog($"Threads (diff): {threadAfter} ({(threadAfter - threadBefore):+#;-#;0})");
 
@@ -323,8 +323,103 @@ IEnumerable<ScenarioType> GetRunScenarios(ScenarioType scenario)
     };
 }
 
-static class DatadogMetricsRecorderExtensions
+public class ProfileService
 {
+    readonly DatadogMetricsRecorder datadog;
+    readonly HardwarePerformanceReporter hardwareReporter;
+    readonly PeriodicTimer timer;
+    readonly ScenarioType scenario;
+    readonly CancellationTokenSource cts;
+    Task? periodicTask = null;
+    // Aggregate hardware metrics for round by statistics
+    readonly HardwareMetricsAggregator aggregator;
+
+    public ProfileService(TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder, ScenarioType scenario)
+    {
+        datadog = datadogRecorder;
+        hardwareReporter = new HardwarePerformanceReporter();
+        timer = new PeriodicTimer(TimeSpan.FromSeconds(10), timeProvider);
+        this.scenario = scenario;
+        this.cts = new CancellationTokenSource();
+        aggregator = new();
+    }
+
+    public void Start()
+    {
+        hardwareReporter.Start();
+
+        var ct = cts.Token;
+        periodicTask = Task.Run(async () =>
+        {
+            var token = ct;
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                var result = hardwareReporter.GetResultAndClear();
+                aggregator.AddResult(result);
+                await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
+            }
+        }, ct);
+    }
+
+    public async Task StopAsync()
+    {
+        hardwareReporter.Stop();
+        cts.Cancel();
+        if (periodicTask is not null)
+            await periodicTask;
+
+        cts.Dispose();
+        timer.Dispose();
+    }
+
+    public HardwarePerformanceResult GetResultAndClear()
+    {
+        return aggregator.GetResultAndClear();
+    }
+}
+
+internal static class DatadogMetricsRecorderExtensions
+{
+    /// <summary>
+    /// Put Client Benchmark metrics average to background. 
+    /// </summary>
+    /// <param name="recorder"></param>
+    /// <param name="scenario"></param>
+    /// <param name="applicationInfo"></param>
+    /// <param name="result"></param>
+    public static async Task PutClientHardwareMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
+    {
+        Post(recorder, scenario, applicationInfo, result, false);
+        if (DatadogMetricsRecorder.EnableLatestTag)
+        {
+            Post(recorder, scenario, applicationInfo, result, true);
+        }
+
+        // wait until send complete
+        await recorder.WaitSaveAsync();
+
+        static void Post(DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, HardwarePerformanceResult result, bool enableLatestTag)
+        {
+            var magicOnionTag = enableLatestTag ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
+            var tags = MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, scenario, applicationInfo), static x => [
+                $"legend:{x.scenario.ToString().ToLower()}-{x.TagLegend}{x.TagStreams}",
+                $"branch:{x.TagBranch}",
+                $"magiconion:{x.magicOnionTag}",
+                $"protocol:{x.TagProtocol}",
+                $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                $"process_count:{x.applicationInfo.ProcessorCount}",
+                $"scenario:{x.scenario}",
+                $"serialization:{x.TagSerialization}",
+                $"streams:{x.TagStreams}",
+            ]);
+
+            // Don't want to await each put. Let's send it to queue and await when benchmark ends.
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", result.MaxCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", result.AvgCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        }
+    }
     /// <summary>
     /// Put Client Benchmark metrics average to background. 
     /// </summary>
@@ -364,35 +459,31 @@ static class DatadogMetricsRecorderExtensions
             recorder.Record(recorder.SendAsync("benchmark.magiconion.client.rps", filtered.Select(x => x.RequestsPerSecond).Average(), DatadogMetricsType.Rate, tags, "request"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.client.total_requests", filtered.Select(x => x.TotalRequests).Average(), DatadogMetricsType.Gauge, tags, "request"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.client.latency_mean", filtered.Select(x => x.Latency.Mean).Average(), DatadogMetricsType.Gauge, tags, "millisecond"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_max", filtered.Select(x => x.hardware.MaxCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.cpu_usage_avg", filtered.Select(x => x.hardware.AvgCpuUsagePercent).Average(), DatadogMetricsType.Gauge, tags, "percent"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_max", filtered.Select(x => x.hardware.MaxMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.client.memory_usage_avg", filtered.Select(x => x.hardware.AvgMemoryUsageMB).Average(), DatadogMetricsType.Gauge, tags, "megabyte"));
         }
+    }
 
-        // Remove Outliner by IQR
-        static IReadOnlyList<PerformanceResult> RemoveOutlinerByIQR(IReadOnlyList<PerformanceResult> data)
-        {
-            // sort rps, latency.mean
-            var rps = data.Select(x => x.RequestsPerSecond).OrderBy(x => x).ToArray();
-            var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
+    // Remove Outliner by IQR
+    private static IReadOnlyList<PerformanceResult> RemoveOutlinerByIQR(IReadOnlyList<PerformanceResult> data)
+    {
+        // sort rps, latency.mean
+        var rps = data.Select(x => x.RequestsPerSecond).OrderBy(x => x).ToArray();
+        var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
 
-            // get outliner for rps
-            var lowerBoundRps = OutlinerHelper.GetLowerBound(rps);
-            var upperBoundRps = OutlinerHelper.GetUpperBound(rps);
+        // get outliner for rps
+        var lowerBoundRps = OutlinerHelper.GetLowerBound(rps);
+        var upperBoundRps = OutlinerHelper.GetUpperBound(rps);
 
-            // get outliner for mean
-            var lowerBoundMean = OutlinerHelper.GetLowerBound(mean);
-            var upperBoundMean = OutlinerHelper.GetUpperBound(mean);
+        // get outliner for mean
+        var lowerBoundMean = OutlinerHelper.GetLowerBound(mean);
+        var upperBoundMean = OutlinerHelper.GetUpperBound(mean);
 
-            // compute tuple in range
-            var filteredData = data
-                .Where(x => x.RequestsPerSecond >= lowerBoundRps && x.RequestsPerSecond <= upperBoundRps)
-                .Where(x => x.Latency.Mean >= lowerBoundMean && x.Latency.Mean <= upperBoundMean)
-                .ToArray();
+        // compute tuple in range
+        var filteredData = data
+            .Where(x => x.RequestsPerSecond >= lowerBoundRps && x.RequestsPerSecond <= upperBoundRps)
+            .Where(x => x.Latency.Mean >= lowerBoundMean && x.Latency.Mean <= upperBoundMean)
+            .ToArray();
 
-            return filteredData;
-        }
+        return filteredData;
     }
 }
 
