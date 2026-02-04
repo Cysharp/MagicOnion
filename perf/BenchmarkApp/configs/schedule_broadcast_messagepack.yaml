@@ -14,59 +14,41 @@ benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   ##### MessagePack #####
   # h2c
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 100
+    channels: 5000
     streams: 1
     serialization: messagepack
     scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 100
+    channels: 10000
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps
   # h2
-  - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
+  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 100
+    channels: 5000
     streams: 1
     serialization: messagepack
     scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
+  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2-linux,streams:1x100,protocol:h2,serialization:messagepack
-    protocol: h2
-    channels: 100
+    channels: 10000
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps
   # h3
-  - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
+  - tags: legend:messagepack-h3-linux,streams:1x5000,protocol:h3,serialization:messagepack
     protocol: h3
-    channels: 100
+    channels: 500
     streams: 1
     serialization: messagepack
     scenario: Broadcast60Fps
-  - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
+  - tags: legend:messagepack-h3-linux,streams:1x10000,protocol:h3,serialization:messagepack
     protocol: h3
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h3-linux,streams:1x100,protocol:h3,serialization:messagepack
-    protocol: h3
-    channels: 100
+    channels: 10000
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps

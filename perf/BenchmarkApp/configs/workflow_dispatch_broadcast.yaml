@@ -12,82 +12,22 @@ benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   # h2c (60fps)
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 500
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
   - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 1000
     streams: 1
     serialization: messagepack
     scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x2000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 2000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
   - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 3000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x4000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 4000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast60Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 5000
     streams: 1
     serialization: messagepack
     scenario: Broadcast60Fps
   # h2c (30fps)
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 500
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 1000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x2000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 2000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
   - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 3000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x4000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 4000
     streams: 1
     serialization: messagepack
     scenario: Broadcast30Fps
@@ -97,70 +37,16 @@ jobs:
     streams: 1
     serialization: messagepack
     scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x6000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 6000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x7000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 7000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
   - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 8000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x9000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 9000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 10000
     streams: 1
     serialization: messagepack
     scenario: Broadcast30Fps
   # h2c (15fps)
-  - tags: legend:messagepack-h2c-linux,streams:1x100,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 100
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 500
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 1000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x2000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 2000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
   - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 3000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x4000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 4000
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps
@@ -170,27 +56,9 @@ jobs:
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x6000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 6000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x7000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 7000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
   - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 8000
-    streams: 1
-    serialization: messagepack
-    scenario: Broadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x9000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 9000
     streams: 1
     serialization: messagepack
     scenario: Broadcast15Fps
