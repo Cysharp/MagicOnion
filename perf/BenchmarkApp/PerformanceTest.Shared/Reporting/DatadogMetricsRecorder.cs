@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,6 +10,7 @@ public class DatadogMetricsRecorder
     // format should be `CLIENTxSERVER` Versions.
     public static string MagicOnionVersions = "";
     public static bool EnableLatestTag = false;
+    public static string Scenario = "";
 
     public string TagBranch { get; }
     public string TagLegend { get; }
@@ -18,6 +19,7 @@ public class DatadogMetricsRecorder
     public string TagSerialization { get; }
     public string TagMagicOnion => MagicOnionVersions;
     public string TagLatestMagicOnion { get; } = "latestxlatest";
+    public string TagScenario => Scenario;
 
     private readonly JsonSerializerOptions jsonSerializerOptions;
     private readonly TimeProvider timeProvider;

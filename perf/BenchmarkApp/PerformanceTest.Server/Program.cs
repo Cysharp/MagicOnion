@@ -1,6 +1,7 @@
-using MagicOnion.Serialization;
+﻿using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using PerformanceTest.Server;
+using PerformanceTest.Shared.Reporting;
 
 // Setup serializer
 if (Array.IndexOf(args, "--serialization") is var index and > -1 && args[index + 1].ToLowerInvariant() == "memorypack")
@@ -20,7 +21,10 @@ builder.Configuration.AddCommandLine(args, new Dictionary<string, string>()
     { "--validate", "Validate" },
 });
 
-builder.Logging.ClearProviders();
+if (builder.Environment.IsProduction())
+{
+    builder.Logging.ClearProviders();
+}
 
 // HTTP/HTTPS Configuration
 builder.ConfigureEndpoint();
@@ -32,6 +36,14 @@ builder.ConfigureEndpoint();
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<PerfGroupService>();
+builder.Services.AddSingleton<PerformanceTest.Shared.Reporting.DatadogMetricsRecorder>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var tagString = configuration.GetValue<string>("Tags") ?? "";
+    var validate = configuration.GetValue<bool?>("Validate") ?? false;
+    return PerformanceTest.Shared.Reporting.DatadogMetricsRecorder.Create(tagString, validate);
+});
 builder.Services.AddHostedService<StartupService>();
 builder.Services.AddHostedService<ProfileService>();
 

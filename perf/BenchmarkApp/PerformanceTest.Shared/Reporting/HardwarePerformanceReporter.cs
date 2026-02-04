@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace PerformanceTest.Shared.Reporting;
@@ -31,7 +31,7 @@ public class HardwarePerformanceReporter
     public void Start()
     {
         running = true;
-        var prevMemory = currentProcess.WorkingSet64;
+
         Task.Run(async () =>
         {
             while (running)
@@ -53,8 +53,8 @@ public class HardwarePerformanceReporter
                 var cpuUsagePercentage = (cpuUsedMs / totalMsPassed) * 100 / cpuCores;
                 cpuUsages.Add(cpuUsagePercentage);
 
-                // Memory usage = working set
-                var currentMemory = currentProcess.WorkingSet64;
+                // Memory usage = working set (Don't use Process.WorkingSet64 because it may be cached)
+                var currentMemory = Environment.WorkingSet;
                 memoryUsages.Add(currentMemory);
             }
         }, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
@@ -88,4 +88,54 @@ public class HardwarePerformanceReporter
     }
 }
 
-public record HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent,double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+
+/// <summary>
+/// 複数ラウンドのハードウェア性能結果を集約するクラス。
+/// </summary>
+public class HardwareMetricsAggregator
+{
+    readonly ConcurrentBag<HardwarePerformanceResult> allResults = [];
+
+    /// <summary>
+    /// ラウンド毎の結果を追加
+    /// </summary>
+    /// <param name="result"></param>
+    public void AddResult(HardwarePerformanceResult result)
+    {
+        allResults.Add(result);
+    }
+
+    /// <summary>
+    /// シナリオ切り替え時にクリア
+    /// </summary>
+    public void Clear()
+    {
+        allResults.Clear();
+    }
+
+    /// <summary>
+    /// 全体を通しての統計を取得
+    /// </summary>
+    /// <returns></returns>
+    public HardwarePerformanceResult GetResult()
+    {
+        if (allResults.Count == 0)
+            return new HardwarePerformanceResult(0, 0, 0, 0);
+
+        var maxCpu = allResults.Max(x => x.MaxCpuUsagePercent);
+        var avgCpu = allResults.Average(x => x.AvgCpuUsagePercent); // 各ラウンドの平均の平均
+        var maxMemory = allResults.Max(x => x.MaxMemoryUsageMB);
+        var avgMemory = allResults.Average(x => x.AvgMemoryUsageMB);
+
+        return new HardwarePerformanceResult(maxCpu, avgCpu, maxMemory, avgMemory);
+    }
+
+    public HardwarePerformanceResult GetResultAndClear()
+    {
+        var result = GetResult();
+        allResults.Clear();
+
+        return result;
+    }
+}

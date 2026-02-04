@@ -9,6 +9,7 @@ public interface IPerfTestControlService : IService<IPerfTestControlService>
 {
     UnaryResult<ServerInformation> GetServerInformationAsync();
     UnaryResult<(string serverMagicOnionVersion, bool enableLatestTag)> ExchangeMagicOnionVersionTagAsync(string? clientMagicOnionVersion, bool isLatestMagicOnionVersion);
+    UnaryResult<string> ExchangeScenarioAsync(string scenario);
 
     UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable);
     UnaryResult CreateMemoryProfilerSnapshotAsync(string name);

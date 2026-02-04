@@ -23,6 +23,7 @@ on:
         default: workflow_dispatch_messagepack_h2c
         type: choice
         options:
+          - workflow_dispatch_broadcast
           - workflow_dispatch_memorypack_h2
           - workflow_dispatch_memorypack_h2c
           - workflow_dispatch_memorypack_h3
