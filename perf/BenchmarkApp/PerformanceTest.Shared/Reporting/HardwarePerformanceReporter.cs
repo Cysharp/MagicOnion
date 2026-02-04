@@ -88,7 +88,7 @@ public class HardwarePerformanceReporter
     }
 }
 
-public record HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
 
 /// <summary>
 /// 複数ラウンドのハードウェア性能結果を集約するクラス。
