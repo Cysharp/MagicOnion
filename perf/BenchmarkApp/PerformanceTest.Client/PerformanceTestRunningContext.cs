@@ -42,11 +42,15 @@ public class PerformanceTestRunningContext
         readyTcs.TrySetResult();
     }
 
-    public async Task CompleteAsync()
+    public void Complete()
     {
         isRunning = false;
-        await profileService.StopAsync();
         stopwatch.Stop();
+    }
+
+    public async Task CleanupAsync()
+    {
+        await profileService.StopAsync();
     }
 
     public void Increment()

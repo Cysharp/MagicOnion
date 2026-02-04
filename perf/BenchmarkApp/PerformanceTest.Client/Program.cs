@@ -240,7 +240,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog($"Running...");
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
-    await ctx.CompleteAsync();
+    ctx.Complete();
     var threadAfter = ThreadPool.ThreadCount;
     WriteLog("Completed");
 
@@ -257,6 +257,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
             // ignore
         }
     }
+    await ctx.CleanupAsync();
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
     WriteLog("Cleanup completed");
 
@@ -364,6 +365,8 @@ public class ProfileService
                     aggregator.AddResult(result);
                     await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
                 }
+
+                hardwareReporter.Stop();
             }
             finally
             {
@@ -374,7 +377,6 @@ public class ProfileService
 
     public async Task StopAsync()
     {
-        hardwareReporter.Stop();
         cts.Cancel();
         await periodicTask.Task;
 
