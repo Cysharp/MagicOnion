@@ -84,17 +84,18 @@ async Task Main(
 
     var resultsByScenario = new Dictionary<ScenarioType, List<PerformanceResult>>();
     var runScenarios = GetRunScenarios(scenario);
-    for (var i = 1; i <= rounds; i++)
+    foreach (var scenario2 in runScenarios)
     {
-        WriteLog($"Round: {i}");
-        foreach (var scenario2 in runScenarios)
+        _ = await controlServiceClient.ExchangeScenarioAsync(scenario2.ToString());
+
+        for (var i = 1; i <= rounds; i++)
         {
+            WriteLog($"Round: {i}");
             if (!resultsByScenario.TryGetValue(scenario2, out var results))
             {
                 results = new List<PerformanceResult>(10000);
                 resultsByScenario[scenario2] = results;
             }
-            _ = await controlServiceClient.ExchangeScenarioAsync(scenario2.ToString());
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient, datadog);
             results.Add(result);
 
