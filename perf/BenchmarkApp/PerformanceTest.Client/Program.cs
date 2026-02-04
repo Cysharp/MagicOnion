@@ -358,18 +358,18 @@ public class ProfileService
                 while (await timer.WaitForNextTickAsync(ct))
                 {
                     var result = hardwareReporter.GetResultAndClear();
-                    // Skip on 0 value
-                    if (result.AvgCpuUsagePercent == 0 || result.AvgMemoryUsageMB == 0)
-                        continue;
-
                     aggregator.AddResult(result);
                     await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
                 }
-
-                hardwareReporter.Stop();
             }
             finally
             {
+                // flush
+                var r = hardwareReporter.GetResultAndClear();
+                await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, r);
+
+                hardwareReporter.Stop();
+
                 periodicTask.TrySetResult(true);
             }
         }, ct);
@@ -401,6 +401,10 @@ internal static class DatadogMetricsRecorderExtensions
     /// <param name="result"></param>
     public static async Task PutClientHardwareMetricsAsync(this DatadogMetricsRecorder recorder, ScenarioType scenario, ApplicationInformation applicationInfo, HardwarePerformanceResult result)
     {
+        // Skip on 0 value
+        if (result.AvgCpuUsagePercent == 0 || result.AvgMemoryUsageMB == 0)
+            return;
+
         Post(recorder, scenario, applicationInfo, result, false);
         if (DatadogMetricsRecorder.EnableLatestTag)
         {
