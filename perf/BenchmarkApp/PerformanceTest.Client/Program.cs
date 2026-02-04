@@ -330,7 +330,7 @@ public class ProfileService
     readonly PeriodicTimer timer;
     readonly ScenarioType scenario;
     readonly CancellationTokenSource cts;
-    Task? periodicTask = null;
+    TaskCompletionSource<bool> periodicTask;
     // Aggregate hardware metrics for round by statistics
     readonly HardwareMetricsAggregator aggregator;
 
@@ -341,6 +341,7 @@ public class ProfileService
         timer = new PeriodicTimer(TimeSpan.FromSeconds(10), timeProvider);
         this.scenario = scenario;
         this.cts = new CancellationTokenSource();
+        periodicTask = new TaskCompletionSource<bool>(false);
         aggregator = new();
     }
 
@@ -349,14 +350,20 @@ public class ProfileService
         hardwareReporter.Start();
 
         var ct = cts.Token;
-        periodicTask = Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
-            var token = ct;
-            while (await timer.WaitForNextTickAsync(token))
+            try
             {
-                var result = hardwareReporter.GetResultAndClear();
-                aggregator.AddResult(result);
-                await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
+                while (await timer.WaitForNextTickAsync(ct))
+                {
+                    var result = hardwareReporter.GetResultAndClear();
+                    aggregator.AddResult(result);
+                    await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, result);
+                }
+            }
+            finally
+            {
+                periodicTask.TrySetResult(true);
             }
         }, ct);
     }
@@ -365,8 +372,7 @@ public class ProfileService
     {
         hardwareReporter.Stop();
         cts.Cancel();
-        if (periodicTask is not null)
-            await periodicTask;
+        await periodicTask.Task;
 
         cts.Dispose();
         timer.Dispose();
