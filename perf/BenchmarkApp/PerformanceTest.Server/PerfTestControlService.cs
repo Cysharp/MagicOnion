@@ -1,4 +1,4 @@
-using JetBrains.Profiler.Api;
+﻿using JetBrains.Profiler.Api;
 using MagicOnion;
 using MagicOnion.Server;
 using PerformanceTest.Shared;
@@ -39,6 +39,13 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
         DatadogMetricsRecorder.MagicOnionVersions = versionTag;
         DatadogMetricsRecorder.EnableLatestTag = isLatestTagEnabled;
         return UnaryResult.FromResult((versionTag, isLatestTagEnabled));
+    }
+
+    public UnaryResult<string> ExchangeScenarioAsync(string scenario)
+    {
+        // keep in server
+        DatadogMetricsRecorder.Scenario = scenario;
+        return UnaryResult.FromResult(scenario);
     }
 
     public UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable)

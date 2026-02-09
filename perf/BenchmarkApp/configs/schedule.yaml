@@ -1,5 +1,4 @@
 type: loader
-# max 3 items are allowed
 branch-configs:
   - suffix: "" # suffix should be unique with others
     branch: main
@@ -16,3 +15,6 @@ branch-configs:
   - suffix: "-4"
     branch: main
     config: ./perf/BenchmarkApp/configs/workflow_dispatch_messagepack_h2c_nugetserver.yaml
+  - suffix: "-5"
+    branch: main
+    config: ./perf/BenchmarkApp/configs/schedule_broadcast_messagepack.yaml
