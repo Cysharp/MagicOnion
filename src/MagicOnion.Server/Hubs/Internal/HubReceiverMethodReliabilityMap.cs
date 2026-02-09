@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Reflection;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Server.Hubs.Internal;
 
@@ -17,7 +18,7 @@ internal record HubReceiverMethodReliabilityMap(
         var reliabilityByMethods = targetType.GetMethods()
             .Concat(targetType.GetInterfaces().SelectMany(x => x.GetMethods()))
             .Select(x => (x.Name, x.ReturnType, Reliability: x.GetCustomAttribute<TransportAttribute>()?.Reliability ?? reliabilityForType))
-            .ToDictionary(k => k.Name, v => (v.Reliability, v.ReturnType, MethodId: v.Name.GetHashCode()));
+            .ToDictionary(k => k.Name, v => (v.Reliability, v.ReturnType, MethodId: FNV1A32.GetHashCode(v.Name))); // TODO: MethodIdAttribute
 
         // Validate
         if (reliabilityByMethods.FirstOrDefault(x => IsAwaitable(x.Value.ReturnType) && x.Value.Reliability != TransportReliability.Reliable) is { Key: not null } method)
