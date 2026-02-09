@@ -47,6 +47,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
     static ReadOnlySpan<byte> MarkerResponseBytes => [0x93, 0xff, 0x00, 0x0c]; // MsgPack: [-1, 0, nil]
 
+    static readonly HubReceiverMethodReliabilityMap reliabilityMap = HubReceiverMethodReliabilityMap.Create<TReceiver>();
+
     readonly Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> requests
         = Channel.CreateBounded<(StreamingHubPayload, UniqueHashDictionary<StreamingHubHandler>, int, int, ReadOnlyMemory<byte>, bool)>(new BoundedChannelOptions(capacity: 10)
         {
@@ -106,12 +108,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         handlers = streamingHubFeature.Handlers;
 
         var isDataChannelCreated = TryCreateDataChannel();
-        var reliabilityMap = HubReceiverMethodReliabilityMap.Create<TReceiver>();
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
         this.remoteClientResultPendingTasks = serviceProvider.GetRequiredService<IRemoteClientResultPendingTaskRegistry>();
-        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext, remoteClientResultPendingTasks, reliabilityMap), remoteSerializer);
+        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext, remoteClientResultPendingTasks, reliabilityMap, isDataChannelCreated ? dataChannel : null), remoteSerializer);
 
         this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, streamingHubFeature.GroupProvider);
 

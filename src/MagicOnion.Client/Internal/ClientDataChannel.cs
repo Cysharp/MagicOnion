@@ -162,7 +162,7 @@ internal class ClientDataChannel : IDisposable
                             SendAckFromClient();
                             connectedTcs.TrySetResult(true);
                             break;
-                        case 0x03: // Data
+                        case 0x11: // Data (from Server)
                             if (result.Buffer.Length > 1 + 8 + 8 /* Sequence */)
                             {
                                 var sequence = BitConverter.ToUInt64(result.Buffer, 1 + 8);

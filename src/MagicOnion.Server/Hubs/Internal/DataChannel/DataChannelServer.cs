@@ -76,7 +76,7 @@ internal class DataChannelServer : BackgroundService
                         channel.SetConnected();
                         break;
                     case 0x10:
-                        // Data
+                        // Data (from Client)
                         data = data.Slice(9);
                         if (data.Length < 8 + 1)
                         {

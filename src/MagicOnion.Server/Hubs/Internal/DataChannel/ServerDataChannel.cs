@@ -102,7 +102,7 @@ internal class ServerDataChannel : IDisposable
         var span = array.AsSpan(0, length);
         try
         {
-            span[0] = 0x10; // Data
+            span[0] = 0x11; // Data (from Server)
             BitConverter.TryWriteBytes(span.Slice(1, 8), SessionId);
             BitConverter.TryWriteBytes(span.Slice(9, 8), outgoingSequence);
             payload.Span.CopyTo(span.Slice(17, payload.Length));

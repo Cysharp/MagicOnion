@@ -277,6 +277,7 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
             }
             catch (Exception ex)
             {
+                // TODO: Error logging / retry?
                 dataChannel.Dispose();
                 dataChannel = null;
             }
@@ -330,12 +331,49 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
         }
     }
 
+    readonly Channel<StreamingHubPayload> receivedDataQueue = Channel.CreateUnbounded<StreamingHubPayload>();
+
+    async Task RunDataConsumerLoopAsync(SynchronizationContext? syncContext, CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (!await receivedDataQueue.Reader.WaitToReadAsync().ConfigureAwait(false))
+            {
+                break;
+            }
+
+            while (receivedDataQueue.Reader.TryRead(out var payload))
+            {
+                ConsumeData(syncContext, payload);
+            }
+        }
+    }
+
+    async Task RunDataChannelReaderLoopAsync(CancellationToken cancellationToken)
+    {
+        if (dataChannel is null) throw new InvalidOperationException();
+        while (!cancellationToken.IsCancellationRequested && await dataChannel.DataReader.WaitToReadAsync().ConfigureAwait(false))
+        {
+            while (dataChannel.DataReader.TryRead(out var payload))
+            {
+                receivedDataQueue.Writer.TryWrite(payload);
+            }
+        }
+    }
+
     async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext, CancellationToken subscriptionToken)
     {
         EnsureConnected();
 
         var disconnectionReason = new DisconnectionReason(DisconnectionType.CompletedNormally, null);
         writerTask = RunWriterLoopAsync(subscriptionToken);
+
+        RunDataConsumerLoopAsync(syncContext, subscriptionToken);
+
+        if (dataChannel is not null)
+        {
+            RunDataChannelReaderLoopAsync(subscriptionToken);
+        }
 
         var reader = this.reader;
         try
@@ -345,7 +383,7 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
             {
                 try
                 {
-                    ConsumeData(syncContext, reader.Current);
+                    receivedDataQueue.Writer.TryWrite(reader.Current);
                 }
                 catch (Exception ex)
                 {
@@ -393,6 +431,7 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
         }
         finally
         {
+            receivedDataQueue.Writer.TryComplete();
             disconnected = true;
 
             try
