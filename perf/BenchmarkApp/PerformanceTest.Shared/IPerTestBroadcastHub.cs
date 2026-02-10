@@ -11,5 +11,6 @@ public interface IPerTestBroadcastHub : IStreamingHub<IPerTestBroadcastHub, IPer
 
 public interface IPerTestBroadcastHubReceiver
 {
+    [Transport(TransportReliability.Unreliable)]
     void OnMessage(BroadcastPositionMessage message);
 }
