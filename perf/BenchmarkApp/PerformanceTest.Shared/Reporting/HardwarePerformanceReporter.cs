@@ -13,6 +13,7 @@ public class HardwarePerformanceReporter
     private readonly ConcurrentBag<double> memoryUsages;
     private CancellationTokenSource cancellationTokenSource;
     private bool running;
+    private Lock @lock = new();
 
     public HardwarePerformanceReporter() : this(TimeSpan.FromMilliseconds(100))
     { }
@@ -70,25 +71,34 @@ public class HardwarePerformanceReporter
     public HardwarePerformanceResult GetResult()
     {
         var filteredCpuUsages = OutlinerHelper.RemoveOutlinerByIQR(cpuUsages.ToArray(), 100.0);
-        var maxCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Max() : 0d;
-        var avgCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Average() : 0d;
-        var maxMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Max() / 1024 / 1024 : 0d;
-        var avgMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Average() / 1024 / 1024 : 0d;
+        if (filteredCpuUsages.Count == 0)
+            return HardwarePerformanceResult.Empty;
+
+        var maxCpuUsage = filteredCpuUsages.Max();
+        var avgCpuUsage = filteredCpuUsages.Average();
+        var maxMemoryUsage = memoryUsages.Max() / 1024 / 1024;
+        var avgMemoryUsage = memoryUsages.Average() / 1024 / 1024;
 
         return new HardwarePerformanceResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
     }
 
     public HardwarePerformanceResult GetResultAndClear()
     {
-        var result = GetResult();
-        cpuUsages.Clear();
-        memoryUsages.Clear();
+        lock (@lock)
+        {
+            var result = GetResult();
+            cpuUsages.Clear();
+            memoryUsages.Clear();
 
-        return result;
+            return result;
+        }
     }
 }
 
-public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB)
+{
+    public static readonly HardwarePerformanceResult Empty = new(0, 0, 0, 0);
+}
 
 /// <summary>
 /// Aggregate hardware performance results across multiple rounds.

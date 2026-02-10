@@ -6,26 +6,26 @@ namespace PerformanceTest.Server;
 public class ProfileService : BackgroundService
 {
     readonly DatadogMetricsRecorder datadog;
-    readonly HardwarePerformanceReporter hardwarehardwarePerformanceReporter;
+    readonly HardwarePerformanceReporter hardware;
     readonly PeriodicTimer timer;
 
-    public ProfileService(TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder)
+    public ProfileService(TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder, HardwarePerformanceReporter hardwareReporter)
     {
         datadog = datadogRecorder;
-        hardwarehardwarePerformanceReporter = new HardwarePerformanceReporter();
+        hardware = hardwareReporter;
         timer = new PeriodicTimer(TimeSpan.FromSeconds(10), timeProvider);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        hardwarehardwarePerformanceReporter.Start();
+        hardware.Start();
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            var result = hardwarehardwarePerformanceReporter.GetResultAndClear();
+            var result = hardware.GetResultAndClear();
             await datadog.PutServerHardwareMetricsAsync(ApplicationInformation.Current, result);
         }
 
-        hardwarehardwarePerformanceReporter.Stop();
+        hardware.Stop();
     }
 }
 

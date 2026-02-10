@@ -99,9 +99,11 @@ async Task Main(
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient, datadog);
             results.Add(result);
 
-            WriteLog($"Interval 1s for next scenario...");
+            WriteLog($"Interval 1s for next run/scenario...");
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
+
+        await controlServiceClient.NotifyCompleteScenarioAsync();
     }
     WriteLog($"All scenario complete");
 

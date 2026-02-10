@@ -6,7 +6,7 @@ using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPerfTestControlService
+public class PerfTestControlService(DatadogMetricsRecorder datadog, HardwarePerformanceReporter hardware) : ServiceBase<IPerfTestControlService>, IPerfTestControlService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -46,6 +46,13 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
         // keep in server
         DatadogMetricsRecorder.Scenario = scenario;
         return UnaryResult.FromResult(scenario);
+    }
+
+    public async UnaryResult NotifyCompleteScenarioAsync()
+    {
+        // flush hardware performance when scenario complete
+        var result = hardware.GetResultAndClear();
+        await datadog.PutServerHardwareMetricsAsync(ApplicationInformation.Current, result);
     }
 
     public UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable)
