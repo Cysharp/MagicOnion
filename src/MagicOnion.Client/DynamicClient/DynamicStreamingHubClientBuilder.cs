@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Reflection;
 using MagicOnion.Server.Hubs;
@@ -6,6 +6,7 @@ using MessagePack;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client.DynamicClient;
 
@@ -53,29 +54,38 @@ internal
 
     static DynamicStreamingHubClientBuilder()
     {
-        var t = typeof(TStreamingHub);
-        var ti = t.GetTypeInfo();
+        var typeOfStreamingHub = typeof(TStreamingHub);
+        var ti = typeOfStreamingHub.GetTypeInfo();
         if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
         var asm = DynamicStreamingHubClientAssemblyHolder.Assembly;
-        var methodDefinitions = SearchDefinitions(t);
+        var methodDefinitions = SearchDefinitions(typeOfStreamingHub);
+        var receiverMethodDefinitions = SearchDefinitions(typeof(TReceiver));
+        // TODO(DataChannel): Support for Transport specification at the class level
+        var isDataChannelPreferred = methodDefinitions.Any(x => x.TransportReliability is not null and not TransportReliability.Reliable) ||
+                                     receiverMethodDefinitions.Any(x => x.TransportReliability is not null and not TransportReliability.Reliable);
 
         var parentType = typeof(StreamingHubClientBase<,>).MakeGenericType(typeof(TStreamingHub), typeof(TReceiver));
-        var typeBuilder = asm.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}StreamingHubClient_{Guid.NewGuid().ToString()}", TypeAttributes.Public, parentType, new Type[] { t });
+        var typeBuilder = asm.DefineType(
+            $"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}StreamingHubClient_{Guid.NewGuid().ToString()}",
+            TypeAttributes.Public,
+            parentType,
+            isDataChannelPreferred ? [typeOfStreamingHub, typeof(IDataChannelPreferred)] : [typeOfStreamingHub]
+        );
 
         VerifyMethodDefinitions(methodDefinitions);
 
         {
             // Create FireAndForgetType first as nested type.
-            var typeBuilderEx = typeBuilder.DefineNestedType($"FireAndForgetClient", TypeAttributes.NestedPrivate, typeof(object), new Type[] { t });
+            var typeBuilderEx = typeBuilder.DefineNestedType($"FireAndForgetClient", TypeAttributes.NestedPrivate, typeof(object), new Type[] { typeOfStreamingHub });
             var tuple = DefineFireAndForgetConstructor(typeBuilderEx, typeBuilder);
             var fireAndForgetClientCtor = tuple.Item1;
             var fireAndForgetField = tuple.Item2;
 
-            DefineMethodsFireAndForget(typeBuilderEx, t, fireAndForgetField, typeBuilder, methodDefinitions);
+            DefineMethodsFireAndForget(typeBuilderEx, typeOfStreamingHub, fireAndForgetField, typeBuilder, methodDefinitions);
             typeBuilderEx.CreateTypeInfo(); // ok to create nested type.
 
-            var clientField = DefineConstructor(typeBuilder, t, typeof(TReceiver), fireAndForgetClientCtor);
-            DefineMethods(typeBuilder, t, typeof(TReceiver), clientField, methodDefinitions);
+            var clientField = DefineConstructor(typeBuilder, typeOfStreamingHub, typeof(TReceiver), fireAndForgetClientCtor);
+            DefineMethods(typeBuilder, typeOfStreamingHub, typeof(TReceiver), clientField, methodDefinitions);
         }
 
         ClientType = typeBuilder.CreateTypeInfo()!.AsType();
@@ -108,7 +118,7 @@ internal
                 return true;
             })
             .Where(x => !x.IsSpecialName)
-            .Select(x => new MethodDefinition(interfaceType, x, default, default))
+            .Select(x => new MethodDefinition(interfaceType, x, default, default, x.GetCustomAttribute<TransportAttribute>()?.Reliability))
             .ToArray();
     }
 
@@ -769,12 +779,15 @@ internal
 
         public Type? RequestType { get; set; }
 
-        public MethodDefinition(Type serviceType, MethodInfo methodInfo, int methodId, Type? requestType)
+        public TransportReliability? TransportReliability { get; }
+
+        public MethodDefinition(Type serviceType, MethodInfo methodInfo, int methodId, Type? requestType, TransportReliability? transportReliability)
         {
             ServiceType = serviceType;
             MethodInfo = methodInfo;
             MethodId = methodId;
             RequestType = requestType;
+            TransportReliability = transportReliability;
         }
     }
 }

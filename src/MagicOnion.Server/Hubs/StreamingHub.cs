@@ -254,12 +254,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var responseHeaders = DefaultResponseHeaders;
         if (dataChannel is not null)
         {
+            var dataChannelService = Context.ServiceProvider.GetRequiredService<DataChannelService>();
             var newResponseHeaders = new Metadata();
             foreach (var header in responseHeaders)
             {
                 newResponseHeaders.Add(header);
             }
             newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-session-id", dataChannel.SessionId.ToString());
+            newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-host", Context.CallContext.GetHttpContext().Request.Host.Host);
+            newResponseHeaders.Add("x-magiconion-streaminghub-datachannel-port", dataChannelService.Port.ToString());
 
             responseHeaders = newResponseHeaders;
         }

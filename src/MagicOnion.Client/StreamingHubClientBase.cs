@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Client.Internal;
 using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
@@ -204,7 +204,9 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
                 requestHeaders.Add(requestHeader);
             }
         }
-        if (options.DataChannelEndpoint != null)
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        if (this is IDataChannelPreferred)
         {
             requestHeaders.Add("x-magiconion-streaminghub-datachannel", "enabled;encryption-mode=none");
         }
@@ -267,17 +269,23 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
         }
 
         // Try to establish DataChannel
-        if (options.DataChannelEndpoint != null && responseHeaders.FirstOrDefault(x => x.Key == "x-magiconion-streaminghub-datachannel-session-id") is {} dataChannelSessionId)
+        if (responseHeaders.FirstOrDefault(x => x.Key == "x-magiconion-streaminghub-datachannel-session-id") is {} dataChannelSessionId)
         {
+            // TODO(DataChannel):
+            var dataChannelEndpoint = options.DataChannelEndpoint ?? new DnsEndPoint(
+                responseHeaders.GetValue("x-magiconion-streaminghub-datachannel-host")!,
+                int.Parse(responseHeaders.GetValue("x-magiconion-streaminghub-datachannel-port")!)
+            );
+
             var sessionId = ulong.Parse(dataChannelSessionId.Value);
-            dataChannel = new ClientDataChannel(options.DataChannelEndpoint, sessionId);
+            dataChannel = new ClientDataChannel(dataChannelEndpoint, sessionId);
             try
             {
                 await dataChannel.ConnectAsync(subscriptionCts.Token).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                // TODO: Error logging / retry?
+                // TODO(DataChannel): Error logging / retry?
                 dataChannel.Dispose();
                 dataChannel = null;
             }
