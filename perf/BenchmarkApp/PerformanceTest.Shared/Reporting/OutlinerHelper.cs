@@ -36,9 +36,6 @@ public static partial class OutlinerHelper
 
     internal static double GetUpperBound(ReadOnlySpan<double> sortedData)
     {
-        if (sortedData.Length == 0)
-            return sortedData[0];
-
         var q1 = GetPercentile(sortedData, 25);
         var q3 = GetPercentile(sortedData, 75);
         var iqr = q3 - q1;
