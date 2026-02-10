@@ -283,12 +283,12 @@ public abstract partial class StreamingHubClientBase<TStreamingHub, TReceiver> :
             {
                 await dataChannel.ConnectAsync(subscriptionCts.Token).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // TODO(DataChannel): Error logging / retry?
                 dataChannel.Dispose();
                 dataChannel = null;
-                throw;
+                throw new Exception($"Can't connect to the server '{dataChannelEndpoint}'", ex);
             }
         }
 
