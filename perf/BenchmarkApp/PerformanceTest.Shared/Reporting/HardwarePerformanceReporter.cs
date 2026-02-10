@@ -91,14 +91,14 @@ public class HardwarePerformanceReporter
 public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
 
 /// <summary>
-/// 複数ラウンドのハードウェア性能結果を集約するクラス。
+/// Aggregate hardware performance results across multiple rounds.
 /// </summary>
 public class HardwareMetricsAggregator
 {
     readonly ConcurrentBag<HardwarePerformanceResult> allResults = [];
 
     /// <summary>
-    /// ラウンド毎の結果を追加
+    /// Add a new round's hardware performance result to the aggregator.
     /// </summary>
     /// <param name="result"></param>
     public void AddResult(HardwarePerformanceResult result)
@@ -107,15 +107,7 @@ public class HardwareMetricsAggregator
     }
 
     /// <summary>
-    /// シナリオ切り替え時にクリア
-    /// </summary>
-    public void Clear()
-    {
-        allResults.Clear();
-    }
-
-    /// <summary>
-    /// 全体を通しての統計を取得
+    /// Calculate and return the aggregated hardware performance result across all rounds, including max and average CPU and memory usage.
     /// </summary>
     /// <returns></returns>
     public HardwarePerformanceResult GetResult()
@@ -124,7 +116,7 @@ public class HardwareMetricsAggregator
             return new HardwarePerformanceResult(0, 0, 0, 0);
 
         var maxCpu = allResults.Max(x => x.MaxCpuUsagePercent);
-        var avgCpu = allResults.Average(x => x.AvgCpuUsagePercent); // 各ラウンドの平均の平均
+        var avgCpu = allResults.Average(x => x.AvgCpuUsagePercent); // Average of rounds averages. Not perfect but good enough for now.
         var maxMemory = allResults.Max(x => x.MaxMemoryUsageMB);
         var avgMemory = allResults.Average(x => x.AvgMemoryUsageMB);
 
