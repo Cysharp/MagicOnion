@@ -8,6 +8,8 @@ internal class DataChannelService(ILogger<DataChannelService> logger) : IDisposa
 {
     readonly ConcurrentDictionary<ulong, ServerDataChannel> dataChannels = new();
 
+    public int Port => 12345;
+
     public ServerDataChannel CreateChannel()
     {
         var channel = new ServerDataChannel(x => RemoveChannel(x.SessionId));

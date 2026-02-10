@@ -91,9 +91,11 @@ public class StaticStreamingHubClientGenerator
 
     static void EmitHubClientClass(GenerationContext generationContext, StreamingHubClientBuildContext ctx)
     {
+        var isDataChannelPreferred = ctx.Hub.Methods.Any(x => x.TransportReliability != MagicOnionStreamingHubInfo.TransportReliability.Reliable) ||
+                                     ctx.Hub.Receiver.Methods.Any(x => x.TransportReliability != MagicOnionStreamingHubInfo.TransportReliability.Reliable);
         ctx.Writer.AppendLineWithFormat($$"""
                         [global::MagicOnion.Ignore]
-                        public class {{ctx.Hub.GetClientFullName()}} : global::MagicOnion.Client.StreamingHubClientBase<{{ctx.Hub.ServiceType.FullName}}, {{ctx.Hub.Receiver.ReceiverType.FullName}}>, {{ctx.Hub.ServiceType.FullName}}
+                        public class {{ctx.Hub.GetClientFullName()}} : global::MagicOnion.Client.StreamingHubClientBase<{{ctx.Hub.ServiceType.FullName}}, {{ctx.Hub.Receiver.ReceiverType.FullName}}>, {{ctx.Hub.ServiceType.FullName}}{{(isDataChannelPreferred ? ", global::MagicOnion.Client.Internal.IDataChannelPreferred" : "")}}
                         {
             """);
         EmitProperties(ctx);
