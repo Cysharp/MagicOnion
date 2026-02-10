@@ -1,4 +1,4 @@
-namespace PerformanceTest.Shared.Reporting;
+﻿namespace PerformanceTest.Shared.Reporting;
 
 public static partial class OutlinerHelper
 {
@@ -7,49 +7,52 @@ public static partial class OutlinerHelper
         if (data.Count == 0)
             return data;
 
-        // sort rps, latency.mean
-        var sirted = data.OrderBy(x => x).ToArray();
+        var sorted = data.ToArray();
+        Array.Sort(sorted);
+        var sortedSpan = sorted.AsSpan();
 
-        // get outliner for rps
-        var lowerBound = GetLowerBound(sirted);
-        var upperBound = GetUpperBound(sirted);
+        var lowerBound = GetLowerBound(sortedSpan);
+        var upperBound = GetUpperBound(sortedSpan);
 
-        // compute tuple in range
-        var filteredData = data
-            .Where(x => x >= lowerBound && x <= upperBound)
-            .Where(x => x <= upperLimit)
-            .ToArray();
+        var result = new List<double>(data.Count);
+        foreach (var value in data)
+        {
+            if (value >= lowerBound && value <= upperBound && value <= upperLimit)
+            {
+                result.Add(value);
+            }
+        }
 
-        return filteredData;
+        return result;
     }
 
-    internal static double GetLowerBound(IReadOnlyList<double> sortedData)
+    internal static double GetLowerBound(ReadOnlySpan<double> sortedData)
     {
-        var Q1 = GetPercentile(sortedData, 25);
-        var Q3 = GetPercentile(sortedData, 75);
-        var IQR = Q3 - Q1;
-        return Q1 - 1.5 * IQR;
+        var q1 = GetPercentile(sortedData, 25);
+        var q3 = GetPercentile(sortedData, 75);
+        var iqr = q3 - q1;
+        return q1 - 1.5 * iqr;
     }
 
-    internal static double GetUpperBound(IReadOnlyList<double> sortedData)
+    internal static double GetUpperBound(ReadOnlySpan<double> sortedData)
     {
-        if (sortedData.Count == 0)
+        if (sortedData.Length == 0)
             return sortedData[0];
 
-        var Q1 = GetPercentile(sortedData, 25);
-        var Q3 = GetPercentile(sortedData, 75);
-        var IQR = Q3 - Q1;
-        return Q3 + 1.5 * IQR;
+        var q1 = GetPercentile(sortedData, 25);
+        var q3 = GetPercentile(sortedData, 75);
+        var iqr = q3 - q1;
+        return q3 + 1.5 * iqr;
     }
 
-    private static double GetPercentile(IReadOnlyList<double> sortedData, double percentile)
+    static double GetPercentile(ReadOnlySpan<double> sortedData, double percentile)
     {
-        var N = sortedData.Count;
-        var n = (N - 1) * percentile / 100.0 + 1;
-        if (n == 1) return sortedData[0];
-        if (n == N) return sortedData[N - 1];
-        var k = (int)Math.Floor(n) - 1;
-        var d = n - Math.Floor(n);
+        var n = sortedData.Length;
+        var position = (n - 1) * percentile / 100.0 + 1;
+        if (position == 1) return sortedData[0];
+        if (position == n) return sortedData[n - 1];
+        var k = (int)Math.Floor(position) - 1;
+        var d = position - Math.Floor(position);
         return sortedData[k] + d * (sortedData[k + 1] - sortedData[k]);
     }
 }
