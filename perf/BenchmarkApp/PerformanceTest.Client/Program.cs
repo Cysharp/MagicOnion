@@ -490,12 +490,12 @@ internal static class DatadogMetricsRecorderExtensions
         var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
 
         // get outliner for rps
-        var lowerBoundRps = OutlinerHelper.GetLowerBound(rps);
-        var upperBoundRps = OutlinerHelper.GetUpperBound(rps);
+        var lowerBoundRps = OutlierIqr.GetLowerBound(rps);
+        var upperBoundRps = OutlierIqr.GetUpperBound(rps);
 
         // get outliner for mean
-        var lowerBoundMean = OutlinerHelper.GetLowerBound(mean);
-        var upperBoundMean = OutlinerHelper.GetUpperBound(mean);
+        var lowerBoundMean = OutlierIqr.GetLowerBound(mean);
+        var upperBoundMean = OutlierIqr.GetUpperBound(mean);
 
         // compute tuple in range
         var filteredData = data

@@ -70,16 +70,40 @@ public class HardwarePerformanceReporter
 
     public HardwarePerformanceResult GetResult()
     {
-        var filteredCpuUsages = OutlinerHelper.RemoveOutlinerByIQR(cpuUsages.ToArray(), 100.0);
-        if (filteredCpuUsages.Count == 0)
+        if (cpuUsages.Count == 0)
             return HardwarePerformanceResult.Empty;
 
-        var maxCpuUsage = filteredCpuUsages.Max();
-        var avgCpuUsage = filteredCpuUsages.Average();
+        Span<double> cpuData = cpuUsages.ToArray();
+        var cpuRange = OutlierIqr.FindInlierRange(cpuData, 100.0);
+        var filteredCpuData = cpuData[cpuRange];
+
+        var maxCpuUsage = GetMax(filteredCpuData);
+        var avgCpuUsage = GetAverage(filteredCpuData);
         var maxMemoryUsage = memoryUsages.Max() / 1024 / 1024;
         var avgMemoryUsage = memoryUsages.Average() / 1024 / 1024;
 
         return new HardwarePerformanceResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
+    }
+
+    static double GetMax(ReadOnlySpan<double> data)
+    {
+        var max = double.MinValue;
+        foreach (var value in data)
+        {
+            if (value > max) max = value;
+        }
+        return max;
+    }
+
+    static double GetAverage(ReadOnlySpan<double> data)
+    {
+        if (data.Length == 0) return 0;
+        var sum = 0.0;
+        foreach (var value in data)
+        {
+            sum += value;
+        }
+        return sum / data.Length;
     }
 
     public HardwarePerformanceResult GetResultAndClear()
