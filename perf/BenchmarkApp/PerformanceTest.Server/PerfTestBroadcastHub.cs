@@ -16,4 +16,10 @@ public class PerfTestBroadcastHub(PerfGroupService groupService) : StreamingHubB
         groupService.RemoveMember(Context.ContextId);
         return $"{Context.ContextId} leaved.";
     }
+
+    public async ValueTask UpdatePositionAsync(BroadcastPositionMessage position)
+    {
+        // Update position info for broadcasting
+        groupService.UpdatePosition(position);
+    }
 }
