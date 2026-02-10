@@ -85,27 +85,6 @@ public class HardwarePerformanceReporter
         return new HardwarePerformanceResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
     }
 
-    static double GetMax(ReadOnlySpan<double> data)
-    {
-        var max = double.MinValue;
-        foreach (var value in data)
-        {
-            if (value > max) max = value;
-        }
-        return max;
-    }
-
-    static double GetAverage(ReadOnlySpan<double> data)
-    {
-        if (data.Length == 0) return 0;
-        var sum = 0.0;
-        foreach (var value in data)
-        {
-            sum += value;
-        }
-        return sum / data.Length;
-    }
-
     public HardwarePerformanceResult GetResultAndClear()
     {
         lock (@lock)
@@ -117,11 +96,33 @@ public class HardwarePerformanceReporter
             return result;
         }
     }
+
+    private static double GetMax(ReadOnlySpan<double> data)
+    {
+        var max = double.MinValue;
+        foreach (var value in data)
+        {
+            if (value > max) max = value;
+        }
+        return max;
+    }
+
+    private static double GetAverage(ReadOnlySpan<double> data)
+    {
+        if (data.Length == 0) return 0;
+        var sum = 0.0;
+        foreach (var value in data)
+        {
+            sum += value;
+        }
+        return sum / data.Length;
+    }
 }
 
 public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB)
 {
-    public static readonly HardwarePerformanceResult Empty = new(0, 0, 0, 0);
+    public static HardwarePerformanceResult Empty => empty;
+    private static readonly HardwarePerformanceResult empty = new(0, 0, 0, 0);
 }
 
 /// <summary>
