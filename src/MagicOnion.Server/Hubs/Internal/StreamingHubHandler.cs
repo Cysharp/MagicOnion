@@ -19,7 +19,7 @@ internal class StreamingHubHandler : IEquatable<StreamingHubHandler>
     readonly string toStringCache;
     readonly int getHashCodeCache;
 
-    public string HubName => hubMethod.Metadata.StreamingHubInterfaceType.Name;
+    public string HubName => hubMethod.ServiceName;
     public Type HubType => hubMethod.Metadata.StreamingHubImplementationType;
     public MethodInfo MethodInfo => hubMethod.Metadata.ImplementationMethod;
     public int MethodId => hubMethod.Metadata.MethodId;

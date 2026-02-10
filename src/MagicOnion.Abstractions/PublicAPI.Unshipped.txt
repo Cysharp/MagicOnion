@@ -3,3 +3,6 @@ MagicOnion.GenerateDefineDebugAttribute
 MagicOnion.GenerateDefineDebugAttribute.GenerateDefineDebugAttribute() -> void
 MagicOnion.GenerateIfDirectiveAttribute
 MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute(string! condition) -> void
+MagicOnion.ServiceNameAttribute
+MagicOnion.ServiceNameAttribute.Name.get -> string!
+MagicOnion.ServiceNameAttribute.ServiceNameAttribute(string! name) -> void

@@ -6,12 +6,14 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
 {
     public MagicOnionTypeInfo ServiceType { get; }
+    public string ServiceName { get; }
     public IReadOnlyList<MagicOnionHubMethodInfo> Methods { get; }
     public MagicOnionStreamingHubReceiverInfo Receiver { get; }
 
-    public MagicOnionStreamingHubInfo(MagicOnionTypeInfo serviceType, IReadOnlyList<MagicOnionHubMethodInfo> methods, MagicOnionStreamingHubReceiverInfo receiver)
+    public MagicOnionStreamingHubInfo(MagicOnionTypeInfo serviceType, string serviceName, IReadOnlyList<MagicOnionHubMethodInfo> methods, MagicOnionStreamingHubReceiverInfo receiver)
     {
         ServiceType = serviceType;
+        ServiceName = serviceName;
         Methods = methods;
         Receiver = receiver;
     }
