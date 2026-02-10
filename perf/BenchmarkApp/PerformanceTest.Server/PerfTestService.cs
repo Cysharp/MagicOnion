@@ -7,7 +7,7 @@ using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger, DatadogMetricsRecorder datadogRecorder) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -66,10 +66,10 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
         var stream = GetServerStreamingContext<SimpleResponse>();
 
         var ct = stream.ServiceContext.CallContext.CancellationToken;
-        var start = TimeProvider.System.GetTimestamp();
+        var start = timeProvider.GetTimestamp();
         try
         {
-            while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+            while (!ct.IsCancellationRequested && timeProvider.GetElapsedTime(start) < timeout)
             {
                 await stream.WriteAsync(response);
             }
@@ -99,7 +99,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
             // Combine server timeout and client cancellation (when client disconnects)
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, Context.CallContext.CancellationToken);
             var ct = linkedCts.Token;
-            var start = TimeProvider.System.GetTimestamp();
+            var start = timeProvider.GetTimestamp();
 
             // Calculate interval from target FPS
             var intervalMs = targetFps > 0 ? 1000.0 / targetFps : 0;
@@ -139,8 +139,8 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 if (interval > TimeSpan.Zero)
                 {
                     // FPS-controlled broadcast
-                    using var timer = new PeriodicTimer(interval, TimeProvider.System);
-                    while (await timer.WaitForNextTickAsync(ct) && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    using var timer = new PeriodicTimer(interval, timeProvider);
+                    while (await timer.WaitForNextTickAsync(ct) && timeProvider.GetElapsedTime(start) < timeout)
                     {
                         group.SendMessageToAll(response);
                     }
@@ -148,7 +148,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 else
                 {
                     // Maximum speed broadcast (no delay)
-                    while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    while (!ct.IsCancellationRequested && timeProvider.GetElapsedTime(start) < timeout)
                     {
                         group.SendMessageToAll(response);
                     }
