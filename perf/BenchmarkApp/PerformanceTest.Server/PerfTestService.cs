@@ -118,19 +118,6 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 while (await timer.WaitForNextTickAsync(ct))
                 {
                     var currentResult = group.MetricsContext.GetPeriodicResult();
-                    logger.LogInformation(
-                        "[Server Broadcast Metrics (Periodic)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Messages (Period): {PeriodicMessages:N0}, Total Messages: {TotalMessages:N0}, Total Messages Sent: {TotalMessagesSent:N0}, Duration: {Duration}",
-                        currentResult.TargetFps,
-                        currentResult.ActualFps,
-                        currentResult.ClientCountAtStart,
-                        currentResult.ClientCountAtEnd,
-                        currentResult.MinClientCount,
-                        currentResult.MaxClientCount,
-                        currentResult.AvgClientCount,
-                        currentResult.PeriodicMessages,
-                        currentResult.TotalMessages,
-                        currentResult.TotalMessagesSent,
-                        currentResult.Duration);
                 }
             }, ct);
 
@@ -173,20 +160,6 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 // Stop metrics collection and get result
                 group.MetricsContext.Stop();
                 var result = group.MetricsContext.GetResult();
-
-                // Log final server-side broadcast metrics
-                logger.LogInformation(
-                    "[Server Broadcast Metrics (Final)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Total Messages Sent: {TotalMessagesSent:N0}, Duration: {Duration}",
-                    result.TargetFps,
-                    result.ActualFps,
-                    result.ClientCountAtStart,
-                    result.ClientCountAtEnd,
-                    result.MinClientCount,
-                    result.MaxClientCount,
-                    result.AvgClientCount,
-                    result.TotalMessages,
-                    result.TotalMessagesSent,
-                    result.Duration);
 
                 // Send metrics to Datadog
                 await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
