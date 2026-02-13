@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Internal;
 using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient;
@@ -52,12 +53,13 @@ internal class ServiceClientDefinition
         public static MagicOnionServiceMethodInfo Create(Type serviceType, MethodInfo methodInfo)
         {
             var (methodType, requestType, responseType) = GetMethodTypeAndResponseTypeFromMethod(methodInfo);
+            var resolvedServiceName = ServiceNameHelper.GetServiceName(serviceType);
 
             var method = new MagicOnionServiceMethodInfo(
                 methodType,
-                serviceType.Name,
+                resolvedServiceName,
                 methodInfo.Name,
-                $"{serviceType.Name}/{methodInfo.Name}",
+                $"{resolvedServiceName}/{methodInfo.Name}",
                 methodInfo.GetParameters().Select(y => y.ParameterType).ToArray(),
                 methodInfo.ReturnType,
                 requestType ?? GetRequestTypeFromMethod(methodInfo),

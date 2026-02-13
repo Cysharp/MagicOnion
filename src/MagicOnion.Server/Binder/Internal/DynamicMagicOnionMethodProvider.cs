@@ -24,10 +24,12 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
             .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))
             .GenericTypeArguments[0];
 
+        var serviceName = ServiceNameHelper.GetServiceName(typeServiceInterface);
+
         // StreamingHub
         if (typeof(TService).IsAssignableTo(typeof(IStreamingHubBase)))
         {
-            return [new MagicOnionStreamingHubConnectMethod<TService>(typeServiceInterface.Name)];
+            return [new MagicOnionStreamingHubConnectMethod<TService>(serviceName)];
         }
 
         // Unary, ClientStreaming, ServerStreaming, DuplexStreaming
@@ -144,7 +146,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             try
             {
-                var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [typeServiceInterface.Name, targetMethod.Name, invoker])!;
+                var serviceMethod = Activator.CreateInstance(typeMethod.MakeGenericType(typeMethodTypeArgs), [serviceName, targetMethod.Name, invoker])!;
                 methods.Add((IMagicOnionGrpcMethod)serviceMethod);
             }
             catch (TargetInvocationException e)
@@ -168,6 +170,8 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
         var typeServiceInterface = typeServiceImplementation.GetInterfaces()
             .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))
             .GenericTypeArguments[0];
+
+        var serviceName = ServiceNameHelper.GetServiceName(typeServiceInterface);
 
         var interfaceMap = typeServiceImplementation.GetInterfaceMapWithParents(typeServiceInterface);
         for (var i = 0; i < interfaceMap.TargetMethods.Length; i++)
@@ -216,7 +220,7 @@ internal class DynamicMagicOnionMethodProvider : IMagicOnionGrpcMethodProvider
 
             try
             {
-                var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [typeServiceInterface.Name, methodInfo.Name, invoker])!;
+                var hubMethod = (IMagicOnionStreamingHubMethod)Activator.CreateInstance(hubMethodType, [serviceName, methodInfo.Name, invoker])!;
                 methods.Add(hubMethod);
             }
             catch (TargetInvocationException e)
