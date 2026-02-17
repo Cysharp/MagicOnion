@@ -153,7 +153,7 @@ internal
 
             // base("InterfaceName", receiver, callInvoker, options);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, interfaceType.Name);
+            il.Emit(OpCodes.Ldstr, MagicOnion.Internal.ServiceNameHelper.GetServiceName(interfaceType));
             il.Emit(OpCodes.Ldarg_1); // receiver
             il.Emit(OpCodes.Ldarg_2); // callInvoker
             il.Emit(OpCodes.Ldarg_3); // options
@@ -761,7 +761,7 @@ internal
 
     class MethodDefinition
     {
-        public string Path => ServiceType.Name + "/" + MethodInfo.Name;
+        public string Path => MagicOnion.Internal.ServiceNameHelper.GetServiceName(ServiceType) + "/" + MethodInfo.Name;
 
         public Type ServiceType { get; set; }
         public MethodInfo MethodInfo { get; set; }

@@ -1,4 +1,5 @@
 using MagicOnion.Client.DynamicClient;
+using MagicOnion.Internal;
 using MagicOnion.Serialization;
 
 namespace MagicOnion.Client.Tests.DynamicClient
@@ -28,6 +29,38 @@ namespace MagicOnion.Client.Tests.DynamicClient
             Assert.NotNull(factoryB);
             var clientB = factoryB(receiverB, callInvoker, new ("", default, MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance));
         }
+
+        [Fact]
+        public void ServiceClientDefinition_WithServiceNameAttribute_UsesDifferentPaths()
+        {
+            var defA = ServiceClientDefinition.CreateFromType<MagicOnion.Client.Tests.DynamicClient.AreaA.IAttributedFoo>();
+            var defB = ServiceClientDefinition.CreateFromType<MagicOnion.Client.Tests.DynamicClient.AreaB.IAttributedFoo>();
+
+            var methodA = defA.Methods.First();
+            var methodB = defB.Methods.First();
+
+            // Service names should use the [ServiceName] attribute values
+            Assert.Equal("AreaA.IAttributedFoo", methodA.ServiceName);
+            Assert.Equal("AreaB.IAttributedFoo", methodB.ServiceName);
+
+            // Paths should include the distinct service name
+            Assert.Equal("AreaA.IAttributedFoo/DoAsync", methodA.Path);
+            Assert.Equal("AreaB.IAttributedFoo/DoAsync", methodB.Path);
+
+            Assert.NotEqual(methodA.ServiceName, methodB.ServiceName);
+            Assert.NotEqual(methodA.Path, methodB.Path);
+        }
+
+        [Fact]
+        public void ServiceClientDefinition_WithoutServiceNameAttribute_UsesSameShortName()
+        {
+            var defA = ServiceClientDefinition.CreateFromType<MagicOnion.Client.Tests.DynamicClient.AreaA.IFoo>();
+            var defB = ServiceClientDefinition.CreateFromType<MagicOnion.Client.Tests.DynamicClient.AreaB.IFoo>();
+
+            // Without [ServiceName], both use the same short type name
+            Assert.Equal("IFoo", defA.Methods.FirstOrDefault()?.ServiceName ?? ServiceNameHelper.GetServiceName(typeof(AreaA.IFoo)));
+            Assert.Equal("IFoo", defB.Methods.FirstOrDefault()?.ServiceName ?? ServiceNameHelper.GetServiceName(typeof(AreaB.IFoo)));
+        }
     }
 }
 
@@ -39,6 +72,12 @@ namespace MagicOnion.Client.Tests.DynamicClient.AreaA
     {}
     public interface IBazHubReceiver
     {}
+
+    [ServiceName("AreaA.IAttributedFoo")]
+    public interface IAttributedFoo : IService<IAttributedFoo>
+    {
+        UnaryResult<string> DoAsync();
+    }
 }
 
 namespace MagicOnion.Client.Tests.DynamicClient.AreaB
@@ -49,4 +88,10 @@ namespace MagicOnion.Client.Tests.DynamicClient.AreaB
     {}
     public interface IBazHubReceiver
     {}
+
+    [ServiceName("AreaB.IAttributedFoo")]
+    public interface IAttributedFoo : IService<IAttributedFoo>
+    {
+        UnaryResult<string> DoAsync();
+    }
 }

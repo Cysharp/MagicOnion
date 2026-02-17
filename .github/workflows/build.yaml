@@ -57,7 +57,7 @@ jobs:
       - uses: Cysharp/Actions/.github/actions/checkout@main
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet publish -r linux-x64 tests/MagicOnion.Client.NativeAot.Tests/MagicOnion.Client.NativeAot.Tests.csproj
-      - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net9.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
+      - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net10.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
 
   build-unity:
     name: "Verify the integrity of files for Unity"

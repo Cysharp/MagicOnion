@@ -6,11 +6,13 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 public class MagicOnionServiceInfo : IMagicOnionServiceInfo
 {
     public MagicOnionTypeInfo ServiceType { get; }
+    public string ServiceName { get; }
     public IReadOnlyList<MagicOnionServiceMethodInfo> Methods { get; }
 
-    public MagicOnionServiceInfo(MagicOnionTypeInfo serviceType, IReadOnlyList<MagicOnionServiceMethodInfo> methods)
+    public MagicOnionServiceInfo(MagicOnionTypeInfo serviceType, string serviceName, IReadOnlyList<MagicOnionServiceMethodInfo> methods)
     {
         ServiceType = serviceType;
+        ServiceName = serviceName;
         Methods = methods;
     }
 

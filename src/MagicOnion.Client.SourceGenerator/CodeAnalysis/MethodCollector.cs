@@ -87,7 +87,7 @@ public static class MethodCollector
 
                 var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods);
 
-                return new MagicOnionStreamingHubInfo(serviceType, methods, receiver);
+                return new MagicOnionStreamingHubInfo(serviceType, GetServiceNameFromSymbol(x, serviceType), methods, receiver);
             })
             .Where(x => x is not null)
             .Cast<MagicOnionStreamingHubInfo>()
@@ -110,6 +110,16 @@ public static class MethodCollector
         => (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
     static bool HasIgnoreAttribute(ISymbol symbol)
         => symbol.GetAttributes().FindAttributeShortName("IgnoreAttribute") is not null;
+
+    static string GetServiceNameFromSymbol(INamedTypeSymbol interfaceSymbol, MagicOnionTypeInfo serviceType)
+    {
+        var serviceNameAttr = interfaceSymbol.GetAttributes().FindAttributeShortName("ServiceNameAttribute");
+        if (serviceNameAttr is not null && serviceNameAttr.ConstructorArguments.Length > 0 && serviceNameAttr.ConstructorArguments[0].Value is string name)
+        {
+            return name;
+        }
+        return serviceType.Name;
+    }
 
     static bool TryCreateHubMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
@@ -200,12 +210,13 @@ public static class MethodCollector
                     return null;
                 }
 
+                var serviceName = GetServiceNameFromSymbol(x, serviceType);
                 var methods = new List<MagicOnionServiceInfo.MagicOnionServiceMethodInfo>();
                 var hasError = false;
                 foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
                 {
                     if (HasIgnoreAttribute(methodSymbol)) continue;
-                    if (TryCreateServiceMethodInfoFromMethodSymbol(ctx, serviceType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateServiceMethodInfoFromMethodSymbol(ctx, serviceType, serviceName, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         methods.Add(methodInfo);
                     }
@@ -225,7 +236,7 @@ public static class MethodCollector
                     return null;
                 }
 
-                return new MagicOnionServiceInfo(serviceType, methods);
+                return new MagicOnionServiceInfo(serviceType, serviceName, methods);
             })
             .Where(x => x is not null)
             .Cast<MagicOnionServiceInfo>()
@@ -233,7 +244,7 @@ public static class MethodCollector
             .ToArray();
     }
 
-    static bool TryCreateServiceMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionServiceInfo.MagicOnionServiceMethodInfo? serviceMethodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateServiceMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo serviceType, string serviceName, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionServiceInfo.MagicOnionServiceMethodInfo? serviceMethodInfo, out Diagnostic? diagnostic)
     {
         var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
@@ -306,9 +317,9 @@ public static class MethodCollector
         diagnostic = null;
         serviceMethodInfo = new MagicOnionServiceInfo.MagicOnionServiceMethodInfo(
             methodType,
-            serviceType.Name,
+            serviceName,
             methodSymbol.Name,
-            $"{serviceType.Name}/{methodSymbol.Name}",
+            $"{serviceName}/{methodSymbol.Name}",
             methodParameters,
             methodReturnType,
             requestType,

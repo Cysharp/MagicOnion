@@ -187,7 +187,7 @@ public class StaticStreamingHubClientGenerator
         {
             ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.GetClientFullName()}}({{ctx.Hub.Receiver.ReceiverType.FullName}} receiver, global::Grpc.Core.CallInvoker callInvoker, global::MagicOnion.Client.StreamingHubClientOptions options, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
-                                : base("{{ctx.Hub.ServiceType.Name}}", receiver, callInvoker, options)
+                                : base("{{ctx.Hub.ServiceName}}", receiver, callInvoker, options)
                             {
                                 this.diagnosticHandler = diagnosticHandler;
                             }
@@ -197,7 +197,7 @@ public class StaticStreamingHubClientGenerator
         {
             ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.GetClientFullName()}}({{ctx.Hub.Receiver.ReceiverType.FullName}} receiver, global::Grpc.Core.CallInvoker callInvoker, global::MagicOnion.Client.StreamingHubClientOptions options)
-                                : base("{{ctx.Hub.ServiceType.Name}}", receiver, callInvoker, options)
+                                : base("{{ctx.Hub.ServiceName}}", receiver, callInvoker, options)
                             {
                             }
             """);
