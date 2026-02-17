@@ -24,47 +24,47 @@ jobs:
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast60Fps
-  # h2c (30fps)
-  - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 3000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 5000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 8000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast30Fps
-  # h2c (15fps)
-  - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 3000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 5000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 8000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 10000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast15Fps
+  # # h2c (30fps)
+  # - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 3000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast30Fps
+  # - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 5000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast30Fps
+  # - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 8000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast30Fps
+  # # h2c (15fps)
+  # - tags: legend:messagepack-h2c-linux,streams:1x3000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 3000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast15Fps
+  # - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 5000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast15Fps
+  # - tags: legend:messagepack-h2c-linux,streams:1x8000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 8000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast15Fps
+  # - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
+  #   protocol: h2c
+  #   channels: 10000
+  #   streams: 1
+  #   serialization: messagepack
+  #   scenario: MetaverseBroadcast15Fps
