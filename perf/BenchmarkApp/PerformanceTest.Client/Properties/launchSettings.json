@@ -134,75 +134,75 @@
     },
     "PerformanceTest.Client (Broadcast60Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast60Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast60Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast60Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast30Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast30Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast30Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast30Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast15Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast15Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (Broadcast15Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast60Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast60Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast60Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast30Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast30Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast30Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast15Fps 1x1)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 1 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 1 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast15Fps 1x50)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 50 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 50 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast15Fps 1x100)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 100 --streams 1 -d 180"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 100 --streams 1 -d 30"
     },
     "PerformanceTest.Client (ServerStreaming 1x28, MemoryPack)": {
       "commandName": "Project",
