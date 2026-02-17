@@ -1,0 +1,54 @@
+# template: https://github.com/Cysharp/Actions/tree/main/.github/scripts/_template_benchmark_config.yaml
+# config2args script: https://github.com/Cysharp/Actions/tree/main/.github/scripts/benchmark_config2args.sh
+apt-tools: "libmsquic"
+dotnet-version: 10.0
+benchmark-expire-min: 20
+#benchmark-location: "japaneast"
+benchmark-location: "eastus"
+benchmark-timeout-min: 10
+benchmark-client-run-script-path: ".github/scripts/benchmark-client-run.sh"
+benchmark-client-run-script-args: '--run-args "-u http://${BENCHMARK_SERVER_NAME}:5000 --protocol {{ protocol }} -s {{ scenario }} --rounds 1 -d 180 --channels {{ channels }} --streams {{ streams }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsClient }}"'
+benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
+benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
+benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
+jobs:
+  ##### MessagePack #####
+  # h2c
+  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 5000
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast30Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
+    protocol: h2c
+    channels: 10000
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
+  # h2
+  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
+    protocol: h2
+    channels: 5000
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast60Fps
+  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
+    protocol: h2
+    channels: 10000
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
+  # h3
+  - tags: legend:messagepack-h3-linux,streams:1x5000,protocol:h3,serialization:messagepack
+    protocol: h3
+    channels: 500
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast60Fps
+  - tags: legend:messagepack-h3-linux,streams:1x10000,protocol:h3,serialization:messagepack
+    protocol: h3
+    channels: 10000
+    streams: 1
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
