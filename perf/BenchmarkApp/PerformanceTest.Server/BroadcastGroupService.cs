@@ -3,7 +3,7 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class PerfGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider) : IDisposable
+public class BroadcastGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider) : IDisposable
 {
     readonly IMulticastSyncGroup<Guid, IPerTestBroadcastHubReceiver> group = groupProvider.GetOrAddSynchronousGroup<Guid, IPerTestBroadcastHubReceiver>("PerformanceTest");
     readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);

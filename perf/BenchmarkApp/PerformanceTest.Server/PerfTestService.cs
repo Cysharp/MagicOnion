@@ -6,7 +6,7 @@ using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {

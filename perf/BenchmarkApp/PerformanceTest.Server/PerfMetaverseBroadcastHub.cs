@@ -3,7 +3,7 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class MetaverseBroadcastHub(MetaverseGroupService groupService, MetaverseWorld metaverseWorld) : StreamingHubBase<IMetaverseBroadcastHub, IMetaverseBroadcastHubReceiver>, IMetaverseBroadcastHub
+public class PerfMetaverseBroadcastHub(MetaverseGroupService groupService, MetaverseWorld metaverseWorld) : StreamingHubBase<IMetaverseBroadcastHub, IMetaverseBroadcastHubReceiver>, IMetaverseBroadcastHub
 {
     public async ValueTask<string> JoinAsync(int targetFps)
     {

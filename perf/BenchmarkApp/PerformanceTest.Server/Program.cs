@@ -36,7 +36,7 @@ builder.ConfigureEndpoint();
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddSingleton<PerfGroupService>();
+builder.Services.AddSingleton<BroadcastGroupService>();
 
 // Metaverse Broadcast Services
 builder.Services.AddSingleton<MetaverseWorld>();

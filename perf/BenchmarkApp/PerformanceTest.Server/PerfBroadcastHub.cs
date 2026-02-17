@@ -3,7 +3,7 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestBroadcastHub(PerfGroupService groupService) : StreamingHubBase<IPerTestBroadcastHub, IPerTestBroadcastHubReceiver>, IPerTestBroadcastHub
+public class PerfBroadcastHub(BroadcastGroupService groupService) : StreamingHubBase<IPerTestBroadcastHub, IPerTestBroadcastHubReceiver>, IPerTestBroadcastHub
 {
     public async ValueTask<string> JoinGroupAsync()
     {
