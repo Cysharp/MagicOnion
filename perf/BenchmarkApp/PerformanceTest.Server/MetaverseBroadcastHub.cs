@@ -12,7 +12,7 @@ public class MetaverseBroadcastHub(MetaverseGroupService groupService, Metaverse
         // Start broadcast timer if this is the first client
         if (groupService.MemberCount == 1)
         {
-            metaverseWorld.StartBroadcast(targetFps, () => groupService.BroadcastAllPositions());
+            metaverseWorld.StartBroadcast(targetFps, () => groupService.BroadcastAllPositions(Context.ContextId));
         }
         
         return $"{Context.ContextId} joined metaverse world.";

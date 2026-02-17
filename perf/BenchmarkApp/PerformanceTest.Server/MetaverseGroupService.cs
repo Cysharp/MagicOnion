@@ -33,13 +33,14 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
         metaverseWorld.UpdateClientPosition(clientId, position.Position);
     }
 
-    public void BroadcastAllPositions()
+    public void BroadcastAllPositions(Guid id)
     {
         var positions = metaverseWorld.GetAllClientPositions();
         var frameNumber = metaverseWorld.CurrentFrame;
         var message = new AllClientsPositionMessage(frameNumber, positions);
-        
-        group.All.OnBroadcastAllPositions(message);
+
+        // Broadcast to all clients except the sender
+        group.Except(id).OnBroadcastAllPositions(message);
         metricsContext.IncrementMessageCount();
     }
 
