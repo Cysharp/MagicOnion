@@ -19,7 +19,6 @@ public class PerfTestBroadcastHub(PerfGroupService groupService) : StreamingHubB
 
     public async ValueTask UpdatePositionAsync(BroadcastPositionMessage position)
     {
-        // Update position info for broadcasting
-        groupService.UpdatePosition(position);
+        // Not implemented - use MetaverseBroadcastHub for metaverse scenarios
     }
 }

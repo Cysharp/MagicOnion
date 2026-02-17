@@ -37,6 +37,11 @@ builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<PerfGroupService>();
+
+// Metaverse Broadcast Services
+builder.Services.AddSingleton<MetaverseWorld>();
+builder.Services.AddSingleton<MetaverseGroupService>();
+
 builder.Services.AddSingleton<PerformanceTest.Shared.Reporting.DatadogMetricsRecorder>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();

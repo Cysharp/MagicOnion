@@ -1,7 +1,22 @@
-﻿namespace PerformanceTest.Shared;
+﻿using MemoryPack;
+using MessagePack;
 
-public class BroadcastAllClientsPositionMessage 
+namespace PerformanceTest.Shared;
+
+[MemoryPackable]
+[MessagePackObject]
+public partial class AllClientsPositionMessage
 {
+    [Key(0)]
     public long FrameNumber { get; set; }
-    public BroadcastPositionMessage[] Positions { get; set; } = [];
+    
+    [Key(1)]
+    public BroadcastPositionMessage[] Positions { get; set; }
+
+    [MemoryPackConstructor]
+    public AllClientsPositionMessage(long frameNumber, BroadcastPositionMessage[] positions)
+    {
+        FrameNumber = frameNumber;
+        Positions = positions;
+    }
 }

@@ -1,13 +1,12 @@
 ﻿using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
-using Microsoft.Extensions.Logging;
 using PerformanceTest.Shared;
 using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(PerfGroupService group, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
