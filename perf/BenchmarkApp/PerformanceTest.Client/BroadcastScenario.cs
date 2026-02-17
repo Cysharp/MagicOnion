@@ -49,6 +49,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     {
         if (hubClient is not null)
         {
+            await hubClient.LeaveGroupAsync();
             await hubClient.DisposeAsync();
         }
     }

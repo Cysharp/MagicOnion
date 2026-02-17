@@ -15,17 +15,17 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     public void AddMember(Guid id, IMetaverseBroadcastHubReceiver receiver)
     {
         group.Add(id, receiver);
+        metaverseWorld.AddClient(id);
         var newCount = Interlocked.Increment(ref memberCount);
         metricsContext.UpdateClientCount(newCount);
-        metaverseWorld.AddClient(id);
     }
 
     public void RemoveMember(Guid id)
     {
         group.Remove(id);
+        metaverseWorld.RemoveClient(id);
         var newCount = Interlocked.Decrement(ref memberCount);
         metricsContext.UpdateClientCount(newCount);
-        metaverseWorld.RemoveClient(id);
     }
 
     public void UpdatePosition(Guid clientId, BroadcastPositionMessage position)

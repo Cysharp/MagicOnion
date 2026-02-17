@@ -9,7 +9,6 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
     IMetaverseBroadcastHub hubClient = default!;
     PerformanceTestRunningContext context = default!;
     int connectionId;
-    Random random = default!;
 
     protected virtual int TargetFps => 30; // Default 30 FPS
 
@@ -22,11 +21,11 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
     {
         context = ctx;
         this.connectionId = connectionId;
-        random = new Random(connectionId);
+        var random = new Random(connectionId);
         
         // Join metaverse and start broadcast (only first client starts timer)
         await hubClient.JoinAsync(TargetFps);
-        
+
         // Wait for warmup to complete
         await ctx.WaitForReadyAsync();
         
