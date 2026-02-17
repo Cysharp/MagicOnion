@@ -1,4 +1,4 @@
-﻿public enum ScenarioType
+public enum ScenarioType
 {
     All,
     CI, // Run Unary, StreamingHub, ServerStreaming
@@ -27,7 +27,6 @@
 
     ServerStreaming,
 
-    Broadcast,
     Broadcast60Fps,
     Broadcast30Fps,
     Broadcast15Fps,

@@ -202,7 +202,6 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
         ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
-        ScenarioType.Broadcast => () => new BroadcastScenario(config.TimeProvider),
         ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(config.TimeProvider),
         ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(config.TimeProvider),
         ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(config.TimeProvider),
