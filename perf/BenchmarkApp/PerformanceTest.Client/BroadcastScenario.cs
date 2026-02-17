@@ -4,11 +4,10 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Client;
 
-public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
+public class BroadcastScenario(TimeProvider timeProvider) : IScenario, IPerTestBroadcastHubReceiver
 {
     IPerfTestService client = default!;
     IPerTestBroadcastHub hubClient = default!;
-    readonly TimeProvider timeProvider = TimeProvider.System;
     PerformanceTestRunningContext context = default!;
     int connectionId;
     long begin;
@@ -25,7 +24,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        var start = TimeProvider.System.GetTimestamp();
+        var start = timeProvider.GetTimestamp();
         context = ctx;
         this.connectionId = connectionId;
         begin = timeProvider.GetTimestamp();
@@ -65,17 +64,17 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     }
 }
 
-public class Broadcast60FpsScenario : BroadcastScenario
+public class Broadcast60FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
 {
     protected override int TargetFps => 60;
 }
 
-public class Broadcast30FpsScenario : BroadcastScenario
+public class Broadcast30FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
 {
     protected override int TargetFps => 30;
 }
 
-public class Broadcast15FpsScenario : BroadcastScenario
+public class Broadcast15FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
 {
     protected override int TargetFps => 15;
 }

@@ -202,14 +202,14 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
         ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
-        ScenarioType.Broadcast => () => new BroadcastScenario(),
-        ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(),
-        ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(),
-        ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(),
+        ScenarioType.Broadcast => () => new BroadcastScenario(config.TimeProvider),
+        ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(config.TimeProvider),
+        ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(config.TimeProvider),
+        ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(config.TimeProvider),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
-    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration), datadog, scenario);
+    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration), datadog, scenario, config.TimeProvider);
     using var cts = new CancellationTokenSource();
     var cleanIndex = 0;
     var threadBefore = ThreadPool.ThreadCount;
@@ -516,6 +516,7 @@ public class ScenarioConfiguration
     public int Streams { get; }
     public int Channels { get; }
     public bool Verbose { get; }
+    public TimeProvider TimeProvider { get; } = TimeProvider.System;
 
     private readonly bool clientAuth;
     private bool useHttp3;

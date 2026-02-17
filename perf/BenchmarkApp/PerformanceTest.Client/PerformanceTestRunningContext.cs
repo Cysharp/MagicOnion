@@ -15,7 +15,7 @@ public class PerformanceTestRunningContext
     public TimeSpan Timeout { get; }
     public int DurationSeconds { get; }
 
-    public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout, DatadogMetricsRecorder recoder, ScenarioType scenario)
+    public PerformanceTestRunningContext(int connectionCount, (int WarmupSec, int RunSec) serverTimeout, DatadogMetricsRecorder recoder, ScenarioType scenario, TimeProvider timeProvider)
     {
         Timeout = TimeSpan.FromSeconds(serverTimeout.WarmupSec + serverTimeout.RunSec + 3); // add some sec for safely complete serverstreaming
         DurationSeconds = serverTimeout.RunSec;
@@ -23,7 +23,7 @@ public class PerformanceTestRunningContext
         latencyPerConnection = new(connectionCount);
         errorsPerConnection = 0;
         locks = new(connectionCount);
-        profileService = new ProfileService(TimeProvider.System, recoder, scenario);
+        profileService = new ProfileService(timeProvider, recoder, scenario);
 
         for (var i = 0; i < connectionCount; i++)
         {
