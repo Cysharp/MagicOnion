@@ -46,7 +46,7 @@ public class BroadcastGroupService(IMulticastGroupProvider groupProvider, TimePr
     public async ValueTask SendAndClearMetricsAsync()
     {
         // Stop metrics collection and get result
-        var result = metricsContext.GetResult();
+        var result = metricsContext.GetResult(false);
         metricsContext.Reset();
 
         // Send metrics to Datadog

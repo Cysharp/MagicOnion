@@ -1,9 +1,10 @@
 ﻿using Cysharp.Runtime.Multicast;
 using PerformanceTest.Shared;
+using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider, MetaverseWorld metaverseWorld) : IDisposable
+public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider, MetaverseWorld metaverseWorld, DatadogMetricsRecorder datadogRecorder, ILogger<BroadcastGroupService> logger) : IDisposable
 {
     readonly IMulticastSyncGroup<Guid, IMetaverseBroadcastHubReceiver> group = groupProvider.GetOrAddSynchronousGroup<Guid, IMetaverseBroadcastHubReceiver>("MetaverseBroadcast");
     readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);
@@ -42,6 +43,31 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
         // Broadcast to all clients except the sender
         group.Except(id).OnBroadcastAllPositions(message);
         metricsContext.IncrementMessageCount();
+    }
+
+    public void StartMetricsCollection(int targetFps)
+    {
+        metricsContext.Start(targetFps);
+        // Record initial client count
+        metricsContext.UpdateClientCount(memberCount);
+        // NOTE: run periodically send metrics to Datadog every 10 seconds if needed. For simplicity, we will send metrics only at the end of the test currently.
+    }
+
+    public void StopMetricsCollection()
+    {
+        metricsContext.Stop();
+    }
+
+    public async ValueTask SendAndClearMetricsAsync()
+    {
+        // Stop metrics collection and get result
+        var result = metricsContext.GetResult(true);
+        metricsContext.Reset();
+
+        // Send metrics to Datadog
+        await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
+
+        logger.LogInformation("Scenario: {scenario}, BroadCast Metrics: {@MetricsResult}", DatadogMetricsRecorder.Scenario, result);
     }
 
     public void Dispose() => group.Dispose();

@@ -168,9 +168,9 @@
       "commandName": "Project",
       "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s Broadcast15Fps --channels 100 --streams 1 -d 30"
     },
-    "PerformanceTest.Client (MetaverseBroadcast60Fps 1x1)": {
+    "PerformanceTest.Client (MetaverseBroadcast60Fps 1x2)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 1 --streams 1 -d 30"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 2 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast60Fps 1x50)": {
       "commandName": "Project",
@@ -180,9 +180,9 @@
       "commandName": "Project",
       "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast60Fps --channels 100 --streams 1 -d 30"
     },
-    "PerformanceTest.Client (MetaverseBroadcast30Fps 1x1)": {
+    "PerformanceTest.Client (MetaverseBroadcast30Fps 1x2)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 1 --streams 1 -d 30"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 2 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast30Fps 1x50)": {
       "commandName": "Project",
@@ -192,9 +192,9 @@
       "commandName": "Project",
       "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast30Fps --channels 100 --streams 1 -d 30"
     },
-    "PerformanceTest.Client (MetaverseBroadcast15Fps 1x1)": {
+    "PerformanceTest.Client (MetaverseBroadcast15Fps 1x2)": {
       "commandName": "Project",
-      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 1 --streams 1 -d 30"
+      "commandLineArgs": "-u http://localhost:5000 --protocol h2c -s MetaverseBroadcast15Fps --channels 2 --streams 1 -d 30"
     },
     "PerformanceTest.Client (MetaverseBroadcast15Fps 1x50)": {
       "commandName": "Project",

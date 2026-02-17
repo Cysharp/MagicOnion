@@ -62,7 +62,7 @@ public class MetaverseWorld : IDisposable
             StopBroadcast();
         }
 
-        var interval = TimeSpan.FromSeconds(1.0 / fps);
+        var interval = TimeSpan.FromMilliseconds(1000.0 / fps);
         broadcastTimer = new PeriodicTimer(interval);
         cancellationTokenSource = new CancellationTokenSource();
         
@@ -87,6 +87,8 @@ public class MetaverseWorld : IDisposable
             {
                 // Expected when stopping
             }
+
+            Console.WriteLine("[MetaverseWorld] Broadcast stopped.");
         }, cancellationTokenSource.Token);
     }
 

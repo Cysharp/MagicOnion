@@ -6,6 +6,8 @@ namespace PerformanceTest.Client;
 
 public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubReceiver
 {
+    const int clientFps = 15;
+
     IMetaverseBroadcastHub hubClient = default!;
     PerformanceTestRunningContext context = default!;
     int connectionId;
@@ -19,19 +21,26 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
 
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
+        var random = new Random(connectionId);
+
         context = ctx;
         this.connectionId = connectionId;
-        var random = new Random(connectionId);
-        
-        // Join metaverse and start broadcast (only first client starts timer)
         await hubClient.JoinAsync(TargetFps);
 
         // Wait for warmup to complete
         await ctx.WaitForReadyAsync();
-        
-        // Simulate client position updates periodically
-        var updateInterval = TimeSpan.FromSeconds(1.0 / 30); // 30Hz client updates
-        using var updateTimer = new PeriodicTimer(updateInterval);
+
+        // random jitter to avoid all clients sending updates at the same time
+        await Task.Delay(random.Next(0, 500), cancellationToken);
+
+        if (connectionId == 0)
+        {
+            await hubClient.StartBroadcast(TargetFps);
+        }
+
+        // Simulate client position updates periodically (fixed to 15 FPS for all scenarios to isolate broadcast performance)
+        var interval = TimeSpan.FromMilliseconds(1000.0 / clientFps);
+        using var updateTimer = new PeriodicTimer(interval);
         
         try
         {
@@ -53,6 +62,11 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
         catch (OperationCanceledException)
         {
             // Expected on cancellation
+        }
+
+        if (connectionId == 0)
+        {
+            await hubClient.StopBroadcast();
         }
     }
 

@@ -7,6 +7,9 @@ public interface IMetaverseBroadcastHub : IStreamingHub<IMetaverseBroadcastHub, 
     ValueTask<string> JoinAsync(int targetFps);
     ValueTask<string> LeaveAsync();
     ValueTask UpdatePositionAsync(BroadcastPositionMessage position);
+
+    ValueTask StartBroadcast(int targetFps);
+    ValueTask StopBroadcast();
 }
 
 public interface IMetaverseBroadcastHubReceiver

@@ -81,7 +81,6 @@ public class PerfTestService(BroadcastGroupService group, TimeProvider timeProvi
     }
 
     int broadcastLock = 0;
-
     /// <summary>
     /// first client that calls BroadcastAsync will execute the broadcast loop, and other clients will receive cached response without executing the loop until the first client's broadcast loop finishes (either by timeout or cancellation).
     /// This is to prevent multiple simultaneous broadcasts which can cause performance degradation and inaccurate metrics collection.
