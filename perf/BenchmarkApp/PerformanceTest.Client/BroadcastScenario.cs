@@ -4,7 +4,7 @@ using PerformanceTest.Shared;
 
 namespace PerformanceTest.Client;
 
-public class BroadcastScenario(TimeProvider timeProvider) : IScenario, IPerTestBroadcastHubReceiver
+public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 {
     IPerfTestService client = default!;
     IPerTestBroadcastHub hubClient = default!;
@@ -24,23 +24,21 @@ public class BroadcastScenario(TimeProvider timeProvider) : IScenario, IPerTestB
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        var start = timeProvider.GetTimestamp();
         context = ctx;
         this.connectionId = connectionId;
-        begin = timeProvider.GetTimestamp();
         await hubClient.JoinGroupAsync();
-        
+
         // Only the first client triggers broadcast after warmup completes
         if (connectionId == 0)
         {
             // Wait for warmup to complete
             await ctx.WaitForReadyAsync();
-            
+
             // Use exact duration to match client-side metrics collection period
             var duration = TimeSpan.FromSeconds(ctx.DurationSeconds);
             _ = client.BroadcastAsync(duration, TargetFps);
         }
-        
+
         while (!cancellationToken.IsCancellationRequested)
         {
             await Task.Delay(100, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
@@ -59,22 +57,20 @@ public class BroadcastScenario(TimeProvider timeProvider) : IScenario, IPerTestB
     {
         // Collect only Count
         context.Increment();
-        //context.LatencyThrottled(connectionId, timeProvider.GetElapsedTime(begin), 100); // avoid OOM
-        //begin = timeProvider.GetTimestamp();
     }
 }
 
-public class Broadcast60FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
+public class Broadcast60FpsScenario : BroadcastScenario
 {
     protected override int TargetFps => 60;
 }
 
-public class Broadcast30FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
+public class Broadcast30FpsScenario : BroadcastScenario
 {
     protected override int TargetFps => 30;
 }
 
-public class Broadcast15FpsScenario(TimeProvider timeProvider) : BroadcastScenario(timeProvider)
+public class Broadcast15FpsScenario : BroadcastScenario
 {
     protected override int TargetFps => 15;
 }
