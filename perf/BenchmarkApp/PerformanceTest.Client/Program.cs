@@ -90,7 +90,7 @@ async Task Main(
 
         for (var i = 1; i <= rounds; i++)
         {
-            WriteLog($"Round: {i}");
+            WriteLog($"Scenario {scenario}, Round: {i}");
             if (!resultsByScenario.TryGetValue(scenario2, out var results))
             {
                 results = new List<PerformanceResult>(10000);
