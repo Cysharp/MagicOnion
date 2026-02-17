@@ -34,14 +34,14 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
         metaverseWorld.UpdateClientPosition(clientId, position.Position);
     }
 
-    public void BroadcastAllPositions(Guid id)
+    public void BroadcastAllPositions()
     {
         var positions = metaverseWorld.GetAllClientPositions();
         var frameNumber = metaverseWorld.CurrentFrame;
         var message = new AllClientsPositionMessage(frameNumber, positions);
 
-        // Broadcast to all clients except the sender
-        group.Except(id).OnBroadcastAllPositions(message);
+        // Broadcast to all clients
+        group.All.OnBroadcastAllPositions(message);
         metricsContext.IncrementMessageCount();
     }
 
@@ -61,7 +61,7 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     public async ValueTask SendAndClearMetricsAsync()
     {
         // Stop metrics collection and get result
-        var result = metricsContext.GetResult(true);
+        var result = metricsContext.GetResult();
         metricsContext.Reset();
 
         // Send metrics to Datadog

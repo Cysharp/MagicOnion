@@ -29,7 +29,7 @@ public class PerfMetaverseBroadcastHub(MetaverseGroupService groupService, Metav
         // start metrics collection
         groupService.StartMetricsCollection(targetFps);
         // start broadcast timer
-        metaverseWorld.StartBroadcast(targetFps, () => groupService.BroadcastAllPositions(Context.ContextId));
+        metaverseWorld.StartBroadcast(targetFps, () => groupService.BroadcastAllPositions());
     }
 
     public async ValueTask StopBroadcast()

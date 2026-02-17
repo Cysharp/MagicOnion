@@ -83,11 +83,9 @@ public class ServerBroadcastMetricsContext
     }
 
     /// <summary>
-    /// Get the metrics result, optionally excluding the messages sent to self from the total messages sent calculation.
+    /// Get the metrics result
     /// </summary>
-    /// <param name="excludeSelf">If broadcast exlude it's client-self, then set true.</param>
-    /// <returns></returns>
-    public ServerBroadcastMetricsResult GetResult(bool excludeSelf)
+    public ServerBroadcastMetricsResult GetResult()
     {
         var count = Interlocked.Read(ref messageCount);
         var actualFps = elapsed.TotalSeconds > 0 ? count / elapsed.TotalSeconds : 0;
@@ -95,7 +93,7 @@ public class ServerBroadcastMetricsContext
         lock (clientCountLock)
         {
             var avgClientCount = clientCountSampleCount > 0 ? (double)totalClientCountSamples / clientCountSampleCount : 0;
-            var totalMessagesSent = (long)(count * maxClientCount - (excludeSelf ? count : 0));
+            var totalMessagesSent = (long)(count * maxClientCount);
 
             return new ServerBroadcastMetricsResult(
                 count,
