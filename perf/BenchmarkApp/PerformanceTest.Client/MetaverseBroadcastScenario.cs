@@ -73,9 +73,9 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
     }
 }
 
-public class MetaverseBroadcast10FpsScenario : MetaverseBroadcastScenario
+public class MetaverseBroadcast15FpsScenario : MetaverseBroadcastScenario
 {
-    protected override int TargetFps => 10;
+    protected override int TargetFps => 15;
 }
 
 public class MetaverseBroadcast30FpsScenario : MetaverseBroadcastScenario

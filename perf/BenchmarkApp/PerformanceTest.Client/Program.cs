@@ -1,4 +1,4 @@
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
@@ -205,6 +205,9 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(),
         ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(),
         ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(),
+        ScenarioType.MetaverseBroadcast60Fps => () => new MetaverseBroadcast60FpsScenario(),
+        ScenarioType.MetaverseBroadcast30Fps => () => new MetaverseBroadcast30FpsScenario(),
+        ScenarioType.MetaverseBroadcast15Fps => () => new MetaverseBroadcast15FpsScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
