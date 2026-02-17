@@ -16,9 +16,4 @@ public class PerfBroadcastHub(BroadcastGroupService groupService) : StreamingHub
         groupService.RemoveMember(Context.ContextId);
         return $"{Context.ContextId} leaved.";
     }
-
-    public async ValueTask UpdatePositionAsync(BroadcastPositionMessage position)
-    {
-        // Not implemented - use MetaverseBroadcastHub for metaverse scenarios
-    }
 }

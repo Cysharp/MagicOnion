@@ -1,16 +1,14 @@
 ﻿using Cysharp.Runtime.Multicast;
 using PerformanceTest.Shared;
+using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class BroadcastGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider) : IDisposable
+public class BroadcastGroupService(IMulticastGroupProvider groupProvider, TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder, ILogger<BroadcastGroupService> logger) : IDisposable
 {
     readonly IMulticastSyncGroup<Guid, IPerTestBroadcastHubReceiver> group = groupProvider.GetOrAddSynchronousGroup<Guid, IPerTestBroadcastHubReceiver>("PerformanceTest");
     readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);
     int memberCount;
-
-    public ServerBroadcastMetricsContext MetricsContext => metricsContext;
-    public int MemberCount => memberCount;
 
     public void SendMessageToAll(BroadcastPositionMessage response)
     {
@@ -30,6 +28,31 @@ public class BroadcastGroupService(IMulticastGroupProvider groupProvider, TimePr
         group.Remove(id);
         var newCount = Interlocked.Decrement(ref memberCount);
         metricsContext.UpdateClientCount(newCount);
+    }
+
+    public void StartMetricsCollection(int targetFps)
+    {
+        metricsContext.Start(targetFps);
+        // Record initial client count
+        metricsContext.UpdateClientCount(memberCount);
+        // NOTE: run periodically send metrics to Datadog every 10 seconds if needed. For simplicity, we will send metrics only at the end of the test currently.
+    }
+
+    public void StopMetricsCollection()
+    {
+        metricsContext.Stop();
+    }
+
+    public async ValueTask SendAndClearMetricsAsync()
+    {
+        // Stop metrics collection and get result
+        var result = metricsContext.GetResult();
+        metricsContext.Reset();
+
+        // Send metrics to Datadog
+        await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
+
+        logger.LogInformation("Scenario: {scenario}, BroadCast Metrics: {@MetricsResult}", DatadogMetricsRecorder.Scenario, result);
     }
 
     public void Dispose() => group.Dispose();

@@ -2,11 +2,10 @@
 using MagicOnion.Server;
 using MessagePack;
 using PerformanceTest.Shared;
-using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder datadogRecorder, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(BroadcastGroupService group, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -82,6 +81,14 @@ public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder
     }
 
     int broadcastLock = 0;
+
+    /// <summary>
+    /// first client that calls BroadcastAsync will execute the broadcast loop, and other clients will receive cached response without executing the loop until the first client's broadcast loop finishes (either by timeout or cancellation).
+    /// This is to prevent multiple simultaneous broadcasts which can cause performance degradation and inaccurate metrics collection.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="targetFps"></param>
+    /// <returns></returns>
     public async UnaryResult<BroadcastPositionMessage> BroadcastAsync(TimeSpan timeout, int targetFps)
     {
         // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
@@ -91,6 +98,7 @@ public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder
             return BroadcastPositionMessage.Cached;
         }
 
+        // first client path (execute broadcast loop and collect metrics)
         try
         {
             var response = BroadcastPositionMessage.Cached;
@@ -105,20 +113,7 @@ public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder
             var interval = intervalMs > 0 ? TimeSpan.FromMilliseconds(intervalMs) : TimeSpan.Zero;
 
             // Start metrics collection
-            group.MetricsContext.Start(targetFps);
-
-            // Record initial client count
-            group.MetricsContext.UpdateClientCount(group.MemberCount);
-
-            // Start periodic metrics logging task
-            var metricsLoggingTask = Task.Run(async () =>
-            {
-                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10), TimeProvider.System);
-                while (await timer.WaitForNextTickAsync(ct))
-                {
-                    var currentResult = group.MetricsContext.GetPeriodicResult();
-                }
-            }, ct);
+            group.StartMetricsCollection(targetFps);
 
             try
             {
@@ -146,24 +141,9 @@ public class PerfTestService(BroadcastGroupService group, DatadogMetricsRecorder
             }
             finally
             {
-                // Wait for metrics logging task to complete
-                try
-                {
-                    await metricsLoggingTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
-                }
-                catch
-                {
-                    // Ignore exceptions from metrics logging task
-                }
-
-                // Stop metrics collection and get result
-                group.MetricsContext.Stop();
-                var result = group.MetricsContext.GetResult();
-
-                // Send metrics to Datadog
-                await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
-
-                group.MetricsContext.Reset();
+                // Stop metrics collection, send metrics and clear collected metrics
+                group.StopMetricsCollection();
+                await group.SendAndClearMetricsAsync();
             }
 
             return BroadcastPositionMessage.Cached;
