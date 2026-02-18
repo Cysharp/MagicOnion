@@ -119,6 +119,9 @@ public class ClrPerformanceReporter
             var result = GetResult();
             heapSizes.Clear();
             committedMemories.Clear();
+            gcCountGen0.Clear();
+            gcCountGen1.Clear();
+            gcCountGen2.Clear();
 
             return result;
         }
