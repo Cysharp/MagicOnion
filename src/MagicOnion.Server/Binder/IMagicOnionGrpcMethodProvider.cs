@@ -14,8 +14,7 @@ public interface IMagicOnionGrpcMethodProvider
 public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) : IEndpointConventionBuilder
 {
     readonly List<MagicOnionServiceEndpointConventionBuilder> innerBuilders = new();
-
-    static readonly MethodInfo methodMapGrpcServiceOfT = typeof(GrpcEndpointRouteBuilderExtensions)
+    readonly MethodInfo methodMapGrpcServiceOfT = typeof(GrpcEndpointRouteBuilderExtensions)
         .GetMethod(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService), BindingFlags.Static | BindingFlags.Public, [typeof(IEndpointRouteBuilder)])!;
 
     public void Map<T>()
