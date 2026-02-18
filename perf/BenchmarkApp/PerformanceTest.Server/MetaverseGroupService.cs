@@ -10,9 +10,9 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);
     int memberCount;
 
-    // double buffering for broadcast messages to avoid allocating new array every time. We will toggle between buffer0 and buffer1 for each broadcast. (make sure complete writing to buffer within 2 frames)
-    BroadcastPositionMessage[] buffer0 = [];
-    BroadcastPositionMessage[] buffer1 = [];
+    // Circular buffer pool for broadcast messages to avoid allocating new array every time.
+    // Using 8 buffers to handle slow serialization/broadcast scenarios (e.g., 2000 clients at 15fps)
+    BroadcastPositionMessage[][] bufferPool = new BroadcastPositionMessage[8][];
     int currentBufferIndex;
 
     public ServerBroadcastMetricsContext MetricsContext => metricsContext;
@@ -42,9 +42,8 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     public void BroadcastAllPositions()
     {
         var buffer = GetNextBuffer(memberCount);
-        metaverseWorld.GetAllClientPositions(buffer.AsSpan());
-        var frameNumber = metaverseWorld.CurrentFrame;
-        var message = new AllClientsPositionMessage(frameNumber, buffer);
+        metaverseWorld.WriteAllClientPositions(buffer.AsSpan());
+        var message = new AllClientsPositionMessage(metaverseWorld.CurrentFrame, buffer);
 
         // Broadcast to all clients
         group.All.OnBroadcastAllPositions(message);
@@ -80,11 +79,11 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
 
     BroadcastPositionMessage[] GetNextBuffer(int capacity)
     {
-        // Toggle between buffer0 and buffer1
-        var useBuffer0 = Interlocked.Increment(ref currentBufferIndex) % 2 == 0;
-        ref var buffer = ref useBuffer0 ? ref buffer0 : ref buffer1;
+        // Get next buffer from circular pool
+        var index = Interlocked.Increment(ref currentBufferIndex) % bufferPool.Length;
+        ref var buffer = ref bufferPool[index];
 
-        if (buffer.Length != capacity)
+        if (buffer is null || buffer.Length != capacity)
         {
             buffer = new BroadcastPositionMessage[capacity];
         }
