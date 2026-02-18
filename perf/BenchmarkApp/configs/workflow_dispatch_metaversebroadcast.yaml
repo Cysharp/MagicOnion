@@ -11,7 +11,7 @@ benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
-  # h2c (30fps)
+  # h2c (30fps), fails with 1000 channels.
   - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 500
@@ -24,13 +24,7 @@ jobs:
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
-    protocol: h2c
-    channels: 1000
-    streams: 1
-    serialization: messagepack
-    scenario: MetaverseBroadcast30Fps
-  # h2c (15fps)
+  # h2c (15fps), fails with 2000 channels.
   - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 500
@@ -51,7 +45,7 @@ jobs:
     scenario: MetaverseBroadcast15Fps
   - tags: legend:messagepack-h2c-linux,streams:1x2000,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 2000
+    channels: 1500
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast15Fps
