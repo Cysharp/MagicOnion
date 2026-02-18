@@ -39,9 +39,10 @@ public class MetaverseWorld : IDisposable
         }
     }
 
-    public void WriteAllClientPositions(Span<BroadcastPositionMessage> span)
+    public void GetAllClientPositions(Span<BroadcastPositionMessage> span)
     {
         var index = 0;
+
         foreach (var kvp in clients)
         {
             span[index++] = new BroadcastPositionMessage(
