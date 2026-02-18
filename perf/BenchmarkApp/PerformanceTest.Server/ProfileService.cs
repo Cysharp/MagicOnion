@@ -143,8 +143,6 @@ static class DatadogMetricsRecorderExtensions
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_object_size_avg", result.AvgHeapSizeMB, DatadogMetricsType.Gauge, tags, "megabyte"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_max", result.MaxCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_avg", result.AvgCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_allocations_size_total", result.TotalAllocatedMB, DatadogMetricsType.Gauge, tags, "megabyte"));
-            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_allocations_size_per_sec", result.AllocationRateMBPerSec, DatadogMetricsType.Gauge, tags, "megabyte"));
         }
     }
 

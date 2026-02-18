@@ -11,8 +11,6 @@ public class ClrPerformanceReporter
     CancellationTokenSource cancellationTokenSource;
     bool running;
     Lock @lock = new();
-    long startAllocatedBytes;
-    long endAllocatedBytes;
     long startTimestamp;
     long endTimestamp;
 
@@ -31,7 +29,6 @@ public class ClrPerformanceReporter
     public void Start()
     {
         running = true;
-        startAllocatedBytes = GC.GetTotalAllocatedBytes();
         startTimestamp = timeProvider.GetTimestamp();
 
         Task.Run(async () =>
@@ -61,7 +58,6 @@ public class ClrPerformanceReporter
     public void Stop()
     {
         running = false;
-        endAllocatedBytes = GC.GetTotalAllocatedBytes();
         endTimestamp = timeProvider.GetTimestamp();
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
@@ -78,12 +74,9 @@ public class ClrPerformanceReporter
         var avgCommittedMemoryMB = committedMemories.Count > 0 ? committedMemories.Average() / 1024 / 1024 : 0;
 
         // Calculate allocation rate
-        var totalAllocatedBytes = endAllocatedBytes - startAllocatedBytes;
-        var totalAllocatedMB = totalAllocatedBytes / 1024.0 / 1024.0;
         var elapsedSeconds = timeProvider.GetElapsedTime(startTimestamp, endTimestamp).TotalSeconds;
-        var allocationRateMBPerSec = elapsedSeconds > 0 ? totalAllocatedMB / elapsedSeconds : 0;
 
-        return new ClrPerformanceResult(maxHeapSizeMB, avgHeapSizeMB, maxCommittedMemoryMB, avgCommittedMemoryMB, totalAllocatedMB, allocationRateMBPerSec);
+        return new ClrPerformanceResult(maxHeapSizeMB, avgHeapSizeMB, maxCommittedMemoryMB, avgCommittedMemoryMB);
     }
 
     public ClrPerformanceResult GetResultAndClear()
@@ -103,12 +96,10 @@ public readonly record struct ClrPerformanceResult(
     double MaxHeapSizeMB, 
     double AvgHeapSizeMB, 
     double MaxCommittedMemoryMB, 
-    double AvgCommittedMemoryMB,
-    double TotalAllocatedMB,
-    double AllocationRateMBPerSec)
+    double AvgCommittedMemoryMB)
 {
     public static ClrPerformanceResult Empty => empty;
-    private static readonly ClrPerformanceResult empty = new(0, 0, 0, 0, 0, 0);
+    private static readonly ClrPerformanceResult empty = new(0, 0, 0, 0);
 }
 
 /// <summary>
@@ -134,16 +125,14 @@ public class ClrMetricsAggregator
     public ClrPerformanceResult GetResult()
     {
         if (allResults.Count == 0)
-            return new ClrPerformanceResult(0, 0, 0, 0, 0, 0);
+            return new ClrPerformanceResult(0, 0, 0, 0);
 
         var maxHeapSize = allResults.Max(x => x.MaxHeapSizeMB);
         var avgHeapSize = allResults.Average(x => x.AvgHeapSizeMB);
         var maxCommittedMemory = allResults.Max(x => x.MaxCommittedMemoryMB);
         var avgCommittedMemory = allResults.Average(x => x.AvgCommittedMemoryMB);
-        var totalAllocated = allResults.Sum(x => x.TotalAllocatedMB);
-        var avgAllocationRate = allResults.Average(x => x.AllocationRateMBPerSec);
 
-        return new ClrPerformanceResult(maxHeapSize, avgHeapSize, maxCommittedMemory, avgCommittedMemory, totalAllocated, avgAllocationRate);
+        return new ClrPerformanceResult(maxHeapSize, avgHeapSize, maxCommittedMemory, avgCommittedMemory);
     }
 
     public ClrPerformanceResult GetResultAndClear()
