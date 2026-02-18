@@ -6,20 +6,21 @@ public class ClrPerformanceReporter
 {
     readonly TimeSpan samplingInterval;
     readonly TimeProvider timeProvider;
+
     readonly ConcurrentBag<double> heapSizes;
     readonly ConcurrentBag<double> committedMemories;
-
-    const int numberOfGenerations = 3; // gen0, gen1, gen2 (no loh, poh)
-    static readonly string[] genNames = ["gen0", "gen1", "gen2"];
-    readonly ConcurrentBag<long> gcCountGen0;
-    readonly ConcurrentBag<long> gcCountGen1;
-    readonly ConcurrentBag<long> gcCountGen2;
+    readonly ConcurrentBag<int> gcCountGen0Deltas;
+    readonly ConcurrentBag<int> gcCountGen1Deltas;
+    readonly ConcurrentBag<int> gcCountGen2Deltas;
 
     CancellationTokenSource cancellationTokenSource;
     bool running;
     Lock @lock = new();
     long startTimestamp;
     long endTimestamp;
+    int prevGen0Count;
+    int prevGen1Count;
+    int prevGen2Count;
 
     public ClrPerformanceReporter() : this(TimeSpan.FromMilliseconds(100))
     { }
@@ -29,17 +30,20 @@ public class ClrPerformanceReporter
         this.samplingInterval = samplingInterval;
         this.timeProvider = SystemTimeProvider.TimeProvider;
         cancellationTokenSource = new CancellationTokenSource();
-        heapSizes = [];
-        committedMemories = [];
-        gcCountGen0 = [];
-        gcCountGen1 = [];
-        gcCountGen2 = [];
+        heapSizes = new ConcurrentBag<double>();
+        committedMemories = new ConcurrentBag<double>();
+        gcCountGen0Deltas = new ConcurrentBag<int>();
+        gcCountGen1Deltas = new ConcurrentBag<int>();
+        gcCountGen2Deltas = new ConcurrentBag<int>();
     }
 
     public void Start()
     {
         running = true;
         startTimestamp = timeProvider.GetTimestamp();
+        prevGen0Count = GC.CollectionCount(0);
+        prevGen1Count = GC.CollectionCount(1);
+        prevGen2Count = GC.CollectionCount(2);
 
         Task.Run(async () =>
         {
@@ -60,22 +64,18 @@ public class ClrPerformanceReporter
                     // GetGCMemoryInfo may fail before first GC
                 }
 
-                // GC Counts for each generation
-                foreach (var (genName, count) in GetGarbageCollectionCounts())
-                {
-                    switch (genName)
-                    {
-                        case "gen0":
-                            gcCountGen0.Add(count);
-                            break;
-                        case "gen1":
-                            gcCountGen1.Add(count);
-                            break;
-                        case "gen2":
-                            gcCountGen2.Add(count);
-                            break;
-                    }
-                }
+                // Calculate GC count deltas since last sample
+                var currentGen0 = GC.CollectionCount(0);
+                var currentGen1 = GC.CollectionCount(1);
+                var currentGen2 = GC.CollectionCount(2);
+
+                gcCountGen0Deltas.Add(currentGen0 - prevGen0Count);
+                gcCountGen1Deltas.Add(currentGen1 - prevGen1Count);
+                gcCountGen2Deltas.Add(currentGen2 - prevGen2Count);
+
+                prevGen0Count = currentGen0;
+                prevGen1Count = currentGen1;
+                prevGen2Count = currentGen2;
 
                 await Task.Delay(samplingInterval, timeProvider, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
             }
@@ -99,17 +99,26 @@ public class ClrPerformanceReporter
         var avgHeapSizeMB = heapSizes.Average() / 1024 / 1024;
         var maxCommittedMemoryMB = committedMemories.Count > 0 ? committedMemories.Max() / 1024 / 1024 : 0;
         var avgCommittedMemoryMB = committedMemories.Count > 0 ? committedMemories.Average() / 1024 / 1024 : 0;
-        var totalGCGen0 = gcCountGen0.Sum();
-        var avgGCGen0 = gcCountGen0.Average();
-        var totalGCGen1 = gcCountGen1.Sum();
-        var avgGCGen1 = gcCountGen1.Average();
-        var totalGCGen2 = gcCountGen2.Sum();
-        var avgGCGen2 = gcCountGen2.Average();
 
-        // Calculate allocation rate
-        var elapsedSeconds = timeProvider.GetElapsedTime(startTimestamp, endTimestamp).TotalSeconds;
+        // GC count statistics from deltas
+        var totalGen0 = gcCountGen0Deltas.Sum();
+        var avgGen0 = gcCountGen0Deltas.Count > 0 ? (int)gcCountGen0Deltas.Average() : 0;
+        var totalGen1 = gcCountGen1Deltas.Sum();
+        var avgGen1 = gcCountGen1Deltas.Count > 0 ? (int)gcCountGen1Deltas.Average() : 0;
+        var totalGen2 = gcCountGen2Deltas.Sum();
+        var avgGen2 = gcCountGen2Deltas.Count > 0 ? (int)gcCountGen2Deltas.Average() : 0;
 
-        return new ClrPerformanceResult(maxHeapSizeMB, avgHeapSizeMB, maxCommittedMemoryMB, avgCommittedMemoryMB, totalGCGen0, (int)avgGCGen0, totalGCGen1, (int)avgGCGen1, totalGCGen2, (int)avgGCGen2);
+        return new ClrPerformanceResult(
+            maxHeapSizeMB, 
+            avgHeapSizeMB, 
+            maxCommittedMemoryMB, 
+            avgCommittedMemoryMB, 
+            totalGen0, 
+            avgGen0, 
+            totalGen1, 
+            avgGen1, 
+            totalGen2, 
+            avgGen2);
     }
 
     public ClrPerformanceResult GetResultAndClear()
@@ -119,25 +128,11 @@ public class ClrPerformanceReporter
             var result = GetResult();
             heapSizes.Clear();
             committedMemories.Clear();
-            gcCountGen0.Clear();
-            gcCountGen1.Clear();
-            gcCountGen2.Clear();
+            gcCountGen0Deltas.Clear();
+            gcCountGen1Deltas.Clear();
+            gcCountGen2Deltas.Clear();
 
             return result;
-        }
-    }
-
-    private static IEnumerable<(string, long)> GetGarbageCollectionCounts()
-    {
-        long collectionsFromHigherGeneration = 0;
-
-        for (var gen = numberOfGenerations - 1; gen >= 0; --gen)
-        {
-            long collectionsFromThisGeneration = GC.CollectionCount(gen);
-
-            yield return new(genNames[gen], collectionsFromThisGeneration - collectionsFromHigherGeneration);
-
-            collectionsFromHigherGeneration = collectionsFromThisGeneration;
         }
     }
 }
@@ -147,12 +142,12 @@ public readonly record struct ClrPerformanceResult(
     double AvgHeapSizeMB,
     double MaxCommittedMemoryMB,
     double AvgCommittedMemoryMB,
-    long TotalGcCountGen0,
-    long AvgGcCountGen0,
-    long TotalGcCountGen1,
-    long AvgGcCountGen1,
-    long TotalGcCountGen2,
-    long AvgGcCountGen2)
+    int TotalGcCountGen0,
+    int AvgGcCountGen0,
+    int TotalGcCountGen1,
+    int AvgGcCountGen1,
+    int TotalGcCountGen2,
+    int AvgGcCountGen2)
 {
     public static ClrPerformanceResult Empty => empty;
     private static readonly ClrPerformanceResult empty = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
