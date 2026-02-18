@@ -43,7 +43,7 @@ jobs:
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast15Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x2000,protocol:h2c,serialization:messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x1500,protocol:h2c,serialization:messagepack
     protocol: h2c
     channels: 1500
     streams: 1
