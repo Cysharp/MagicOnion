@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Internal;
 using NSubstitute;
 
@@ -465,6 +465,61 @@ public class UnaryTest
         _ = callInvokerMock.ReceivedWithAnyArgs().AsyncUnaryCall(default(Method<Box<Nil>, Box<int>>)!, default, default, default!);
     }
 
+    [Fact]
+    public async Task Issue1021_AccessViolationException()
+    {
+        // Arrange
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<int?>, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), GrpcMethodHelper.ToRaw<int?, Box<int?>>(null))
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
+
+        var a = callInvokerMock.AsyncUnaryCall(new Method<Box<int?>, Box<Nil>>(MethodType.Unary, "", "", new Marshaller<Box<int?>>(x => [], x => Box.Create<int?>(null)), new Marshaller<Box<Nil>>(x => [], x => Box.Create<Nil>(default))), "", new CallOptions(), GrpcMethodHelper.ToRaw<int?, Box<int?>>(null));
+
+        // Act & Assert
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
+        for (var i = 0; i < 100000; i++)
+        {
+            await client.OneNullableValueTypeParameterNonGenericReturnType(null);
+        }
+    }
+
+    [Fact]
+    public async Task GrpcMethodHelper_NullableValueType()
+    {
+        for (var i = 0; i < 100000; i++)
+        {
+            var boxed = GrpcMethodHelper.ToRaw<int?, Box<int?>>(null);
+            var unboxed = GrpcMethodHelper.FromRaw<Box<int?>, int?>(boxed);
+            Assert.NotNull(boxed);
+            Assert.Null(boxed.Value);
+            Assert.Null(unboxed);
+        }
+    }
+
+    [Fact]
+    public async Task GrpcMethodHelper_ValueType()
+    {
+        for (var i = 0; i < 100000; i++)
+        {
+            var boxed = GrpcMethodHelper.ToRaw<int, Box<int>>(12345);
+            var unboxed = GrpcMethodHelper.FromRaw<Box<int>, int>(boxed);
+            Assert.Equal(12345, boxed.Value);
+            Assert.Equal(12345, unboxed);
+        }
+    }
+
+    [Fact]
+    public async Task GrpcMethodHelper_RefType()
+    {
+        for (var i = 0; i < 100000; i++)
+        {
+            var boxed = GrpcMethodHelper.ToRaw<string?, string?>(null);
+            var unboxed = GrpcMethodHelper.FromRaw<string?, string?>(boxed);
+            Assert.NotNull(boxed);
+            Assert.Null(unboxed);
+        }
+    }
+
     public interface IUnaryTestService : IService<IUnaryTestService>
     {
         UnaryResult<Nil> ParameterlessReturnNil();
@@ -480,6 +535,7 @@ public class UnaryTest
         UnaryResult ParameterlessNonGenericReturnType();
         UnaryResult OneRefTypeParameterNonGenericReturnType(string arg1);
         UnaryResult OneValueTypeParameterNonGenericReturnType(int arg1);
+        UnaryResult OneNullableValueTypeParameterNonGenericReturnType(int? arg1);
         UnaryResult TwoParametersNonGenericReturnType(int arg1, string arg2);
     }
 
