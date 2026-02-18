@@ -14,41 +14,41 @@ benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   ##### MessagePack #####
   # h2c
-  - tags: legend:messagepack-h2c-linux,streams:1x5000,protocol:h2c,serialization:messagepack
+  - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 5000
+    channels: 500
     streams: 1
     serialization: messagepack
-    scenario: MetaverseBroadcast30Fps
-  - tags: legend:messagepack-h2c-linux,streams:1x10000,protocol:h2c,serialization:messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast15Fps
   # h2
-  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
+  - tags: legend:messagepack-h2-linux,streams:1x500,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 5000
+    channels: 500
     streams: 1
     serialization: messagepack
-    scenario: MetaverseBroadcast60Fps
-  - tags: legend:messagepack-h2-linux,streams:1x5000,protocol:h2,serialization:messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h2-linux,streams:1x1000,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast15Fps
   # h3
-  - tags: legend:messagepack-h3-linux,streams:1x5000,protocol:h3,serialization:messagepack
+  - tags: legend:messagepack-h3-linux,streams:1x500,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 500
     streams: 1
     serialization: messagepack
-    scenario: MetaverseBroadcast60Fps
-  - tags: legend:messagepack-h3-linux,streams:1x10000,protocol:h3,serialization:messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h3-linux,streams:1x1000,protocol:h3,serialization:messagepack
     protocol: h3
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: messagepack
     scenario: MetaverseBroadcast15Fps

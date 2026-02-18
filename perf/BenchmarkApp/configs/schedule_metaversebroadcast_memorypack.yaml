@@ -14,41 +14,41 @@ benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
   ##### memorypack #####
   # h2c
-  - tags: legend:memorypack-h2c-linux,streams:1x5000,protocol:h2c,serialization:memorypack
+  - tags: legend:memorypack-h2c-linux,streams:1x500,protocol:h2c,serialization:memorypack
     protocol: h2c
-    channels: 5000
+    channels: 500
     streams: 1
     serialization: memorypack
-    scenario: MetaverseBroadcast30Fps
-  - tags: legend:memorypack-h2c-linux,streams:1x10000,protocol:h2c,serialization:memorypack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:memorypack-h2c-linux,streams:1x1000,protocol:h2c,serialization:memorypack
     protocol: h2c
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: memorypack
     scenario: MetaverseBroadcast15Fps
   # h2
-  - tags: legend:memorypack-h2-linux,streams:1x5000,protocol:h2,serialization:memorypack
+  - tags: legend:memorypack-h2-linux,streams:1x500,protocol:h2,serialization:memorypack
     protocol: h2
-    channels: 5000
+    channels: 500
     streams: 1
     serialization: memorypack
-    scenario: MetaverseBroadcast60Fps
-  - tags: legend:memorypack-h2-linux,streams:1x5000,protocol:h2,serialization:memorypack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:memorypack-h2-linux,streams:1x1000,protocol:h2,serialization:memorypack
     protocol: h2
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: memorypack
     scenario: MetaverseBroadcast15Fps
   # h3
-  - tags: legend:memorypack-h3-linux,streams:1x5000,protocol:h3,serialization:memorypack
+  - tags: legend:memorypack-h3-linux,streams:1x500,protocol:h3,serialization:memorypack
     protocol: h3
     channels: 500
     streams: 1
     serialization: memorypack
-    scenario: MetaverseBroadcast60Fps
-  - tags: legend:memorypack-h3-linux,streams:1x10000,protocol:h3,serialization:memorypack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:memorypack-h3-linux,streams:1x1000,protocol:h3,serialization:memorypack
     protocol: h3
-    channels: 10000
+    channels: 1000
     streams: 1
     serialization: memorypack
     scenario: MetaverseBroadcast15Fps
