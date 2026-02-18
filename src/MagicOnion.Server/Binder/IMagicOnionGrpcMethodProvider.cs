@@ -1,3 +1,4 @@
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
@@ -14,6 +15,9 @@ public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) 
 {
     readonly List<MagicOnionServiceEndpointConventionBuilder> innerBuilders = new();
 
+    static readonly MethodInfo methodMapGrpcServiceOfT = typeof(GrpcEndpointRouteBuilderExtensions)
+        .GetMethod(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService), BindingFlags.Static | BindingFlags.Public, [typeof(IEndpointRouteBuilder)])!;
+
     public void Map<T>()
         where T : class, IServiceMarker
     {
@@ -24,10 +28,8 @@ public class MagicOnionGrpcServiceMappingContext(IEndpointRouteBuilder builder) 
     {
         VerifyServiceType(t);
 
-        innerBuilders.Add(new MagicOnionServiceEndpointConventionBuilder((GrpcServiceEndpointConventionBuilder)typeof(GrpcEndpointRouteBuilderExtensions)
-            .GetMethod(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService))!
-            .MakeGenericMethod(t)
-            .Invoke(null, [builder])!));
+        innerBuilders.Add(new MagicOnionServiceEndpointConventionBuilder(
+            (GrpcServiceEndpointConventionBuilder)methodMapGrpcServiceOfT.MakeGenericMethod(t).Invoke(null, [builder])!));
     }
 
     static void VerifyServiceType(Type type)
