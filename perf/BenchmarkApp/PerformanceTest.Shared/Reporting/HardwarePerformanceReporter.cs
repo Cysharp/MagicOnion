@@ -40,7 +40,7 @@ public class HardwarePerformanceReporter
                 // begin
                 var start = timeProvider.GetTimestamp();
                 TimeSpan startCpuTime = currentProcess.TotalProcessorTime;
-                await Task.Delay(samplingInterval, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+                await Task.Delay(samplingInterval, timeProvider, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
                 if (cancellationTokenSource.IsCancellationRequested) break;
 

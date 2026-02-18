@@ -50,6 +50,7 @@ builder.Services.AddSingleton<PerformanceTest.Shared.Reporting.DatadogMetricsRec
     return PerformanceTest.Shared.Reporting.DatadogMetricsRecorder.Create(tagString, validate);
 });
 builder.Services.AddSingleton<HardwarePerformanceReporter>();
+builder.Services.AddSingleton<ClrPerformanceReporter>();
 builder.Services.AddHostedService<StartupService>();
 builder.Services.AddHostedService<ProfileService>();
 

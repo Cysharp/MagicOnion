@@ -7,22 +7,29 @@ public class ProfileService : BackgroundService
 {
     readonly DatadogMetricsRecorder datadog;
     readonly HardwarePerformanceReporter hardware;
+    readonly ClrPerformanceReporter clr;
     readonly PeriodicTimer timer;
 
-    public ProfileService(TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder, HardwarePerformanceReporter hardwareReporter)
+    public ProfileService(TimeProvider timeProvider, DatadogMetricsRecorder datadogRecorder, HardwarePerformanceReporter hardwareReporter, ClrPerformanceReporter clrReporter)
     {
         datadog = datadogRecorder;
         hardware = hardwareReporter;
+        clr = clrReporter;
         timer = new PeriodicTimer(TimeSpan.FromSeconds(10), timeProvider);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         hardware.Start();
+        clr.Start();
+
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            var result = hardware.GetResultAndClear();
-            await datadog.PutServerHardwareMetricsAsync(ApplicationInformation.Current, result);
+            var hardwareResult = hardware.GetResultAndClear();
+            var clrResult = clr.GetResultAndClear();
+
+            await datadog.PutServerHardwareMetricsAsync(ApplicationInformation.Current, hardwareResult);
+            await datadog.PutServerClrMetricsAsync(ApplicationInformation.Current, clrResult);
         }
 
         hardware.Stop();
@@ -82,6 +89,62 @@ static class DatadogMetricsRecorderExtensions
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.cpu_usage_avg", result.AvgCpuUsagePercent, DatadogMetricsType.Gauge, tags, "percent"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_max", result.MaxMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.memory_usage_avg", result.AvgMemoryUsageMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+        }
+    }
+
+    /// <summary>
+    /// Put Server Clr metrics to background. 
+    /// </summary>
+    /// <param name="recorder"></param>
+    /// <param name="applicationInfo"></param>
+    /// <param name="result"></param>
+    public static async Task PutServerClrMetricsAsync(this DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, ClrPerformanceResult result)
+    {
+        if (string.IsNullOrEmpty(recorder.TagMagicOnion))
+            return;
+
+        Post(recorder, applicationInfo, result, false);
+        if (DatadogMetricsRecorder.EnableLatestTag)
+        {
+            Post(recorder, applicationInfo, result, true);
+        }
+
+        // wait until send complete
+        await recorder.WaitSaveAsync();
+
+        static void Post(DatadogMetricsRecorder recorder, ApplicationInformation applicationInfo, ClrPerformanceResult result, bool isMagicOnionLatest)
+        {
+            var magicOnionTag = isMagicOnionLatest ? recorder.TagLatestMagicOnion : recorder.TagMagicOnion;
+            var tags = string.IsNullOrEmpty(recorder.TagScenario)
+                ? MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo), static x => [
+                    $"legend:{x.TagLegend}{x.TagStreams}",
+                    $"branch:{x.TagBranch}",
+                    $"magiconion:{x.magicOnionTag}",
+                    $"protocol:{x.TagProtocol}",
+                    $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                    $"process_count:{x.applicationInfo.ProcessorCount}",
+                    $"serialization:{x.TagSerialization}",
+                    $"streams:{x.TagStreams}",
+                ])
+                : MetricsTagCache.Get((recorder.TagBranch, recorder.TagLegend, recorder.TagStreams, recorder.TagProtocol, recorder.TagSerialization, magicOnionTag, applicationInfo, recorder.TagScenario), static x => [
+                    $"legend:{x.TagLegend}{x.TagStreams}",
+                    $"branch:{x.TagBranch}",
+                    $"magiconion:{x.magicOnionTag}",
+                    $"protocol:{x.TagProtocol}",
+                    $"process_arch:{x.applicationInfo.ProcessArchitecture}",
+                    $"process_count:{x.applicationInfo.ProcessorCount}",
+                    $"scenario:{x.TagScenario}",
+                    $"serialization:{x.TagSerialization}",
+                    $"streams:{x.TagStreams}",
+                ]);
+
+            // Don't want to await each put. Let's send it to queue and await when benchmark ends.
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_object_size_max", result.MaxHeapSizeMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_object_size_avg", result.AvgHeapSizeMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_max", result.MaxCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_avg", result.AvgCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_allocations_size_total", result.TotalAllocatedMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_allocations_size_per_sec", result.AllocationRateMBPerSec, DatadogMetricsType.Gauge, tags, "megabyte"));
         }
     }
 
