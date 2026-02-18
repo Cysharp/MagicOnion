@@ -739,7 +739,6 @@ public class StreamingHubTest
     public async Task ConnectAsync_Failure()
     {
         // Arrange
-        var disposed = false;
         var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(
             factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance,
@@ -765,7 +764,7 @@ public class StreamingHubTest
             onResponseHeaderAsync: async metadata =>
             {
                 // Simulate a long time to response
-                await Task.Delay(1500);
+                await Task.Delay(1500, TestContext.Current.CancellationToken);
             },
             onDuplexStreamingCallDisposeAction: () =>
             {
@@ -777,7 +776,7 @@ public class StreamingHubTest
         var begin = Stopwatch.GetTimestamp();
         var ex = await Record.ExceptionAsync(async () => await helper.ConnectAsync(connectTimeout.Token));
         var elapsed = Stopwatch.GetElapsedTime(begin);
-        await Task.Delay(2000); // Wait for the ConnectAsync to complete.
+        await Task.Delay(2000, TestContext.Current.CancellationToken); // Wait for the ConnectAsync to complete.
 
         // Assert
         Assert.IsType<OperationCanceledException>(ex);
@@ -819,6 +818,7 @@ public class StreamingHubTest
 
         // Assert
         Assert.Equal(123, result);
+        Assert.True(disposed);
     }
 }
 

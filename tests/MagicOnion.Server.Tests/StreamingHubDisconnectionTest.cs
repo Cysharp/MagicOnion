@@ -27,19 +27,20 @@ public class StreamingHubDisconnectionTest : IClassFixture<MagicOnionApplication
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() {HttpClient = httpClient});
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubDisconnectionTestHub, IStreamingHubDisconnectionTestHubReceiver>(
             channel,
-            Substitute.For<IStreamingHubDisconnectionTestHubReceiver>());
+            Substitute.For<IStreamingHubDisconnectionTestHubReceiver>(),
+            cancellationToken: TestContext.Current.CancellationToken);
 
-        client.DoWorkAsync();
-        await Task.Delay(50);
-        client.DoWorkAsync(); // 150ms
-        client.DoWorkAsync(); // 250ms
-        client.DoWorkAsync(); // 350ms
+        _ = client.DoWorkAsync();
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+        _ = client.DoWorkAsync(); // 150ms
+        _ = client.DoWorkAsync(); // 250ms
+        _ = client.DoWorkAsync(); // 350ms
 
         await client.DisposeAsync();
         channel.Dispose();
         httpClient.Dispose();
 
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
 
         var logs = factory.Logs.GetSnapshot();
         var doWorkAsyncCallCount = logs.Count(x => x.Message == "DoWorkAsync:Begin");
@@ -63,7 +64,7 @@ public class StreamingHubDisconnectionTestHub(ILogger<StreamingHubDisconnectionT
     public async Task DoWorkAsync()
     {
         logger.LogInformation("DoWorkAsync:Begin");
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         _ = this.Context.CallContext.GetHttpContext().Features;
         logger.LogInformation("DoWorkAsync:Done");
     }
