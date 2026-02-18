@@ -10,6 +10,11 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     readonly ServerBroadcastMetricsContext metricsContext = new(timeProvider);
     int memberCount;
 
+    // double buffering for broadcast messages to avoid allocating new array every time. We will toggle between buffer0 and buffer1 for each broadcast. (make sure complete writing to buffer within 2 frames)
+    BroadcastPositionMessage[] buffer0 = [];
+    BroadcastPositionMessage[] buffer1 = [];
+    int currentBufferIndex;
+
     public ServerBroadcastMetricsContext MetricsContext => metricsContext;
     public int MemberCount => memberCount;
 
@@ -36,9 +41,10 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
 
     public void BroadcastAllPositions()
     {
-        var positions = metaverseWorld.GetAllClientPositions();
+        var buffer = GetNextBuffer(memberCount);
+        metaverseWorld.GetAllClientPositions(buffer.AsSpan());
         var frameNumber = metaverseWorld.CurrentFrame;
-        var message = new AllClientsPositionMessage(frameNumber, positions);
+        var message = new AllClientsPositionMessage(frameNumber, buffer);
 
         // Broadcast to all clients
         group.All.OnBroadcastAllPositions(message);
@@ -71,4 +77,18 @@ public class MetaverseGroupService(IMulticastGroupProvider groupProvider, TimePr
     }
 
     public void Dispose() => group.Dispose();
+
+    BroadcastPositionMessage[] GetNextBuffer(int capacity)
+    {
+        // Toggle between buffer0 and buffer1
+        var useBuffer0 = Interlocked.Increment(ref currentBufferIndex) % 2 == 0;
+        ref var buffer = ref useBuffer0 ? ref buffer0 : ref buffer1;
+
+        if (buffer.Length != capacity)
+        {
+            buffer = new BroadcastPositionMessage[capacity];
+        }
+
+        return buffer;
+    }
 }

@@ -39,20 +39,17 @@ public class MetaverseWorld : IDisposable
         }
     }
 
-    public BroadcastPositionMessage[] GetAllClientPositions()
+    public void GetAllClientPositions(Span<BroadcastPositionMessage> span)
     {
-        var positions = new BroadcastPositionMessage[clients.Count];
         var index = 0;
 
         foreach (var kvp in clients)
         {
-            positions[index++] = new BroadcastPositionMessage(
+            span[index++] = new BroadcastPositionMessage(
                 (int)kvp.Key.GetHashCode(),
                 kvp.Value.Position
             );
         }
-
-        return positions;
     }
 
     public void StartBroadcast(int fps, Action broadcastAction)
