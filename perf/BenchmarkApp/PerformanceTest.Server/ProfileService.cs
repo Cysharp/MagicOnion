@@ -143,6 +143,12 @@ static class DatadogMetricsRecorderExtensions
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_object_size_avg", result.AvgHeapSizeMB, DatadogMetricsType.Gauge, tags, "megabyte"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_max", result.MaxCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
             recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_committed_memory_size_avg", result.AvgCommittedMemoryMB, DatadogMetricsType.Gauge, tags, "megabyte"));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen0_total", result.TotalGcCountGen0, DatadogMetricsType.Count, tags));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen0_avg", result.AvgGcCountGen0, DatadogMetricsType.Count, tags));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen1_total", result.TotalGcCountGen1, DatadogMetricsType.Count, tags));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen1_avg", result.AvgGcCountGen1, DatadogMetricsType.Count, tags));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen2_total", result.TotalGcCountGen2, DatadogMetricsType.Count, tags));
+            recorder.Record(recorder.SendAsync("benchmark.magiconion.server.gc_collection_gen2_avg", result.AvgGcCountGen2, DatadogMetricsType.Count, tags));
         }
     }
 
