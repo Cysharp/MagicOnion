@@ -9,8 +9,6 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     IPerfTestService client = default!;
     IPerTestBroadcastHub hubClient = default!;
     PerformanceTestRunningContext context = default!;
-    int connectionId;
-    long begin;
 
     protected virtual int TargetFps => 0; // 0 means maximum speed
 
@@ -25,7 +23,6 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
         context = ctx;
-        this.connectionId = connectionId;
         await hubClient.JoinGroupAsync();
 
         // Only the first client triggers broadcast after warmup completes
