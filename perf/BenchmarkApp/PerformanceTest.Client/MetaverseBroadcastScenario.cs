@@ -7,6 +7,7 @@ namespace PerformanceTest.Client;
 public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubReceiver
 {
     const int clientFps = 15;
+    static Random random = new(76); // Fixed seed for reproducibility
 
     IMetaverseBroadcastHub hubClient = default!;
     PerformanceTestRunningContext context = default!;
@@ -21,8 +22,6 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
 
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        var random = new Random(connectionId);
-
         context = ctx;
         this.connectionId = connectionId;
         await hubClient.JoinAsync(TargetFps);
@@ -30,7 +29,7 @@ public class MetaverseBroadcastScenario : IScenario, IMetaverseBroadcastHubRecei
         // Wait for warmup to complete
         await ctx.WaitForReadyAsync();
 
-        // random jitter to avoid all clients sending updates at the same time
+        // jitter to avoid all clients sending updates at the same time
         await Task.Delay(random.Next(0, 500), cancellationToken);
 
         if (connectionId == 0)
