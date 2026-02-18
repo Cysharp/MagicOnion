@@ -42,17 +42,18 @@ public class StreamingHubThrowOnDisconnectTest : IClassFixture<MagicOnionApplica
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() {HttpClient = httpClient});
         var client = await StreamingHubClient.ConnectAsync<IStreamingHubThrowOnDisconnectTestHub, IStreamingHubThrowOnDisconnectTestHubReceiver>(
             channel,
-            Substitute.For<IStreamingHubThrowOnDisconnectTestHubReceiver>());
+            Substitute.For<IStreamingHubThrowOnDisconnectTestHubReceiver>(),
+            cancellationToken: TestContext.Current.CancellationToken);
 
         await client.DoWorkAsync();
         await client.DisposeAsync();
         channel.Dispose();
         httpClient.Dispose();
 
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         var logs = this.factory.Logs.GetSnapshot();
-        Assert.True(logs.Any(x => x.Message == "OnDisconnected"));
+        Assert.Contains(logs, x => x.Message == "OnDisconnected");
         Assert.True(pendingTaskRegistry.IsDisposed);
     }
 }

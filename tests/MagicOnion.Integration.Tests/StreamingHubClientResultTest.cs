@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Grpc.Net.Client;
 using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server.Hubs;
@@ -330,9 +330,9 @@ public class StreamingHubClientResultTest : IClassFixture<MagicOnionApplicationF
 
         // Act
         var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: false);
-        await Task.Delay(150); // Give some time to process the request.
+        await Task.Delay(150, TestContext.Current.CancellationToken); // Give some time to process the request.
         await client.DisposeAsync(); // Disconnect from the server.
-        await Task.Delay(1500); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
+        await Task.Delay(1500, TestContext.Current.CancellationToken); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
 
         // Assert
         Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Never), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
@@ -353,9 +353,9 @@ public class StreamingHubClientResultTest : IClassFixture<MagicOnionApplicationF
 
         // Act
         var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: true);
-        await Task.Delay(150); // Give some time to process the request.
+        await Task.Delay(150, TestContext.Current.CancellationToken); // Give some time to process the request.
         await client.DisposeAsync(); // Disconnect from the server.
-        await Task.Delay(1500); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
+        await Task.Delay(1500, TestContext.Current.CancellationToken); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
 
         // Assert
         Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Never), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
@@ -576,7 +576,7 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
             var result = await Client.Parameter_Zero();
             Items.TryAdd(nameof(Invoke_Parameter_Zero), result);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw;
         }
