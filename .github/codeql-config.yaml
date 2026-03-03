@@ -2,5 +2,5 @@ name: My CodeQL config
 
 # ignore unity C# files
 paths-ignore:
-  - samples
+  - samples/ChatApp
   - src/MagicOnion.Client.Unity
