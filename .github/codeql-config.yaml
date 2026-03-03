@@ -1,6 +1,8 @@
 name: My CodeQL config
 
-# ignore unity C# files
 paths-ignore:
+  # ignore unity C# files
   - samples/ChatApp
   - src/MagicOnion.Client.Unity
+  # ignore test resource files (extensions are .cs, but not actually code. Which reduce codeql quiality percentage)
+  - tests/MagicOnion.Client.SourceGenerator.Tests/Resources

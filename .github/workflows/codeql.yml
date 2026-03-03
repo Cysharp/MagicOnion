@@ -47,7 +47,7 @@ jobs:
           - language: actions
             build-mode: none
           - language: csharp
-            build-mode: manual
+            build-mode: none
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -88,10 +88,10 @@ jobs:
       # to build your code.
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-      - name: Run manual build steps
-        if: ${{ matrix.build-mode == 'manual' }}
-        shell: bash
-        run: dotnet build MagicOnion.slnx
+      # - name: Run manual build steps
+      #   if: ${{ matrix.build-mode == 'manual' }}
+      #   shell: bash
+      #   run: dotnet build MagicOnion.slnx
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@c793b717bc78562f491db7b0e93a3a178b099162 # v4.32.5
