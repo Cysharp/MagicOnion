@@ -1,0 +1,4 @@
+name: My CodeQL config
+
+paths-ignore:
+  - samples
