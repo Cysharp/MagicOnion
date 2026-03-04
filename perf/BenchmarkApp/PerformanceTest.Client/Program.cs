@@ -257,13 +257,14 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
         catch (TimeoutException)
         {
-            WriteLog($"Cleanup timed out after {cleanupTimeout.TotalSeconds}s, skipping remaining cleanup.");
+            WriteLog($"...Cleanup timed out after {cleanupTimeout.TotalSeconds}s, skipping remaining cleanup.");
         }
         catch (NullReferenceException)
         {
             // ignore
         }
     }
+    WriteLog($"...Cleanup scenarios, stop loop and notify server.");
     await ctx.CleanupAsync();
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
     WriteLog("Cleanup completed");
@@ -371,13 +372,22 @@ public class ProfileService
             }
             finally
             {
-                // flush
-                var r = hardwareReporter.GetResultAndClear();
-                await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, r);
-
                 hardwareReporter.Stop();
 
-                periodicTask.TrySetResult(true);
+                try
+                {
+                    // flush
+                    var r = hardwareReporter.GetResultAndClear();
+                    await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, r).WaitAsync(TimeSpan.FromSeconds(5));
+                }
+                catch (TimeoutException)
+                {
+                    // ignore
+                }
+                finally
+                {
+                    periodicTask.TrySetResult(true);
+                }
             }
         }, ct);
     }
@@ -385,7 +395,7 @@ public class ProfileService
     public async Task StopAsync()
     {
         cts.Cancel();
-        await periodicTask.Task;
+        await periodicTask.Task.WaitAsync(TimeSpan.FromSeconds(8));
 
         cts.Dispose();
         timer.Dispose();
