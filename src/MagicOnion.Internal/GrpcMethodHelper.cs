@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MagicOnion.Serialization;
 using MessagePack;
@@ -9,7 +9,7 @@ internal static class GrpcMethodHelper
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TRaw ToRaw<T, TRaw>(T obj)
-        => (obj is ValueType)
+        => (typeof(T).IsValueType)
             ? (TRaw)(object)Box.Create(obj)
             : DangerousDummyNull.GetObjectOrDummyNull(Unsafe.As<T, TRaw>(ref obj));
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 MagicOnion.Client.IResponseContext
 MagicOnion.Client.IResponseContext.GetStatus() -> Grpc.Core.Status
 MagicOnion.Client.IResponseContext.GetTrailers() -> Grpc.Core.Metadata!
@@ -123,6 +123,9 @@ MagicOnion.Serialization.IMagicOnionSerializer.Deserialize<T>(in System.Buffers.
 MagicOnion.Serialization.IMagicOnionSerializer.Serialize<T>(System.Buffers.IBufferWriter<byte>! writer, in T value) -> void
 MagicOnion.Serialization.IMagicOnionSerializerProvider
 MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(Grpc.Core.MethodType methodType, System.Reflection.MethodInfo? methodInfo) -> MagicOnion.Serialization.IMagicOnionSerializer!
+MagicOnion.ServiceNameAttribute
+MagicOnion.ServiceNameAttribute.Name.get -> string!
+MagicOnion.ServiceNameAttribute.ServiceNameAttribute(string! name) -> void
 MagicOnion.Server.Hubs.MethodIdAttribute
 MagicOnion.Server.Hubs.MethodIdAttribute.MethodIdAttribute(int methodId) -> void
 MagicOnion.ServerStreamingResult<TResponse>
