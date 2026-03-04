@@ -247,12 +247,18 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog("Completed");
 
     WriteLog("Cleaning up...");
-    foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
+    var chunks = Math.Clamp(scenarios.Count / 3, 1, scenarios.Count);
+    var cleanupTimeout = TimeSpan.FromSeconds(30);
+    foreach (var s in scenarios.Chunk(chunks))
     {
-        WriteLog($"...Cleaning up ({cleanIndex++})");
+        WriteLog($"...Cleaning up ({cleanIndex++}/{chunks})");
         try
         {
-            await Task.WhenAll(s.Select(x => x.CompleteAsync()));
+            await Task.WhenAll(s.Select(x => x.CompleteAsync())).WaitAsync(cleanupTimeout);
+        }
+        catch (TimeoutException)
+        {
+            WriteLog($"Cleanup timed out after {cleanupTimeout.TotalSeconds}s, skipping remaining cleanup.");
         }
         catch (NullReferenceException)
         {
