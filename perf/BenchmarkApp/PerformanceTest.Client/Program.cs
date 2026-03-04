@@ -108,7 +108,14 @@ async Task Main(
     WriteLog($"Saving metrics...");
     foreach (var (s, results) in resultsByScenario)
     {
-        await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, results);
+        try
+        {
+            await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, results);
+        }
+        catch (TaskCanceledException)
+        {
+            WriteLog($"... Sending datadog metrics canceled. scenario: {s}, count: {results.Count}");
+        }
     }
 
     if (!string.IsNullOrWhiteSpace(report))
