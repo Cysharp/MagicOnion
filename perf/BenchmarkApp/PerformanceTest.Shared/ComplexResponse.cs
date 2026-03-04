@@ -1,4 +1,4 @@
-using MemoryPack;
+﻿using MemoryPack;
 using MessagePack;
 
 namespace PerformanceTest.Shared;
@@ -23,8 +23,7 @@ public partial class ComplexResponse
             Value8 = 256,
             Value9 = DateTimeOffset.Now,
         },
-        Value4 = new InnerObject2[]
-        {
+        Value4 = [
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
@@ -36,7 +35,7 @@ public partial class ComplexResponse
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
             new InnerObject2 { Value1 = 123456789, Value2 = 123, Value3 = 4567, Value4 = 89101112 },
-        },
+        ],
     };
 
     [Key(0)]
