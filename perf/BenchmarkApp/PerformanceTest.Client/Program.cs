@@ -361,6 +361,11 @@ public class ProfileService
         aggregator = new();
     }
 
+    static void WriteLog(string value)
+    {
+        Console.WriteLine($"[{DateTime.Now:s}] {value}");
+    }
+
     public void Start()
     {
         hardwareReporter.Start();
@@ -380,6 +385,7 @@ public class ProfileService
             finally
             {
                 hardwareReporter.Stop();
+                periodicTask.TrySetResult(true);
 
                 try
                 {
@@ -389,11 +395,7 @@ public class ProfileService
                 }
                 catch (TimeoutException)
                 {
-                    // ignore
-                }
-                finally
-                {
-                    periodicTask.TrySetResult(true);
+                    WriteLog("... Sending datadog metrics timed out.");
                 }
             }
         }, ct);
@@ -402,7 +404,7 @@ public class ProfileService
     public async Task StopAsync()
     {
         cts.Cancel();
-        await periodicTask.Task.WaitAsync(TimeSpan.FromSeconds(8));
+        await periodicTask.Task;
 
         cts.Dispose();
         timer.Dispose();
