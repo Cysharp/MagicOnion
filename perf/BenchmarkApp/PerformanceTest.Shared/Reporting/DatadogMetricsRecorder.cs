@@ -109,7 +109,19 @@ public class DatadogMetricsRecorder
         // sequential handling to avoid Datadog API quota
         while (backgroundQueue.TryDequeue(out var task))
         {
+            if (task.IsCanceled)
+            {
+                WriteLog("... Task was canceled, go next.");
+                continue;
+            }
+            if (task.IsFaulted)
+            {
+                WriteLog($"... Task was faulted with exception: {task.Exception}, go next.");
+                continue;
+            }
+
             await task;
+
             if (backgroundQueue.Count == 0)
             {
                 break;
@@ -163,8 +175,13 @@ public class DatadogMetricsRecorder
         {
             // don't want to throw, show error message when failed instead
             var responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Failed to post metrics to Datadog. StatusCode: {(int)response.StatusCode}, Response: {responseContent}");
+            WriteLog($"... Failed to post metrics to Datadog. StatusCode: {(int)response.StatusCode}, Response: {responseContent}");
         }
+    }
+
+    static void WriteLog(string value)
+    {
+        Console.WriteLine($"[{DateTime.Now:s}] {value}");
     }
 }
 

@@ -108,7 +108,14 @@ async Task Main(
     WriteLog($"Saving metrics...");
     foreach (var (s, results) in resultsByScenario)
     {
-        await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, results);
+        try
+        {
+            await datadog.PutClientBenchmarkMetricsAsync(s, ApplicationInformation.Current, results);
+        }
+        catch (TaskCanceledException)
+        {
+            WriteLog($"... Sending datadog metrics canceled. scenario: {s}, count: {results.Count}");
+        }
     }
 
     if (!string.IsNullOrWhiteSpace(report))
@@ -247,18 +254,24 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     WriteLog("Completed");
 
     WriteLog("Cleaning up...");
+    var cleanupTimeout = TimeSpan.FromSeconds(30);
     foreach (var s in scenarios.Chunk(Math.Clamp(scenarios.Count / 3, 1, scenarios.Count)))
     {
-        WriteLog($"...Cleaning up ({cleanIndex++})");
+        WriteLog($"...Cleaning up {s.Length}/{scenarios.Count} ({cleanIndex++})");
         try
         {
-            await Task.WhenAll(s.Select(x => x.CompleteAsync()));
+            await Task.WhenAll(s.Select(x => x.CompleteAsync())).WaitAsync(cleanupTimeout);
+        }
+        catch (TimeoutException)
+        {
+            WriteLog($"...Cleanup timed out after {cleanupTimeout.TotalSeconds}s, skipping remaining cleanup.");
         }
         catch (NullReferenceException)
         {
             // ignore
         }
     }
+    WriteLog($"...Cleanup scenarios, stop loop and notify server.");
     await ctx.CleanupAsync();
     await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
     WriteLog("Cleanup completed");
@@ -348,6 +361,11 @@ public class ProfileService
         aggregator = new();
     }
 
+    static void WriteLog(string value)
+    {
+        Console.WriteLine($"[{DateTime.Now:s}] {value}");
+    }
+
     public void Start()
     {
         hardwareReporter.Start();
@@ -366,13 +384,19 @@ public class ProfileService
             }
             finally
             {
-                // flush
-                var r = hardwareReporter.GetResultAndClear();
-                await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, r);
-
                 hardwareReporter.Stop();
-
                 periodicTask.TrySetResult(true);
+
+                try
+                {
+                    // flush
+                    var r = hardwareReporter.GetResultAndClear();
+                    await datadog.PutClientHardwareMetricsAsync(scenario, ApplicationInformation.Current, r).WaitAsync(TimeSpan.FromSeconds(5));
+                }
+                catch (TimeoutException)
+                {
+                    WriteLog("... Sending datadog metrics timed out.");
+                }
             }
         }, ct);
     }
