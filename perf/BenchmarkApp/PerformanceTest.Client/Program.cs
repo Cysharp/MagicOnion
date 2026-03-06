@@ -90,7 +90,7 @@ async Task Main(
 
         for (var i = 1; i <= rounds; i++)
         {
-            WriteLog($"Round: {i}");
+            WriteLog($"Scenario {scenario}, Round: {i}");
             if (!resultsByScenario.TryGetValue(scenario2, out var results))
             {
                 results = new List<PerformanceResult>(10000);
@@ -99,9 +99,11 @@ async Task Main(
             var result = await RunScenarioAsync(scenario2, config, config.ChannelList, controlServiceClient, datadog);
             results.Add(result);
 
-            WriteLog($"Interval 1s for next scenario...");
+            WriteLog($"Interval 1s for next run/scenario...");
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing); // interval
         }
+
+        await controlServiceClient.NotifyCompleteScenarioAsync();
     }
     WriteLog($"All scenario complete");
 
@@ -207,14 +209,16 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
         ScenarioType.ServerStreaming => () => new ServerStreamingScenario(),
-        ScenarioType.Broadcast => () => new BroadcastScenario(),
         ScenarioType.Broadcast60Fps => () => new Broadcast60FpsScenario(),
         ScenarioType.Broadcast30Fps => () => new Broadcast30FpsScenario(),
         ScenarioType.Broadcast15Fps => () => new Broadcast15FpsScenario(),
+        ScenarioType.MetaverseBroadcast60Fps => () => new MetaverseBroadcast60FpsScenario(),
+        ScenarioType.MetaverseBroadcast30Fps => () => new MetaverseBroadcast30FpsScenario(),
+        ScenarioType.MetaverseBroadcast15Fps => () => new MetaverseBroadcast15FpsScenario(),
         _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
-    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration), datadog, scenario);
+    var ctx = new PerformanceTestRunningContext(connectionCount: config.Channels, serverTimeout: (config.Warmup, config.Duration), datadog, scenario, config.TimeProvider);
     using var cts = new CancellationTokenSource();
     var cleanIndex = 0;
     var threadBefore = ThreadPool.ThreadCount;
@@ -512,12 +516,12 @@ internal static class DatadogMetricsRecorderExtensions
         var mean = data.Select(x => x.Latency.Mean).OrderBy(x => x).ToArray();
 
         // get outliner for rps
-        var lowerBoundRps = OutlinerHelper.GetLowerBound(rps);
-        var upperBoundRps = OutlinerHelper.GetUpperBound(rps);
+        var lowerBoundRps = OutlierIqr.GetLowerBound(rps);
+        var upperBoundRps = OutlierIqr.GetUpperBound(rps);
 
         // get outliner for mean
-        var lowerBoundMean = OutlinerHelper.GetLowerBound(mean);
-        var upperBoundMean = OutlinerHelper.GetUpperBound(mean);
+        var lowerBoundMean = OutlierIqr.GetLowerBound(mean);
+        var upperBoundMean = OutlierIqr.GetUpperBound(mean);
 
         // compute tuple in range
         var filteredData = data
@@ -538,6 +542,7 @@ public class ScenarioConfiguration
     public int Streams { get; }
     public int Channels { get; }
     public bool Verbose { get; }
+    public TimeProvider TimeProvider { get; } = TimeProvider.System;
 
     private readonly bool clientAuth;
     private bool useHttp3;

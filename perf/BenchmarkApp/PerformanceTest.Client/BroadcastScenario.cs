@@ -8,10 +8,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
 {
     IPerfTestService client = default!;
     IPerTestBroadcastHub hubClient = default!;
-    readonly TimeProvider timeProvider = TimeProvider.System;
     PerformanceTestRunningContext context = default!;
-    int connectionId;
-    long begin;
 
     protected virtual int TargetFps => 0; // 0 means maximum speed
 
@@ -25,23 +22,20 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     // So most times MoveNext won't wait at all, and it may wait occasionally.
     public async ValueTask RunAsync(int connectionId, PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
     {
-        var start = TimeProvider.System.GetTimestamp();
         context = ctx;
-        this.connectionId = connectionId;
-        begin = timeProvider.GetTimestamp();
         await hubClient.JoinGroupAsync();
-        
+
         // Only the first client triggers broadcast after warmup completes
         if (connectionId == 0)
         {
             // Wait for warmup to complete
             await ctx.WaitForReadyAsync();
-            
+
             // Use exact duration to match client-side metrics collection period
             var duration = TimeSpan.FromSeconds(ctx.DurationSeconds);
             _ = client.BroadcastAsync(duration, TargetFps);
         }
-        
+
         while (!cancellationToken.IsCancellationRequested)
         {
             await Task.Delay(100, cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
@@ -52,6 +46,7 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     {
         if (hubClient is not null)
         {
+            await hubClient.LeaveGroupAsync();
             await hubClient.DisposeAsync();
         }
     }
@@ -60,8 +55,6 @@ public class BroadcastScenario : IScenario, IPerTestBroadcastHubReceiver
     {
         // Collect only Count
         context.Increment();
-        //context.LatencyThrottled(connectionId, timeProvider.GetElapsedTime(begin), 100); // avoid OOM
-        //begin = timeProvider.GetTimestamp();
     }
 }
 

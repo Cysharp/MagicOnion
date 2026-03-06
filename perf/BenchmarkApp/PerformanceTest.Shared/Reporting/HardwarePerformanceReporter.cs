@@ -13,6 +13,7 @@ public class HardwarePerformanceReporter
     private readonly ConcurrentBag<double> memoryUsages;
     private CancellationTokenSource cancellationTokenSource;
     private bool running;
+    private Lock @lock = new();
 
     public HardwarePerformanceReporter() : this(TimeSpan.FromMilliseconds(100))
     { }
@@ -39,7 +40,7 @@ public class HardwarePerformanceReporter
                 // begin
                 var start = timeProvider.GetTimestamp();
                 TimeSpan startCpuTime = currentProcess.TotalProcessorTime;
-                await Task.Delay(samplingInterval, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+                await Task.Delay(samplingInterval, timeProvider, cancellationTokenSource.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
                 if (cancellationTokenSource.IsCancellationRequested) break;
 
@@ -69,26 +70,60 @@ public class HardwarePerformanceReporter
 
     public HardwarePerformanceResult GetResult()
     {
-        var filteredCpuUsages = OutlinerHelper.RemoveOutlinerByIQR(cpuUsages.ToArray(), 100.0);
-        var maxCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Max() : 0d;
-        var avgCpuUsage = cpuUsages.Count > 0 ? filteredCpuUsages.Average() : 0d;
-        var maxMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Max() / 1024 / 1024 : 0d;
-        var avgMemoryUsage = memoryUsages.Count > 0 ? memoryUsages.Average() / 1024 / 1024 : 0d;
+        if (cpuUsages.Count == 0)
+            return HardwarePerformanceResult.Empty;
+
+        Span<double> cpuData = cpuUsages.ToArray();
+        var cpuRange = OutlierIqr.FindInlierRange(cpuData, 100.0);
+        var filteredCpuData = cpuData[cpuRange];
+
+        var maxCpuUsage = GetMax(filteredCpuData);
+        var avgCpuUsage = GetAverage(filteredCpuData);
+        var maxMemoryUsage = memoryUsages.Max() / 1024 / 1024;
+        var avgMemoryUsage = memoryUsages.Average() / 1024 / 1024;
 
         return new HardwarePerformanceResult(maxCpuUsage, avgCpuUsage, maxMemoryUsage, avgMemoryUsage);
     }
 
     public HardwarePerformanceResult GetResultAndClear()
     {
-        var result = GetResult();
-        cpuUsages.Clear();
-        memoryUsages.Clear();
+        lock (@lock)
+        {
+            var result = GetResult();
+            cpuUsages.Clear();
+            memoryUsages.Clear();
 
-        return result;
+            return result;
+        }
+    }
+
+    private static double GetMax(ReadOnlySpan<double> data)
+    {
+        var max = double.MinValue;
+        foreach (var value in data)
+        {
+            if (value > max) max = value;
+        }
+        return max;
+    }
+
+    private static double GetAverage(ReadOnlySpan<double> data)
+    {
+        if (data.Length == 0) return 0;
+        var sum = 0.0;
+        foreach (var value in data)
+        {
+            sum += value;
+        }
+        return sum / data.Length;
     }
 }
 
-public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB);
+public readonly record struct HardwarePerformanceResult(double MaxCpuUsagePercent, double AvgCpuUsagePercent, double MaxMemoryUsageMB, double AvgMemoryUsageMB)
+{
+    public static HardwarePerformanceResult Empty => empty;
+    private static readonly HardwarePerformanceResult empty = new(0, 0, 0, 0);
+}
 
 /// <summary>
 /// Aggregate hardware performance results across multiple rounds.

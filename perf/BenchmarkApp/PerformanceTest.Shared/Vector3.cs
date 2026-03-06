@@ -7,6 +7,9 @@ namespace PerformanceTest.Shared;
 [MessagePackObject]
 public readonly partial struct Vector3
 {
+    public static readonly Vector3 Zero = new(0.0f, 0.0f, 0.0f);
+    public static readonly Vector3 One = new(1.0f, 1.0f, 1.0f);
+
     [Key(0)]
     public float X { get; }
 

@@ -2,7 +2,7 @@
 # config2args implementation: https://github.com/Cysharp/Actions/blob/main/src/CysharpActions/Commands/BenchmarkConfig2MatrixCommand.cs
 apt-tools: "libmsquic"
 dotnet-version: 10.0
-benchmark-expire-min: 15
+benchmark-expire-min: 20
 #benchmark-location: "japaneast"
 benchmark-location: "eastus"
 benchmark-timeout-min: 10
@@ -12,43 +12,43 @@ benchmark-server-run-script-path: ".github/scripts/benchmark-server-run.sh"
 benchmark-server-run-script-args: '--run-args "-u http://0.0.0.0:5000 --protocol {{ protocol }} --serialization {{ serialization }} --validate true --tags {{ tags }}" --build-args "{{ buildArgsServer }}"'
 benchmark-server-stop-script-path: ".github/scripts/benchmark-server-stop.sh"
 jobs:
-  ##### memorypack #####
+  ##### MessagePack #####
   # h2c
-  - tags: legend:memorypack-h2c-linux,streams:1x5000,protocol:h2c,serialization:memorypack
+  - tags: legend:messagepack-h2c-linux,streams:1x500,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 5000
+    channels: 500
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast30Fps
-  - tags: legend:memorypack-h2c-linux,streams:1x10000,protocol:h2c,serialization:memorypack
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h2c-linux,streams:1x1000,protocol:h2c,serialization:messagepack
     protocol: h2c
-    channels: 10000
+    channels: 1000
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast15Fps
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
   # h2
-  - tags: legend:memorypack-h2-linux,streams:1x5000,protocol:h2,serialization:memorypack
+  - tags: legend:messagepack-h2-linux,streams:1x500,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 5000
+    channels: 500
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast60Fps
-  - tags: legend:memorypack-h2-linux,streams:1x5000,protocol:h2,serialization:memorypack
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h2-linux,streams:1x1000,protocol:h2,serialization:messagepack
     protocol: h2
-    channels: 10000
+    channels: 1000
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast15Fps
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
   # h3
-  - tags: legend:memorypack-h3-linux,streams:1x5000,protocol:h3,serialization:memorypack
+  - tags: legend:messagepack-h3-linux,streams:1x500,protocol:h3,serialization:messagepack
     protocol: h3
     channels: 500
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast60Fps
-  - tags: legend:memorypack-h3-linux,streams:1x10000,protocol:h3,serialization:memorypack
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps
+  - tags: legend:messagepack-h3-linux,streams:1x1000,protocol:h3,serialization:messagepack
     protocol: h3
-    channels: 10000
+    channels: 1000
     streams: 1
-    serialization: memorypack
-    scenario: Broadcast15Fps
+    serialization: messagepack
+    scenario: MetaverseBroadcast15Fps

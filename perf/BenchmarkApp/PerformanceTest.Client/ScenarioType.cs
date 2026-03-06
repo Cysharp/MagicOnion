@@ -27,8 +27,11 @@
 
     ServerStreaming,
 
-    Broadcast,
     Broadcast60Fps,
     Broadcast30Fps,
     Broadcast15Fps,
+
+    MetaverseBroadcast60Fps,
+    MetaverseBroadcast30Fps,
+    MetaverseBroadcast15Fps,
 }

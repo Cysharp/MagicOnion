@@ -36,7 +36,12 @@ builder.ConfigureEndpoint();
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion();
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddSingleton<PerfGroupService>();
+builder.Services.AddSingleton<BroadcastGroupService>();
+
+// Metaverse Broadcast Services
+builder.Services.AddSingleton<MetaverseWorld>();
+builder.Services.AddSingleton<MetaverseGroupService>();
+
 builder.Services.AddSingleton<PerformanceTest.Shared.Reporting.DatadogMetricsRecorder>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
@@ -44,6 +49,8 @@ builder.Services.AddSingleton<PerformanceTest.Shared.Reporting.DatadogMetricsRec
     var validate = configuration.GetValue<bool?>("Validate") ?? false;
     return PerformanceTest.Shared.Reporting.DatadogMetricsRecorder.Create(tagString, validate);
 });
+builder.Services.AddSingleton<HardwarePerformanceReporter>();
+builder.Services.AddSingleton<ClrPerformanceReporter>();
 builder.Services.AddHostedService<StartupService>();
 builder.Services.AddHostedService<ProfileService>();
 

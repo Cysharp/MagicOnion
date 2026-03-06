@@ -1,13 +1,11 @@
 ﻿using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
-using Microsoft.Extensions.Logging;
 using PerformanceTest.Shared;
-using PerformanceTest.Shared.Reporting;
 
 namespace PerformanceTest.Server;
 
-public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> logger, DatadogMetricsRecorder datadogRecorder) : ServiceBase<IPerfTestService>, IPerfTestService
+public class PerfTestService(BroadcastGroupService group, TimeProvider timeProvider) : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
@@ -66,10 +64,10 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
         var stream = GetServerStreamingContext<SimpleResponse>();
 
         var ct = stream.ServiceContext.CallContext.CancellationToken;
-        var start = TimeProvider.System.GetTimestamp();
+        var start = timeProvider.GetTimestamp();
         try
         {
-            while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+            while (!ct.IsCancellationRequested && timeProvider.GetElapsedTime(start) < timeout)
             {
                 await stream.WriteAsync(response);
             }
@@ -83,6 +81,13 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
     }
 
     int broadcastLock = 0;
+    /// <summary>
+    /// first client that calls BroadcastAsync will execute the broadcast loop, and other clients will receive cached response without executing the loop until the first client's broadcast loop finishes (either by timeout or cancellation).
+    /// This is to prevent multiple simultaneous broadcasts which can cause performance degradation and inaccurate metrics collection.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="targetFps"></param>
+    /// <returns></returns>
     public async UnaryResult<BroadcastPositionMessage> BroadcastAsync(TimeSpan timeout, int targetFps)
     {
         // Accept only one request at single BroadcastAsync execution. If multiple clients call simultaneously, they will be dropped.
@@ -92,6 +97,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
             return BroadcastPositionMessage.Cached;
         }
 
+        // first client path (execute broadcast loop and collect metrics)
         try
         {
             var response = BroadcastPositionMessage.Cached;
@@ -99,48 +105,22 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
             // Combine server timeout and client cancellation (when client disconnects)
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, Context.CallContext.CancellationToken);
             var ct = linkedCts.Token;
-            var start = TimeProvider.System.GetTimestamp();
+            var start = timeProvider.GetTimestamp();
 
             // Calculate interval from target FPS
             var intervalMs = targetFps > 0 ? 1000.0 / targetFps : 0;
             var interval = intervalMs > 0 ? TimeSpan.FromMilliseconds(intervalMs) : TimeSpan.Zero;
 
             // Start metrics collection
-            group.MetricsContext.Start(targetFps);
-
-            // Record initial client count
-            group.MetricsContext.UpdateClientCount(group.MemberCount);
-
-            // Start periodic metrics logging task
-            var metricsLoggingTask = Task.Run(async () =>
-            {
-                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10), TimeProvider.System);
-                while (await timer.WaitForNextTickAsync(ct))
-                {
-                    var currentResult = group.MetricsContext.GetPeriodicResult();
-                    logger.LogInformation(
-                        "[Server Broadcast Metrics (Periodic)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Messages (Period): {PeriodicMessages:N0}, Total Messages: {TotalMessages:N0}, Total Messages Sent: {TotalMessagesSent:N0}, Duration: {Duration}",
-                        currentResult.TargetFps,
-                        currentResult.ActualFps,
-                        currentResult.ClientCountAtStart,
-                        currentResult.ClientCountAtEnd,
-                        currentResult.MinClientCount,
-                        currentResult.MaxClientCount,
-                        currentResult.AvgClientCount,
-                        currentResult.PeriodicMessages,
-                        currentResult.TotalMessages,
-                        currentResult.TotalMessagesSent,
-                        currentResult.Duration);
-                }
-            }, ct);
+            group.StartMetricsCollection(targetFps);
 
             try
             {
                 if (interval > TimeSpan.Zero)
                 {
                     // FPS-controlled broadcast
-                    using var timer = new PeriodicTimer(interval, TimeProvider.System);
-                    while (await timer.WaitForNextTickAsync(ct) && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    using var timer = new PeriodicTimer(interval, timeProvider);
+                    while (await timer.WaitForNextTickAsync(ct) && timeProvider.GetElapsedTime(start) < timeout)
                     {
                         group.SendMessageToAll(response);
                     }
@@ -148,7 +128,7 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
                 else
                 {
                     // Maximum speed broadcast (no delay)
-                    while (!ct.IsCancellationRequested && TimeProvider.System.GetElapsedTime(start) < timeout)
+                    while (!ct.IsCancellationRequested && timeProvider.GetElapsedTime(start) < timeout)
                     {
                         group.SendMessageToAll(response);
                     }
@@ -160,38 +140,9 @@ public class PerfTestService(PerfGroupService group, ILogger<PerfTestService> lo
             }
             finally
             {
-                // Wait for metrics logging task to complete
-                try
-                {
-                    await metricsLoggingTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
-                }
-                catch
-                {
-                    // Ignore exceptions from metrics logging task
-                }
-
-                // Stop metrics collection and get result
-                group.MetricsContext.Stop();
-                var result = group.MetricsContext.GetResult();
-
-                // Log final server-side broadcast metrics
-                logger.LogInformation(
-                    "[Server Broadcast Metrics (Final)] TargetFPS: {TargetFps}, ActualFPS: {ActualFps:N2}, Clients: {ClientsAtStart}->{ClientsAtEnd} (Min: {MinClients}, Max: {MaxClients}, Avg: {AvgClients:F1}), Total Messages: {TotalMessages:N0}, Total Messages Sent: {TotalMessagesSent:N0}, Duration: {Duration}",
-                    result.TargetFps,
-                    result.ActualFps,
-                    result.ClientCountAtStart,
-                    result.ClientCountAtEnd,
-                    result.MinClientCount,
-                    result.MaxClientCount,
-                    result.AvgClientCount,
-                    result.TotalMessages,
-                    result.TotalMessagesSent,
-                    result.Duration);
-
-                // Send metrics to Datadog
-                await datadogRecorder.PutServerBroadcastMetricsAsync(ApplicationInformation.Current, result);
-
-                group.MetricsContext.Reset();
+                // Stop metrics collection, send metrics and clear collected metrics
+                group.StopMetricsCollection();
+                await group.SendAndClearMetricsAsync();
             }
 
             return BroadcastPositionMessage.Cached;
