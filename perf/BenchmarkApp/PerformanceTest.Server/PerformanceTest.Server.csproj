@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,6 +9,7 @@
 
   <PropertyGroup Condition="'$(UseNuGetServer)' != ''">
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <DefineConstants>$(DefineConstants);MAGICONION_NUGET_SERVER</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition="'$(UseNuGetServer)' != ''">
     <PackageReference Include="Grpc.AspNetCore" Version="$(GrpcVersion)"/>

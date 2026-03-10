@@ -7,7 +7,12 @@ public class PerfTestBroadcastHub(PerfGroupService groupService) : StreamingHubB
 {
     public async ValueTask<string> JoinGroupAsync()
     {
+#if MAGICONION_NUGET_SERVER
+        var group = await Group.AddAsync("PerformanceTestBroadcast");
+        groupService.AddMember(Context.ContextId, BroadcastToSelf(group));
+#else
         groupService.AddMember(Context.ContextId, Client);
+#endif
         return $"{Context.ContextId} joined.";
     }
 
