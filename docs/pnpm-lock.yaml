@@ -24,13 +24,13 @@ importers:
         specifier: ^3.9.2
         version: 3.9.2(@docusaurus/plugin-content-docs@3.9.2(@mdx-js/react@3.1.0(@types/react@19.0.7)(react@19.2.3))(acorn@8.15.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.6.3))(@mdx-js/react@3.1.0(@types/react@19.0.7)(react@19.2.3))(acorn@8.15.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.6.3)
       '@mdx-js/react':
-        specifier: ^3.1.0
+        specifier: ^3.0.0
         version: 3.1.0(@types/react@19.0.7)(react@19.2.3)
       clsx:
-        specifier: ^2.1.1
+        specifier: ^2.0.0
         version: 2.1.1
       prism-react-renderer:
-        specifier: ^2.4.1
+        specifier: ^2.3.0
         version: 2.4.1(react@19.2.3)
       react:
         specifier: ^19.2.3
@@ -49,7 +49,7 @@ importers:
         specifier: 3.9.2
         version: 3.9.2(acorn@8.15.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       typescript:
-        specifier: ~5.6.3
+        specifier: ~5.6.2
         version: 5.6.3
 
 packages:
