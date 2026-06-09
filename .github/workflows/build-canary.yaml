@@ -31,9 +31,9 @@ jobs:
       - run: echo "MAGICONION_VERSION=ci-${GITHUB_REF_NAME//\//-}-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build
-      - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.slnx
+      - run: dotnet build -c ${BUILD_CONFIG} ./MagicOnion.slnx
       # pack
-      - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack -c ${BUILD_CONFIG} ./MagicOnion.Packaging.slnf --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - uses: Cysharp/Actions/.github/actions/upload-artifact@main
         with:
           name: nuget
