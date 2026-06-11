@@ -62,7 +62,7 @@ To call the Unary service method from the client, use the `MagicOnionClient.Crea
 
 ```csharp
 var channel = GrpcChannel.ForAddress("https://localhost:5001");
-var client = await MagicOnionClient.Create<IGreeterService>(channel, receiver);
+var client = MagicOnionClient.Create<IGreeterService>(channel);
 ```
 
 Call the method of the Unary service using the generated client proxy.
