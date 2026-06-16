@@ -56,7 +56,9 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
       # WORKAROUND: NuGet.org rejects `.snupkg` that do not contian `.pdb` files.
-      - run: rm ./publish/MagicOnion.${{ inputs.tag }}.snupkg
+      - run: rm ./publish/MagicOnion.${TAG}.snupkg
+        env:
+          TAG: ${{ inputs.tag }}
       - run: dotnet nuget push "./publish/*.nupkg" --skip-duplicate -s https://api.nuget.org/v3/index.json -k "${NUGET_KEY}"
         if: ${{ !inputs.dry-run }}
         env:
