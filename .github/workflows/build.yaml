@@ -32,7 +32,7 @@ jobs:
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet build -c Debug ./MagicOnion.slnx
       - run: dotnet build -c Release ./MagicOnion.slnx
-      - run: dotnet pack -c Release --no-build  -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -o $GITHUB_WORKSPACE/artifacts
+      - run: dotnet pack -c Release --no-build -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -o $GITHUB_WORKSPACE/artifacts
 
   run-tests:
     name: "Run tests"
@@ -72,7 +72,7 @@ jobs:
     steps:
       - name: Load secrets
         id: op-load-secret
-        uses: 1password/load-secrets-action@8d0d610af187e78a2772c2d18d627f4c52d3fbfb # v3.1.0
+        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
         with:
           export-env: false
         env:

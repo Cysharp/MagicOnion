@@ -1,4 +1,5 @@
 using System.Text;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.CodeGen.MemoryPack;
 
@@ -64,9 +65,19 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
             """);
         foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
         {
-            writer.AppendLineWithFormat($$"""
-                        global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}});
-            """);
+            switch (resolverInfo)
+            {
+                case EnumSerializationInfo:
+                    writer.AppendLineWithFormat($$"""
+                                                              global::MemoryPack.MemoryPackFormatterProvider.Register(new global::MemoryPack.Formatters.UnmanagedFormatter<{{resolverInfo.FullName}}>());
+                                                  """);
+                    break;
+                default:
+                    writer.AppendLineWithFormat($$"""
+                                                              global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}});
+                                                  """);
+                    break;
+            }
         }
         writer.AppendLineWithFormat($$"""
                     }
