@@ -34,4 +34,5 @@ jobs:
         ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity/package.json
         ./Directory.Build.props
       tag: ${{ needs.new-version.outputs.version }}
+      use-bot-token: true
       dry-run: false
