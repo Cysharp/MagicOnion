@@ -3,6 +3,8 @@ name: PR Harness
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [harness]
 
 jobs:
   harness:
@@ -10,3 +12,5 @@ jobs:
       contents: read
       pull-requests: read
     uses: Cysharp/Actions/.github/workflows/pr-harness.yaml@main
+    with:
+      license-check: true
