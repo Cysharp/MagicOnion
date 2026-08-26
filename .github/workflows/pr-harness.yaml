@@ -16,4 +16,3 @@ jobs:
       license-check: true
       exclude-license-input-paths: |
         docs/
-        samples/
