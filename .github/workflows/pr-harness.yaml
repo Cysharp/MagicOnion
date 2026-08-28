@@ -10,3 +10,7 @@ jobs:
       contents: read
       pull-requests: read
     uses: Cysharp/Actions/.github/workflows/pr-harness.yaml@main
+    with:
+      license-check: true
+      exclude-license-input-paths: |
+        docs/
