@@ -309,7 +309,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
 
-        // NOTE: The payload is not returned here because it will be returned after being sent to the queue in the case of Request/RequestFireAndForget.
+        // NOTE: In the case of Request/RequestFireAndForget, the payload is delegated to be returned after being sent to the client, so it should not be returned when writing to the ChannelWriter is successful.
         var shouldReturnPayloadToPool = true;
         try
         {
