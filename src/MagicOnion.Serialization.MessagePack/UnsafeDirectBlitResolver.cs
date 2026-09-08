@@ -1,4 +1,4 @@
-using MessagePack;
+﻿using MessagePack;
 using System.Buffers;
 using MessagePack.Formatters;
 using System.Runtime.CompilerServices;
@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace MagicOnion.Serialization.MessagePack
 {
+    [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
     public class UnsafeDirectBlitResolver : IFormatterResolver
     {
         public static readonly UnsafeDirectBlitResolver Instance = new UnsafeDirectBlitResolver();
@@ -53,6 +54,7 @@ namespace MagicOnion.Serialization.MessagePack
         }
     }
 
+    [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
     public class UnsafeDirectBlitArrayFormatter<T> : IMessagePackFormatter<T[]?>
         where T : unmanaged
     {
@@ -153,6 +155,7 @@ namespace MagicOnion.Serialization.MessagePack
         }
     }
 
+    [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
     public class UnsafeDirectBlitFormatter<T> : IMessagePackFormatter<T>
         where T : unmanaged
     {

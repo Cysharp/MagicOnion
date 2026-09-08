@@ -1,5 +1,6 @@
-using MessagePack;
+﻿using MessagePack;
 using MessagePack.Resolvers;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace MagicOnion.Serialization.MessagePack.Tests;
 
