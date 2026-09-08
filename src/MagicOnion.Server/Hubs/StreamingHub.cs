@@ -1,4 +1,4 @@
-using System.Buffers;
+﻿using System.Buffers;
 using System.Threading.Channels;
 using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
@@ -305,60 +305,77 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     }
 
 
-    ValueTask ProcessMessageAsync(StreamingHubPayload payload, CancellationToken cancellationToken)
+    async ValueTask ProcessMessageAsync(StreamingHubPayload payload, CancellationToken cancellationToken)
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
-        var messageType = reader.ReadMessageType();
 
-        switch (messageType)
+        // NOTE: In the case of Request/RequestFireAndForget, the payload is delegated to be returned after being sent to the client, so it should not be returned when writing to the ChannelWriter is successful.
+        var shouldReturnPayloadToPool = true;
+        try
         {
-            case StreamingHubMessageType.Request:
-                {
-                    var requestMessage = reader.ReadRequest();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
-                }
-            case StreamingHubMessageType.RequestFireAndForget:
-                {
-                    var requestMessage = reader.ReadRequestFireAndForget();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
-                }
-            case StreamingHubMessageType.ClientResultResponse:
-                {
-                    var responseMessage = reader.ReadClientResultResponse();
-                    if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
-                    {
-                        pendingMessage.TrySetResult(responseMessage.Body);
-                    }
-                    return default;
-                }
-            case StreamingHubMessageType.ClientResultResponseWithError:
-                {
-                    var responseMessage = reader.ReadClientResultResponseForError();
-                    if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
-                    {
-                        pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode, responseMessage.Message + (string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail))));
-                    }
-                    return default;
-                }
-            case StreamingHubMessageType.ServerHeartbeatResponse:
+            var messageType = reader.ReadMessageType();
+            switch (messageType)
             {
-                    var seq = reader.ReadServerHeartbeatResponse();
-                    heartbeatHandle.Ack(seq);
-                    return default;
-                }
-            case StreamingHubMessageType.ClientHeartbeat:
-                {
-                    var (seq, clientSentAt, heartbeatBody) = reader.ReadClientHeartbeat();
+                case StreamingHubMessageType.Request:
+                    {
+                        var requestMessage = reader.ReadRequest();
+                        await requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
+                        shouldReturnPayloadToPool = false;
+                    }
+                    break;
+                case StreamingHubMessageType.RequestFireAndForget:
+                    {
+                        var requestMessage = reader.ReadRequestFireAndForget();
+                        await requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
+                        shouldReturnPayloadToPool = false;
+                    }
+                    break;
+                case StreamingHubMessageType.ClientResultResponse:
+                    {
+                        var responseMessage = reader.ReadClientResultResponse();
+                        if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                        {
+                            pendingMessage.TrySetResult(responseMessage.Body);
+                        }
+                    }
+                    break;
+                case StreamingHubMessageType.ClientResultResponseWithError:
+                    {
+                        var responseMessage = reader.ReadClientResultResponseForError();
+                        if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                        {
+                            pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode,
+                                $"{responseMessage.Message}{(string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail)}")));
+                        }
+                    }
+                    break;
+                case StreamingHubMessageType.ServerHeartbeatResponse:
+                    {
+                        var seq = reader.ReadServerHeartbeatResponse();
+                        heartbeatHandle.Ack(seq);
+                    }
+                    break;
+                case StreamingHubMessageType.ClientHeartbeat:
+                    {
+                        var (seq, clientSentAt, heartbeatBody) = reader.ReadClientHeartbeat();
 
-                    using var bufferWriter = ArrayPoolBufferWriter.RentThreadStaticWriter();
-                    StreamingHubMessageWriter.WriteClientHeartbeatMessageResponse(bufferWriter, seq, clientSentAt);
-                    bufferWriter.Write(heartbeatBody.Span); // Copy an extra body to the response message.
+                        using var bufferWriter = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                        StreamingHubMessageWriter.WriteClientHeartbeatMessageResponse(bufferWriter, seq, clientSentAt);
+                        bufferWriter.Write(heartbeatBody.Span); // Copy an extra body to the response message.
 
-                    StreamingServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan));
-                    return default;
-                }
-            default:
-                throw new InvalidOperationException($"Unknown MessageType: {messageType}");
+                        StreamingServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan));
+                    }
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown MessageType: {messageType}");
+            }
+        }
+        finally
+        {
+            if (shouldReturnPayloadToPool)
+            {
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
         }
     }
 
