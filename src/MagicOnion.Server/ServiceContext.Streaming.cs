@@ -1,5 +1,6 @@
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
@@ -65,7 +66,14 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         if (MethodType == MethodType.DuplexStreaming)
         {
             this.streamingResponseWriter = new Lazy<QueuedResponseWriter<TResponse>>(() =>
-                new QueuedResponseWriter<TResponse>(ResponseStream!, () => IsDisconnected, MagicOnionServerInternalLogger.Current));
+                new QueuedResponseWriter<TResponse>(ResponseStream!, () => IsDisconnected, MagicOnionServerInternalLogger.Current,
+                    static value =>
+                    {
+                        if (value is StreamingHubPayload payload)
+                        {
+                            StreamingHubPayloadPool.Shared.Return(payload);
+                        }
+                    }));
         }
         else
         {
