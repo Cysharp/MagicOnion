@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
@@ -8,17 +9,27 @@ namespace MagicOnion.Server.Internal;
 // So requires queueing.
 internal class QueuedResponseWriter<T> : IDisposable
 {
-    IStreamingServiceContext serviceContext;
-    Channel<T> channel;
+    readonly IServerStreamWriter<T> responseStream;
+    readonly Func<bool> isDisconnected;
+    readonly ILogger logger;
+    readonly Channel<T> channel;
 
     /// <summary>
     /// Gets a task that completes when the response queue consumer has stopped.
     /// </summary>
     public Task Completion { get; }
 
-    public QueuedResponseWriter(IStreamingServiceContext serviceContext)
+    /// <summary>
+    /// Creates a queue that serializes writes to the response stream.
+    /// </summary>
+    /// <param name="responseStream">The destination for queued responses.</param>
+    /// <param name="isDisconnected">A callback that reports the current disconnection state.</param>
+    /// <param name="logger">The logger used to report response write failures.</param>
+    public QueuedResponseWriter(IServerStreamWriter<T> responseStream, Func<bool> isDisconnected, ILogger logger)
     {
-        this.serviceContext = serviceContext;
+        this.responseStream = responseStream;
+        this.isDisconnected = isDisconnected;
+        this.logger = logger;
         channel = Channel.CreateUnbounded<T>(new UnboundedChannelOptions
         {
             AllowSynchronousContinuations = false,
@@ -37,22 +48,21 @@ internal class QueuedResponseWriter<T> : IDisposable
     async Task ConsumeQueueAsync()
     {
         var reader = channel.Reader;
-        var stream = ((IServiceContextWithResponseStream<T>)serviceContext).ResponseStream!;
         do
         {
             while (reader.TryRead(out var item))
             {
-                if (serviceContext.IsDisconnected) break;
+                if (isDisconnected()) break;
                 try
                 {
-                    await stream.WriteAsync(item).ConfigureAwait(false);
+                    await responseStream.WriteAsync(item).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    MagicOnionServerInternalLogger.Current.LogError(ex, "error occurred on write to client.");
+                    logger.LogError(ex, "error occurred on write to client.");
                 }
             }
-            if (serviceContext.IsDisconnected) break;
+            if (isDisconnected()) break;
         } while (await reader.WaitToReadAsync().ConfigureAwait(false));
 
     }

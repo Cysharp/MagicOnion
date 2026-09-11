@@ -64,7 +64,8 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         // streaming hub
         if (MethodType == MethodType.DuplexStreaming)
         {
-            this.streamingResponseWriter = new Lazy<QueuedResponseWriter<TResponse>>(() => new QueuedResponseWriter<TResponse>(this));
+            this.streamingResponseWriter = new Lazy<QueuedResponseWriter<TResponse>>(() =>
+                new QueuedResponseWriter<TResponse>(ResponseStream!, () => IsDisconnected, MagicOnionServerInternalLogger.Current));
         }
         else
         {
