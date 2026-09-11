@@ -7,6 +7,9 @@ namespace MagicOnion.Server;
 
 public class MagicOnionOptions
 {
+    int? streamingHubResponseQueueMaxLength = 1024;
+    long? streamingHubResponseQueueMaxSize = 16 * 1024 * 1024;
+
     /// <summary>
     /// Gets and sets the serializer that serializes the message. The default serializer is <see cref="MagicOnionSerializerProvider.Default"/>.
     /// </summary>
@@ -51,6 +54,41 @@ public class MagicOnionOptions
     /// Gets or sets a StreamingHub heartbeat timeout. Default is <see keyword="null"/>. If the value is <see keyword="null"/>, the server does not disconnect a client due to timeout.
     /// </summary>
     public TimeSpan? StreamingHubHeartbeatTimeout { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of responses waiting in each StreamingHub connection's response queue.
+    /// Default is 1024. Null disables the count limit. Exceeding either queue limit aborts the connection.
+    /// </summary>
+    /// <remarks>The response already handed to the transport is excluded.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException">The value is zero or negative.</exception>
+    public int? StreamingHubResponseQueueMaxLength
+    {
+        get => streamingHubResponseQueueMaxLength;
+        set
+        {
+            if (value is <= 0) throw new ArgumentOutOfRangeException(nameof(value), "The queue length limit must be positive or null.");
+            streamingHubResponseQueueMaxLength = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the maximum total payload size in bytes waiting in each StreamingHub connection's response queue.
+    /// Default is 16 MiB. Null disables the size limit. Exceeding either queue limit aborts the connection.
+    /// </summary>
+    /// <remarks>
+    /// Counts serialized payload lengths, excluding the response already handed to the transport,
+    /// pooled buffer capacity, and transport buffers. A single response larger than the limit is rejected.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">The value is zero or negative.</exception>
+    public long? StreamingHubResponseQueueMaxSize
+    {
+        get => streamingHubResponseQueueMaxSize;
+        set
+        {
+            if (value is <= 0) throw new ArgumentOutOfRangeException(nameof(value), "The queue size limit must be positive or null.");
+            streamingHubResponseQueueMaxSize = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets a <see cref="System.TimeProvider"/> used internally by MagicOnion.

@@ -13,7 +13,16 @@ internal class QueuedResponseWriter<T> : IDisposable
     readonly Func<bool> isDisconnected;
     readonly ILogger logger;
     readonly Action<T> onDiscard;
-    readonly Channel<T> channel;
+    readonly Func<T, int> getSize;
+    readonly Action onMaxLengthOrSizeExceeded;
+    readonly int maxQueueLength;
+    readonly long maxQueueSize;
+    readonly Channel<(T Value, int Size)> channel;
+    readonly object gate = new();
+    int queuedCount;
+    long queuedSize;
+    bool completed;
+    volatile bool overflowed;
 
     /// <summary>
     /// Gets a task that completes when the response queue consumer has stopped.
@@ -30,13 +39,25 @@ internal class QueuedResponseWriter<T> : IDisposable
     /// Releases items that are never passed to the response stream. This callback may run concurrently
     /// on producer and consumer threads. Failures are logged without retrying the callback.
     /// </param>
-    public QueuedResponseWriter(IServerStreamWriter<T> responseStream, Func<bool> isDisconnected, ILogger logger, Action<T> onDiscard)
+    /// <param name="getSize">Gets an item's retained data size in bytes before ownership is transferred.</param>
+    /// <param name="onMaxLengthOrSizeExceeded">Aborts the response stream when the maximum queue length or size is exceeded. Called once, outside the queue lock.</param>
+    /// <param name="maxQueueLength">The maximum number of waiting items, or null for no limit.</param>
+    /// <param name="maxQueueSize">The maximum total size of waiting items in bytes, or null for no limit.</param>
+    public QueuedResponseWriter(IServerStreamWriter<T> responseStream, Func<bool> isDisconnected, ILogger logger, Action<T> onDiscard,
+        Func<T, int> getSize, Action onMaxLengthOrSizeExceeded, int? maxQueueLength = null, long? maxQueueSize = null)
     {
+        if (maxQueueLength is <= 0) throw new ArgumentOutOfRangeException(nameof(maxQueueLength));
+        if (maxQueueSize is <= 0) throw new ArgumentOutOfRangeException(nameof(maxQueueSize));
         this.responseStream = responseStream;
         this.isDisconnected = isDisconnected;
         this.logger = logger;
         this.onDiscard = onDiscard;
-        channel = Channel.CreateUnbounded<T>(new UnboundedChannelOptions
+        this.getSize = getSize;
+        this.onMaxLengthOrSizeExceeded = onMaxLengthOrSizeExceeded;
+        this.maxQueueLength = maxQueueLength ?? int.MaxValue;
+        this.maxQueueSize = maxQueueSize ?? long.MaxValue;
+        // Admission and accounting are atomic under gate, including when producers race.
+        channel = Channel.CreateUnbounded<(T, int)>(new UnboundedChannelOptions
         {
             AllowSynchronousContinuations = false,
             SingleReader = true,
@@ -55,9 +76,34 @@ internal class QueuedResponseWriter<T> : IDisposable
     /// </remarks>
     public void Write(in T value)
     {
-        if (!channel.Writer.TryWrite(value))
+        var size = getSize(value);
+        var notifyOverflow = false;
+        lock (gate)
         {
-            Discard(value);
+            if (!completed)
+            {
+                if (queuedCount >= maxQueueLength || size > maxQueueSize - queuedSize)
+                {
+                    overflowed = true;
+                    completed = true;
+                    channel.Writer.TryComplete();
+                    notifyOverflow = true;
+                }
+                else if (channel.Writer.TryWrite((value, size)))
+                {
+                    queuedCount++;
+                    queuedSize += size;
+                    return;
+                }
+            }
+        }
+
+        Discard(value);
+        if (notifyOverflow)
+        {
+            onMaxLengthOrSizeExceeded();
+            logger.LogWarning("The StreamingHub response queue limit was exceeded. Maximum length: {MaxQueueLength}, maximum size: {MaxQueueSize} bytes.",
+                maxQueueLength, maxQueueSize);
         }
     }
 
@@ -69,7 +115,7 @@ internal class QueuedResponseWriter<T> : IDisposable
             do
             {
                 // Check before removing an item so that unsent items remain available for cleanup.
-                while (!isDisconnected() && reader.TryRead(out var item))
+                while (!isDisconnected() && TryRead(out var item))
                 {
                     try
                     {
@@ -80,18 +126,35 @@ internal class QueuedResponseWriter<T> : IDisposable
                         logger.LogError(ex, "error occurred on write to client.");
                     }
                 }
-                if (isDisconnected()) break;
+                if (isDisconnected() || overflowed) break;
             } while (await reader.WaitToReadAsync().ConfigureAwait(false));
         }
         finally
         {
             // Reject further writes before draining. Only the consumer reads from the channel.
-            channel.Writer.TryComplete();
-            while (reader.TryRead(out var item))
+            Dispose();
+            while (TryRead(out var item, discard: true))
             {
                 Discard(item);
             }
         }
+    }
+
+    bool TryRead(out T item, bool discard = false)
+    {
+        lock (gate)
+        {
+            if ((discard || !overflowed) && channel.Reader.TryRead(out var entry))
+            {
+                queuedCount--;
+                queuedSize -= entry.Size;
+                // Cache sizes on enqueue: serialization may return the item to its pool.
+                item = entry.Value;
+                return true;
+            }
+        }
+        item = default!;
+        return false;
     }
 
     void Discard(T item)
@@ -115,6 +178,10 @@ internal class QueuedResponseWriter<T> : IDisposable
     /// </remarks>
     public void Dispose()
     {
-        channel.Writer.TryComplete();
+        lock (gate)
+        {
+            completed = true;
+            channel.Writer.TryComplete();
+        }
     }
 }

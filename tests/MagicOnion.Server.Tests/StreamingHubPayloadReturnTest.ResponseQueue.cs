@@ -3,13 +3,13 @@ using System.Threading.Channels;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MessagePack;
+using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
 public partial class StreamingHubPayloadReturnTest
 {
-    // Proposed acceptance budgets for the Red phase, not existing production defaults.
-    // Once configurable limits exist, configure the harness with these small values.
+    // Small configured budgets keep the overflow tests independent of production defaults.
     // Count and bytes measure retained payloads; the fake serializes the in-flight response
     // before blocking, just as a transport can stall after the marshaller returns its buffer.
     const int ResponseQueueCountBudget = 16;
@@ -32,6 +32,9 @@ public partial class StreamingHubPayloadReturnTest
         Assert.True(pending.Count <= ResponseQueueCountBudget,
             $"The stopped writer retained {pending.Count} heartbeat responses ({pending.Bytes} bytes); the count budget is {ResponseQueueCountBudget}.");
         Assert.True(harness.Inner.Context.IsDisconnected, "Exceeding the response count budget must disconnect the slow client.");
+        harness.Inner.RequestLifetime.Received(1).Abort();
+        await harness.Inner.Context.ResponseWriterCompletion.WaitAsync(ResponseQueueTestTimeout, TestContext.Current.CancellationToken);
+        harness.Inner.AssertAllReturnedOnce();
     }
 
     /// <summary>
@@ -51,6 +54,9 @@ public partial class StreamingHubPayloadReturnTest
         Assert.True(pending.Bytes <= ResponseQueueByteBudget,
             $"The stopped writer retained {pending.Bytes} bytes in {pending.Count} heartbeat responses; the byte budget is {ResponseQueueByteBudget}.");
         Assert.True(harness.Inner.Context.IsDisconnected, "Exceeding the response byte budget must disconnect the slow client.");
+        harness.Inner.RequestLifetime.Received(1).Abort();
+        await harness.Inner.Context.ResponseWriterCompletion.WaitAsync(ResponseQueueTestTimeout, TestContext.Current.CancellationToken);
+        harness.Inner.AssertAllReturnedOnce();
     }
 
     /// <summary>
@@ -153,7 +159,13 @@ public partial class StreamingHubPayloadReturnTest
         {
             // The existing harness uses NopStreamingHubHeartbeatManager: queue protection
             // must work with server heartbeats and their timeout disabled.
-            Inner = new Harness(Stream);
+            Inner = new Harness(Stream, new MagicOnionOptions
+            {
+                StreamingHubResponseQueueMaxLength = ResponseQueueCountBudget,
+                StreamingHubResponseQueueMaxSize = ResponseQueueByteBudget,
+            });
+            // Model the transport releasing its pending write when the request is aborted.
+            Inner.RequestLifetime.When(x => x.Abort()).Do(_ => Stream.Release());
         }
 
         public async Task StartBlockedWriteAsync()

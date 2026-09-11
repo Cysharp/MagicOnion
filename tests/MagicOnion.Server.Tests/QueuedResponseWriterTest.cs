@@ -28,7 +28,7 @@ public class QueuedResponseWriterTest
             writeStarted.TrySetResult();
             return releaseWrite.Task;
         });
-        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add, static _ => 0, static () => { });
 
         try
         {
@@ -59,7 +59,7 @@ public class QueuedResponseWriterTest
     public async Task Completion_DisposeWithoutMessages_Completes()
     {
         var stream = new ResponseStream(_ => Task.CompletedTask);
-        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, static _ => { });
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, static _ => { }, static _ => 0, static () => { });
 
         writer.Dispose();
 
@@ -81,7 +81,7 @@ public class QueuedResponseWriterTest
             disconnected = true;
             return Task.CompletedTask;
         });
-        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add, static _ => 0, static () => { });
 
         writer.Write(1);
         writer.Write(2);
@@ -111,7 +111,7 @@ public class QueuedResponseWriterTest
             if (synchronousFailure) throw error;
             return Task.FromException(error);
         });
-        using var writer = new QueuedResponseWriter<int>(stream, static () => false, logger, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, logger, discarded.Add, static _ => 0, static () => { });
 
         writer.Write(1);
         writer.Write(2);
@@ -139,7 +139,7 @@ public class QueuedResponseWriterTest
             sent.Add(message);
             return Task.CompletedTask;
         });
-        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add, static _ => 0, static () => { });
         writer.Dispose();
         await writer.Completion.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
@@ -167,7 +167,7 @@ public class QueuedResponseWriterTest
             writeStarted.TrySetResult();
             return releaseWrite.Task;
         });
-        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add, static _ => 0, static () => { });
 
         try
         {
@@ -215,7 +215,7 @@ public class QueuedResponseWriterTest
         {
             attempted.Add(message);
             if (message == 1) throw error;
-        });
+        }, static _ => 0, static () => { });
 
         try
         {
@@ -254,7 +254,7 @@ public class QueuedResponseWriterTest
             writeStarted.TrySetResult();
             return releaseWrite.Task;
         });
-        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add);
+        using var writer = new QueuedResponseWriter<int>(stream, () => disconnected, NullLogger.Instance, discarded.Add, static _ => 0, static () => { });
 
         try
         {
@@ -285,6 +285,178 @@ public class QueuedResponseWriterTest
             disconnected = true;
             writer.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Each limit accepts its exact boundary and closes the queue on the next oversized admission.
+    /// </summary>
+    [Theory]
+    [InlineData(2, null)]
+    [InlineData(null, 5L)]
+    [InlineData(2, 5L)]
+    public async Task Write_ExceedsLimit_StopsSendingAndDiscardsAllUnsentItems(int? maxLength, long? maxSize)
+    {
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sent = new List<int>();
+        var discarded = new ConcurrentBag<int>();
+        var overflows = 0;
+        var stream = new ResponseStream(message =>
+        {
+            sent.Add(message);
+            started.TrySetResult();
+            return release.Task;
+        });
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add,
+            static value => value, () => Interlocked.Increment(ref overflows), maxLength, maxSize);
+
+        try
+        {
+            writer.Write(0);
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            writer.Write(2);
+            writer.Write(3);
+            Assert.Equal(0, overflows);
+            Assert.Empty(discarded);
+
+            writer.Write(4);
+            writer.Write(5);
+            Assert.Equal(1, overflows);
+            Assert.Equal(new[] { 4, 5 }, discarded.Order());
+        }
+        finally
+        {
+            writer.Dispose();
+            release.TrySetResult();
+            await writer.Completion.WaitAsync(TimeSpan.FromSeconds(5), CancellationToken.None);
+        }
+
+        Assert.Equal(new[] { 0 }, sent);
+        Assert.Equal(new[] { 2, 3, 4, 5 }, discarded.Order());
+    }
+
+    /// <summary>
+    /// A single payload larger than the size limit is rejected even when the queue is empty.
+    /// </summary>
+    [Fact]
+    public async Task Write_SingleOversizedItem_AbortsWithoutSending()
+    {
+        var sent = new List<int>();
+        var discarded = new ConcurrentBag<int>();
+        var overflows = 0;
+        var stream = new ResponseStream(message =>
+        {
+            sent.Add(message);
+            return Task.CompletedTask;
+        });
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add,
+            static value => value, () => Interlocked.Increment(ref overflows), maxQueueSize: 5);
+
+        writer.Write(6);
+        await writer.Completion.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, overflows);
+        Assert.Empty(sent);
+        Assert.Equal(new[] { 6 }, discarded);
+    }
+
+    /// <summary>
+    /// Dequeuing releases both budgets before awaiting the transport, allowing sustained sending.
+    /// </summary>
+    [Fact]
+    public async Task Consumer_Dequeue_ReleasesCapacityForLaterResponses()
+    {
+        var firstStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseFirst = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseSecond = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sent = new List<int>();
+        var discarded = new ConcurrentBag<int>();
+        var overflows = 0;
+        var stream = new ResponseStream(message =>
+        {
+            sent.Add(message);
+            if (message == 1)
+            {
+                firstStarted.TrySetResult();
+                return releaseFirst.Task;
+            }
+            if (message == 2)
+            {
+                secondStarted.TrySetResult();
+                return releaseSecond.Task;
+            }
+            return Task.CompletedTask;
+        });
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add,
+            static _ => 3, () => Interlocked.Increment(ref overflows), maxQueueLength: 1, maxQueueSize: 3);
+
+        try
+        {
+            writer.Write(1);
+            await firstStarted.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            writer.Write(2);
+            releaseFirst.TrySetResult();
+            await secondStarted.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            writer.Write(3);
+        }
+        finally
+        {
+            writer.Dispose();
+            releaseFirst.TrySetResult();
+            releaseSecond.TrySetResult();
+            await writer.Completion.WaitAsync(TimeSpan.FromSeconds(5), CancellationToken.None);
+        }
+
+        Assert.Equal(0, overflows);
+        Assert.Empty(discarded);
+        Assert.Equal(new[] { 1, 2, 3 }, sent);
+    }
+
+    /// <summary>
+    /// Concurrent producers cannot overbook either budget or notify overflow more than once.
+    /// </summary>
+    [Theory]
+    [InlineData(8, null)]
+    [InlineData(null, 8L)]
+    public async Task Write_ConcurrentOverflow_EnforcesLimitAndDiscardsEachItemOnce(int? maxLength, long? maxSize)
+    {
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var startRace = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var discarded = new ConcurrentBag<int>();
+        var overflows = 0;
+        var stream = new ResponseStream(_ =>
+        {
+            started.TrySetResult();
+            return release.Task;
+        });
+        using var writer = new QueuedResponseWriter<int>(stream, static () => false, NullLogger.Instance, discarded.Add,
+            static _ => 1, () => Interlocked.Increment(ref overflows), maxLength, maxSize);
+
+        try
+        {
+            writer.Write(0);
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            var producers = Task.WhenAll(Enumerable.Range(1, 64).Select(async message =>
+            {
+                await startRace.Task;
+                writer.Write(message);
+            }));
+            startRace.SetResult();
+            await producers.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+            Assert.Equal(1, overflows);
+            Assert.Equal(64 - 8, discarded.Count);
+        }
+        finally
+        {
+            writer.Dispose();
+            release.TrySetResult();
+            await writer.Completion.WaitAsync(TimeSpan.FromSeconds(5), CancellationToken.None);
+        }
+
+        Assert.Equal(Enumerable.Range(1, 64), discarded.Order());
     }
 
     sealed class ResponseStream(Func<int, Task> write) : IServerStreamWriter<int>

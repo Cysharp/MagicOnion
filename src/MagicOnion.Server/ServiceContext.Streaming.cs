@@ -6,7 +6,10 @@ using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server;
 
@@ -33,6 +36,7 @@ public interface IStreamingServiceContext<TRequest, TResponse> : IServiceContext
 internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IStreamingServiceContext<TRequest, TResponse>
 {
     readonly Lazy<QueuedResponseWriter<TResponse>> streamingResponseWriter;
+    volatile bool isDisconnected;
 
     public IAsyncStreamReader<TRequest>? RequestStream { get; }
     public IServerStreamWriter<TResponse>? ResponseStream { get; }
@@ -45,7 +49,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         : Task.CompletedTask;
 
     // used in StreamingHub
-    public bool IsDisconnected { get; private set; }
+    public bool IsDisconnected => isDisconnected;
 
     public StreamingServiceContext(
         object instance,
@@ -66,14 +70,28 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         if (MethodType == MethodType.DuplexStreaming)
         {
             this.streamingResponseWriter = new Lazy<QueuedResponseWriter<TResponse>>(() =>
-                new QueuedResponseWriter<TResponse>(ResponseStream!, () => IsDisconnected, MagicOnionServerInternalLogger.Current,
+            {
+                var options = serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value;
+                // Capture the request lifetime before producers can run outside the request flow.
+                var requestLifetime = context.GetHttpContext().Features.GetRequiredFeature<IHttpRequestLifetimeFeature>();
+                return new QueuedResponseWriter<TResponse>(ResponseStream!, () => IsDisconnected, MagicOnionServerInternalLogger.Current,
                     static value =>
                     {
                         if (value is StreamingHubPayload payload)
                         {
                             StreamingHubPayloadPool.Shared.Return(payload);
                         }
-                    }));
+                    },
+                    static value => value is StreamingHubPayload payload ? payload.Length : 0,
+                    () =>
+                    {
+                        CompleteStreamingHub();
+                        // Queue closure alone cannot unblock an in-flight transport write.
+                        requestLifetime.Abort();
+                    },
+                    options.StreamingHubResponseQueueMaxLength,
+                    options.StreamingHubResponseQueueMaxSize);
+            });
         }
         else
         {
@@ -89,7 +107,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
 
     public void CompleteStreamingHub()
     {
-        IsDisconnected = true;
+        isDisconnected = true;
         streamingResponseWriter.Value.Dispose();
     }
 }

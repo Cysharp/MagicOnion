@@ -12,6 +12,8 @@ using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 using MessagePack;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.ObjectPool;
@@ -269,6 +271,7 @@ public partial class StreamingHubPayloadReturnTest
         public int InvocationCount => hub.InvocationCount;
         public StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> Context => context;
         public (int Count, long Bytes) OutstandingPayloads => pool.OutstandingPayloads;
+        public IHttpRequestLifetimeFeature RequestLifetime { get; } = Substitute.For<IHttpRequestLifetimeFeature>();
 
         public Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> Requests
         {
@@ -276,15 +279,21 @@ public partial class StreamingHubPayloadReturnTest
             set => SetField("requests", value);
         }
 
-        public Harness(IServerStreamWriter<StreamingHubPayload> responseStream = null)
+        public Harness(IServerStreamWriter<StreamingHubPayload> responseStream = null, MagicOnionOptions options = null)
         {
-            services = new ServiceCollection().AddMetrics().BuildServiceProvider();
+            services = new ServiceCollection().AddMetrics()
+                .AddSingleton<IOptions<MagicOnionOptions>>(Options.Create(options ?? new MagicOnionOptions()))
+                .BuildServiceProvider();
             metrics = new MagicOnionMetrics(services.GetRequiredService<IMeterFactory>());
             var method = Substitute.For<IMagicOnionGrpcMethod>();
             method.MethodType.Returns(MethodType.DuplexStreaming);
             method.ServiceName.Returns("PayloadReturnTestHub");
+            var serverCallContext = Substitute.For<ServerCallContext>();
+            var httpContext = new DefaultHttpContext();
+            httpContext.Features.Set(RequestLifetime);
+            serverCallContext.UserState.Returns(new Dictionary<object, object> { ["__HttpContext"] = httpContext });
             context = new StreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hub, method,
-                Substitute.For<ServerCallContext>(), MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null),
+                serverCallContext, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null),
                 metrics, NullLogger.Instance, services, null, responseStream ?? new ResponseStream(Response));
             ((IServiceBase)hub).Context = context;
             ((IServiceBase)hub).Metrics = metrics;
