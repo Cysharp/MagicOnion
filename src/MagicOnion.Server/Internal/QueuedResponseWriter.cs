@@ -11,6 +11,11 @@ internal class QueuedResponseWriter<T> : IDisposable
     IStreamingServiceContext serviceContext;
     Channel<T> channel;
 
+    /// <summary>
+    /// Gets a task that completes when the response queue consumer has stopped.
+    /// </summary>
+    public Task Completion { get; }
+
     public QueuedResponseWriter(IStreamingServiceContext serviceContext)
     {
         this.serviceContext = serviceContext;
@@ -21,7 +26,7 @@ internal class QueuedResponseWriter<T> : IDisposable
             SingleWriter = false
         });
 
-        ConsumeQueueAsync();
+        Completion = ConsumeQueueAsync();
     }
 
     public void Write(in T value)
@@ -29,7 +34,7 @@ internal class QueuedResponseWriter<T> : IDisposable
         channel.Writer.TryWrite(value);
     }
 
-    async void ConsumeQueueAsync()
+    async Task ConsumeQueueAsync()
     {
         var reader = channel.Reader;
         var stream = ((IServiceContextWithResponseStream<T>)serviceContext).ResponseStream!;

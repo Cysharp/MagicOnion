@@ -36,6 +36,13 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
     public IAsyncStreamReader<TRequest>? RequestStream { get; }
     public IServerStreamWriter<TResponse>? ResponseStream { get; }
 
+    /// <summary>
+    /// Gets the response queue consumer's completion task, or a completed task if the writer has not been created.
+    /// </summary>
+    internal Task ResponseWriterCompletion => streamingResponseWriter is { IsValueCreated: true }
+        ? streamingResponseWriter.Value.Completion
+        : Task.CompletedTask;
+
     // used in StreamingHub
     public bool IsDisconnected { get; private set; }
 
