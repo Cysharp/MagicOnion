@@ -80,4 +80,65 @@ public class BoxTest
         Assert.Equal(box2.Value, box1.Value);
         Assert.Same(box2, box1);
     }
+
+    [Fact]
+    public void CacheNullableBool()
+    {
+        // Act
+        var box1 = Box.Create<bool?>(true);
+        var box2 = Box.Create<bool?>(false);
+
+        // Assert
+        Assert.True(box1.Value);
+        Assert.False(box2.Value);
+        Assert.NotEqual(box2.Value, box1.Value);
+        Assert.NotSame(box2, box1);
+    }
+
+    [Fact]
+    public void CacheNullableBoolTrue()
+    {
+        // Act
+        var box1 = Box.Create<bool?>(true);
+        var box2 = Box.Create<bool?>(true);
+
+        // Assert
+        Assert.True(box1.Value);
+        Assert.Equal(box2.Value, box1.Value);
+        Assert.Same(box2, box1);
+    }
+
+    [Fact]
+    public void CacheNullableBoolFalse()
+    {
+        // Act
+        var box1 = Box.Create<bool?>(false);
+        var box2 = Box.Create<bool?>(false);
+
+        // Assert
+        Assert.False(box1.Value);
+        Assert.Equal(box2.Value, box1.Value);
+        Assert.Same(box2, box1);
+    }
+
+    [Fact]
+    public void CacheNullableBoolIsSeparatedFromBool()
+    {
+        // Act
+        var box1 = Box.Create(true);
+        var box2 = Box.Create<bool?>(true);
+
+        // Assert
+        Assert.NotSame(box1, box2);
+    }
+
+    [Fact]
+    public void NullableBoolNull()
+    {
+        // Act
+        var box = Box.Create<bool?>(null);
+
+        // Assert
+        Assert.Null(box.Value);
+    }
 }
