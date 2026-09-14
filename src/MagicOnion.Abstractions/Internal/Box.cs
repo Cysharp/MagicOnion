@@ -41,11 +41,17 @@ public sealed class Box<T> : IEquatable<Box<T>>
 public static class Box
 {
     private static readonly Box<MessagePack.Nil> Nil = new Box<MessagePack.Nil>(MessagePack.Nil.Default);
+    private static readonly Box<bool?> NullableBoolTrue = new Box<bool?>(true);
+    private static readonly Box<bool?> NullableBoolFalse = new Box<bool?>(false);
     private static readonly Box<bool> BoolTrue = new Box<bool>(true);
     private static readonly Box<bool> BoolFalse = new Box<bool>(false);
 
     public static Box<T> Create<T>(T value)
-        => (value is MessagePack.Nil) ? (Box<T>)(object)Nil
-            : (value is bool b) ? (Box<T>)(object)(b ? BoolTrue : BoolFalse)
-            : new Box<T>(value);
+        => (value is MessagePack.Nil)
+            ? (Box<T>)(object)Nil
+            : (value is bool b)
+                ? typeof(T) == typeof(bool?)
+                    ? (Box<T>)(object)(b ? NullableBoolTrue : NullableBoolFalse)
+                    : (Box<T>)(object)(b ? BoolTrue : BoolFalse)
+                : new Box<T>(value);
 }
