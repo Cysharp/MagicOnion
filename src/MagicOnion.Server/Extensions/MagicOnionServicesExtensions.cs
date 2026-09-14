@@ -58,7 +58,17 @@ public static class MagicOnionServicesExtensions
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
             {
-                configuration.GetSection(string.IsNullOrWhiteSpace(configName) ? "MagicOnion" : configName).Bind(o);
+                var section = configuration.GetSection(string.IsNullOrWhiteSpace(configName) ? "MagicOnion" : configName);
+                section.Bind(o);
+                // .NET 8 binding preserves initialized nullable properties for JSON null values.
+                // Honor explicit nulls consistently across supported frameworks.
+                foreach (var setting in section.GetChildren().Where(x => string.IsNullOrEmpty(x.Value) && !x.GetChildren().Any()))
+                {
+                    if (setting.Key.Equals(nameof(MagicOnionOptions.StreamingHubResponseQueueMaxLength), StringComparison.OrdinalIgnoreCase))
+                        o.StreamingHubResponseQueueMaxLength = null;
+                    else if (setting.Key.Equals(nameof(MagicOnionOptions.StreamingHubResponseQueueMaxSize), StringComparison.OrdinalIgnoreCase))
+                        o.StreamingHubResponseQueueMaxSize = null;
+                }
                 configureOptions?.Invoke(o);
             });
 

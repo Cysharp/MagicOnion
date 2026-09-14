@@ -12,6 +12,8 @@ using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Hubs.Internal;
 using MagicOnion.Server.Internal;
 using MessagePack;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.ObjectPool;
@@ -21,7 +23,7 @@ using NSubstitute;
 namespace MagicOnion.Server.Tests;
 
 [Collection(nameof(StreamingHubPayloadReturnTestCollection))]
-public class StreamingHubPayloadReturnTest
+public partial class StreamingHubPayloadReturnTest
 {
     [Theory]
     [InlineData(false, false)]
@@ -30,7 +32,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true, true)]
     public async Task ClientResult_ReturnsPayloadOnce(bool isError, bool registered)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         var id = Guid.NewGuid();
         var completion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         if (registered)
@@ -62,7 +64,7 @@ public class StreamingHubPayloadReturnTest
     [Fact]
     public async Task ClientResult_InvalidResultBody_ReturnsPayloadOnce()
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         var id = Guid.NewGuid();
         var completion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         harness.PendingTasks.Register(harness.PendingTasks.CreateTask("Receiver", 1, id, completion,
@@ -78,7 +80,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true)]
     public async Task Heartbeat_ReturnsInputPayloadOnce(bool clientHeartbeat)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         byte[] bytes = clientHeartbeat ? [0x94, 0x7e, 0x01, 0x02, 0xa3, 0x61, 0x62, 0x63] : [0x94, 0x7f, 0x01, 0xc0, 0xc0];
         var payload = harness.Rent(bytes);
 
@@ -109,7 +111,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(new byte[] { 0x92 })]
     public async Task MalformedMessage_ReturnsPayloadOnce(byte[] bytes)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         var payload = harness.Rent(bytes);
 
         await Assert.ThrowsAnyAsync<Exception>(() => harness.ProcessAsync(payload, TestContext.Current.CancellationToken).AsTask());
@@ -122,7 +124,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true)]
     public async Task Request_ReturnsPayloadOnlyAfterConsumption(bool fireAndForget)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         var bytes = BuildRequest(fireAndForget);
         var payload = harness.Rent(bytes);
 
@@ -155,7 +157,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true)]
     public async Task Request_CanceledWhileQueueIsFull_ReturnsOnlyUnqueuedPayload(bool fireAndForget)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         var queuedPayload = harness.Rent(BuildRequest(fireAndForget));
         // A one-element channel makes the pending write deterministic, without timing or network dependencies.
@@ -183,7 +185,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true)]
     public async Task Request_WaitsForQueueThenTransfersPayload(bool fireAndForget)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         harness.Requests = Channel.CreateBounded<(StreamingHubPayload, UniqueHashDictionary<StreamingHubHandler>, int, int, ReadOnlyMemory<byte>, bool)>(1);
         var firstPayload = harness.Rent(BuildRequest(fireAndForget));
         await harness.ProcessAsync(firstPayload, TestContext.Current.CancellationToken);
@@ -211,7 +213,7 @@ public class StreamingHubPayloadReturnTest
     [InlineData(true)]
     public async Task Request_ClosedQueue_ReturnsPayloadOnce(bool fireAndForget)
     {
-        using var harness = new Harness();
+        await using var harness = new Harness();
         harness.Requests.Writer.Complete();
         var payload = harness.Rent(BuildRequest(fireAndForget));
 
@@ -250,7 +252,7 @@ public class StreamingHubPayloadReturnTest
         return buffer.WrittenMemory.ToArray();
     }
 
-    sealed class Harness : IDisposable
+    sealed class Harness : IAsyncDisposable
     {
         static readonly Type HubBaseType = typeof(StreamingHubBase<ITestHub, ITestReceiver>);
         static readonly FieldInfo PoolField = typeof(StreamingHubPayloadPool).GetField("pool", BindingFlags.Instance | BindingFlags.NonPublic)!;
@@ -267,6 +269,9 @@ public class StreamingHubPayloadReturnTest
         public RemoteClientResultPendingTaskRegistry PendingTasks { get; } = new(Timeout.InfiniteTimeSpan);
         public TaskCompletionSource<StreamingHubPayload> Response { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public int InvocationCount => hub.InvocationCount;
+        public StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> Context => context;
+        public (int Count, long Bytes) OutstandingPayloads => pool.OutstandingPayloads;
+        public IHttpRequestLifetimeFeature RequestLifetime { get; } = Substitute.For<IHttpRequestLifetimeFeature>();
 
         public Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> Requests
         {
@@ -274,17 +279,22 @@ public class StreamingHubPayloadReturnTest
             set => SetField("requests", value);
         }
 
-        public Harness()
+        public Harness(IServerStreamWriter<StreamingHubPayload> responseStream = null, MagicOnionOptions options = null)
         {
-            services = new ServiceCollection().AddMetrics().BuildServiceProvider();
+            services = new ServiceCollection().AddMetrics()
+                .AddSingleton<IOptions<MagicOnionOptions>>(Options.Create(options ?? new MagicOnionOptions()))
+                .BuildServiceProvider();
             metrics = new MagicOnionMetrics(services.GetRequiredService<IMeterFactory>());
             var method = Substitute.For<IMagicOnionGrpcMethod>();
             method.MethodType.Returns(MethodType.DuplexStreaming);
             method.ServiceName.Returns("PayloadReturnTestHub");
-            var responseStream = new ResponseStream(Response);
+            var serverCallContext = Substitute.For<ServerCallContext>();
+            var httpContext = new DefaultHttpContext();
+            httpContext.Features.Set(RequestLifetime);
+            serverCallContext.UserState.Returns(new Dictionary<object, object> { ["__HttpContext"] = httpContext });
             context = new StreamingServiceContext<StreamingHubPayload, StreamingHubPayload>(hub, method,
-                Substitute.For<ServerCallContext>(), MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null),
-                metrics, NullLogger.Instance, services, null, responseStream);
+                serverCallContext, MessagePackMagicOnionSerializerProvider.Default.Create(MethodType.DuplexStreaming, null),
+                metrics, NullLogger.Instance, services, null, responseStream ?? new ResponseStream(Response));
             ((IServiceBase)hub).Context = context;
             ((IServiceBase)hub).Metrics = metrics;
             heartbeat = NopStreamingHubHeartbeatManager.Instance.Register(context);
@@ -324,11 +334,15 @@ public class StreamingHubPayloadReturnTest
             Assert.Throws<InvalidOperationException>(() => payload.Memory);
         }
 
+        public void AssertAllReturnedOnce() => pool.AssertAllReturnedOnce();
+
         void SetField(string name, object value) => HubBaseType.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(hub, value);
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             context.CompleteStreamingHub();
+            // Finish response cleanup before restoring the shared pool.
+            await context.ResponseWriterCompletion.WaitAsync(TimeSpan.FromSeconds(5), CancellationToken.None);
             heartbeat.Dispose();
             PendingTasks.Dispose();
             PoolField.SetValue(StreamingHubPayloadPool.Shared, originalPool);
@@ -373,6 +387,23 @@ public class StreamingHubPayloadReturnTest
         public int ReturnCount(StreamingHubPayloadCore obj)
         {
             lock (returns) return returns[obj];
+        }
+
+        public (int Count, long Bytes) OutstandingPayloads
+        {
+            get
+            {
+                lock (returns)
+                {
+                    var outstanding = returns.Where(x => x.Value == 0).Select(x => x.Key).ToArray();
+                    return (outstanding.Length, outstanding.Sum(x => (long)x.Length));
+                }
+            }
+        }
+
+        public void AssertAllReturnedOnce()
+        {
+            lock (returns) Assert.All(returns.Values, count => Assert.Equal(1, count));
         }
 
         public void Dispose()
