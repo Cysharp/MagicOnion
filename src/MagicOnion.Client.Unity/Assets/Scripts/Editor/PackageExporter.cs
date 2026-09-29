@@ -1,3 +1,5 @@
+﻿#if UNITY_EDITOR
+
 using System;
 using System.IO;
 using System.Linq;
@@ -38,6 +40,8 @@ public static class PackageExporter
             exportPath,
             ExportPackageOptions.Default);
 
-        UnityEngine.Debug.Log("Export complete: " + Path.GetFullPath(exportPath));
+        UnityEngine.Debug.Log("Build succeeded! Export complete: " + Path.GetFullPath(exportPath));
     }
 }
+
+#endif
