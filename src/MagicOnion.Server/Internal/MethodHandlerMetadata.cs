@@ -8,6 +8,50 @@ namespace MagicOnion.Server.Internal;
 
 public class MethodHandlerMetadata
 {
+    /// <summary>
+    /// Creates metadata for a service method whose contract and message types are known at compile time.
+    /// </summary>
+    /// <param name="serviceImplementationType">The concrete service implementation type.</param>
+    /// <param name="serviceMethod">The implementation method, preserved for reflection by the caller.</param>
+    /// <param name="methodType">The gRPC method type.</param>
+    /// <param name="responseType">The unwrapped response type.</param>
+    /// <param name="requestType">The request type, including any argument tuple.</param>
+    /// <param name="serviceInterface">The service contract interface.</param>
+    /// <returns>Metadata including the implementation's parameters and inherited attributes.</returns>
+    public static MethodHandlerMetadata Create(Type serviceImplementationType, MethodInfo serviceMethod, MethodType methodType, Type responseType, Type requestType, Type serviceInterface)
+    {
+        var metadata = serviceImplementationType.GetCustomAttributes(true)
+            .Concat(serviceMethod.GetCustomAttributes(true))
+            .ToList();
+
+        // Accept CORS preflight requests so that the CORS middleware can handle them.
+        metadata.Add(new HttpMethodMetadata(new[] { "POST" }, acceptCorsPreflight: true));
+
+        return new MethodHandlerMetadata(serviceImplementationType, serviceMethod, methodType, responseType, requestType, serviceMethod.GetParameters(), serviceInterface, metadata);
+    }
+
+    /// <summary>
+    /// Creates metadata for the built-in StreamingHub connection method without discovering its message types.
+    /// </summary>
+    /// <typeparam name="TService">The concrete hub implementation type.</typeparam>
+    /// <typeparam name="THubInterface">The hub contract interface.</typeparam>
+    /// <typeparam name="TReceiver">The receiver contract interface.</typeparam>
+    /// <returns>Metadata for the built-in connection method, including attributes on the concrete hub.</returns>
+    /// <remarks>
+    /// The method is reflected from <see cref="StreamingHubBase{THubInterface, TReceiver}"/>, where the
+    /// private explicit implementation is declared. <see cref="ServiceImplementationType"/> remains
+    /// <typeparamref name="TService"/>. This avoids runtime differences in inherited private method lookup.
+    /// </remarks>
+    public static MethodHandlerMetadata CreateStreamingHubConnect<TService, THubInterface, TReceiver>()
+        where TService : StreamingHubBase<THubInterface, TReceiver>
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        // Connect is an explicit implementation declared on the base class. Preserve it there,
+        // since preserving non-public members on TService does not preserve private base methods.
+        var method = typeof(StreamingHubBase<THubInterface, TReceiver>).GetMethod("MagicOnion.Server.Internal.IStreamingHubBase.Connect", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return Create(typeof(TService), method, MethodType.DuplexStreaming, typeof(StreamingHubPayload), typeof(StreamingHubPayload), typeof(THubInterface));
+    }
+
     public Type ServiceImplementationType { get; }
     public MethodInfo ServiceImplementationMethod { get; }
 
@@ -45,6 +89,27 @@ public class MethodHandlerMetadata
 
 public class StreamingHubMethodHandlerMetadata
 {
+    /// <summary>
+    /// Creates metadata for a hub method whose identifier, contract, and message types are known at compile time.
+    /// </summary>
+    /// <param name="methodId">The method identifier defined by the hub contract.</param>
+    /// <param name="streamingHubImplementationType">The concrete hub implementation type.</param>
+    /// <param name="interfaceMethodInfo">The contract method, preserved for reflection by the caller.</param>
+    /// <param name="implementationMethodInfo">The implementation method, preserved for reflection by the caller.</param>
+    /// <param name="responseType">The unwrapped response type, or <see langword="null"/> for a method without a result.</param>
+    /// <param name="requestType">The request type, including any argument tuple.</param>
+    /// <param name="streamingHubInterfaceType">The hub contract interface.</param>
+    /// <returns>Metadata including the implementation's parameters and inherited attributes.</returns>
+    public static StreamingHubMethodHandlerMetadata Create(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, Type streamingHubInterfaceType)
+    {
+        var attributes = streamingHubImplementationType.GetCustomAttributes(true)
+            .Concat(implementationMethodInfo.GetCustomAttributes(true))
+            .Cast<Attribute>()
+            .ToArray();
+
+        return new StreamingHubMethodHandlerMetadata(methodId, streamingHubImplementationType, interfaceMethodInfo, implementationMethodInfo, responseType, requestType, implementationMethodInfo.GetParameters(), streamingHubInterfaceType, attributes);
+    }
+
     public int MethodId { get; }
     public Type StreamingHubImplementationType { get; }
     public Type StreamingHubInterfaceType { get; }
@@ -97,17 +162,7 @@ internal class MethodHandlerMetadataFactory
             throw new InvalidOperationException($"{methodType} does not support method parameters. If you need to send some arguments, use request headers instead. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
-        var metadata = serviceClass.GetCustomAttributes(true)
-            .Concat(methodInfo.GetCustomAttributes(true))
-            .ToList();
-
-        // from https://github.com/grpc/grpc-dotnet/blob/1732f28dc6ad74da33b2758f11cbdfabb2dcbc86/src/Grpc.AspNetCore.Server/Model/Internal/ProviderServiceBinder.cs#L91
-        // Accepting CORS preflight means gRPC will allow requests with OPTIONS + preflight headers.
-        // If CORS middleware hasn't been configured then the request will reach gRPC handler.
-        // gRPC will return 405 response and log that CORS has not been configured.
-        metadata.Add(new HttpMethodMetadata(new[] { "POST" }, acceptCorsPreflight: true));
-
-        return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, metadata);
+        return MethodHandlerMetadata.Create(serviceClass, methodInfo, methodType, responseType, requestType, serviceInterfaceType);
     }
 
     public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata<T>(string methodName)
@@ -128,11 +183,6 @@ internal class MethodHandlerMetadataFactory
         var responseType = UnwrapStreamingHubResponseType(methodInfo, out var responseIsTaskOrValueTask);
         var requestType = GetRequestTypeFromMethod(methodInfo, parameters);
 
-        var attributes = serviceClass.GetCustomAttributes(true)
-            .Concat(methodInfo.GetCustomAttributes(true))
-            .Cast<Attribute>()
-            .ToArray();
-
         var interfaceMethodInfo = ResolveInterfaceMethod(serviceClass, hubInterface, methodInfo.Name);
 
         if (!responseIsTaskOrValueTask)
@@ -146,7 +196,7 @@ internal class MethodHandlerMetadataFactory
             throw new InvalidOperationException($"The '{serviceClass.Name}.{methodInfo.Name}' cannot have MethodId attribute. MethodId attribute must be annotated to a hub interface instead.");
         }
 
-        return new StreamingHubMethodHandlerMetadata(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, parameters, hubInterface, attributes);
+        return StreamingHubMethodHandlerMetadata.Create(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, hubInterface);
     }
 
     static MethodInfo ResolveInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)

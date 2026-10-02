@@ -70,6 +70,7 @@
     <Project Path="tests/MagicOnion.Serialization.MessagePack.Tests/MagicOnion.Serialization.MessagePack.Tests.csproj" />
     <Project Path="tests/MagicOnion.Server.InternalTesting/MagicOnion.Server.InternalTesting.csproj" />
     <Project Path="tests/MagicOnion.Server.JsonTranscoding.Tests/MagicOnion.Server.JsonTranscoding.Tests.csproj" />
+    <Project Path="tests/MagicOnion.Server.NativeAot.Tests/MagicOnion.Server.NativeAot.Tests.csproj" />
     <Project Path="tests/MagicOnion.Server.Redis.Tests/MagicOnion.Server.Redis.Tests.csproj" />
     <Project Path="tests/MagicOnion.Server.Tests/MagicOnion.Server.Tests.csproj" />
   </Folder>

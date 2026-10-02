@@ -16,7 +16,7 @@ public interface IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawReque
     ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request);
 }
 
-public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, TRawRequest, TRawResponse>(string serviceName, string methodName)
+public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, TRawRequest, TRawResponse>
     : IMagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
     where TService : class
     where TRawRequest : class
@@ -26,10 +26,31 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
 
     public MethodType MethodType => MethodType.Unary;
     public Type ServiceImplementationType => typeof(TService);
-    public string ServiceName => serviceName;
-    public string MethodName => methodName;
+    public string ServiceName { get; }
+    public string MethodName { get; }
 
-    public MethodHandlerMetadata Metadata { get; } = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName);
+    public MethodHandlerMetadata Metadata { get; }
+
+    /// <summary>
+    /// Initializes a unary method by discovering its metadata at runtime.
+    /// </summary>
+    public MagicOnionUnaryMethodBase(string serviceName, string methodName)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a unary method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The service name exposed over gRPC.</param>
+    /// <param name="methodName">The method name exposed over gRPC.</param>
+    /// <param name="metadata">The metadata for the service implementation method.</param>
+    public MagicOnionUnaryMethodBase(string serviceName, string methodName, MethodHandlerMetadata metadata)
+    {
+        ServiceName = serviceName;
+        MethodName = methodName;
+        Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
+    }
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)
         => binder.BindUnary(this);
@@ -77,22 +98,68 @@ public abstract class MagicOnionUnaryMethodBase<TService, TRequest, TResponse, T
 }
 
 [DebuggerDisplay("MagicOnionUnaryMethod: {ServiceName,nq}.{MethodName,nq}; Implementation={typeof(TService).ToString(),nq}; Request={typeof(TRequest).ToString(),nq}; RawRequest={typeof(TRawRequest).ToString(),nq}; Response={typeof(TResponse).ToString(),nq}; RawResponse={typeof(TRawResponse).ToString(),nq}")]
-public sealed class MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult<TResponse>> invoker)
-    : MagicOnionUnaryMethodBase<TService, TRequest, TResponse, TRawRequest, TRawResponse>(serviceName, methodName)
+public sealed class MagicOnionUnaryMethod<TService, TRequest, TResponse, TRawRequest, TRawResponse>
+    : MagicOnionUnaryMethodBase<TService, TRequest, TResponse, TRawRequest, TRawResponse>
     where TService : class
     where TRawRequest : class
     where TRawResponse : class
 {
+    readonly Func<TService, ServiceContext, TRequest, UnaryResult<TResponse>> invoker;
+
+    /// <summary>
+    /// Initializes a unary method by discovering its metadata at runtime.
+    /// </summary>
+    public MagicOnionUnaryMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult<TResponse>> invoker)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName), invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a unary method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The service name exposed over gRPC.</param>
+    /// <param name="methodName">The method name exposed over gRPC.</param>
+    /// <param name="metadata">The metadata for the service implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionUnaryMethod(string serviceName, string methodName, MethodHandlerMetadata metadata, Func<TService, ServiceContext, TRequest, UnaryResult<TResponse>> invoker)
+        : base(serviceName, methodName, metadata)
+    {
+        this.invoker = invoker;
+    }
+
     public override ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request)
         => SetUnaryResult(invoker(service, context, request), context);
 }
 
 [DebuggerDisplay("MagicOnionUnaryMethod: {ServiceName,nq}.{MethodName,nq}; Implementation={typeof(TService).ToString(),nq}; Request={typeof(TRequest).ToString(),nq}; RawRequest={typeof(TRawRequest).ToString(),nq}")]
-public sealed class MagicOnionUnaryMethod<TService, TRequest, TRawRequest>(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult> invoker)
-    : MagicOnionUnaryMethodBase<TService, TRequest, MessagePack.Nil, TRawRequest, Box<MessagePack.Nil>>(serviceName, methodName)
+public sealed class MagicOnionUnaryMethod<TService, TRequest, TRawRequest>
+    : MagicOnionUnaryMethodBase<TService, TRequest, MessagePack.Nil, TRawRequest, Box<MessagePack.Nil>>
     where TService : class
     where TRawRequest : class
 {
+    readonly Func<TService, ServiceContext, TRequest, UnaryResult> invoker;
+
+    /// <summary>
+    /// Initializes a unary method by discovering its metadata at runtime.
+    /// </summary>
+    public MagicOnionUnaryMethod(string serviceName, string methodName, Func<TService, ServiceContext, TRequest, UnaryResult> invoker)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName), invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a unary method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The service name exposed over gRPC.</param>
+    /// <param name="methodName">The method name exposed over gRPC.</param>
+    /// <param name="metadata">The metadata for the service implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionUnaryMethod(string serviceName, string methodName, MethodHandlerMetadata metadata, Func<TService, ServiceContext, TRequest, UnaryResult> invoker)
+        : base(serviceName, methodName, metadata)
+    {
+        this.invoker = invoker;
+    }
+
     public override ValueTask InvokeAsync(TService service, ServiceContext context, TRequest request)
         => SetUnaryResultNonGeneric(invoker(service, context, request), context);
 }

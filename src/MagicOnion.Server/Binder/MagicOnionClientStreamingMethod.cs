@@ -21,10 +21,22 @@ public class MagicOnionClientStreamingMethod<TService, TRequest, TResponse, TRaw
     public MethodHandlerMetadata Metadata { get; }
 
     public MagicOnionClientStreamingMethod(string serviceName, string methodName, Func<TService, ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>> invoker)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName), invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a streaming method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The service name exposed over gRPC.</param>
+    /// <param name="methodName">The method name exposed over gRPC.</param>
+    /// <param name="metadata">The metadata for the service implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionClientStreamingMethod(string serviceName, string methodName, MethodHandlerMetadata metadata, Func<TService, ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>> invoker)
     {
         ServiceName = serviceName;
         MethodName = methodName;
-        Metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>(methodName);
+        Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
 
         this.invoker = invoker;
     }

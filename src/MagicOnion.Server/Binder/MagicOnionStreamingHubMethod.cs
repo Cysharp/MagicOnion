@@ -25,12 +25,24 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
 
     // for Dynamic
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Delegate invoker)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(methodName), invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Delegate invoker)
     {
         Debug.Assert(invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> or Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>>);
 
         this.ServiceName = serviceName;
         this.MethodName  = methodName;
-        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(MethodName);
+        this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invokerTask)
         {
@@ -48,7 +60,31 @@ public class MagicOnionStreamingHubMethod<TService, TRequest, TResponse> : IMagi
     {
     }
 
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, ValueTask<TResponse>> invoker)
+        : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invoker) : this(serviceName, methodName, (Delegate)invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, Task<TResponse>> invoker)
+        : this(serviceName, methodName, metadata, (Delegate)invoker)
     {
     }
 
@@ -71,12 +107,24 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
 
     // for Dynamic
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Delegate invoker)
+        : this(serviceName, methodName, MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(methodName), invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Delegate invoker)
     {
         Debug.Assert(invoker is Func<TService, StreamingHubContext, TRequest, Task> or Func<TService, StreamingHubContext, TRequest, ValueTask> or Action<TService, StreamingHubContext, TRequest>);
 
         this.ServiceName = serviceName;
         this.MethodName = methodName;
-        this.Metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata<TService>(MethodName);
+        this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
 
         if (invoker is Func<TService, StreamingHubContext, TRequest, Task> invokerTask)
         {
@@ -103,11 +151,47 @@ public class MagicOnionStreamingHubMethod<TService, TRequest> : IMagicOnionStrea
     {
     }
 
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, ValueTask> invoker)
+        : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Func<TService, StreamingHubContext, TRequest, Task> invoker) : this(serviceName, methodName, (Delegate)invoker)
     {
     }
 
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Func<TService, StreamingHubContext, TRequest, Task> invoker)
+        : this(serviceName, methodName, metadata, (Delegate)invoker)
+    {
+    }
+
     public MagicOnionStreamingHubMethod(string serviceName, string methodName, Action<TService, StreamingHubContext, TRequest> invoker) : this(serviceName, methodName, (Delegate)invoker)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a hub method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub contract name.</param>
+    /// <param name="methodName">The hub method name.</param>
+    /// <param name="metadata">The metadata for the hub implementation method.</param>
+    /// <param name="invoker">The delegate that invokes the implementation method.</param>
+    public MagicOnionStreamingHubMethod(string serviceName, string methodName, StreamingHubMethodHandlerMetadata metadata, Action<TService, StreamingHubContext, TRequest> invoker)
+        : this(serviceName, methodName, metadata, (Delegate)invoker)
     {
     }
 
