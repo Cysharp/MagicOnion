@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
+    <!-- Run this executable in the NativeAOT CI job. Shared tests also run in MagicOnion.Server.Tests. -->
+    <IsTestProject>false</IsTestProject>
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
     <!-- Keeping Connect's MethodInfo also roots existing MessagePack paths. Report their
          AOT diagnostics until serializer support is implemented; do not suppress them. -->
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
