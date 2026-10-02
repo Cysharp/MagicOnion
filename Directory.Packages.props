@@ -47,6 +47,7 @@
     <PackageVersion Include="Testcontainers" Version="2.3.0" />
     <PackageVersion Include="TUnit" Version="0.4.105" />
     <PackageVersion Include="xunit.v3" Version="1.0.0" />
+    <PackageVersion Include="xunit.v3.aot" Version="4.0.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
   </ItemGroup>
   <!-- for samples/perf -->

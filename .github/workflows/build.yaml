@@ -59,6 +59,18 @@ jobs:
       - run: dotnet publish -r linux-x64 tests/MagicOnion.Client.NativeAot.Tests/MagicOnion.Client.NativeAot.Tests.csproj
       - run: tests/MagicOnion.Client.NativeAot.Tests/bin/Release/net10.0/linux-x64/publish/MagicOnion.Client.NativeAot.Tests
 
+  run-server-nativeaot-tests:
+    name: "Run Server Native AOT tests"
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: Cysharp/Actions/.github/actions/checkout@main
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      - run: dotnet publish -c Release -r linux-x64 tests/MagicOnion.Server.NativeAot.Tests/MagicOnion.Server.NativeAot.Tests.csproj
+      - run: tests/MagicOnion.Server.NativeAot.Tests/bin/Release/net10.0/linux-x64/publish/MagicOnion.Server.NativeAot.Tests
+
   build-unity:
     name: "Verify the integrity of files for Unity"
     if: ${{ (github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:') }}
@@ -128,7 +140,7 @@ jobs:
       #    retention-days: 1
 
   actions-timeline:
-    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, build-unity]
+    needs: [build-dotnet, run-tests, run-client-nativeaot-tests, run-server-nativeaot-tests, build-unity]
     permissions:
       contents: read
     uses: Cysharp/Actions/.github/workflows/actions-timeline.yaml@main

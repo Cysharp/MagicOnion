@@ -13,12 +13,23 @@ public class MagicOnionStreamingHubConnectMethod<TService> : IMagicOnionGrpcMeth
     public string ServiceName { get; }
     public string MethodName { get; }
 
-    public MethodHandlerMetadata Metadata { get; } = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>("MagicOnion.Server.Internal.IStreamingHubBase.Connect");
+    public MethodHandlerMetadata Metadata { get; }
 
     public MagicOnionStreamingHubConnectMethod(string serviceName)
+        : this(serviceName, MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata<TService>("MagicOnion.Server.Internal.IStreamingHubBase.Connect"))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a StreamingHub connection method with precomputed metadata, without runtime method discovery.
+    /// </summary>
+    /// <param name="serviceName">The hub name exposed over gRPC.</param>
+    /// <param name="metadata">The metadata for the built-in connection method.</param>
+    public MagicOnionStreamingHubConnectMethod(string serviceName, MethodHandlerMetadata metadata)
     {
         ServiceName = serviceName;
         MethodName = nameof(IStreamingHubBase.Connect);
+        Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
     }
 
     public void Bind(IMagicOnionGrpcMethodBinder<TService> binder)

@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../MagicOnion.Server.NativeAot.Tests/MethodMetadataTest.cs" Link="NativeAot/MethodMetadataTest.cs" />
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
