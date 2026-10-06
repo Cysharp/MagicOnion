@@ -3,3 +3,16 @@ MagicOnion.GenerateDefineDebugAttribute
 MagicOnion.GenerateDefineDebugAttribute.GenerateDefineDebugAttribute() -> void
 MagicOnion.GenerateIfDirectiveAttribute
 MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute(string! condition) -> void
+MagicOnion.ReliableAttribute
+MagicOnion.ReliableAttribute.ReliableAttribute() -> void
+MagicOnion.StreamingHubTransportMode
+MagicOnion.StreamingHubTransportMode.Reliable = 0 -> MagicOnion.StreamingHubTransportMode
+MagicOnion.StreamingHubTransportMode.UnreliableSequenced = 1 -> MagicOnion.StreamingHubTransportMode
+MagicOnion.StreamingHubTransportMode.UnreliableUnordered = 2 -> MagicOnion.StreamingHubTransportMode
+MagicOnion.TransportAttribute
+MagicOnion.TransportAttribute.Mode.get -> MagicOnion.StreamingHubTransportMode
+MagicOnion.TransportAttribute.TransportAttribute(MagicOnion.StreamingHubTransportMode mode) -> void
+MagicOnion.UnreliableAttribute
+MagicOnion.UnreliableAttribute.UnreliableAttribute() -> void
+MagicOnion.UnreliableUnorderedAttribute
+MagicOnion.UnreliableUnorderedAttribute.UnreliableUnorderedAttribute() -> void
