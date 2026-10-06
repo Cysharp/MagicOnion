@@ -36,7 +36,7 @@ public static class MethodCollector
                 foreach (var methodSymbol in GetAllMethods(x, ctx.ReferenceSymbols))
                 {
                     if (HasIgnoreAttribute(methodSymbol)) continue;
-                    if (TryCreateHubMethodInfoFromMethodSymbol(ctx, serviceType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateHubMethodInfoFromMethodSymbol(ctx, serviceType, x, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         // When a method with the same name has already been registered, it is ignored.
                         if (!methods.Any(x => x.MethodName == methodInfo.MethodName))
@@ -61,7 +61,7 @@ public static class MethodCollector
                 var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo>();
                 foreach (var methodSymbol in GetAllMethods(receiverInterfaceSymbol, ctx.ReferenceSymbols))
                 {
-                    if (TryCreateHubReceiverMethodInfoFromMethodSymbol(ctx, serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateHubReceiverMethodInfoFromMethodSymbol(ctx, serviceType, receiverType, receiverInterfaceSymbol, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         // When a method with the same name has already been registered, it is ignored.
                         if (!receiverMethods.Any(x => x.MethodName == methodInfo.MethodName))
@@ -97,13 +97,16 @@ public static class MethodCollector
 
     static IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol typeSymbol, ReferenceSymbols referenceSymbols)
     {
+        // A method inherited through several paths (diamond inheritance) is reached more than once; report it once.
         return typeSymbol.GetMembers()
             .OfType<IMethodSymbol>()
             .Concat(
                 typeSymbol.AllInterfaces
                     .Where(x => !x.OriginalDefinition.ApproximatelyEqual(referenceSymbols.IStreamingHub))
                     .SelectMany(x => GetAllMethods(x, referenceSymbols))
-            );
+            )
+            .Distinct(SymbolEqualityComparer.Default)
+            .Cast<IMethodSymbol>();
     }
 
     static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
@@ -121,13 +124,14 @@ public static class MethodCollector
         return serviceType.Name;
     }
 
-    static bool TryCreateHubMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateHubMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, INamedTypeSymbol hubInterfaceSymbol, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+        var hasReturnValue = false;
         switch (methodReturnType.FullNameOpenType)
         {
             case "global::System.Threading.Tasks.Task":
@@ -138,6 +142,7 @@ public static class MethodCollector
             case "global::System.Threading.Tasks.Task<>":
             case "global::System.Threading.Tasks.ValueTask<>":
                 responseType = methodReturnType.GenericArguments[0];
+                hasReturnValue = true;
                 break;
             default:
                 methodInfo = null;
@@ -148,18 +153,35 @@ public static class MethodCollector
                 return false;
         }
 
+        // Resolve the transport mode from the shared contract. An unreliable method cannot return a result.
+        if (!TransportModeResolver.TryResolve(hubInterfaceSymbol, methodSymbol, out var transportMode, out diagnostic))
+        {
+            methodInfo = null;
+            return false;
+        }
+        if (transportMode != TransportMode.Reliable && hasReturnValue)
+        {
+            methodInfo = null;
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.StreamingHubUnreliableMethodMustNotReturnValue,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
+                $"{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified));
+            return false;
+        }
+
         methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
             hubId,
             methodSymbol.Name,
             methodParameters,
             methodReturnType,
             requestType,
-            responseType
+            responseType,
+            transportMode
         );
         diagnostic = null;
         return true;
     }
-    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo? methodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, ITypeSymbol receiverInterfaceSymbol, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
@@ -185,13 +207,30 @@ public static class MethodCollector
             responseType = methodReturnType.GenericArguments[0];
         }
 
+        // Resolve the transport mode from the shared contract. A client result method (non-void) cannot be unreliable.
+        if (!TransportModeResolver.TryResolve(receiverInterfaceSymbol, methodSymbol, out var transportMode, out diagnostic))
+        {
+            methodInfo = null;
+            return false;
+        }
+        if (transportMode != TransportMode.Reliable && methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
+        {
+            methodInfo = null;
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.StreamingHubUnreliableReceiverMethodMustReturnVoid,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
+                $"{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace));
+            return false;
+        }
+
         methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo(
             hubId,
             methodSymbol.Name,
             methodParameters,
             methodReturnType,
             requestType,
-            responseType
+            responseType,
+            transportMode
         );
         diagnostic = null;
         return true;

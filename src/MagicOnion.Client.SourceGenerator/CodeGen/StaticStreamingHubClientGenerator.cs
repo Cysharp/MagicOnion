@@ -177,6 +177,34 @@ public class StaticStreamingHubClientGenerator
                                 return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                             }
             """);
+
+            // Unreliable methods never return a value, so only the Task and ValueTask shapes are needed.
+            if (ctx.Hub.Methods.Any(x => x.TransportMode != TransportMode.Reliable))
+            {
+                ctx.Writer.AppendLine("""
+
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageUnreliableDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    return base.WriteMessageUnreliableTaskAsync<TRequest, TResponse>(methodId, message);
+                                }
+
+                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>).AsTask();
+                            }
+
+                            async global::System.Threading.Tasks.ValueTask WriteMessageUnreliableDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    await base.WriteMessageUnreliableValueTaskAsync<TRequest, TResponse>(methodId, message);
+                                    return;
+                                }
+
+                                await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>);
+                            }
+            """);
+            }
             ctx.Writer.AppendLine();
         }
     }
@@ -253,14 +281,20 @@ public class StaticStreamingHubClientGenerator
                 _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
             };
             var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
+            // An unreliable method always uses the unreliable write path, whether called directly or through FireAndForget().
+            var isUnreliable = method.TransportMode != TransportMode.Reliable;
             var writeMessageTarget = isFireAndForget ? "parent" : "this";
             var writeMessageAsyncPrefix = ctx.EnableStreamingHubDiagnosticHandler
-                ? isFireAndForget || isReturnTypeVoid
-                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnostic"
-                    : $"{writeMessageTarget}.WriteMessageWithResponseDiagnostic"
-                : isFireAndForget || isReturnTypeVoid
-                    ? $"{writeMessageTarget}.WriteMessageFireAndForget"
-                    : $"{writeMessageTarget}.WriteMessageWithResponse";
+                ? isUnreliable
+                    ? $"{writeMessageTarget}.WriteMessageUnreliableDiagnostic"
+                    : isFireAndForget || isReturnTypeVoid
+                        ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnostic"
+                        : $"{writeMessageTarget}.WriteMessageWithResponseDiagnostic"
+                : isUnreliable
+                    ? $"{writeMessageTarget}.WriteMessageUnreliable"
+                    : isFireAndForget || isReturnTypeVoid
+                        ? $"{writeMessageTarget}.WriteMessageFireAndForget"
+                        : $"{writeMessageTarget}.WriteMessageWithResponse";
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""

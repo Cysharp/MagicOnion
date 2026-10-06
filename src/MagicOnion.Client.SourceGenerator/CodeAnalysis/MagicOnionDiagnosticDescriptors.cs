@@ -85,4 +85,44 @@ public static class MagicOnionDiagnosticDescriptors
             description: "The interface '{0}' has two or more IStreamingHub<THub, THubReceiver> interfaces.",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor StreamingHubTransportAttributeConflict =
+        new DiagnosticDescriptor(
+            id: "MOC1009",
+            title: "Must specify a single transport attribute",
+            messageFormat: "'{0}' has multiple transport attributes ({1}). Specify only one of [Transport], [Reliable], [Unreliable], or [UnreliableUnordered].",
+            category: "Usage",
+            description: "An interface or method must not specify more than one transport attribute.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor StreamingHubTransportModeAmbiguous =
+        new DiagnosticDescriptor(
+            id: "MOC1010",
+            title: "Transport mode is ambiguous",
+            messageFormat: "The transport mode of '{0}' is ambiguous for '{1}'. '{2}' specifies {3} and '{4}' specifies {5} at the same inheritance distance. Specify the mode on the method or on '{1}'.",
+            category: "Usage",
+            description: "Inherited interfaces at the same inheritance distance specify different transport modes.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor StreamingHubUnreliableMethodMustNotReturnValue =
+        new DiagnosticDescriptor(
+            id: "MOC1011",
+            title: "Unreliable method must not return a value",
+            messageFormat: "The unreliable StreamingHub method '{0}' has return type '{1}'. An unreliable method must return void, Task, or ValueTask. Mark the method with [Reliable] to override an unreliable interface default.",
+            category: "Usage",
+            description: "A StreamingHub method whose effective transport mode is unreliable cannot return a result.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor StreamingHubUnreliableReceiverMethodMustReturnVoid =
+        new DiagnosticDescriptor(
+            id: "MOC1012",
+            title: "Unreliable receiver method must return void",
+            messageFormat: "The unreliable StreamingHub receiver method '{0}' has return type '{1}'. A client result method cannot be unreliable. Mark the method with [Reliable] to override an unreliable interface default.",
+            category: "Usage",
+            description: "A StreamingHub receiver method whose effective transport mode is unreliable must return void.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
 }

@@ -68,7 +68,12 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         /// </summary>
         public MagicOnionTypeInfo ResponseType { get; }
 
-        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType)
+        /// <summary>
+        /// Gets the effective transport mode resolved from the shared contract interface.
+        /// </summary>
+        public TransportMode TransportMode { get; }
+
+        public MagicOnionHubMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, TransportMode transportMode = TransportMode.Reliable)
         {
             HubId = hubId;
             MethodName = methodName;
@@ -76,6 +81,7 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
             MethodReturnType = methodReturnType;
             RequestType = requestType;
             ResponseType = responseType;
+            TransportMode = transportMode;
         }
     }
 
@@ -84,8 +90,8 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
     {
         public bool IsClientResult { get; }
 
-        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType)
-            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType)
+        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType, TransportMode transportMode = TransportMode.Reliable)
+            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType, transportMode)
         {
             IsClientResult = methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void;
         }
