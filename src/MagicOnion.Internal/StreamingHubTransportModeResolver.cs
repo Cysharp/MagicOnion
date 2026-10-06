@@ -19,8 +19,6 @@ namespace MagicOnion.Internal;
 /// </remarks>
 internal static class StreamingHubTransportModeResolver
 {
-    const string TrimmingMessage = "StreamingHubTransportModeResolver walks interface hierarchies by reflection and is incompatible with trimming. Use a generated client instead.";
-
     /// <summary>
     /// Resolves the effective transport mode of a method when it is accessed through the specified root contract interface.
     /// </summary>
@@ -28,8 +26,16 @@ internal static class StreamingHubTransportModeResolver
     /// <param name="method">A method declared on <paramref name="rootInterface"/> or one of its inherited interfaces.</param>
     /// <returns>The effective transport mode.</returns>
     /// <exception cref="InvalidOperationException">The contract specifies conflicting or ambiguous transport attributes.</exception>
-    [RequiresUnreferencedCode(TrimmingMessage)]
-    public static StreamingHubTransportMode Resolve(Type rootInterface, MethodInfo method)
+    /// <remarks>
+    /// Only the interface list of <paramref name="rootInterface"/> is reflected. Inheritance distances are derived from the flattened list
+    /// with <see cref="Type.IsAssignableFrom"/>, so no further reflection on the inherited interfaces is required.
+    /// </remarks>
+    public static StreamingHubTransportMode Resolve(
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+        Type rootInterface,
+        MethodInfo method)
     {
         if (rootInterface is null) throw new ArgumentNullException(nameof(rootInterface));
         if (method is null) throw new ArgumentNullException(nameof(method));
@@ -54,7 +60,7 @@ internal static class StreamingHubTransportModeResolver
         }
 
         // 3. The nearest applicable inherited interface default.
-        foreach (var level in EnumerateInheritedInterfacesByDistance(rootInterface))
+        foreach (var level in EnumerateInheritedInterfacesByDistance(rootInterface, rootInterface.GetInterfaces()))
         {
             StreamingHubTransportMode? levelMode = null;
             Type? levelSource = null;
@@ -151,12 +157,16 @@ internal static class StreamingHubTransportModeResolver
             _ => member.ToString() ?? string.Empty,
         };
 
-    [RequiresUnreferencedCode(TrimmingMessage)]
-    static IEnumerable<Type[]> EnumerateInheritedInterfacesByDistance(Type root)
+    /// <summary>
+    /// Enumerates the inherited interfaces of <paramref name="root"/> grouped by inheritance distance, nearest first.
+    /// </summary>
+    /// <param name="root">The root interface.</param>
+    /// <param name="allInterfaces">The flattened interface list of <paramref name="root"/>.</param>
+    static IEnumerable<Type[]> EnumerateInheritedInterfacesByDistance(Type root, Type[] allInterfaces)
     {
         var visited = new HashSet<Type> { root };
         var frontier = new List<Type>();
-        foreach (var parent in GetDirectInterfaces(root))
+        foreach (var parent in GetDirectParents(root, allInterfaces))
         {
             if (visited.Add(parent)) frontier.Add(parent);
         }
@@ -168,7 +178,7 @@ internal static class StreamingHubTransportModeResolver
             var next = new List<Type>();
             foreach (var type in frontier)
             {
-                foreach (var parent in GetDirectInterfaces(type))
+                foreach (var parent in GetDirectParents(type, allInterfaces))
                 {
                     if (visited.Add(parent)) next.Add(parent);
                 }
@@ -177,18 +187,22 @@ internal static class StreamingHubTransportModeResolver
         }
     }
 
-    [RequiresUnreferencedCode(TrimmingMessage)]
-    static List<Type> GetDirectInterfaces(Type type)
+    /// <summary>
+    /// Gets the interfaces that <paramref name="type"/> inherits directly, using only the flattened interface list of the root.
+    /// An interface P is a direct parent when <paramref name="type"/> implements P and no other interface in the list sits between them.
+    /// </summary>
+    static List<Type> GetDirectParents(Type type, Type[] allInterfaces)
     {
-        // Type.GetInterfaces returns the flattened set. An interface is direct when no other member of the set derives from it.
-        var all = type.GetInterfaces();
-        var direct = new List<Type>(all.Length);
-        foreach (var candidate in all)
+        var direct = new List<Type>();
+        foreach (var candidate in allInterfaces)
         {
+            if (candidate == type || !candidate.IsAssignableFrom(type)) continue;
+
             var isIndirect = false;
-            foreach (var other in all)
+            foreach (var other in allInterfaces)
             {
-                if (other != candidate && candidate.IsAssignableFrom(other))
+                if (other == candidate || other == type) continue;
+                if (candidate.IsAssignableFrom(other) && other.IsAssignableFrom(type))
                 {
                     isIndirect = true;
                     break;

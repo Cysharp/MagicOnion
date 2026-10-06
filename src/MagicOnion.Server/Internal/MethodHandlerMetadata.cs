@@ -100,14 +100,26 @@ public class StreamingHubMethodHandlerMetadata
     /// <param name="requestType">The request type, including any argument tuple.</param>
     /// <param name="streamingHubInterfaceType">The hub contract interface.</param>
     /// <returns>Metadata including the implementation's parameters and inherited attributes.</returns>
-    public static StreamingHubMethodHandlerMetadata Create(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, Type streamingHubInterfaceType)
+    /// <exception cref="InvalidOperationException">
+    /// The contract method has an invalid transport mode, or a transport attribute is placed on the implementation method instead of the contract interface.
+    /// </exception>
+    public static StreamingHubMethodHandlerMetadata Create(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)] Type streamingHubInterfaceType)
     {
         var attributes = streamingHubImplementationType.GetCustomAttributes(true)
             .Concat(implementationMethodInfo.GetCustomAttributes(true))
             .Cast<Attribute>()
             .ToArray();
 
-        return new StreamingHubMethodHandlerMetadata(methodId, streamingHubImplementationType, interfaceMethodInfo, implementationMethodInfo, responseType, requestType, implementationMethodInfo.GetParameters(), streamingHubInterfaceType, attributes);
+        // Transport attributes belong to the shared contract interface, like MethodIdAttribute.
+        if (implementationMethodInfo.GetCustomAttributes(typeof(TransportAttribute), inherit: true).Length != 0)
+        {
+            throw new InvalidOperationException($"The '{streamingHubImplementationType.Name}.{implementationMethodInfo.Name}' cannot have Transport attributes. Transport attributes must be annotated to a hub interface instead.");
+        }
+
+        var transportMode = StreamingHubTransportModeResolver.Resolve(streamingHubInterfaceType, interfaceMethodInfo);
+        StreamingHubTransportModeResolver.ValidateHubMethod(interfaceMethodInfo, transportMode);
+
+        return new StreamingHubMethodHandlerMetadata(methodId, streamingHubImplementationType, interfaceMethodInfo, implementationMethodInfo, responseType, requestType, implementationMethodInfo.GetParameters(), streamingHubInterfaceType, attributes, transportMode);
     }
 
     public int MethodId { get; }
@@ -121,7 +133,20 @@ public class StreamingHubMethodHandlerMetadata
     public ILookup<Type, Attribute> AttributeLookup { get; }
     public IReadOnlyList<object> Metadata { get; }
 
-    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, IReadOnlyList<object> metadata)
+    /// <summary>
+    /// Gets the effective transport mode of the hub method, resolved from the shared contract interface.
+    /// </summary>
+    public StreamingHubTransportMode TransportMode { get; }
+
+    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)] Type streamingHubInterfaceType, IReadOnlyList<object> metadata)
+        : this(methodId, streamingHubImplementationType, interfaceMethodInfo, implementationMethodInfo, responseType, requestType, parameters, streamingHubInterfaceType, metadata, StreamingHubTransportModeResolver.Resolve(streamingHubInterfaceType, interfaceMethodInfo))
+    {
+    }
+
+    /// <summary>
+    /// Initializes metadata with a precomputed transport mode. The other overload resolves the mode from the contract interface.
+    /// </summary>
+    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, IReadOnlyList<object> metadata, StreamingHubTransportMode transportMode)
     {
         MethodId = methodId;
         StreamingHubImplementationType = streamingHubImplementationType;
@@ -133,6 +158,7 @@ public class StreamingHubMethodHandlerMetadata
         StreamingHubInterfaceType = streamingHubInterfaceType;
         AttributeLookup = metadata.OfType<Attribute>().ToLookup(x => x.GetType());
         Metadata = metadata;
+        TransportMode = transportMode;
     }
 }
 

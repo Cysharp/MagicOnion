@@ -24,6 +24,11 @@ internal class StreamingHubHandler : IEquatable<StreamingHubHandler>
     public MethodInfo MethodInfo => hubMethod.Metadata.ImplementationMethod;
     public int MethodId => hubMethod.Metadata.MethodId;
 
+    /// <summary>
+    /// Gets the effective transport mode of the hub method, resolved from the shared contract interface.
+    /// </summary>
+    public StreamingHubTransportMode TransportMode => hubMethod.Metadata.TransportMode;
+
     public ILookup<Type, Attribute> AttributeLookup => hubMethod.Metadata.AttributeLookup;
 
     internal Type RequestType => hubMethod.Metadata.RequestType;

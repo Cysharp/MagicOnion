@@ -544,6 +544,49 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         return default;
     }
 
+    /// <summary>
+    /// Sends a call to a Hub method whose effective transport mode is unreliable. The call never waits for a response.
+    /// </summary>
+    /// <remarks>
+    /// Until an additional transport is negotiated for the connection, the call is sent as a fire-and-forget request over the gRPC connection.
+    /// Completion of the returned task only means that the call was accepted locally.
+    /// </remarks>
+    protected Task<TResponse> WriteMessageUnreliableTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+        => WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>(methodId, message).AsTask();
+
+    /// <summary>
+    /// Sends a call to a Hub method whose effective transport mode is unreliable. The call never waits for a response.
+    /// </summary>
+    /// <remarks>
+    /// Until an additional transport is negotiated for the connection, the call is sent as a fire-and-forget request over the gRPC connection.
+    /// Completion of the returned task only means that the call was accepted locally.
+    /// </remarks>
+    protected ValueTask<TResponse> WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message)
+    {
+        ThrowIfDisposed();
+        ThrowIfDisconnected();
+
+        // NOTE: Routing to an additional transport (and the per-connection agreed method table) is introduced together with
+        //       the transport negotiation. Until then, an unreliable call uses the same fire-and-forget request as the gRPC path.
+        var v = BuildRequestMessage(methodId, message);
+        _ = writerQueue.Writer.TryWrite(v);
+
+        return default;
+    }
+
+    /// <summary>
+    /// Sends a call to a Hub method whose effective transport mode is unreliable. The call never waits for a response.
+    /// </summary>
+    /// <remarks>
+    /// Until an additional transport is negotiated for the connection, the call is sent as a fire-and-forget request over the gRPC connection.
+    /// Completion of the returned task only means that the call was accepted locally.
+    /// </remarks>
+    protected ValueTask WriteMessageUnreliableValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
+    {
+        WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+        return default;
+    }
+
     protected Task<TResponse> WriteMessageWithResponseTaskAsync<TRequest, TResponse>(int methodId, TRequest message)
         => WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message).AsTask();
 

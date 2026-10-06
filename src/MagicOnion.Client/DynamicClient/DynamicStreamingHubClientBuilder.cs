@@ -64,6 +64,15 @@ internal
 
         VerifyMethodDefinitions(methodDefinitions);
 
+        // Resolve the transport mode of each hub method from the shared contract interfaces.
+        // Building the contracts also validates them and fails deterministically for an invalid contract.
+        var hubContract = StreamingHubTransportContract.ForHub<TStreamingHub>();
+        _ = StreamingHubTransportContract.ForReceiver<TReceiver>();
+        foreach (var definition in methodDefinitions)
+        {
+            definition.TransportMode = hubContract.TryGetMode(definition.MethodId, out var transportMode) ? transportMode : StreamingHubTransportMode.Reliable;
+        }
+
         {
             // Create FireAndForgetType first as nested type.
             var typeBuilderEx = typeBuilder.DefineNestedType($"FireAndForgetClient", TypeAttributes.NestedPrivate, typeof(object), new Type[] { t });
@@ -563,7 +572,11 @@ internal
                 il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
             }
 
-            if (def.MethodInfo.ReturnType == typeof(Task))
+            if (def.TransportMode != StreamingHubTransportMode.Reliable)
+            {
+                EmitUnreliableWriteCall(il, def, callType);
+            }
+            else if (def.MethodInfo.ReturnType == typeof(Task))
             {
                 il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseTaskAsync.MakeGenericMethod(callType, typeof(Nil)));
             }
@@ -676,7 +689,11 @@ internal
                 responseType = def.MethodInfo.ReturnType.GetGenericArguments()[0];
             }
 
-            if (def.MethodInfo.ReturnType == typeof(Task))
+            if (def.TransportMode != StreamingHubTransportMode.Reliable)
+            {
+                EmitUnreliableWriteCall(il, def, requestType);
+            }
+            else if (def.MethodInfo.ReturnType == typeof(Task))
             {
                 il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync.MakeGenericMethod(requestType, responseType));
             }
@@ -703,6 +720,32 @@ internal
             }
 
             il.Emit(OpCodes.Ret);
+        }
+    }
+
+    /// <summary>
+    /// Emits a call to the unreliable write method of <see cref="StreamingHubClientBase{TStreamingHub, TReceiver}"/>.
+    /// The request message is already on the evaluation stack. Unreliable methods never return a value, so the response type is always <see cref="Nil"/>.
+    /// </summary>
+    static void EmitUnreliableWriteCall(ILGenerator il, MethodDefinition def, Type requestType)
+    {
+        if (def.MethodInfo.ReturnType == typeof(Task))
+        {
+            il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageUnreliableTaskAsync.MakeGenericMethod(requestType, typeof(Nil)));
+        }
+        else if (def.MethodInfo.ReturnType == typeof(ValueTask))
+        {
+            il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageUnreliableValueTaskAsync.MakeGenericMethod(requestType, typeof(Nil)));
+        }
+        else if (def.MethodInfo.ReturnType == typeof(void))
+        {
+            il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageUnreliableValueTaskOfTAsync.MakeGenericMethod(requestType, typeof(Nil)));
+            il.Emit(OpCodes.Pop);
+        }
+        else
+        {
+            // The contract validation rejects result-returning unreliable methods before reaching here.
+            throw new NotSupportedException($"Unsupported return type for an unreliable StreamingHub method: {def.MethodInfo.ReturnType} ({def.MethodInfo.Name})");
         }
     }
 
@@ -741,6 +784,12 @@ internal
             = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
         public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetTaskAsync
             = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+        public static readonly MethodInfo StreamingHubClientBase_WriteMessageUnreliableValueTaskOfTAsync
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageUnreliableValueTaskOfTAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+        public static readonly MethodInfo StreamingHubClientBase_WriteMessageUnreliableValueTaskAsync
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageUnreliableValueTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+        public static readonly MethodInfo StreamingHubClientBase_WriteMessageUnreliableTaskAsync
+            = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageUnreliableTaskAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
         // ReSharper restore StaticMemberInGenericType
         // ReSharper restore InconsistentNaming
 #pragma warning restore IDE1006 // Naming Styles
@@ -768,6 +817,9 @@ internal
         public int MethodId { get; set; }
 
         public Type? RequestType { get; set; }
+
+        /// <summary>Gets or sets the effective transport mode resolved from the shared contract interface.</summary>
+        public StreamingHubTransportMode TransportMode { get; set; }
 
         public MethodDefinition(Type serviceType, MethodInfo methodInfo, int methodId, Type? requestType)
         {
