@@ -150,9 +150,14 @@ public abstract class StreamingHubServerHeartbeatTestBase
             {"x-mo-test-disable-heartbeat", "true"},
         };
         var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray())).WithCallOptions(new CallOptions(metadata));
+        var heartbeatUnregistered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_Conditional.HeartbeatUnregisteredKey] = heartbeatUnregistered;
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
+        // The client completes connecting when it receives the response headers, but the server calls `OnConnected` (and `Unregister`) after sending them.
+        // Wait for `Unregister` before advancing the time. Otherwise, the heartbeat timer may tick while the connection is still registered.
+        await heartbeatUnregistered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
         await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
@@ -280,9 +285,11 @@ public class StreamingHubServerHeartbeatTestHub_TimeoutBehavior([FromKeyedServic
 }
 
 [Heartbeat(Enable = true, Interval = 200, Timeout = 100)]
-public class StreamingHubServerHeartbeatTestHub_Conditional
+public class StreamingHubServerHeartbeatTestHub_Conditional([FromKeyedServices(ServerFixture.ItemsServiceKey)] ConcurrentDictionary<string, object> items)
     : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_Conditional
 {
+    public const string HeartbeatUnregisteredKey = "Heartbeat/Conditional/Unregistered";
+
     protected override ValueTask OnConnected()
     {
         var httpContext = Context.CallContext.GetHttpContext();
@@ -291,6 +298,10 @@ public class StreamingHubServerHeartbeatTestHub_Conditional
             if (disableHeartbeatHeader == "true")
             {
                 httpContext.Features.GetRequiredFeature<IMagicOnionHeartbeatFeature>().Unregister();
+                if (items.TryGetValue(HeartbeatUnregisteredKey, out var unregistered))
+                {
+                    ((TaskCompletionSource)unregistered).TrySetResult();
+                }
             }
         }
 
