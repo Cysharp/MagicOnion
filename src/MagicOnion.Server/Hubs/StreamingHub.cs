@@ -191,6 +191,10 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
         await writer.WriteAsync(StreamingHubPayloadPool.Shared.RentOrCreate(MarkerResponseBytes));
 
+        // Start sending heartbeats after the headers and marker have been sent.
+        // NOTE: A heartbeat written while OnConnecting is running would implicitly send the response headers without the StreamingHub version header.
+        heartbeatHandle.MarkAsReady();
+
         // Call OnConnected after sending the headers and marker.
         // The server can send messages or broadcast to client after OnConnected.
         // eg: Send the current game state to the client.
