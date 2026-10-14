@@ -20,7 +20,8 @@ public abstract class StreamingHubServerHeartbeatTestBase
         StreamingHubServerHeartbeatTestHub_DisableByAttribute,
         StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
         StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
-        StreamingHubServerHeartbeatTestHub_Conditional
+        StreamingHubServerHeartbeatTestHub_Conditional,
+        StreamingHubServerHeartbeatTestHub_SlowOnConnecting
     >
     {
         public FakeTimeProvider FakeTimeProvider { get; } = new();
@@ -162,6 +163,39 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Assert
         Assert.Empty(receivedHeartbeatMetadata);
     }
+
+    [Fact]
+    public async Task HeartbeatInterval_Elapsed_During_OnConnecting()
+    {
+        // Arrange
+        var onConnectingEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseOnConnecting = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Fixture.Items["SlowOnConnecting/Entered"] = onConnectingEntered;
+        Fixture.Items["SlowOnConnecting/Release"] = releaseOnConnecting;
+
+        var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
+        var receivedHeartbeatMetadata = new ConcurrentQueue<byte[]>();
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Enqueue(x.Metadata.ToArray()));
+
+        // Act
+        var connectTask = Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
+        await onConnectingEntered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        // The heartbeat interval elapses while OnConnecting is still running (the response headers and the marker have not been sent yet).
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Give the heartbeat loop a chance to write to the response stream.
+
+        releaseOnConnecting.SetResult();
+        var client = await connectTask.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        // The server starts sending heartbeats after the connection has been established.
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15, TestContext.Current.CancellationToken);
+        await client.DisposeAsync();
+
+        // Assert
+        Assert.Single(receivedHeartbeatMetadata);
+    }
 }
 
 
@@ -244,6 +278,7 @@ public interface IStreamingHubServerHeartbeatTestHub_DisableByAttribute : IStrea
 public interface IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout : IStreamingHub<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_TimeoutBehavior : IStreamingHub<IStreamingHubServerHeartbeatTestHub_TimeoutBehavior, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_Conditional : IStreamingHub<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>;
+public interface IStreamingHubServerHeartbeatTestHub_SlowOnConnecting : IStreamingHub<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHubReceiver;
 
 // Implementations
@@ -295,6 +330,17 @@ public class StreamingHubServerHeartbeatTestHub_Conditional
         }
 
         return base.OnConnected();
+    }
+}
+
+[Heartbeat]
+public class StreamingHubServerHeartbeatTestHub_SlowOnConnecting([FromKeyedServices(ServerFixture.ItemsServiceKey)] ConcurrentDictionary<string, object> items)
+    : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_SlowOnConnecting
+{
+    protected override async ValueTask OnConnecting()
+    {
+        ((TaskCompletionSource)items["SlowOnConnecting/Entered"]).SetResult();
+        await ((TaskCompletionSource)items["SlowOnConnecting/Release"]).Task;
     }
 }
 

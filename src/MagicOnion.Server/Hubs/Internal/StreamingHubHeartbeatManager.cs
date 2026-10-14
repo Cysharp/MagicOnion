@@ -28,6 +28,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     DateTimeOffset lastSentAt;
     long lastSentAtTimestamp;
     Action<TimeSpan>? onAckCallback;
+    volatile bool isReady;
 
     /// <summary>
     /// Gets the last received time.
@@ -38,6 +39,11 @@ internal class StreamingHubHeartbeatHandle : IDisposable
     /// Gets the latency between client and server. Returns <see cref="TimeSpan.Zero"/> if not sent or received.
     /// </summary>
     public TimeSpan Latency { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the connection is ready to receive heartbeat messages.
+    /// </summary>
+    public bool IsReady => isReady;
 
     public IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; }
     public CancellationToken TimeoutToken => timeoutToken.Token;
@@ -52,6 +58,18 @@ internal class StreamingHubHeartbeatHandle : IDisposable
             , this.manager.TimeProvider
 #endif
         );
+    }
+
+    /// <summary>
+    /// Marks the connection as ready to receive heartbeat messages.
+    /// </summary>
+    /// <remarks>
+    /// Call this after the response headers and the marker have been written to the response stream.
+    /// A message written before them causes the response headers to be sent implicitly without the StreamingHub version header.
+    /// </remarks>
+    public void MarkAsReady()
+    {
+        isReady = true;
     }
 
     public void RestartTimeoutTimer(short sequence, DateTimeOffset sentAt, long sentAtTimestamp)
@@ -213,6 +231,9 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
             {
                 foreach (var (contextId, handle) in contexts)
                 {
+                    // Skip connections that have not yet sent the response headers and the marker (e.g. OnConnecting is still running).
+                    if (!handle.IsReady) continue;
+
                     handle.RestartTimeoutTimer(sequence, now, timestamp);
                     handle.ServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan));
                 }
