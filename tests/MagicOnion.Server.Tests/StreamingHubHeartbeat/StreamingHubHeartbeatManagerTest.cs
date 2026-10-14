@@ -58,6 +58,7 @@ public class StreamingHubHeartbeatManagerTest
 
         // Act
         using var handle = manager.Register(context);
+        handle.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
         await Task.Delay(16, TestContext.Current.CancellationToken);
 
@@ -99,6 +100,7 @@ public class StreamingHubHeartbeatManagerTest
 
         // Act
         using var handle = manager.Register(context);
+        handle.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
         await Task.Delay(16, TestContext.Current.CancellationToken);
 
@@ -124,6 +126,9 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
+        handle1.MarkAsReady();
+        handle2.MarkAsReady();
+        handle3.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
@@ -162,6 +167,9 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
+        handle1.MarkAsReady();
+        handle2.MarkAsReady();
+        handle3.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
@@ -199,6 +207,9 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
+        handle1.MarkAsReady();
+        handle2.MarkAsReady();
+        handle3.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         var isCanceled1 = handle1.TimeoutToken.IsCancellationRequested;
@@ -234,6 +245,9 @@ public class StreamingHubHeartbeatManagerTest
         var handle1 = manager.Register(context1);
         var handle2 = manager.Register(context2);
         var handle3 = manager.Register(context3);
+        handle1.MarkAsReady();
+        handle2.MarkAsReady();
+        handle3.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
@@ -266,6 +280,35 @@ public class StreamingHubHeartbeatManagerTest
     }
 
     [Fact]
+    public async Task Interval_Skip_Until_Ready()
+    {
+        // Arrange
+        var logger = new FakeLogger<StreamingHubHeartbeatManager>();
+        var timeProvider = new FakeTimeProvider();
+        var manager = new StreamingHubHeartbeatManager(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(50), null, timeProvider, logger);
+        var context = CreateFakeStreamingServiceContext();
+        byte[] expectedHeartbeatMessageNoExtra = BuildMessage(1, timeProvider.GetUtcNow().AddMilliseconds(200));
+
+        // Act
+        using var handle = manager.Register(context);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(100)); // The connection is not ready yet. The heartbeat (Sequence = 0) is not sent.
+        await Task.Delay(16, TestContext.Current.CancellationToken);
+        timeProvider.Advance(TimeSpan.FromMilliseconds(60)); // The timeout must not be started for the skipped heartbeat.
+        await Task.Delay(16, TestContext.Current.CancellationToken);
+        var responseCountBeforeReady = context.Responses.Count;
+        var isCanceledBeforeReady = handle.TimeoutToken.IsCancellationRequested;
+        handle.MarkAsReady();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(40));
+        await Task.Delay(16, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(0, responseCountBeforeReady);
+        Assert.False(isCanceledBeforeReady);
+        Assert.Single(context.Responses);
+        Assert.Equal(expectedHeartbeatMessageNoExtra, context.Responses[0].Memory.ToArray());
+    }
+
+    [Fact]
     public async Task CustomMetadataProvider()
     {
         // Arrange
@@ -283,6 +326,9 @@ public class StreamingHubHeartbeatManagerTest
         using var handle1 = manager.Register(context1);
         using var handle2 = manager.Register(context2);
         using var handle3 = manager.Register(context3);
+        handle1.MarkAsReady();
+        handle2.MarkAsReady();
+        handle3.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         timeProvider.Advance(TimeSpan.FromMilliseconds(100));
@@ -317,6 +363,7 @@ public class StreamingHubHeartbeatManagerTest
 
         // Act & Assert
         using var handle = manager.Register(context);
+        handle.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
@@ -357,6 +404,7 @@ public class StreamingHubHeartbeatManagerTest
 
         // Act & Assert
         using var handle = manager.Register(context);
+        handle.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromSeconds(1));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         Assert.False(handle.TimeoutToken.IsCancellationRequested);
@@ -399,6 +447,7 @@ public class StreamingHubHeartbeatManagerTest
 
         // Act
         using var handle1 = manager.Register(context1);
+        handle1.MarkAsReady();
         timeProvider.Advance(TimeSpan.FromMilliseconds(350));
         await Task.Delay(16, TestContext.Current.CancellationToken);
         // Simulate to send heartbeat responses from clients.
@@ -442,6 +491,7 @@ public class StreamingHubHeartbeatManagerTest
         // Act
         var ackCalled = default(TimeSpan?);
         using var handle = manager.Register(context);
+        handle.MarkAsReady();
         handle.SetAckCallback(x => ackCalled = x);
         timeProvider.Advance(TimeSpan.FromMilliseconds(350)); // SentAt = 00:00.0350
         await Task.Delay(16, TestContext.Current.CancellationToken);

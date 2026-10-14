@@ -20,7 +20,8 @@ public abstract class StreamingHubServerHeartbeatTestBase
         StreamingHubServerHeartbeatTestHub_DisableByAttribute,
         StreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout,
         StreamingHubServerHeartbeatTestHub_TimeoutBehavior,
-        StreamingHubServerHeartbeatTestHub_Conditional
+        StreamingHubServerHeartbeatTestHub_Conditional,
+        StreamingHubServerHeartbeatTestHub_SlowOnConnecting
     >
     {
         public FakeTimeProvider FakeTimeProvider { get; } = new();
@@ -150,9 +151,14 @@ public abstract class StreamingHubServerHeartbeatTestBase
             {"x-mo-test-disable-heartbeat", "true"},
         };
         var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Add(x.Metadata.ToArray())).WithCallOptions(new CallOptions(metadata));
+        var heartbeatUnregistered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_Conditional.HeartbeatUnregisteredKey] = heartbeatUnregistered;
 
         // Act
         var client = await Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
+        // The client completes connecting when it receives the response headers, but the server calls `OnConnected` (and `Unregister`) after sending them.
+        // Wait for `Unregister` before advancing the time. Otherwise, the heartbeat timer may tick while the connection is still registered.
+        await heartbeatUnregistered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
         await Task.Delay(15, TestContext.Current.CancellationToken);
         Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
@@ -161,6 +167,39 @@ public abstract class StreamingHubServerHeartbeatTestBase
 
         // Assert
         Assert.Empty(receivedHeartbeatMetadata);
+    }
+
+    [Fact]
+    public async Task HeartbeatInterval_Elapsed_During_OnConnecting()
+    {
+        // Arrange
+        var onConnectingEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseOnConnecting = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_SlowOnConnecting.OnConnectingEnteredKey] = onConnectingEntered;
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_SlowOnConnecting.ReleaseOnConnectingKey] = releaseOnConnecting;
+
+        var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
+        var receivedHeartbeatMetadata = new ConcurrentQueue<byte[]>();
+        var options = StreamingHubClientOptions.CreateWithDefault().WithServerHeartbeatReceived(x => receivedHeartbeatMetadata.Enqueue(x.Metadata.ToArray()));
+
+        // Act
+        var connectTask = Fixture.CreateStreamingHubClientAsync<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>(receiver, options);
+        await onConnectingEntered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        // The heartbeat interval elapses while OnConnecting is still running (the response headers and the marker have not been sent yet).
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(100, TestContext.Current.CancellationToken); // Give the heartbeat loop a chance to write to the response stream.
+
+        releaseOnConnecting.SetResult();
+        var client = await connectTask.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        // The server starts sending heartbeats after the connection has been established.
+        Fixture.FakeTimeProvider.Advance(TimeSpan.FromMilliseconds(300));
+        await Task.Delay(15, TestContext.Current.CancellationToken);
+        await client.DisposeAsync();
+
+        // Assert
+        Assert.Single(receivedHeartbeatMetadata);
     }
 }
 
@@ -244,6 +283,7 @@ public interface IStreamingHubServerHeartbeatTestHub_DisableByAttribute : IStrea
 public interface IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout : IStreamingHub<IStreamingHubServerHeartbeatTestHub_CustomIntervalAndTimeout, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_TimeoutBehavior : IStreamingHub<IStreamingHubServerHeartbeatTestHub_TimeoutBehavior, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHub_Conditional : IStreamingHub<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>;
+public interface IStreamingHubServerHeartbeatTestHub_SlowOnConnecting : IStreamingHub<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>;
 public interface IStreamingHubServerHeartbeatTestHubReceiver;
 
 // Implementations
@@ -280,9 +320,11 @@ public class StreamingHubServerHeartbeatTestHub_TimeoutBehavior([FromKeyedServic
 }
 
 [Heartbeat(Enable = true, Interval = 200, Timeout = 100)]
-public class StreamingHubServerHeartbeatTestHub_Conditional
+public class StreamingHubServerHeartbeatTestHub_Conditional([FromKeyedServices(ServerFixture.ItemsServiceKey)] ConcurrentDictionary<string, object> items)
     : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_Conditional, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_Conditional
 {
+    public const string HeartbeatUnregisteredKey = "Heartbeat/Conditional/Unregistered";
+
     protected override ValueTask OnConnected()
     {
         var httpContext = Context.CallContext.GetHttpContext();
@@ -291,10 +333,28 @@ public class StreamingHubServerHeartbeatTestHub_Conditional
             if (disableHeartbeatHeader == "true")
             {
                 httpContext.Features.GetRequiredFeature<IMagicOnionHeartbeatFeature>().Unregister();
+                if (items.TryGetValue(HeartbeatUnregisteredKey, out var unregistered))
+                {
+                    ((TaskCompletionSource)unregistered).TrySetResult();
+                }
             }
         }
 
         return base.OnConnected();
+    }
+}
+
+[Heartbeat]
+public class StreamingHubServerHeartbeatTestHub_SlowOnConnecting([FromKeyedServices(ServerFixture.ItemsServiceKey)] ConcurrentDictionary<string, object> items)
+    : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_SlowOnConnecting
+{
+    public const string OnConnectingEnteredKey = "Heartbeat/SlowOnConnecting/Entered";
+    public const string ReleaseOnConnectingKey = "Heartbeat/SlowOnConnecting/Release";
+
+    protected override async ValueTask OnConnecting()
+    {
+        ((TaskCompletionSource)items[OnConnectingEnteredKey]).SetResult();
+        await ((TaskCompletionSource)items[ReleaseOnConnectingKey]).Task;
     }
 }
 

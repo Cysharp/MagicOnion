@@ -75,6 +75,11 @@ public class StreamingHubConnectionEventsTest: IClassFixture<MagicOnionApplicati
                 option: new CallOptions(new Metadata(){ { "ThrowsRSEOnConnected", "1" }}),
                 cancellationToken: TestContext.Current.CancellationToken);
 
+        // Wait for the client to observe the disconnection before calling the hub method.
+        // A call that is still in flight when the connection is closed is canceled (TaskCanceledException),
+        // while a call after the disconnection throws RpcException. Without waiting, the result depends on timing.
+        await client.WaitForDisconnectAsync().WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.HelloAsync());
         var logSnapshot = factory.Logs.GetSnapshot();
         Assert.Contains("StreamingHubClient has already been disconnected from the server", ex.Message);
