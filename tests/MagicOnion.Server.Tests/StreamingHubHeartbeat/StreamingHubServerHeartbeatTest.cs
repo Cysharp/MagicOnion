@@ -175,8 +175,8 @@ public abstract class StreamingHubServerHeartbeatTestBase
         // Arrange
         var onConnectingEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var releaseOnConnecting = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        Fixture.Items["SlowOnConnecting/Entered"] = onConnectingEntered;
-        Fixture.Items["SlowOnConnecting/Release"] = releaseOnConnecting;
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_SlowOnConnecting.OnConnectingEnteredKey] = onConnectingEntered;
+        Fixture.Items[StreamingHubServerHeartbeatTestHub_SlowOnConnecting.ReleaseOnConnectingKey] = releaseOnConnecting;
 
         var receiver = Substitute.For<IStreamingHubServerHeartbeatTestHubReceiver>();
         var receivedHeartbeatMetadata = new ConcurrentQueue<byte[]>();
@@ -348,10 +348,13 @@ public class StreamingHubServerHeartbeatTestHub_Conditional([FromKeyedServices(S
 public class StreamingHubServerHeartbeatTestHub_SlowOnConnecting([FromKeyedServices(ServerFixture.ItemsServiceKey)] ConcurrentDictionary<string, object> items)
     : StreamingHubBase<IStreamingHubServerHeartbeatTestHub_SlowOnConnecting, IStreamingHubServerHeartbeatTestHubReceiver>, IStreamingHubServerHeartbeatTestHub_SlowOnConnecting
 {
+    public const string OnConnectingEnteredKey = "Heartbeat/SlowOnConnecting/Entered";
+    public const string ReleaseOnConnectingKey = "Heartbeat/SlowOnConnecting/Release";
+
     protected override async ValueTask OnConnecting()
     {
-        ((TaskCompletionSource)items["SlowOnConnecting/Entered"]).SetResult();
-        await ((TaskCompletionSource)items["SlowOnConnecting/Release"]).Task;
+        ((TaskCompletionSource)items[OnConnectingEnteredKey]).SetResult();
+        await ((TaskCompletionSource)items[ReleaseOnConnectingKey]).Task;
     }
 }
 
