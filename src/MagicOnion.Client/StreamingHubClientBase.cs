@@ -715,12 +715,24 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 }
 
                 // cleanup completion
+                // Take a snapshot under the lock: a caller that passed `ThrowIfDisposed`/`ThrowIfDisconnected` just before the flag was set may still add a future concurrently.
+                // A future added after the snapshot is not left pending, because `writerQueue` has already been completed and the caller throws synchronously.
+                IStreamingHubResponseTaskSource[] pendingFutures;
+                lock (responseFutures)
+                {
+                    pendingFutures = responseFutures.Values.ToArray();
+                }
+
+                // CleanupAsync is also called when the subscription ends (closed by the server, faulted, or timed out) without the client being disposed.
+                var cancellationMessage = disposed
+                    ? "A task was canceled because the client has disposed."
+                    : "A task was canceled because the client has been disconnected from the server.";
                 List<Exception>? aggregateException = null;
-                foreach (var item in responseFutures)
+                foreach (var future in pendingFutures)
                 {
                     try
                     {
-                        item.Value.TrySetCanceled("A task was canceled because the client has disposed.");
+                        future.TrySetCanceled(cancellationMessage);
                     }
                     catch (Exception ex)
                     {

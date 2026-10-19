@@ -1,6 +1,7 @@
 ﻿using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -733,6 +734,88 @@ public class StreamingHubTest
             await Task.Delay(100, TestContext.Current.CancellationToken);
             await client.DisposeAsync();
         }
+    }
+
+    [Fact]
+    public async Task ThrowTaskCanceledException_PendingRequest_When_Disposed()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+        var task = client.Parameter_Zero();
+        _ = await helper.ReadRequestAsync<Nil>();
+
+        // Act
+        await client.DisposeAsync();
+        var ex = await Record.ExceptionAsync(async () => await task.WaitAsync(timeout.Token));
+
+        // Assert
+        Assert.IsType<TaskCanceledException>(ex);
+        Assert.Equal("A task was canceled because the client has disposed.", ex.Message);
+    }
+
+    [Fact]
+    public async Task ThrowTaskCanceledException_PendingRequest_When_Disconnected()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+        var task = client.Parameter_Zero();
+        _ = await helper.ReadRequestAsync<Nil>();
+
+        // Act
+        // The connection is closed by the server before the response is received.
+        helper.ThrowRpcException();
+        var ex = await Record.ExceptionAsync(async () => await task.WaitAsync(timeout.Token));
+
+        // Assert
+        Assert.IsType<TaskCanceledException>(ex);
+        Assert.Equal("A task was canceled because the client has been disconnected from the server.", ex.Message);
+    }
+
+    [Fact]
+    public async Task CancelPendingRequests_When_Disconnected_While_Invoking_Concurrently()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+        var tasks = new ConcurrentQueue<Task<int>>();
+        var callers = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => Task.Factory.StartNew(() =>
+        {
+            try
+            {
+                while (true)
+                {
+                    tasks.Enqueue(client.Parameter_One(0));
+                }
+            }
+            catch (RpcException)
+            {
+                // The client has been disconnected from the server.
+            }
+        }, TaskCreationOptions.LongRunning)).ToArray();
+        await Task.Delay(20, TestContext.Current.CancellationToken);
+
+        // Act
+        // Invoking hub methods while the client is canceling pending requests must not break the cleanup.
+        helper.ThrowRpcException();
+        await client.WaitForDisconnectAsync().WaitAsync(timeout.Token);
+        await Task.WhenAll(callers).WaitAsync(timeout.Token);
+        try
+        {
+            await Task.WhenAll(tasks).WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        }
+        catch (TaskCanceledException)
+        {
+            // All pending requests are expected to be canceled.
+        }
+
+        // Assert
+        Assert.NotEmpty(tasks);
+        Assert.Equal(0, tasks.Count(x => !x.IsCanceled));
     }
 
     [Fact]
