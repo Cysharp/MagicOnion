@@ -16,3 +16,18 @@ MagicOnion.UnreliableAttribute
 MagicOnion.UnreliableAttribute.UnreliableAttribute() -> void
 MagicOnion.UnreliableUnorderedAttribute
 MagicOnion.UnreliableUnorderedAttribute.UnreliableUnorderedAttribute() -> void
+MagicOnion.AdditionalTransportEstablishment
+MagicOnion.AdditionalTransportEstablishment.Preferred = 0 -> MagicOnion.AdditionalTransportEstablishment
+MagicOnion.AdditionalTransportEstablishment.Required = 1 -> MagicOnion.AdditionalTransportEstablishment
+MagicOnion.StreamingHubTransportInfo
+MagicOnion.StreamingHubTransportInfo.AdditionalTransportProviderId.get -> string?
+MagicOnion.StreamingHubTransportInfo.AdditionalTransportProviderVersion.get -> int
+MagicOnion.StreamingHubTransportInfo.State.get -> MagicOnion.StreamingHubTransportState
+MagicOnion.StreamingHubTransportInfo.StreamingHubTransportInfo() -> void
+MagicOnion.StreamingHubTransportInfo.StreamingHubTransportInfo(MagicOnion.StreamingHubTransportState state, string? additionalTransportProviderId, int additionalTransportProviderVersion) -> void
+MagicOnion.StreamingHubTransportState
+MagicOnion.StreamingHubTransportState.ActiveAdditionalTransport = 1 -> MagicOnion.StreamingHubTransportState
+MagicOnion.StreamingHubTransportState.GrpcFallback = 2 -> MagicOnion.StreamingHubTransportState
+MagicOnion.StreamingHubTransportState.GrpcOnly = 0 -> MagicOnion.StreamingHubTransportState
+override MagicOnion.StreamingHubTransportInfo.ToString() -> string!
+static MagicOnion.StreamingHubTransportInfo.GrpcOnly.get -> MagicOnion.StreamingHubTransportInfo

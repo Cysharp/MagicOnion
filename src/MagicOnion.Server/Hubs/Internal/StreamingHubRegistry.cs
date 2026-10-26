@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Cysharp.Runtime.Multicast;
+using MagicOnion.Internal;
 using MagicOnion.Server.Binder;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Features.Internal;
@@ -24,6 +25,9 @@ internal class StreamingHubRegistry<TService> : IStreamingHubFeature
     public MagicOnionManagedGroupProvider GroupProvider => groupProvider;
     public IStreamingHubHeartbeatManager HeartbeatManager => heartbeatManager;
     public UniqueHashDictionary<StreamingHubHandler> Handlers => methodsById!;
+    public IReadOnlyList<IAdditionalTransportServerProvider> AdditionalTransportProviders { get; }
+    public AdditionalTransportServerOptions AdditionalTransportOptions { get; }
+    public StreamingHubTransportModeTable UnreliableHubMethods { get; private set; } = StreamingHubTransportModeTable.Empty;
 
     public StreamingHubRegistry(IOptions<MagicOnionOptions> options, IServiceProvider serviceProvider, ILogger<StreamingHubRegistry<TService>> logger)
     {
@@ -32,6 +36,26 @@ internal class StreamingHubRegistry<TService> : IStreamingHubFeature
         this.groupProvider = new MagicOnionManagedGroupProvider(CreateGroupProvider(serviceProvider));
         this.heartbeatManager = CreateHeartbeatManager(options.Value, typeof(TService), serviceProvider);
         this.logger = logger;
+        this.AdditionalTransportProviders = ValidateAdditionalTransportProviders(serviceProvider.GetServices<IAdditionalTransportServerProvider>());
+        this.AdditionalTransportOptions = serviceProvider.GetService<IOptions<AdditionalTransportServerOptions>>()?.Value ?? new AdditionalTransportServerOptions();
+    }
+
+    static IReadOnlyList<IAdditionalTransportServerProvider> ValidateAdditionalTransportProviders(IEnumerable<IAdditionalTransportServerProvider> providers)
+    {
+        var providerList = providers.ToArray();
+        var registered = new HashSet<(string, int)>();
+        foreach (var provider in providerList)
+        {
+            if (!AdditionalTransportNegotiation.IsValidProviderId(provider.Id))
+            {
+                throw new InvalidOperationException($"The additional transport provider identifier '{provider.Id}' is invalid. Use 1 to 64 lowercase ASCII letters, digits, '.', '-', or '_'.");
+            }
+            if (!registered.Add((provider.Id, provider.Version)))
+            {
+                throw new InvalidOperationException($"The additional transport provider '{provider.Id}' version {provider.Version} is registered more than once.");
+            }
+        }
+        return providerList;
     }
 
     public void RegisterMethods(IEnumerable<IMagicOnionStreamingHubMethod> methods)
@@ -43,6 +67,11 @@ internal class StreamingHubRegistry<TService> : IStreamingHubFeature
             .ToArray();
 
         methodsById = new UniqueHashDictionary<StreamingHubHandler>(methodAndIdPairs);
+
+        // The unreliable hub methods offered for an additional transport. The modes are resolved from the contract in the method metadata.
+        UnreliableHubMethods = StreamingHubTransportModeTable.Create(methodAndIdPairs
+            .Where(static x => x.x.TransportMode != StreamingHubTransportMode.Reliable)
+            .Select(static x => new StreamingHubTransportModeEntry(x.MethodId, x.x.TransportMode)));
 
         foreach (var (_, method) in methodAndIdPairs)
         {

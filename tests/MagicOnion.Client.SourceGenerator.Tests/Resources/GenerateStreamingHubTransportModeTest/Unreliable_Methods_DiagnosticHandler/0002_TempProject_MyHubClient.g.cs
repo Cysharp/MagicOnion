@@ -18,6 +18,17 @@ namespace TempProject
                     this.diagnosticHandler = diagnosticHandler;
                 }
 
+                protected override global::System.ReadOnlySpan<global::System.Byte> EncodedUnreliableHubMethods => new global::System.Byte[]
+                {
+                    0xFA, 0x15, 0x65, 0x08, 0x01, // MoveAsync: -99261176, UnreliableSequenced
+                    0x59, 0x7D, 0xB6, 0x05, 0x02, // EmoteAsync: 1501410821, UnreliableUnordered
+                    0x7F, 0xB7, 0xF0, 0xA9, 0x01, // Ping: 2142761129, UnreliableSequenced
+                };
+                protected override global::System.ReadOnlySpan<global::System.Byte> EncodedUnreliableReceiverMethods => new global::System.Byte[]
+                {
+                    0x55, 0x3A, 0x26, 0x7D, 0x01, // OnMove: 1429874301, UnreliableSequenced
+                };
+
                 global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
                     if (diagnosticHandler is null)

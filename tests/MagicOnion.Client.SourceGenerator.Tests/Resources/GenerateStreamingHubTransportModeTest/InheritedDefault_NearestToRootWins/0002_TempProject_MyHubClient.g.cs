@@ -15,6 +15,12 @@ namespace TempProject
                 {
                 }
 
+                protected override global::System.ReadOnlySpan<global::System.Byte> EncodedUnreliableHubMethods => new global::System.Byte[]
+                {
+                    0xAD, 0xFE, 0x5A, 0x0C, 0x01, // BaseAsync: -1375839732, UnreliableSequenced
+                    0x72, 0xF8, 0xF6, 0x4C, 0x01, // MiddleAsync: 1928918604, UnreliableSequenced
+                };
+
                 public global::System.Threading.Tasks.Task<global::System.Int32> RootAsync()
                     => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::System.Int32>(-1955405937, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task MiddleAsync()

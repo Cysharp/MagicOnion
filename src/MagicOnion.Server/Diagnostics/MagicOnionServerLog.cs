@@ -91,6 +91,18 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 17, Level = LogLevel.Information, EventName = nameof(HubMethodNotFound), Message = "StreamingHub method '{methodId}' was not found in '{hubName}'.")]
     public static partial void HubMethodNotFound(ILogger logger, string hubName, int methodId);
 
+    [LoggerMessage(EventId = 18, Level = LogLevel.Debug, EventName = nameof(AdditionalTransportNegotiated), Message = "The additional transport negotiation of StreamingHub '{hubName}' completed. State: {state}, Provider: {providerId}, Reason: {reason}")]
+    internal static partial void AdditionalTransportNegotiated(ILogger logger, string hubName, StreamingHubTransportState state, string? providerId, string reason);
+
+    [LoggerMessage(EventId = 19, Level = LogLevel.Information, EventName = nameof(AdditionalTransportNegotiationFailed), Message = "The client of StreamingHub '{hubName}' requires an additional transport, but it could not be established. Reason: {reason}")]
+    internal static partial void AdditionalTransportNegotiationFailed(ILogger logger, string hubName, string reason);
+
+    [LoggerMessage(EventId = 20, Level = LogLevel.Warning, EventName = nameof(AdditionalTransportModeConflict), Message = "The transport mode of the {direction} method '{methodName}' (MethodId: {methodId}) of StreamingHub '{hubName}' differs between the server ({serverMode}) and the client ({clientMode}). The method uses gRPC on this connection.")]
+    internal static partial void AdditionalTransportModeConflict(ILogger logger, string hubName, string direction, int methodId, string? methodName, StreamingHubTransportMode serverMode, StreamingHubTransportMode clientMode);
+
+    [LoggerMessage(EventId = 21, Level = LogLevel.Error, EventName = nameof(AdditionalTransportProviderError), Message = "The additional transport provider '{providerId}' failed during the negotiation of StreamingHub '{hubName}'.")]
+    internal static partial void AdditionalTransportProviderError(ILogger logger, Exception ex, string hubName, string providerId);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 

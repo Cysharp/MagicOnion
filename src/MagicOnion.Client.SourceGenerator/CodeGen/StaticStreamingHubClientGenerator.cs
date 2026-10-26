@@ -98,6 +98,7 @@ public class StaticStreamingHubClientGenerator
             """);
         EmitProperties(ctx);
         EmitConstructor(ctx);
+        EmitTransportModeTables(ctx);
         EmitHelperMethods(ctx);
         EmitHubMethods(ctx, isFireAndForget: false);
         EmitFireAndForget(ctx);
@@ -231,6 +232,43 @@ public class StaticStreamingHubClientGenerator
             """);
         }
         ctx.Writer.AppendLine();
+    }
+
+    static void EmitTransportModeTables(StreamingHubClientBuildContext ctx)
+    {
+        // The tables are offered to the server when an additional transport is configured. Emitted only for contracts with unreliable methods,
+        // so that the generated code of other contracts does not change.
+        var hubMethods = ctx.Hub.Methods.Where(x => x.TransportMode != TransportMode.Reliable).OrderBy(x => x.HubId).ToArray();
+        var receiverMethods = ctx.Hub.Receiver.Methods.Where(x => x.TransportMode != TransportMode.Reliable).OrderBy(x => x.HubId).ToArray();
+        if (hubMethods.Length == 0 && receiverMethods.Length == 0) return;
+
+        if (hubMethods.Length != 0)
+        {
+            EmitEncodedTable(ctx, "EncodedUnreliableHubMethods", hubMethods);
+        }
+        if (receiverMethods.Length != 0)
+        {
+            EmitEncodedTable(ctx, "EncodedUnreliableReceiverMethods", receiverMethods);
+        }
+        ctx.Writer.AppendLine();
+
+        static void EmitEncodedTable(StreamingHubClientBuildContext ctx, string propertyName, IEnumerable<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo> methods)
+        {
+            ctx.Writer.AppendLineWithFormat($$"""
+                            protected override global::System.ReadOnlySpan<global::System.Byte> {{propertyName}} => new global::System.Byte[]
+                            {
+            """);
+            foreach (var method in methods)
+            {
+                var bytes = string.Join(", ", TransportModeTableEncoding.EncodeEntry(method.HubId, method.TransportMode).Select(x => $"0x{x:X2}"));
+                ctx.Writer.AppendLineWithFormat($$"""
+                                {{bytes}}, // {{method.MethodName}}: {{method.HubId}}, {{method.TransportMode}}
+            """);
+            }
+            ctx.Writer.AppendLine("""
+                            };
+            """);
+        }
     }
 
     static void EmitFireAndForget(StreamingHubClientBuildContext ctx)

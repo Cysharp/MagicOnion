@@ -29,6 +29,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     bool isReturnExceptionStackTraceInErrorDetail = false;
     UniqueHashDictionary<StreamingHubHandler> handlers = default!;
     Task? consumingRequestQueueTask = default;
+    // Set only when the client offered an additional transport.
+    AdditionalTransportServerNegotiation? additionalTransportNegotiation;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -59,6 +61,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     protected Guid ConnectionId
         => Context.ContextId;
+
+    /// <summary>
+    /// Gets the additional-transport negotiation result of the connection. Valid from <see cref="OnConnected"/> onward.
+    /// </summary>
+    internal StreamingHubTransportInfo TransportInfo
+        => additionalTransportNegotiation is { IsCompleted: true } negotiation ? negotiation.TransportInfo : StreamingHubTransportInfo.GrpcOnly;
 
     /// <summary>
     /// Called before connect, instead of constructor.
@@ -154,6 +162,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 await consumingRequestQueueTask.WaitAsync(RequestQueueShutdownTimeout).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
             }
 
+            // The additional transport lives as long as the gRPC connection. Release it and any provisional candidate.
+            if (additionalTransportNegotiation is not null)
+            {
+                await CleanupSafeAsync(static hub => hub.additionalTransportNegotiation!.DisposeAsync(), this);
+            }
+
             // User code or network backed Group provider may throw an exception while cleaning up.
             await CleanupSafeAsync(static hub => hub.OnDisconnected(), this);
             await CleanupSafeAsync(static hub => hub.Group.DisposeAsync(), this);
@@ -183,9 +197,17 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var reader = StreamingServiceContext.RequestStream!;
         var writer = StreamingServiceContext.ResponseStream!;
 
+        // Negotiate an additional transport only when the client offered one. A connection without an offer keeps the existing flow.
+        var negotiation = additionalTransportNegotiation = await StartAdditionalTransportNegotiationAsync(ct);
+
         // Send a hint to the client to start sending messages.
         // The client can read the response headers before any StreamingHub's message.
-        await Context.CallContext.WriteResponseHeadersAsync(ResponseHeaders);
+        await Context.CallContext.WriteResponseHeadersAsync(negotiation is null ? ResponseHeaders : CreateResponseHeaders(negotiation));
+        if (negotiation is { ResponseStatus: AdditionalTransportNegotiationStatus.Failed })
+        {
+            // The client requires an additional transport and reads the reason from the response headers.
+            throw new ReturnStatusException(StatusCode.FailedPrecondition, $"The client requires an additional transport, but it could not be established. Reason: {negotiation.Reason}");
+        }
 
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
@@ -193,7 +215,27 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         // Start sending heartbeats after the headers and marker have been sent.
         // NOTE: A heartbeat written while OnConnecting is running would implicitly send the response headers without the StreamingHub version header.
+        // Heartbeats keep working during the additional-transport control phase below.
         heartbeatHandle.MarkAsReady();
+
+        // Finalize the negotiation before OnConnected. Hub methods are not dispatched until the result is fixed.
+        Task<bool>? pendingMoveNext = null;
+        if (negotiation is not null)
+        {
+            if (!negotiation.IsCompleted)
+            {
+                var (streamCompleted, pendingRead) = await RunAdditionalTransportControlPhaseAsync(negotiation, reader, ct);
+                if (streamCompleted)
+                {
+                    // The client closed the stream before the negotiation completed.
+                    return;
+                }
+                pendingMoveNext = pendingRead;
+            }
+
+            negotiation.EndDeadline();
+            Context.CallContext.GetHttpContext().Features.Set<IStreamingHubTransportFeature>(new StreamingHubTransportFeature(negotiation.TransportInfo));
+        }
 
         // Call OnConnected after sending the headers and marker.
         // The server can send messages or broadcast to client after OnConnected.
@@ -202,6 +244,16 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         // Starts a loop that consumes the request queue.
         consumingRequestQueueTask = ConsumeRequestQueueAsync(ct);
+
+        if (pendingMoveNext is not null)
+        {
+            // A read was in flight when the negotiation deadline expired.
+            if (!await pendingMoveNext)
+            {
+                return;
+            }
+            await ProcessMessageAsync(reader.Current, ct);
+        }
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
@@ -213,6 +265,134 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
             // NOTE: DO NOT return the StreamingHubPayload to the pool here.
             //       Client requests may be pending at this point.
+        }
+    }
+
+    async ValueTask<AdditionalTransportServerNegotiation?> StartAdditionalTransportNegotiationAsync(CancellationToken cancellationToken)
+    {
+        var entry = Context.CallContext.RequestHeaders.GetOrDefault(AdditionalTransportNegotiation.MetadataKey);
+        if (entry is null || !entry.IsBinary)
+        {
+            return null;
+        }
+
+        return await AdditionalTransportServerNegotiation.StartAsync(
+            entry.ValueBytes,
+            streamingHubFeature.UnreliableHubMethods,
+            static () => StreamingHubTransportContract.ForReceiver<TReceiver>().UnreliableMethods,
+            methodId => streamingHubFeature.TryGetMethod(methodId, out var handler) ? handler.MethodInfo.Name : null,
+            static methodId => FindReceiverMethodName(methodId),
+            streamingHubFeature.AdditionalTransportProviders,
+            new AdditionalTransportServerContext(Context.ContextId, Context.CallContext, Context.ServiceProvider),
+            streamingHubFeature.AdditionalTransportOptions,
+            timeProvider,
+            payload => StreamingServiceContext.QueueResponseStreamWrite(payload),
+            Context.Logger,
+            Context.ServiceName,
+            cancellationToken);
+    }
+
+    static string? FindReceiverMethodName(int methodId)
+    {
+        foreach (var method in StreamingHubTransportContract.ForReceiver<TReceiver>().Methods)
+        {
+            if (method.MethodId == methodId) return method.Method.Name;
+        }
+        return null;
+    }
+
+    static Metadata CreateResponseHeaders(AdditionalTransportServerNegotiation negotiation)
+        => new Metadata()
+        {
+            { "x-magiconion-streaminghub-version", "2" },
+            { AdditionalTransportNegotiation.MetadataKey, negotiation.ResponseBytes },
+        };
+
+    /// <summary>
+    /// Processes messages until the negotiation is finalized. Hub requests are not accepted in this phase; heartbeats are.
+    /// </summary>
+    /// <returns>
+    /// Whether the client completed the stream, and a read that was in flight when the deadline expired.
+    /// The main loop processes the pending read after <see cref="OnConnected"/>.
+    /// </returns>
+    async Task<(bool StreamCompleted, Task<bool>? PendingMoveNext)> RunAdditionalTransportControlPhaseAsync(AdditionalTransportServerNegotiation negotiation, IAsyncStreamReader<StreamingHubPayload> reader, CancellationToken cancellationToken)
+    {
+        Task<bool>? moveNext = null;
+        while (!negotiation.IsCompleted)
+        {
+            // NOTE: Do not cancel MoveNext for the deadline. Canceling a read may break the stream; wait for either instead.
+            moveNext ??= reader.MoveNext(cancellationToken);
+            if (await Task.WhenAny(moveNext, negotiation.Deadline) != moveNext)
+            {
+                try
+                {
+                    await negotiation.OnDeadlineAsync();
+                }
+                catch
+                {
+                    // The connection ends, so the pending read is never awaited.
+                    _ = moveNext.ContinueWith(static t => _ = t.Exception, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                    throw;
+                }
+                return (false, moveNext);
+            }
+
+            var hasNext = await moveNext;
+            moveNext = null;
+            if (!hasNext)
+            {
+                return (true, null);
+            }
+
+            await ProcessAdditionalTransportNegotiationMessageAsync(negotiation, reader.Current, cancellationToken);
+        }
+
+        return (false, null);
+    }
+
+    ValueTask ProcessAdditionalTransportNegotiationMessageAsync(AdditionalTransportServerNegotiation negotiation, StreamingHubPayload payload, CancellationToken cancellationToken)
+    {
+        StreamingHubMessageType messageType;
+        (AdditionalTransportControlMessageKind Kind, int AttemptId, int Code, ReadOnlyMemory<byte> Data) message = default;
+        try
+        {
+            var reader = new StreamingHubServerMessageReader(payload.Memory);
+            messageType = reader.ReadMessageType();
+            if (messageType == StreamingHubMessageType.AdditionalTransportControl)
+            {
+                message = reader.ReadAdditionalTransportControl();
+            }
+        }
+        catch
+        {
+            StreamingHubPayloadPool.Shared.Return(payload);
+            throw;
+        }
+
+        switch (messageType)
+        {
+            case StreamingHubMessageType.AdditionalTransportControl:
+                return ProcessControlMessageAsync(negotiation, payload, message);
+            case StreamingHubMessageType.ClientHeartbeat:
+            case StreamingHubMessageType.ServerHeartbeatResponse:
+                // Heartbeats keep working while the connection is being established. ProcessMessageAsync returns the payload.
+                return ProcessMessageAsync(payload, cancellationToken);
+            default:
+                StreamingHubPayloadPool.Shared.Return(payload);
+                throw new ReturnStatusException(StatusCode.InvalidArgument, "The client sent a StreamingHub message before the additional transport negotiation completed.");
+        }
+
+        static async ValueTask ProcessControlMessageAsync(AdditionalTransportServerNegotiation negotiation, StreamingHubPayload payload, (AdditionalTransportControlMessageKind Kind, int AttemptId, int Code, ReadOnlyMemory<byte> Data) message)
+        {
+            try
+            {
+                // The data refers to the payload, which is returned to the pool after the negotiation processed it.
+                await negotiation.ProcessClientMessageAsync(message.Kind, message.AttemptId, message.Code, message.Data);
+            }
+            finally
+            {
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
         }
     }
 
@@ -369,6 +549,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
                         StreamingServiceContext.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan));
                     }
+                    break;
+                case StreamingHubMessageType.AdditionalTransportControl:
+                    // A control message that arrives after the negotiation is finalized, such as a late Activate after a timeout, is ignored.
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown MessageType: {messageType}");

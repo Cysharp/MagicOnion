@@ -18,6 +18,12 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     public TReceiver Receiver => receiver;
     public CallInvoker CallInvoker => callInvokerMock;
 
+    /// <summary>Gets the call options passed to the duplex streaming call, or <see langword="null"/> when the call has not started.</summary>
+    public CallOptions? LastCallOptions { get; private set; }
+
+    /// <summary>Gets a value indicating whether a request message is available without waiting.</summary>
+    public bool HasPendingRequest => requestChannel.Reader.TryPeek(out _);
+
     public StreamingHubClientTestHelper(IStreamingHubClientFactoryProvider? factoryProvider = null, Func<Metadata, Task>? onResponseHeaderAsync = null, Action? onDuplexStreamingCallDisposeAction = null)
     {
         requestChannel = Channel.CreateUnbounded<StreamingHubPayload>();
@@ -31,6 +37,7 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         callInvokerMock.AsyncDuplexStreamingCall(default(Method<StreamingHubPayload, StreamingHubPayload>)!, default, default)
         .ReturnsForAnyArgs(x =>
         {
+            LastCallOptions = x.ArgAt<CallOptions>(2);
             return new AsyncDuplexStreamingCall<StreamingHubPayload, StreamingHubPayload>(
                 requestStream,
                 responseStream,

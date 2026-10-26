@@ -40,10 +40,27 @@ internal ref struct StreamingHubClientMessageReader
         return subType switch
         {
             0x00 /*   0:ClientResultRequest */ => StreamingHubMessageType.ClientResultRequest,
+            0x7d /* 125:AdditionalTransportControl */ => StreamingHubMessageType.AdditionalTransportControl,
             0x7e /* 126:ClientHeartbeatResponse */ => StreamingHubMessageType.ClientHeartbeatResponse,
             0x7f /* 127:ServerHeartbeat */ => StreamingHubMessageType.ServerHeartbeat,
             _ => throw new InvalidOperationException($"Unknown Type: {subType}"),
         };
+    }
+
+    public (AdditionalTransportControlMessageKind Kind, int AttemptId, int Code, ReadOnlyMemory<byte> Data) ReadAdditionalTransportControl()
+    {
+        // [Type=0x7d, Kind(byte), AttemptId(int), [Code(int), Data(bin)], Nil]; Type is already read by ReadMessageType.
+        var reader = new MessagePackReader(data.Slice(position));
+        var kind = (AdditionalTransportControlMessageKind)reader.ReadByte();
+        var attemptId = reader.ReadInt32();
+        var bodyArray = reader.ReadArrayHeader();
+        if (bodyArray != 2) throw new InvalidOperationException($"Invalid AdditionalTransportControl: The BodyArray length is {bodyArray}");
+
+        var code = reader.ReadInt32();
+        var body = reader.TryReadNil() ? default : (reader.ReadBytes() is { } bytes ? bytes.First : default);
+        position += (int)reader.Consumed;
+
+        return (kind, attemptId, code, body);
     }
 
     public (int MethodId, int Cosumed) ReadBroadcastMessageMethodId()

@@ -7,17 +7,53 @@ namespace MagicOnion.Internal;
 /// <summary>
 /// A MethodId and its unreliable transport mode. This is the unit exchanged between peers during additional-transport negotiation.
 /// </summary>
-/// <param name="MethodId">The MethodId of the contract method.</param>
-/// <param name="Mode">The unreliable transport mode of the contract method.</param>
-internal readonly record struct StreamingHubTransportModeEntry(int MethodId, StreamingHubTransportMode Mode);
+/// <remarks>
+/// A plain struct rather than a record struct, because MagicOnion.Internal is also compiled without the <c>IsExternalInit</c> polyfill.
+/// </remarks>
+internal readonly struct StreamingHubTransportModeEntry : IEquatable<StreamingHubTransportModeEntry>
+{
+    /// <summary>Gets the MethodId of the contract method.</summary>
+    public int MethodId { get; }
+
+    /// <summary>Gets the unreliable transport mode of the contract method.</summary>
+    public StreamingHubTransportMode Mode { get; }
+
+    public StreamingHubTransportModeEntry(int methodId, StreamingHubTransportMode mode)
+    {
+        MethodId = methodId;
+        Mode = mode;
+    }
+
+    public bool Equals(StreamingHubTransportModeEntry other) => MethodId == other.MethodId && Mode == other.Mode;
+    public override bool Equals(object? obj) => obj is StreamingHubTransportModeEntry other && Equals(other);
+    public override int GetHashCode() => unchecked((MethodId * 397) ^ (int)Mode);
+    public override string ToString() => $"{MethodId}: {Mode}";
+
+    public static bool operator ==(StreamingHubTransportModeEntry left, StreamingHubTransportModeEntry right) => left.Equals(right);
+    public static bool operator !=(StreamingHubTransportModeEntry left, StreamingHubTransportModeEntry right) => !left.Equals(right);
+}
 
 /// <summary>
 /// A method known to both peers whose transport modes differ. Such a method is excluded from the agreed table and uses gRPC.
 /// </summary>
-/// <param name="MethodId">The MethodId of the contract method.</param>
-/// <param name="LocalMode">The mode declared by the local contract.</param>
-/// <param name="PeerMode">The mode declared by the peer contract.</param>
-internal readonly record struct StreamingHubTransportModeConflict(int MethodId, StreamingHubTransportMode LocalMode, StreamingHubTransportMode PeerMode);
+internal readonly struct StreamingHubTransportModeConflict
+{
+    /// <summary>Gets the MethodId of the contract method.</summary>
+    public int MethodId { get; }
+
+    /// <summary>Gets the mode declared by the local contract.</summary>
+    public StreamingHubTransportMode LocalMode { get; }
+
+    /// <summary>Gets the mode declared by the peer contract.</summary>
+    public StreamingHubTransportMode PeerMode { get; }
+
+    public StreamingHubTransportModeConflict(int methodId, StreamingHubTransportMode localMode, StreamingHubTransportMode peerMode)
+    {
+        MethodId = methodId;
+        LocalMode = localMode;
+        PeerMode = peerMode;
+    }
+}
 
 /// <summary>
 /// An immutable table of unreliable methods for one direction of a StreamingHub connection, keyed by MethodId.

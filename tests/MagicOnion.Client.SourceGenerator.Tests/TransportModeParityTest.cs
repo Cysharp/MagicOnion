@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeGen;
 using MagicOnion.Internal;
 using Microsoft.CodeAnalysis;
 using SampleServiceDefinitions.Hubs;
@@ -80,5 +81,13 @@ public class TransportModeParityTest
             .Select(x => (x.MethodId, Mode: (int)x.Mode))
             .ToArray();
         Assert.Equal(runtimeUnreliableReceiverMethods, roslynUnreliableReceiverMethods);
+
+        // The bytes embedded in generated clients must decode to the same tables as the runtime encoding.
+        var generatedHubBytes = roslynUnreliableHubMethods.SelectMany(x => TransportModeTableEncoding.EncodeEntry(x.MethodId, (TransportMode)x.Mode)).ToArray();
+        var generatedReceiverBytes = roslynUnreliableReceiverMethods.SelectMany(x => TransportModeTableEncoding.EncodeEntry(x.MethodId, (TransportMode)x.Mode)).ToArray();
+        Assert.Equal(AdditionalTransportNegotiation.EncodeEntries(hubContract.UnreliableMethods), generatedHubBytes);
+        Assert.Equal(AdditionalTransportNegotiation.EncodeEntries(receiverContract.UnreliableMethods), generatedReceiverBytes);
+        Assert.True(AdditionalTransportNegotiation.DecodeEntries(generatedHubBytes).ContentEquals(hubContract.UnreliableMethods));
+        Assert.True(AdditionalTransportNegotiation.DecodeEntries(generatedReceiverBytes).ContentEquals(receiverContract.UnreliableMethods));
     }
 }

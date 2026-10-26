@@ -33,6 +33,10 @@ namespace MagicOnion.Internal;
 ///             <term>ClientHeartbeat/Response:</term>
 ///             <description>Array(5): [Type=0x7e, Nil, Nil, Nil, [ClientTime(long)]]</description>
 ///         </item>
+///         <item>
+///             <term>AdditionalTransportControl: negotiation of an additional transport (from server to client)</term>
+///             <description>Array(5): [Type=0x7d, Kind(byte), AttemptId(int), [Code(int), Data(bin)], Nil]</description>
+///         </item>
 ///     </list>
 ///     <para>StreamingHub message formats (from Client to Server):</para>
 ///     <list type="bullet">
@@ -59,6 +63,10 @@ namespace MagicOnion.Internal;
 ///         <item>
 ///             <term>ClientHeartbeat/Request:</term>
 ///             <description>Array(4): [Type=0x7e, Nil, Nil, [ClientTime(long)]]</description>
+///         </item>
+///         <item>
+///             <term>AdditionalTransportControl: negotiation of an additional transport (from client to server)</term>
+///             <description>Array(4): [Type=0x7d, Kind(byte), AttemptId(int), [Code(int), Data(bin)]]</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -306,6 +314,47 @@ internal static class StreamingHubMessageWriter
         bufferWriter.Advance(bytesWritten);
     }
 
+    /// <summary>
+    /// Writes an additional-transport control message for sending from the client.
+    /// </summary>
+    public static void WriteAdditionalTransportControlMessageFromClient(IBufferWriter<byte> bufferWriter, AdditionalTransportControlMessageKind kind, int attemptId, int code, ReadOnlySpan<byte> data)
+    {
+        // Array(4)[0x7d(125), Kind(byte), AttemptId(int), [Code(int), Data(bin)]]
+        var writer = new MessagePackWriter(bufferWriter);
+        writer.WriteArrayHeader(4);
+        WriteAdditionalTransportControlMessageBody(ref writer, kind, attemptId, code, data);
+        writer.Flush();
+    }
+
+    /// <summary>
+    /// Writes an additional-transport control message for sending from the server.
+    /// </summary>
+    public static void WriteAdditionalTransportControlMessageFromServer(IBufferWriter<byte> bufferWriter, AdditionalTransportControlMessageKind kind, int attemptId, int code, ReadOnlySpan<byte> data)
+    {
+        // Array(5)[0x7d(125), Kind(byte), AttemptId(int), [Code(int), Data(bin)], Nil]
+        // NOTE: Messages with a sub-type are Array(5) from the server, because the client reads Array(4) as an error response.
+        var writer = new MessagePackWriter(bufferWriter);
+        writer.WriteArrayHeader(5);
+        WriteAdditionalTransportControlMessageBody(ref writer, kind, attemptId, code, data);
+        // 4:Reserved (Nil)
+        writer.WriteNil();
+        writer.Flush();
+    }
+
+    static void WriteAdditionalTransportControlMessageBody(ref MessagePackWriter writer, AdditionalTransportControlMessageKind kind, int attemptId, int code, ReadOnlySpan<byte> data)
+    {
+        // 0:Type = 0x7d / 125 (AdditionalTransportControl)
+        writer.Write((byte)0x7d);
+        // 1:Kind
+        writer.Write((byte)kind);
+        // 2:AttemptId
+        writer.Write(attemptId);
+        // 3:[Code, Data]
+        writer.WriteArrayHeader(2);
+        writer.Write(code);
+        writer.Write(data);
+    }
+
     static void VerifyResultAndAdvance(bool result, int written, ref int bytesWrittenTotal)
     {
         if (!result)
@@ -372,4 +421,9 @@ internal enum StreamingHubMessageType
     /// Heartbeat: Client -> Server -> Client
     /// </summary>
     ClientHeartbeatResponse,
+
+    /// <summary>
+    /// AdditionalTransportControl: Client -> Server, Server -> Client (negotiation of an additional transport)
+    /// </summary>
+    AdditionalTransportControl,
 }

@@ -67,11 +67,16 @@ internal
         // Resolve the transport mode of each hub method from the shared contract interfaces.
         // Building the contracts also validates them and fails deterministically for an invalid contract.
         var hubContract = StreamingHubTransportContract.ForHub<TStreamingHub>();
-        _ = StreamingHubTransportContract.ForReceiver<TReceiver>();
+        var receiverContract = StreamingHubTransportContract.ForReceiver<TReceiver>();
         foreach (var definition in methodDefinitions)
         {
             definition.TransportMode = hubContract.TryGetMode(definition.MethodId, out var transportMode) ? transportMode : StreamingHubTransportMode.Reliable;
         }
+
+        // Embed the unreliable method tables in the same properties as generated clients, so the base class reads them the same way.
+        DefineEncodedTransportModeTables(typeBuilder,
+            AdditionalTransportNegotiation.EncodeEntries(hubContract.UnreliableMethods),
+            AdditionalTransportNegotiation.EncodeEntries(receiverContract.UnreliableMethods));
 
         {
             // Create FireAndForgetType first as nested type.
@@ -88,6 +93,51 @@ internal
         }
 
         ClientType = typeBuilder.CreateTypeInfo()!.AsType();
+    }
+
+    /// <summary>
+    /// Overrides <c>EncodedUnreliableHubMethods</c> and <c>EncodedUnreliableReceiverMethods</c> to return the encoded tables, as generated clients do.
+    /// </summary>
+    /// <remarks>
+    /// Each table is stored in a static field initialized by the type initializer, and the property returns a span over it without allocating.
+    /// A property is not overridden when its table is empty, so a contract without unreliable methods keeps the base implementation.
+    /// </remarks>
+    static void DefineEncodedTransportModeTables(TypeBuilder typeBuilder, byte[] encodedHubMethods, byte[] encodedReceiverMethods)
+    {
+        var tables = new[]
+        {
+            (PropertyName: "EncodedUnreliableHubMethods", Encoded: encodedHubMethods),
+            (PropertyName: "EncodedUnreliableReceiverMethods", Encoded: encodedReceiverMethods),
+        }.Where(static x => x.Encoded.Length != 0).ToArray();
+        if (tables.Length == 0) return;
+
+        var spanConstructor = typeof(ReadOnlySpan<byte>).GetConstructor(new[] { typeof(byte[]) })!;
+        var typeInitializer = typeBuilder.DefineTypeInitializer().GetILGenerator();
+        foreach (var (propertyName, encoded) in tables)
+        {
+            // static readonly byte[] __EncodedUnreliable...Methods = new byte[] { ... };
+            var field = typeBuilder.DefineField("__" + propertyName, typeof(byte[]), FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly);
+            typeInitializer.EmitLdc_I4(encoded.Length);
+            typeInitializer.Emit(OpCodes.Newarr, typeof(byte));
+            for (var i = 0; i < encoded.Length; i++)
+            {
+                typeInitializer.Emit(OpCodes.Dup);
+                typeInitializer.EmitLdc_I4(i);
+                typeInitializer.EmitLdc_I4(encoded[i]);
+                typeInitializer.Emit(OpCodes.Stelem_I1);
+            }
+            typeInitializer.Emit(OpCodes.Stsfld, field);
+
+            // protected override ReadOnlySpan<byte> EncodedUnreliable...Methods => new ReadOnlySpan<byte>(__EncodedUnreliable...Methods);
+            var baseGetter = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic)!.GetMethod!;
+            var getter = typeBuilder.DefineMethod(baseGetter.Name, MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.SpecialName, typeof(ReadOnlySpan<byte>), Type.EmptyTypes);
+            var il = getter.GetILGenerator();
+            il.Emit(OpCodes.Ldsfld, field);
+            il.Emit(OpCodes.Newobj, spanConstructor);
+            il.Emit(OpCodes.Ret);
+            typeBuilder.DefineMethodOverride(getter, baseGetter);
+        }
+        typeInitializer.Emit(OpCodes.Ret);
     }
 
     static MethodDefinition[] SearchDefinitions(Type interfaceType)

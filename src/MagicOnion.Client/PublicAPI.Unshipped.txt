@@ -12,3 +12,24 @@ static MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(Gr
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageUnreliableTaskAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.Task<TResponse>!
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageUnreliableValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.ValueTask
 MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageUnreliableValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message) -> System.Threading.Tasks.ValueTask<TResponse>
+MagicOnion.Client.AdditionalTransportClientOptions
+MagicOnion.Client.AdditionalTransportClientOptions.AdditionalTransportClientOptions(System.Collections.Generic.IEnumerable<MagicOnion.Client.IAdditionalTransportClientProvider!>! providers, MagicOnion.AdditionalTransportEstablishment establishment = MagicOnion.AdditionalTransportEstablishment.Preferred, System.TimeSpan? negotiationTimeout = null) -> void
+MagicOnion.Client.AdditionalTransportClientOptions.Establishment.get -> MagicOnion.AdditionalTransportEstablishment
+MagicOnion.Client.AdditionalTransportClientOptions.NegotiationTimeout.get -> System.TimeSpan
+MagicOnion.Client.AdditionalTransportClientOptions.Providers.get -> System.Collections.Generic.IReadOnlyList<MagicOnion.Client.IAdditionalTransportClientProvider!>!
+MagicOnion.Client.IAdditionalTransportClientCandidate
+MagicOnion.Client.IAdditionalTransportClientCandidate.EstablishAsync(System.ReadOnlyMemory<byte> selection, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.ReadOnlyMemory<byte>>
+MagicOnion.Client.IAdditionalTransportClientCandidate.Offer.get -> System.ReadOnlyMemory<byte>
+MagicOnion.Client.IAdditionalTransportClientCandidate.OnActivated() -> void
+MagicOnion.Client.IAdditionalTransportClientProvider
+MagicOnion.Client.IAdditionalTransportClientProvider.TryCreateCandidate(out MagicOnion.Client.IAdditionalTransportClientCandidate? candidate) -> bool
+MagicOnion.Client.IAdditionalTransportClientProvider.Id.get -> string!
+MagicOnion.Client.IAdditionalTransportClientProvider.Version.get -> int
+MagicOnion.Client.StreamingHubClientOptions.AdditionalTransport.get -> MagicOnion.Client.AdditionalTransportClientOptions?
+MagicOnion.Client.StreamingHubClientOptions.StreamingHubClientOptions(string? host, Grpc.Core.CallOptions callOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider! serializerProvider, MagicOnion.Client.IMagicOnionClientLogger! logger, System.TimeSpan? clientHeartbeatInterval, System.TimeSpan? clientHeartbeatTimeout, System.Action<MagicOnion.Client.ServerHeartbeatEvent>? onServerHeartbeatReceived, System.Action<MagicOnion.Client.ClientHeartbeatEvent>? onClientHeartbeatResponseReceived, System.TimeProvider? timeProvider, MagicOnion.Client.AdditionalTransportClientOptions? additionalTransport) -> void
+MagicOnion.Client.StreamingHubClientOptions.WithAdditionalTransport(MagicOnion.Client.AdditionalTransportClientOptions? additionalTransport) -> MagicOnion.Client.StreamingHubClientOptions!
+static MagicOnion.Client.AdditionalTransportClientOptions.DefaultNegotiationTimeout.get -> System.TimeSpan
+static MagicOnion.Client.StreamingHubClientExtensions.GetTransportInfo<TStreamingHub>(this TStreamingHub hub) -> MagicOnion.StreamingHubTransportInfo
+virtual MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.EncodedUnreliableHubMethods.get -> System.ReadOnlySpan<byte>
+virtual MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.EncodedUnreliableReceiverMethods.get -> System.ReadOnlySpan<byte>
+static MagicOnion.Client.StreamingHubClientExtensions.TryGetTransportInfo<TStreamingHub>(this TStreamingHub hub, out MagicOnion.StreamingHubTransportInfo transportInfo) -> bool

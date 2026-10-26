@@ -15,6 +15,15 @@ namespace TempProject
                 {
                 }
 
+                protected override global::System.ReadOnlySpan<global::System.Byte> EncodedUnreliableHubMethods => new global::System.Byte[]
+                {
+                    0xFA, 0x15, 0x65, 0x08, 0x01, // MoveAsync: -99261176, UnreliableSequenced
+                };
+                protected override global::System.ReadOnlySpan<global::System.Byte> EncodedUnreliableReceiverMethods => new global::System.Byte[]
+                {
+                    0x55, 0x3A, 0x26, 0x7D, 0x01, // OnMove: 1429874301, UnreliableSequenced
+                };
+
                 public global::System.Threading.Tasks.Task MoveAsync(global::System.Int32 x)
                     => this.WriteMessageUnreliableTaskAsync<global::System.Int32, global::MessagePack.Nil>(-99261176, x);
                 public global::System.Threading.Tasks.Task<global::System.Int32> JoinAsync(global::System.String name)

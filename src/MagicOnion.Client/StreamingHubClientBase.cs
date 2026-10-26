@@ -4,6 +4,7 @@ using MagicOnion.Internal;
 using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using System.Buffers;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 
@@ -22,12 +23,27 @@ public class StreamingHubClientOptions
     public Action<ClientHeartbeatEvent>? OnClientHeartbeatResponseReceived { get; }
     public TimeProvider? TimeProvider { get; }
 
+    /// <summary>
+    /// Gets the additional transports offered to the server, or <see langword="null"/> when the connection uses gRPC only.
+    /// </summary>
+    /// <remarks>This API is experimental and may change.</remarks>
+    public AdditionalTransportClientOptions? AdditionalTransport { get; }
+
     public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         : this(host, callOptions, serializerProvider, logger, default, default, default, default, default)
     {
     }
 
     public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived,TimeProvider? timeProvider)
+        : this(host, callOptions, serializerProvider, logger, clientHeartbeatInterval, clientHeartbeatTimeout, onServerHeartbeatReceived, onClientHeartbeatResponseReceived, timeProvider, default)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance with all options, including the additional transports offered to the server.
+    /// </summary>
+    /// <remarks>The <paramref name="additionalTransport"/> parameter is experimental and may change.</remarks>
+    public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? clientHeartbeatInterval, TimeSpan? clientHeartbeatTimeout, Action<ServerHeartbeatEvent>? onServerHeartbeatReceived, Action<ClientHeartbeatEvent>? onClientHeartbeatResponseReceived, TimeProvider? timeProvider, AdditionalTransportClientOptions? additionalTransport)
     {
         Host = host;
         CallOptions = callOptions;
@@ -38,6 +54,7 @@ public class StreamingHubClientOptions
         OnServerHeartbeatReceived = onServerHeartbeatReceived;
         OnClientHeartbeatResponseReceived = onClientHeartbeatResponseReceived;
         TimeProvider = timeProvider;
+        AdditionalTransport = additionalTransport;
     }
 
     public static StreamingHubClientOptions CreateWithDefault(string? host = default, CallOptions callOptions = default, IMagicOnionSerializerProvider? serializerProvider = default, IMagicOnionClientLogger? logger = default)
@@ -47,22 +64,26 @@ public class StreamingHubClientOptions
         => new(host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
     public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
         => new(Host, callOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
     public StreamingHubClientOptions WithSerializerProvider(IMagicOnionSerializerProvider serializerProvider)
         => new(
             Host, CallOptions, serializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
     public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
         => new(Host, CallOptions, SerializerProvider, logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
 
     /// <summary>
@@ -74,6 +95,7 @@ public class StreamingHubClientOptions
         => new(Host, CallOptions, SerializerProvider, Logger
             , interval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
 
     /// <summary>
@@ -85,6 +107,7 @@ public class StreamingHubClientOptions
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, timeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
 
     /// <summary>
@@ -96,6 +119,7 @@ public class StreamingHubClientOptions
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, onServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
 
     /// <summary>
@@ -107,6 +131,7 @@ public class StreamingHubClientOptions
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, onClientHeartbeatResponseReceived
             , TimeProvider
+            , AdditionalTransport
         );
 
     /// <summary>
@@ -118,10 +143,24 @@ public class StreamingHubClientOptions
         => new(Host, CallOptions, SerializerProvider, Logger
             , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
             , timeProvider
+            , AdditionalTransport
+        );
+
+    /// <summary>
+    /// Sets the additional transports offered to the server. If a value is <see langword="null"/>, the connection uses gRPC only.
+    /// </summary>
+    /// <param name="additionalTransport">The additional transport options, or <see langword="null"/>.</param>
+    /// <returns>A new options instance.</returns>
+    /// <remarks>This API is experimental and may change.</remarks>
+    public StreamingHubClientOptions WithAdditionalTransport(AdditionalTransportClientOptions? additionalTransport)
+        => new(Host, CallOptions, SerializerProvider, Logger
+            , ClientHeartbeatInterval, ClientHeartbeatTimeout, OnServerHeartbeatReceived, OnClientHeartbeatResponseReceived
+            , TimeProvider
+            , additionalTransport
         );
 }
 
-public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStreamingHubClient
+public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStreamingHubClient, IStreamingHubClientTransportInfoAccessor
     where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
 {
 #pragma warning disable IDE1006 // Naming Styles
@@ -154,7 +193,35 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
     StreamingHubClientHeartbeatManager? heartbeatManager;
     Task? subscription;
 
+    // Additional transport: the negotiation in progress, the activated transport, and the finalized result.
+    AdditionalTransportClientNegotiation? additionalTransportNegotiation;
+    IAdditionalTransportClientCandidate? activeAdditionalTransport;
+    StreamingHubTransportInfo transportInfo;
+
     protected readonly TReceiver receiver;
+
+    StreamingHubTransportInfo IStreamingHubClientTransportInfoAccessor.TransportInfo => transportInfo;
+
+    /// <summary>
+    /// Gets the unreliable methods of the hub contract, encoded for the additional-transport negotiation.
+    /// This member supports the MagicOnion source generator and the dynamic client, and is not intended to be used directly from your code.
+    /// </summary>
+    /// <remarks>
+    /// Each entry is 5 bytes: the MethodId as a big-endian 32-bit integer followed by the <see cref="StreamingHubTransportMode"/> value.
+    /// Entries are sorted by MethodId in ascending order. A client that does not override this property declares no unreliable hub method.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected virtual ReadOnlySpan<byte> EncodedUnreliableHubMethods => default;
+
+    /// <summary>
+    /// Gets the unreliable methods of the receiver contract, encoded for the additional-transport negotiation.
+    /// This member supports the MagicOnion source generator and the dynamic client, and is not intended to be used directly from your code.
+    /// </summary>
+    /// <remarks>
+    /// The encoding is the same as <see cref="EncodedUnreliableHubMethods"/>. A client that does not override this property declares no unreliable receiver method.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected virtual ReadOnlySpan<byte> EncodedUnreliableReceiverMethods => default;
 
     protected StreamingHubClientBase(string serviceName, TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
     {
@@ -170,7 +237,34 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
     internal async Task __ConnectAndSubscribeAsync(CancellationToken connectAndSubscribeCancellationToken)
     {
         var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
-        var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, options.CallOptions);
+
+        // Prepare the negotiation of an additional transport before the call starts. Without additional transport options,
+        // or when the contracts have no unreliable method, the connection uses the existing flow and sends no negotiation metadata.
+        var negotiation = options.AdditionalTransport is { } additionalTransportOptions
+            ? await AdditionalTransportClientNegotiation.PrepareAsync(
+                additionalTransportOptions,
+                AdditionalTransportNegotiation.DecodeEntries(EncodedUnreliableHubMethods),
+                AdditionalTransportNegotiation.DecodeEntries(EncodedUnreliableReceiverMethods),
+                logger).ConfigureAwait(false)
+            : null;
+        try
+        {
+            await ConnectAndSubscribeCoreAsync(syncContext, negotiation, connectAndSubscribeCancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            // Dispose the candidates that did not become the additional transport of the connection.
+            if (negotiation is not null)
+            {
+                await negotiation.DisposeAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
+    async Task ConnectAndSubscribeCoreAsync(SynchronizationContext? syncContext, AdditionalTransportClientNegotiation? negotiation, CancellationToken connectAndSubscribeCancellationToken)
+    {
+        var callOptions = negotiation is null ? options.CallOptions : negotiation.ApplyTo(options.CallOptions);
+        var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, callOptions);
 
         this.writer = callResult.RequestStream;
         this.reader = callResult.ResponseStream;
@@ -183,6 +277,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
 
         // Establish StreamingHub connection between the client and the server.
         Metadata.Entry? messageVersion;
+        Metadata headers;
         try
         {
             // The client can read the response headers before any StreamingHub's message.
@@ -211,7 +306,7 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 return;
             }
 
-            var headers = await responseHeadersTask.ConfigureAwait(false);
+            headers = await responseHeadersTask.ConfigureAwait(false);
             messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
             // Check message version of StreamingHub.
@@ -223,6 +318,27 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         catch (RpcException e)
         {
             throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
+        }
+
+        // Apply the negotiation result returned with the response headers.
+        // The connection is finalized here unless the server selected a candidate that must be established.
+        var needsAdditionalTransportControlPhase = false;
+        if (negotiation is not null && messageVersion is not null)
+        {
+            try
+            {
+                needsAdditionalTransportControlPhase = negotiation.ProcessResponseHeaders(headers);
+            }
+            catch
+            {
+                callResult.Dispose();
+                throw;
+            }
+
+            if (!needsAdditionalTransportControlPhase)
+            {
+                transportInfo = negotiation.TransportInfo;
+            }
         }
 
         // Set up the Heartbeat Manager
@@ -256,7 +372,29 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
             throw new RpcException(new Status(StatusCode.Internal, $"The request started successfully (StatusCode = OK), but the StreamingHub client has failed to negotiate with the server. ServerVersion is missing."));
         }
 
+        if (needsAdditionalTransportControlPhase)
+        {
+            // Route the control messages received by the subscription loop to the negotiation.
+            additionalTransportNegotiation = negotiation;
+        }
+
         this.subscription = StartSubscribe(syncContext, firstMoveNextTask, subscriptionToken);
+
+        if (needsAdditionalTransportControlPhase)
+        {
+            // ConnectAsync completes only after the server finalized the result, so the returned proxy never observes the negotiation.
+            try
+            {
+                transportInfo = await negotiation!.RunControlPhaseAsync(writerQueue.Writer, options.TimeProvider ?? TimeProvider.System, connectAndSubscribeCancellationToken).ConfigureAwait(false);
+                activeAdditionalTransport = negotiation.TakeActiveCandidate();
+            }
+            catch
+            {
+                // The proxy is not returned to the caller, so close the connection here.
+                await DisposeAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
     }
 
     // Helper methods to make building clients easy.
@@ -349,6 +487,8 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
         finally
         {
             disconnected = true;
+            // Fail the negotiation in progress, if any, because no more control messages arrive.
+            additionalTransportNegotiation?.OnDisconnected(disconnectionReason.Exception);
 
             try
             {
@@ -392,6 +532,14 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 break;
             case StreamingHubMessageType.ClientHeartbeatResponse:
                 heartbeatManager!.ProcessClientHeartbeatResponse(payload);
+                break;
+            case StreamingHubMessageType.AdditionalTransportControl:
+                {
+                    // Handled on the subscription loop without posting to the synchronization context; the negotiation copies the data.
+                    var message = messageReader.ReadAdditionalTransportControl();
+                    additionalTransportNegotiation?.OnControlMessage(message.Kind, message.AttemptId, message.Code, message.Data);
+                    StreamingHubPayloadPool.Shared.Return(payload);
+                }
                 break;
         }
     }
@@ -796,6 +944,21 @@ public abstract class StreamingHubClientBase<TStreamingHub, TReceiver> : IStream
                 if (!(ex is OperationCanceledException))
                 {
                     throw;
+                }
+            }
+            finally
+            {
+                // The additional transport lives as long as the StreamingHub connection.
+                if (Interlocked.Exchange(ref activeAdditionalTransport, null) is { } additionalTransport)
+                {
+                    try
+                    {
+                        await additionalTransport.DisposeAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "An error occurred while disposing the additional transport.");
+                    }
                 }
             }
         }

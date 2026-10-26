@@ -42,10 +42,27 @@ internal ref struct StreamingHubServerMessageReader
         {
             0x00 => StreamingHubMessageType.ClientResultResponse,
             0x01 => StreamingHubMessageType.ClientResultResponseWithError,
+            0x7d => StreamingHubMessageType.AdditionalTransportControl,
             0x7e => StreamingHubMessageType.ClientHeartbeat,
             0x7f => StreamingHubMessageType.ServerHeartbeatResponse,
             _ => throw new InvalidOperationException($"Unknown client response message: {subType}"),
         };
+    }
+
+    public (AdditionalTransportControlMessageKind Kind, int AttemptId, int Code, ReadOnlyMemory<byte> Data) ReadAdditionalTransportControl()
+    {
+        // [Type=0x7d, Kind(byte), AttemptId(int), [Code(int), Data(bin)]]; Type is already read by ReadMessageType.
+        var reader = new MessagePackReader(data.Slice(position));
+        var kind = (AdditionalTransportControlMessageKind)reader.ReadByte();
+        var attemptId = reader.ReadInt32();
+        var bodyArray = reader.ReadArrayHeader();
+        if (bodyArray != 2) throw new InvalidOperationException($"Invalid AdditionalTransportControl: The BodyArray length is {bodyArray}");
+
+        var code = reader.ReadInt32();
+        var body = reader.TryReadNil() ? default : (reader.ReadBytes() is { } bytes ? bytes.First : default);
+        position += (int)reader.Consumed;
+
+        return (kind, attemptId, code, body);
     }
 
     public (int MethodId, ReadOnlyMemory<byte> Body) ReadRequestFireAndForget()
