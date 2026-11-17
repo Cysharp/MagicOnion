@@ -9,7 +9,7 @@ overrides:
   '@docusaurus/theme-mermaid>mermaid': ^11.17.2
   caniuse-lite: 1.0.30001793
   graceful-fs@>4.2.11: 4.2.11
-  mermaid>katex: 0.18.4
+  mermaid>katex: ^0.19.1
   sax@>1.6.0: 1.6.0
   serialize-javascript@<7.1.3: ^7.1.4
   sockjs>uuid: ^11.1.1
@@ -2391,6 +2391,10 @@ packages:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
     engines: {node: '>=14'}
 
+  commander@15.1.0:
+    resolution: {integrity: sha512-cgnQ88TRrWcC7pVq46RzJVRMktu3W2RcbnoidnfBsl1bmDCBwJS/udcIZpKoCrbAYYaCqsz1yZCVIgbIaU3ddQ==}
+    engines: {node: '>=22.12.0'}
+
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
 
@@ -3641,8 +3645,8 @@ packages:
   jsonfile@6.2.1:
     resolution: {integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==}
 
-  katex@0.18.4:
-    resolution: {integrity: sha512-IMPntbRLOU+eu88XDiFKqQ8Akhr9Tv7jDMXqPhjG9SI1JMA4DIgXk4x9k4skJz2NZJXBRbC+2pYBLj9olqcZow==}
+  katex@0.19.1:
+    resolution: {integrity: sha512-jG8uKntjSEcm2EpQOh0XturpPuuC9r3Sq5HLHdsFdWZT27E672SF19QEi+of0/YeOy15lDgRhKvr5614uRrEfA==}
     hasBin: true
 
   keyv@4.5.4:
@@ -9208,6 +9212,8 @@ snapshots:
 
   commander@10.0.1: {}
 
+  commander@15.1.0: {}
+
   commander@2.20.3: {}
 
   commander@5.1.0: {}
@@ -10561,9 +10567,9 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  katex@0.18.4:
+  katex@0.19.1:
     dependencies:
-      commander: 8.3.0
+      commander: 15.1.0
 
   keyv@4.5.4:
     dependencies:
@@ -10876,7 +10882,7 @@ snapshots:
       dompurify: 3.4.18
       es-toolkit: 1.53.2
       fastdom: 1.0.12
-      katex: 0.18.4
+      katex: 0.19.1
       khroma: 2.1.0
       marked: 16.4.2
       roughjs: 4.6.6
