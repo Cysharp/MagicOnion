@@ -18,7 +18,6 @@
     <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="$(UseNuGetServer)-preview" />
     <PackageReference Include="MagicOnion.Server" Version="$(UseNuGetServer)" />
     <PackageReference Include="Multicaster" Version="$(MulticasterVersion)" />
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0"/>
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseNuGetServer)' == ''">

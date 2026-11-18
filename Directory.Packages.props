@@ -15,7 +15,6 @@
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.3.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Multicaster" Version="2.1.1" />
     <PackageVersion Include="Multicaster.Distributed.Redis" Version="2.1.1" />
     <PackageVersion Include="Multicaster.Distributed.Nats" Version="2.1.1" />
