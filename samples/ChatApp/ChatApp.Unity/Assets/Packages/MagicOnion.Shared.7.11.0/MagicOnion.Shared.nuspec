@@ -18,19 +18,19 @@
         <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="MagicOnion.Serialization.MessagePack" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
-        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.12" exclude="Build,Analyzers" />
       </group>
       <group targetFramework=".NETStandard2.0">
         <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="MagicOnion.Serialization.MessagePack" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
-        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.12" exclude="Build,Analyzers" />
       </group>
       <group targetFramework=".NETStandard2.1">
         <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="MagicOnion.Serialization.MessagePack" version="7.11.0" exclude="Build,Analyzers" />
         <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
-        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.12" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
