@@ -51,7 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="packages.json">
+    <None Update="package.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
