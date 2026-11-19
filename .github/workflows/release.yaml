@@ -23,6 +23,7 @@ jobs:
     uses: Cysharp/Actions/.github/workflows/validate-release.yaml@main
     with:
       tag: ${{ inputs.tag }}
+      allowed-branches: "release/*"
 
   update-packagejson:
     needs: [validate-release]
