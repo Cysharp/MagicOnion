@@ -152,7 +152,7 @@ public class MagicOnionJsonTranscodingGrpcMethodBinder<TService>(
     {
         public override IBufferWriter<byte> GetBufferWriter() => writer;
         public override void Complete() {}
-        public override void SetPayloadLength(int payloadLength) => throw new NotSupportedException();
+        public override void SetPayloadLength(int payloadLength) {} // The payload length is optional. The response body does not need it.
         public override void Complete(byte[] payload) => throw new NotSupportedException();
     }
 
