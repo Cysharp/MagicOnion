@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MagicOnion.Serialization.MessagePack</id>
+    <version>7.11.0</version>
+    <authors>Cysharp</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/Cysharp/MagicOnion</projectUrl>
+    <description>MagicOnion extension package for serialization using MessagePack.</description>
+    <copyright>© Cysharp, Inc.</copyright>
+    <tags>magiconion grpc http2</tags>
+    <repository type="git" url="https://github.com/Cysharp/MagicOnion" commit="e18aea47c60dfba9e7e1b72312f11826c8e32812" />
+    <dependencies>
+      <group targetFramework="net10.0">
+        <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="MagicOnion.Abstractions" version="7.11.0" exclude="Build,Analyzers" />
+        <dependency id="Grpc.Core.Api" version="2.57.0" exclude="Build,Analyzers" />
+        <dependency id="MessagePack" version="3.1.7" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
