@@ -41,7 +41,4 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)LICENSE" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all"/>
-  </ItemGroup>
 </Project>
