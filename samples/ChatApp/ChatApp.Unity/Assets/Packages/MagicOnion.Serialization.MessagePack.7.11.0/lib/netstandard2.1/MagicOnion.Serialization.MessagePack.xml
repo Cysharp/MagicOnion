@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MagicOnion.Serialization.MessagePack</name>
+    </assembly>
+    <members>
+        <member name="T:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider">
+            <summary>
+            Provides a <see cref="T:MagicOnion.Serialization.IMagicOnionSerializerProvider"/> using MessagePack.
+            </summary>
+        </member>
+        <member name="P:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider.Default">
+            <summary>
+            Gets the provider with <see cref="P:MessagePack.MessagePackSerializer.DefaultOptions"/> for serialization.
+            </summary>
+        </member>
+        <member name="M:MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider.WithEnableFallback(System.Boolean)">
+            <summary>
+            Gets a provider with method parameter fallback option. If the option is enabled, a serializer will respects the method's optional parameters.
+            </summary>
+            <param name="enableFallback"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MessagePack.GeneratedMessagePackResolver">
+            <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary>
+        </member>
+        <member name="F:MessagePack.GeneratedMessagePackResolver.Instance">
+            <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary>
+        </member>
+    </members>
+</doc>
