@@ -1,5 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Buffers;
+using System.Runtime.CompilerServices;
 using Grpc.Core;
+using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using MessagePack;
 
@@ -70,10 +72,7 @@ internal static class GrpcMethodHelper
         {
             ReadOnlySpan<byte> unsafeNilBytes = new[] { MessagePackCode.Nil };
 
-            var writer = ctx.GetBufferWriter();
-            var buffer = writer.GetSpan(unsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.
-            unsafeNilBytes.CopyTo(buffer);
-            writer.Advance(unsafeNilBytes.Length);
+            WritePayload(ctx, unsafeNilBytes); // Write `Nil` as `byte[]` to the buffer.
 
             ctx.Complete();
         },
@@ -90,14 +89,11 @@ internal static class GrpcMethodHelper
 #pragma warning restore CS8602
                 {
                     var rawBytesBox = (RawBytesBox)(object)obj;
-                    var writer = ctx.GetBufferWriter();
-                    var buffer = writer.GetSpan(rawBytesBox.Bytes.Length);
-                    rawBytesBox.Bytes.Span.CopyTo(buffer);
-                    writer.Advance(rawBytesBox.Bytes.Length);
+                    WritePayload(ctx, rawBytesBox.Bytes.Span);
                 }
                 else
                 {
-                    messageSerializer.Serialize(ctx.GetBufferWriter(), DangerousDummyNull.GetObjectOrDefault<T>(obj));
+                    SerializeAndWritePayload(messageSerializer, ctx, DangerousDummyNull.GetObjectOrDefault<T>(obj));
                 }
                 ctx.Complete();
             },
@@ -114,14 +110,11 @@ internal static class GrpcMethodHelper
 #pragma warning restore CS8602
                 {
                     var rawBytesBox = (RawBytesBox)(object)obj;
-                    var writer = ctx.GetBufferWriter();
-                    var buffer = writer.GetSpan(rawBytesBox.Bytes.Length);
-                    rawBytesBox.Bytes.Span.CopyTo(buffer);
-                    writer.Advance(rawBytesBox.Bytes.Length);
+                    WritePayload(ctx, rawBytesBox.Bytes.Span);
                 }
                 else
                 {
-                    messageSerializer.Serialize(ctx.GetBufferWriter(), obj.Value);
+                    SerializeAndWritePayload(messageSerializer, ctx, obj.Value);
                 }
                 ctx.Complete();
             },
@@ -129,4 +122,22 @@ internal static class GrpcMethodHelper
         );
     }
 
+    // The message is serialized into a pooled buffer first, because the serializer cannot tell the payload length in advance.
+    // The length is then passed to the gRPC serialization context before the buffer writer is requested.
+    // When the length is known, grpc-dotnet writes the payload directly to the response (or to a rented buffer on the client).
+    // Otherwise it allocates a new ArrayBufferWriter<byte> for each message, and the array grows by doubling while the serializer writes.
+    static void SerializeAndWritePayload<T>(IMagicOnionSerializer messageSerializer, SerializationContext ctx, in T value)
+    {
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        messageSerializer.Serialize(buffer, value);
+        WritePayload(ctx, buffer.WrittenSpan);
+    }
+
+    // NOTE: SetPayloadLength must be called before GetBufferWriter.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void WritePayload(SerializationContext ctx, ReadOnlySpan<byte> payload)
+    {
+        ctx.SetPayloadLength(payload.Length);
+        ctx.GetBufferWriter().Write(payload);
+    }
 }
