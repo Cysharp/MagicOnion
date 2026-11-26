@@ -84,7 +84,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         public IReadOnlyDictionary<string, string> GenericFormattersMap { get; } = new Dictionary<string, string>
         {
             {"global::System.Nullable<>", "global::MessagePack.Formatters.NullableFormatterFactory" },
-            // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/v3.0.300/src/MessagePack/Resolvers/DynamicGenericResolver.cs#L52
+            // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/v4.0.0-rc.1/src/MessagePack/MessagePackFormatterFactory.Generic.cs#L87
             {"global::System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatterFactory" },
             {"global::System.Collections.Generic.LinkedList<>", "global::MessagePack.Formatters.LinkedListFormatterFactory" },
             {"global::System.Collections.Generic.Queue<>", "global::MessagePack.Formatters.QueueFormatterFactory" },
