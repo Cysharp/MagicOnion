@@ -112,9 +112,9 @@ internal class MagicOnionSourceGeneratorVerifier
             // MagicOnion.Serialization.MessagePack
             this.TestState.AdditionalReferences.Add(typeof(MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider).Assembly);
             // MessagePack
-            this.TestState.AdditionalReferences.Add(typeof(MessagePack.Formatters.IMessagePackFormatter).Assembly);
-            // MessagePack.Annotations
-            this.TestState.AdditionalReferences.Add(typeof(MessagePack.MessagePackObjectAttribute).Assembly);
+            this.TestState.AdditionalReferences.Add(typeof(MessagePack.MessagePackSerializer).Assembly);
+            // SerializerFoundation
+            this.TestState.AdditionalReferences.Add(typeof(SerializerFoundation.IReadBuffer).Assembly);
             // Grpc.Core.Api
             this.TestState.AdditionalReferences.Add(typeof(Grpc.Core.AsyncUnaryCall<>).Assembly);
             // Grpc.Net.Client

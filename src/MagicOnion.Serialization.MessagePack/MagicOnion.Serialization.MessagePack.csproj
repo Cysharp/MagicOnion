@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MessagePack" />
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
 

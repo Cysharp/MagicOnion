@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MessagePack;
-using MessagePack.Formatters;
 
 namespace MagicOnion.Serialization.MessagePack
 {
@@ -13,9 +12,24 @@ namespace MagicOnion.Serialization.MessagePack
     public class MessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
     {
         /// <summary>
-        /// Gets the provider with <see cref="MessagePackSerializer.DefaultOptions"/> for serialization.
+        /// Gets the provider with <see cref="MessagePackSerializerOptions.Default"/> for serialization, or the AOT options when dynamic code is unavailable.
         /// </summary>
-        public static MessagePackMagicOnionSerializerProvider Default { get; } = new MessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions, enableFallback: false);
+        public static MessagePackMagicOnionSerializerProvider Default { get; } = new MessagePackMagicOnionSerializerProvider(GetDefaultOptions(), enableFallback: false);
+
+#if NET6_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The JIT options are used only when dynamic code is supported.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Trimmed applications can pass MessagePackSerializerOptions.DefaultAot explicitly.")]
+#endif
+        static MessagePackSerializerOptions GetDefaultOptions()
+        {
+#if !NETSTANDARD2_0
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
+                return MessagePackSerializerOptions.DefaultAot;
+            }
+#endif
+            return MessagePackSerializerOptions.Default;
+        }
 
         protected MessagePackSerializerOptions SerializerOptions { get; }
         protected bool EnableFallback { get; }
@@ -47,8 +61,8 @@ namespace MagicOnion.Serialization.MessagePack
 #endif
         public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
         {
-            var serializerOptions = EnableFallback && methodInfo != null ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
-            return new MessagePackMagicOnionSerializer(serializerOptions);
+            var fallback = EnableFallback && methodInfo != null ? CreateFallbackOptions(methodInfo.GetParameters()) : default;
+            return new MessagePackMagicOnionSerializer(SerializerOptions, fallback.Options, fallback.RequestType);
         }
 
 #if NET6_0_OR_GREATER
@@ -56,15 +70,14 @@ namespace MagicOnion.Serialization.MessagePack
 #endif
         static class DynamicArgumentTupleTypeCache
         {
-            public static readonly Type[] Types = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
-                .GetTypes()
-                .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
+            public static readonly Type[] Types = typeof(DynamicArgumentTuple<,>).Assembly.GetTypes()
+                .Where(x => x.IsGenericTypeDefinition && x.Name.StartsWith("DynamicArgumentTuple", StringComparison.Ordinal))
                 .OrderBy(x => x.GetGenericArguments().Length)
                 .ToArray();
 
             public static readonly Type[] FormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).GetTypeInfo().Assembly
                 .GetTypes()
-                .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
+                .Where(x => x.IsGenericTypeDefinition && x.DeclaringType is null && x.Name.StartsWith("DynamicArgumentTupleFormatter", StringComparison.Ordinal))
                 .OrderBy(x => x.GetGenericArguments().Length)
                 .ToArray();
         }
@@ -73,25 +86,25 @@ namespace MagicOnion.Serialization.MessagePack
 #if NET6_0_OR_GREATER
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(nameof(DynamicArgumentTupleTypeCache) + " is incompatible with trimming and Native AOT.")]
 #endif
-        MessagePackSerializerOptions WrapFallbackResolverIfNeeded(ParameterInfo[] parameters)
+        (Type? RequestType, MessagePackSerializerOptions? Options) CreateFallbackOptions(ParameterInfo[] parameters)
         {
 #if !NETSTANDARD2_0
-            if (!RuntimeFeature.IsDynamicCodeSupported) throw new NotSupportedException("When running with AOT runtime, DynamicArgumentTupleFormatter does not support fallback resolver fro optional parameters.");
+            if (!RuntimeFeature.IsDynamicCodeSupported) throw new NotSupportedException("When running with AOT runtime, DynamicArgumentTupleFormatter does not support fallback resolver for optional parameters.");
 #endif
             // If the method has no parameter or one parameter, we don't need to create fallback resolver for optional parameters.
             if (parameters.Length < 2)
             {
-                return SerializerOptions;
+                return default;
             }
 
             // start from T2
-            var tupleTypeBase = DynamicArgumentTupleTypeCache.Types[parameters.Length - 2];
             var formatterTypeBase = DynamicArgumentTupleTypeCache.FormatterTypes[parameters.Length - 2];
 
-            var t = tupleTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
-            var formatterType = formatterTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
+            var parameterTypes = parameters.Select(x => x.ParameterType).ToArray();
+            var formatterType = formatterTypeBase.MakeGenericType(parameterTypes);
+            var requestType = DynamicArgumentTupleTypeCache.Types[parameters.Length - 2].MakeGenericType(parameterTypes);
 
-            var defaultValues = parameters
+            var constructorArguments = parameters
                 .Select(x =>
                 {
                     if (x.HasDefaultValue)
@@ -106,55 +119,31 @@ namespace MagicOnion.Serialization.MessagePack
                     {
                         return null;
                     }
-                }).ToArray();
+                }).Prepend(SerializerOptions.Resolver).ToArray();
 
-            var formatter = Activator.CreateInstance(formatterType, defaultValues)!;
+            var factory = (MessagePackFormatterFactory)Activator.CreateInstance(formatterType,
+                BindingFlags.Instance | BindingFlags.NonPublic, binder: null, constructorArguments, culture: null)!;
 
-            return SerializerOptions.WithResolver(new PriorityResolver(t, formatter, SerializerOptions.Resolver));
+            return (requestType, SerializerOptions with
+            {
+                Resolver = new MessagePackFormatterResolver(factory)
+                {
+                    ThrowOnLegacyFormatter = SerializerOptions.Resolver.ThrowOnLegacyFormatter,
+                },
+            });
         }
 
-        class MessagePackMagicOnionSerializer : IMagicOnionSerializer
+        class MessagePackMagicOnionSerializer(
+            MessagePackSerializerOptions serializerOptions,
+            MessagePackSerializerOptions? fallbackOptions,
+            Type? fallbackRequestType) : IMagicOnionSerializer
         {
-            readonly MessagePackSerializerOptions serializerOptions;
-            public MessagePackMagicOnionSerializer(MessagePackSerializerOptions serializerOptions)
-            {
-                this.serializerOptions = serializerOptions;
-            }
-
             public T Deserialize<T>(in ReadOnlySequence<byte> bytes)
-                => MessagePackSerializer.Deserialize<T>(bytes, serializerOptions);
+                => MessagePackSerializer.Deserialize<T>(bytes, typeof(T) == fallbackRequestType ? fallbackOptions! : serializerOptions);
+
             public void Serialize<T>(IBufferWriter<byte> writer, in T? value)
                 => MessagePackSerializer.Serialize(writer, value, serializerOptions);
         }
 
-        class PriorityResolver : IFormatterResolver
-        {
-            readonly Type formatterType;
-            readonly object formatter;
-            readonly IFormatterResolver innerResolver;
-
-            public PriorityResolver(Type formatterType, object formatter, IFormatterResolver innerResolver)
-            {
-                this.formatterType = formatterType;
-                this.formatter = formatter;
-                this.innerResolver = innerResolver;
-            }
-
-            public IMessagePackFormatter<T> GetFormatter<T>()
-            {
-                if (typeof(T) == formatterType)
-                {
-                    return (IMessagePackFormatter<T>)formatter;
-                }
-                else if (innerResolver == null)
-                {
-                    return MessagePackSerializer.DefaultOptions.Resolver.GetFormatterWithVerify<T>();
-                }
-                else
-                {
-                    return innerResolver.GetFormatterWithVerify<T>();
-                }
-            }
-        }
     }
 }

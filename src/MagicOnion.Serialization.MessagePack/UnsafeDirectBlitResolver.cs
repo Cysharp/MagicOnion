@@ -1,216 +1,192 @@
-﻿using MessagePack;
-using System.Buffers;
-using MessagePack.Formatters;
+using MessagePack;
+using SerializerFoundation;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace MagicOnion.Serialization.MessagePack
 {
+    /// <summary>Supplies formatters that serialize registered unmanaged types using their in-memory representation.</summary>
     [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
-    public class UnsafeDirectBlitResolver : IFormatterResolver
+    public class UnsafeDirectBlitResolver : MessagePackFormatterFactory
     {
-        public static readonly UnsafeDirectBlitResolver Instance = new UnsafeDirectBlitResolver();
+        /// <summary>Gets the shared direct-blit formatter factory.</summary>
+        public static readonly UnsafeDirectBlitResolver Instance = new();
 
-        bool isFreezed = false;
-        Dictionary<Type, object> formatters = new Dictionary<Type, object>();
+        readonly Dictionary<Type, MessagePackFormatterFactory> formatters = new();
+        bool frozen;
 
         UnsafeDirectBlitResolver()
         {
         }
 
-        public void Register<T>()
-            where T : unmanaged
+        /// <summary>Registers an unmanaged value type and its array type before the first formatter lookup.</summary>
+        public void Register<T>() where T : unmanaged
         {
-            if (isFreezed)
+            lock (formatters)
             {
-                throw new InvalidOperationException("Register must call on startup(before use GetFormatter<T>).");
-            }
-
-            formatters.Add(typeof(T), new UnsafeDirectBlitFormatter<T>());
-            formatters.Add(typeof(T[]), new UnsafeDirectBlitArrayFormatter<T>());
-        }
-
-        public IMessagePackFormatter<T>? GetFormatter<T>()
-        {
-            return FormatterCache<T>.formatter;
-        }
-
-        static class FormatterCache<T>
-        {
-            public static readonly IMessagePackFormatter<T>? formatter;
-
-            static FormatterCache()
-            {
-                Instance.isFreezed = true;
-
-                var t = typeof(T);
-
-                object? formatterObject;
-                if (Instance.formatters.TryGetValue(t, out formatterObject))
+                if (frozen)
                 {
-                    formatter = (IMessagePackFormatter<T>)formatterObject;
+                    throw new InvalidOperationException("Register must be called before the first formatter lookup.");
                 }
+
+                var factory = new UnsafeDirectBlitFormatterFactory<T>();
+                formatters.Add(typeof(T), factory);
+                formatters.Add(typeof(T[]), factory);
+            }
+        }
+
+#if NET9_0_OR_GREATER
+        /// <inheritdoc />
+        public override object? CreateFormatter<TWriteBuffer, TReadBuffer>(Type type)
+            => FindFactory(type)?.CreateFormatter<TWriteBuffer, TReadBuffer>(type);
+#endif
+
+        /// <inheritdoc />
+        public override object? CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType)
+            => FindFactory(valueType)?.CreateFormatter(writeBufferType, readBufferType, valueType);
+
+        MessagePackFormatterFactory? FindFactory(Type type)
+        {
+            lock (formatters)
+            {
+                frozen = true;
+                return formatters.TryGetValue(type, out var factory) ? factory : null;
             }
         }
     }
 
     [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
-    public class UnsafeDirectBlitArrayFormatter<T> : IMessagePackFormatter<T[]?>
+    sealed partial class UnsafeDirectBlitFormatterFactory<T> : MessagePackFormatterFactory where T : unmanaged
+    {
+#if NET9_0_OR_GREATER
+        public override object? CreateFormatter<TWriteBuffer, TReadBuffer>(Type type)
+#else
+        public object? CreateFormatter<TWriteBuffer, TReadBuffer>(Type type)
+            where TWriteBuffer : struct, IWriteBuffer
+            where TReadBuffer : struct, IReadBuffer
+#endif
+        {
+            if (type == typeof(T))
+            {
+                return new UnsafeDirectBlitFormatter<TWriteBuffer, TReadBuffer, T>();
+            }
+
+            return type == typeof(T[]) ? new UnsafeDirectBlitArrayFormatter<TWriteBuffer, TReadBuffer, T>() : null;
+        }
+    }
+
+    /// <summary>Serializes an unmanaged array as a MessagePack extension containing its native bytes.</summary>
+    [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
+    public sealed class UnsafeDirectBlitArrayFormatter<TWriteBuffer, TReadBuffer, T> : IMessagePackFormatter<TWriteBuffer, TReadBuffer, T[]?>
+        where TWriteBuffer : struct, IWriteBuffer
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TReadBuffer : struct, IReadBuffer
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
         where T : unmanaged
     {
-        const int TypeCode = 45;
+        const sbyte TypeCode = 45;
 
-        // use ext instead of ArrayFormatter for extremely boostup performance.
-        // Layout: [extHeader, isLittlEendian(bool), bytes()]
-
-        readonly int StructLength;
-
-        public UnsafeDirectBlitArrayFormatter()
+        /// <inheritdoc />
+        public void Initialize(MessagePackFormatterResolver resolver)
         {
-            this.StructLength = Unsafe.SizeOf<T>();
         }
 
-        public void Serialize(ref MessagePackWriter writer, T[]? value, MessagePackSerializerOptions options)
+        /// <inheritdoc />
+        public void Serialize(ref TWriteBuffer buffer, ref SerializeState state, T[]? value)
         {
-            if (value == null)
+            if (value is null)
             {
-                writer.WriteNil();
+                buffer.WriteNil();
                 return;
             }
 
-            var byteLen = value.Length * StructLength;
-            writer.WriteExtensionFormatHeader(new ExtensionHeader(TypeCode, byteLen + 1));
-            writer.Write(BitConverter.IsLittleEndian);
-
-            /*
-            Span<byte> span = writer.GetSpan();
-            Unsafe.CopyBlockUnaligned(ref span[0], ref Unsafe.As<T, byte>(ref value[0]), (uint)byteLen);
-            writer.Advance(byteLen);
-            */
-
-            // currently can not write directly, wait msgpack update.
-            var span = System.Buffers.ArrayPool<byte>.Shared.Rent(byteLen);
-            try
-            {
-                Unsafe.CopyBlockUnaligned(ref span[0], ref Unsafe.As<T, byte>(ref value[0]), (uint)byteLen);
-                writer.WriteRaw(span.AsSpan().Slice(0, byteLen));
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(span);
-            }
+            var bytes = MemoryMarshal.AsBytes(value.AsSpan());
+            buffer.WriteExtHeader(TypeCode, checked(bytes.Length + 1));
+            buffer.WriteBoolean(BitConverter.IsLittleEndian);
+            buffer.WriteRaw(bytes);
         }
 
-        public T[]? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        /// <inheritdoc />
+        public void Deserialize(ref TReadBuffer buffer, ref DeserializeState state, ref T[]? value)
         {
-            if (reader.IsNil)
+            if (buffer.TryReadNil())
             {
-                return null;
+                value = null;
+                return;
             }
 
-            var ext = reader.ReadExtensionFormat();
-            if (ext.Header.TypeCode != TypeCode) throw new InvalidOperationException("Invalid typeCode.");
-
-            var extReader = new MessagePackReader(ext.Data);
-            var isLittleEndian = extReader.ReadBoolean();
-
-            // extReader.read
-            byte[]? rentMemory = default;
-            ReadOnlySpan<byte> span = default;
-            try
+            var (typeCode, length) = buffer.ReadExtHeader();
+            var size = Unsafe.SizeOf<T>();
+            if (typeCode != TypeCode || length < 1 || (length - 1) % size != 0)
             {
-                var seqSlice = extReader.Sequence.Slice(extReader.Position);
-                if (isLittleEndian != BitConverter.IsLittleEndian)
-                {
-                    rentMemory = ArrayPool<byte>.Shared.Rent((int)seqSlice.Length);
-                    seqSlice.CopyTo(rentMemory);
-                    Array.Reverse(rentMemory);
-                    span = rentMemory;
-                }
-                else
-                {
-                    if (seqSlice.IsSingleSegment)
-                    {
-                        span = seqSlice.First.Span;
-                    }
-                    else
-                    {
-                        rentMemory = ArrayPool<byte>.Shared.Rent((int)seqSlice.Length);
-                        seqSlice.CopyTo(rentMemory);
-                        span = rentMemory;
-                    }
-                }
+                throw new MessagePackSerializationException("Invalid direct-blit array extension.");
+            }
 
-                var result = new T[span.Length / StructLength];
-                Unsafe.CopyBlockUnaligned(ref Unsafe.As<T, byte>(ref result[0]), ref MemoryMarshal.GetReference(span), (uint)span.Length);
-                return result;
-            }
-            finally
+            if (buffer.ReadBoolean() != BitConverter.IsLittleEndian)
             {
-                if (rentMemory != null)
-                {
-                    ArrayPool<byte>.Shared.Return(rentMemory);
-                }
+                throw new MessagePackSerializationException("The direct-blit array uses a different byte order.");
             }
+
+            var byteCount = length - 1;
+            if (byteCount == 0)
+            {
+                value = Array.Empty<T>();
+                return;
+            }
+
+            if (!buffer.TryGetSpan(byteCount, out var bytes))
+            {
+                throw new MessagePackSerializationException("Incomplete direct-blit array data.");
+            }
+
+            value = MemoryMarshal.Cast<byte, T>(bytes.Slice(0, byteCount)).ToArray();
+            buffer.Advance(byteCount);
         }
     }
 
+    /// <summary>Serializes an unmanaged value as a MessagePack binary value containing its native bytes.</summary>
     [Obsolete("Do not use UnsafeDirectBlit because it poses a high security risk.")]
-    public class UnsafeDirectBlitFormatter<T> : IMessagePackFormatter<T>
+    public sealed class UnsafeDirectBlitFormatter<TWriteBuffer, TReadBuffer, T> : IMessagePackFormatter<TWriteBuffer, TReadBuffer, T>
+        where TWriteBuffer : struct, IWriteBuffer
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TReadBuffer : struct, IReadBuffer
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
         where T : unmanaged
     {
-        readonly int size;
-
-        public UnsafeDirectBlitFormatter()
+        /// <inheritdoc />
+        public void Initialize(MessagePackFormatterResolver resolver)
         {
-            // Note: check is T blittable?
-            this.size = Unsafe.SizeOf<T>();
         }
 
-        public void Serialize(ref MessagePackWriter writer, T value, MessagePackSerializerOptions options)
+        /// <inheritdoc />
+        public void Serialize(ref TWriteBuffer buffer, ref SerializeState state, T value)
         {
-            // fix to v2.0-stable
-            byte[] rentMemory = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                var span = rentMemory.AsSpan().Slice(0, size);
-                Unsafe.WriteUnaligned(ref span[0], value);
-                writer.Write(span);
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(rentMemory);
-            }
+            var size = Unsafe.SizeOf<T>();
+            buffer.WriteBinHeader(size);
+            var bytes = buffer.GetSpan(size);
+            Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(bytes), value);
+            buffer.Advance(size);
         }
 
-        public T Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        /// <inheritdoc />
+        public void Deserialize(ref TReadBuffer buffer, ref DeserializeState state, ref T value)
         {
-            var segment = reader.ReadBytes();
-            if (segment == null)
+            var length = buffer.ReadBinHeader();
+            if (length < Unsafe.SizeOf<T>() || !buffer.TryGetSpan(length, out var bytes))
             {
-                throw new InvalidOperationException("data is null");
+                throw new MessagePackSerializationException("Incomplete direct-blit value data.");
             }
 
-            ValidateRead(segment.Value.Length);
-
-            if (segment.Value.IsSingleSegment)
-            {
-                var firstMemory = segment.Value.First;
-                return Unsafe.ReadUnaligned<T>(ref MemoryMarshal.GetReference(firstMemory.Span));
-            }
-            else
-            {
-                var memory = segment.Value.ToArray();
-                return Unsafe.ReadUnaligned<T>(ref memory[0]);
-            }
-        }
-
-        void ValidateRead(long length)
-        {
-            if (length < size)
-            {
-                throw new InvalidOperationException("Overflow");
-            }
+            value = MemoryMarshal.Read<T>(bytes);
+            buffer.Advance(length);
         }
     }
 }

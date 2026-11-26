@@ -509,15 +509,15 @@ public class StreamingHubHeartbeatManagerTest
     static byte[] BuildMessageHeader(byte sequence, DateTimeOffset serverSentAt)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var messagePackWriter = new MessagePackWriter(bufferWriter);
+        using var messagePackWriter = new MessagePackWriter();
         messagePackWriter.WriteArrayHeader(5);
         {
-            messagePackWriter.Write(127);                                   // 0: 0x7f / 127: ServerHeartbeat
-            messagePackWriter.Write(sequence);                              // 1: Sequence
-            messagePackWriter.Write(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
+            messagePackWriter.WriteByte(127);                                    // 0: 0x7f / 127: ServerHeartbeat
+            messagePackWriter.WriteInt32(sequence);                              // 1: Sequence
+            messagePackWriter.WriteInt64(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
             messagePackWriter.WriteNil();                                   // 3: Dummy
         }
-        messagePackWriter.Flush();
+        messagePackWriter.WriteTo(bufferWriter);
 
         return bufferWriter.WrittenSpan.ToArray();
     }
@@ -525,16 +525,16 @@ public class StreamingHubHeartbeatManagerTest
     static byte[] BuildMessage(byte sequence, long serverSentAt)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var messagePackWriter = new MessagePackWriter(bufferWriter);
+        using var messagePackWriter = new MessagePackWriter();
         messagePackWriter.WriteArrayHeader(5);
         {
-            messagePackWriter.Write(127);          // 0: 0x7f / 127: ServerHeartbeat
-            messagePackWriter.Write(sequence);     // 1: Sequence
-            messagePackWriter.Write(serverSentAt); // 2: ServerSentAt
+            messagePackWriter.WriteByte(127);           // 0: 0x7f / 127: ServerHeartbeat
+            messagePackWriter.WriteInt32(sequence);     // 1: Sequence
+            messagePackWriter.WriteInt64(serverSentAt); // 2: ServerSentAt
             messagePackWriter.WriteNil();          // 3: Dummy
             messagePackWriter.WriteNil();          // 4: Dummy
         }
-        messagePackWriter.Flush();
+        messagePackWriter.WriteTo(bufferWriter);
 
         return bufferWriter.WrittenSpan.ToArray();
     }
@@ -542,17 +542,17 @@ public class StreamingHubHeartbeatManagerTest
     static byte[] BuildMessage(byte sequence, DateTimeOffset serverSentAt)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var messagePackWriter = new MessagePackWriter(bufferWriter);
+        using var messagePackWriter = new MessagePackWriter();
         messagePackWriter.WriteArrayHeader(5);
         {
-            messagePackWriter.Write(127);                                   // 0: 0x7f / 127: ServerHeartbeat
-            messagePackWriter.Write(sequence);                              // 1: Sequence
-            messagePackWriter.Write(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
+            messagePackWriter.WriteByte(127);                                    // 0: 0x7f / 127: ServerHeartbeat
+            messagePackWriter.WriteInt32(sequence);                              // 1: Sequence
+            messagePackWriter.WriteInt64(serverSentAt.ToUnixTimeMilliseconds()); // 2: ServerSentAt
             messagePackWriter.WriteNil();                                   // 3: Dummy
             messagePackWriter.WriteNil();                                   // 4: Dummy
 
         }
-        messagePackWriter.Flush();
+        messagePackWriter.WriteTo(bufferWriter);
 
         return bufferWriter.WrittenSpan.ToArray();
     }

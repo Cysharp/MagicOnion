@@ -1,5 +1,4 @@
 using MagicOnion.Serialization.MessagePack;
-using MessagePack.Resolvers;
 
 namespace MagicOnion.Client.NativeAot.Tests;
 
@@ -9,8 +8,7 @@ public sealed class UnaryTest
     public async Task Create()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
 
         // Act
@@ -24,14 +22,13 @@ public sealed class UnaryTest
     public async Task Invoke_With_Arguments()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
         // Act
         var resultTask = client.TwoParametersReturnValueType(12345, "Hello");
-        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(67890));
+        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(67890, MessagePackSerializerOptions.DefaultAot));
         var result = await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
@@ -44,14 +41,13 @@ public sealed class UnaryTest
     public async Task Invoke_Enum()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
         // Act
         var resultTask = client.Enum(MyEnumValue.C);
-        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(Nil.Default));
+        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(Nil.Default, MessagePackSerializerOptions.DefaultAot));
         await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
@@ -63,8 +59,7 @@ public sealed class UnaryTest
     public async Task Invoke_Enum_Return()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
@@ -83,14 +78,13 @@ public sealed class UnaryTest
     public async Task Invoke_BuiltInGeneric()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
         // Act
         var resultTask = client.BuiltInGeneric([new(1), new(2), new(3), new(4), new(5)]);
-        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(Nil.Default));
+        callInvokerMock.ResponseChannel.Writer.TryWrite(MessagePackSerializer.Serialize(Nil.Default, MessagePackSerializerOptions.DefaultAot));
         await resultTask.ResponseAsync.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Assert
@@ -102,8 +96,7 @@ public sealed class UnaryTest
     public async Task Invoke_BuiltInGeneric_Return()
     {
         // Arrange
-        var resolvers = CompositeResolver.Create(MagicOnionClientGeneratedInitializer.Resolver, StandardResolver.Instance);
-        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+        var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
         var callInvokerMock = new MockCallInvoker();
         var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 
@@ -125,7 +118,7 @@ public sealed class UnaryTest
     //{
     //    // Arrange
     //    var resolvers = StandardResolver.Instance; // Unuse MagicOnionClientGeneratedInitializer.Resolver (serialization may fail)
-    //    var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.Standard.WithResolver(resolvers));
+    //    var serializerOptions = MessagePackMagicOnionSerializerProvider.Default.WithOptions(MessagePackSerializerOptions.DefaultAot);
     //    var callInvokerMock = new MockCallInvoker();
     //    var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock, serializerOptions);
 

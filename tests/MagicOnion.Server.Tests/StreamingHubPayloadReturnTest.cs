@@ -228,27 +228,27 @@ public partial class StreamingHubPayloadReturnTest
     static byte[] BuildClientResult(Guid id, bool isError, bool invalidBody = false)
     {
         var buffer = new ArrayBufferWriter<byte>();
-        var writer = new MessagePackWriter(buffer);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(4);
-        writer.Write(isError ? 1 : 0);
-        MessagePackSerializer.Serialize(ref writer, id);
-        writer.Write(1);
+        writer.WriteByte(isError ? (byte)1 : (byte)0);
+        writer.Serialize(id);
+        writer.WriteInt32(1);
         if (isError)
         {
             writer.WriteArrayHeader(3);
-            writer.Write((int)StatusCode.InvalidArgument);
-            writer.Write("detail");
-            writer.Write("error");
+            writer.WriteInt32((int)StatusCode.InvalidArgument);
+            writer.WriteString("detail");
+            writer.WriteString("error");
         }
         else if (invalidBody)
         {
-            writer.Write(123);
+            writer.WriteInt32(123);
         }
         else
         {
-            writer.Write("result");
+            writer.WriteString("result");
         }
-        writer.Flush();
+        writer.WriteTo(buffer);
         return buffer.WrittenMemory.ToArray();
     }
 

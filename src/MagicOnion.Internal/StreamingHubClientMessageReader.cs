@@ -12,9 +12,9 @@ internal ref struct StreamingHubClientMessageReader
         this.data = data;
         this.position = 0;
     }
-    void VerifyResultAndAdvance(MessagePackPrimitives.DecodeResult result, int readLen)
+    void VerifyResultAndAdvance(DecodeResult result, int readLen)
     {
-        if (result != MessagePackPrimitives.DecodeResult.Success)
+        if (result != DecodeResult.Success)
         {
             throw new InvalidOperationException($"Invalid message format: {result}");
         }
@@ -67,7 +67,7 @@ internal ref struct StreamingHubClientMessageReader
 
     public (int MessageId, int StatusCode, string? Detail, string? Error) ReadResponseWithErrorMessage()
     {
-        var reader = new MessagePackReader(data.Slice(position));
+        using var reader = new MessagePackReader(data.Slice(position));
         var messageId = reader.ReadInt32();
         var statusCode = reader.ReadInt32();
         var detail = reader.ReadString();
@@ -78,12 +78,12 @@ internal ref struct StreamingHubClientMessageReader
 
     public (Guid ClientResultRequestMessageId, int MethodId, ReadOnlyMemory<byte> Body) ReadClientResultRequestMessage()
     {
-        var reader = new MessagePackReader(data.Slice(position));
+        using var reader = new MessagePackReader(data.Slice(position));
         //var type = reader.ReadByte(); // Type is already read by ReadMessageType
         reader.Skip(); // Dummy
-        var clientRequestMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+        var clientRequestMessageId = reader.Deserialize<Guid>(MessagePackSerializerOptions.DefaultAot);
         var methodId = reader.ReadInt32();
-        position += (int)reader.Consumed;
+        position += (int)reader.BytesConsumed;
 
         return (clientRequestMessageId, methodId, data.Slice(position));
     }
@@ -97,7 +97,7 @@ internal ref struct StreamingHubClientMessageReader
         // ServerSentAt (2)
         VerifyResultAndAdvance(MessagePackPrimitives.TryReadInt64(data.Span.Slice(position), out var serverSentAt, out var readLenServerSentAt), readLenServerSentAt);
         // Reserved (3)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryReadNil(data.Span.Slice(position), out var readLenReserved), readLenReserved);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryReadNil(data.Span.Slice(position)) ? DecodeResult.Success : DecodeResult.TokenMismatch, 1);
 
         return (sequence, serverSentAt, data.Slice(position));
     }
@@ -111,7 +111,7 @@ internal ref struct StreamingHubClientMessageReader
         // ClientSentAt (2)
         VerifyResultAndAdvance(MessagePackPrimitives.TryReadInt64(data.Span.Slice(position), out var clientSentAt, out var readLenClientSentAt), readLenClientSentAt);
         // Reserved (3)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryReadNil(data.Span.Slice(position), out var readLenReserved), readLenReserved);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryReadNil(data.Span.Slice(position)) ? DecodeResult.Success : DecodeResult.TokenMismatch, 1);
 
         return (sequence, clientSentAt);
     }

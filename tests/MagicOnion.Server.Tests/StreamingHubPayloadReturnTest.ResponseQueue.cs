@@ -130,20 +130,20 @@ public partial class StreamingHubPayloadReturnTest
     static byte[] BuildHeartbeat(short sequence, int extraSize)
     {
         var buffer = new ArrayBufferWriter<byte>();
-        var writer = new MessagePackWriter(buffer);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(4);
-        writer.Write(0x7e);
-        writer.Write(sequence);
-        writer.Write(2L);
+        writer.WriteByte(0x7e);
+        writer.WriteInt32(sequence);
+        writer.WriteInt64(2L);
         if (extraSize == 0)
         {
             writer.WriteNil();
         }
         else
         {
-            writer.Write(new byte[extraSize]);
+            writer.WriteBinary(new byte[extraSize]);
         }
-        writer.Flush();
+        writer.WriteTo(buffer);
         return buffer.WrittenSpan.ToArray();
     }
 

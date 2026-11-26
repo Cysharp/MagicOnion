@@ -40,20 +40,18 @@ public partial class MagicOnionClientSourceGenerator
             var outputs = new List<(string Path, string Source)>();
 
             // Configure serialization
-            (ISerializationFormatterNameMapper Mapper, ISerializerFormatterGenerator Generator, Func<IEnumerable<EnumSerializationInfo>, string> EnumFormatterGenerator)
+            (ISerializationFormatterNameMapper Mapper, ISerializerFormatterGenerator Generator)
                 serialization = context.Options.Serializer switch
             {
                 SerializerType.MemoryPack => (
                     Mapper: new MemoryPackFormatterNameMapper(),
-                    Generator: new MemoryPackFormatterRegistrationGenerator(),
-                    EnumFormatterGenerator: _ => string.Empty
+                    Generator: new MemoryPackFormatterRegistrationGenerator()
                 ),
                 SerializerType.MessagePack => (
                     Mapper: new MessagePackFormatterNameMapper(
                         (context.Options.AdditionalOptions.TryGetValue("MessagePack.FormatterNamespace", out var formatterNamespace) ? formatterNamespace as string : null) ?? "MessagePack.Formatters",
                         context.Options.AdditionalOptions.TryGetValue("MessagePack.GenerateResolverForCustomFormatter", out var generateTypeHintsForCustomFormatter) && generateTypeHintsForCustomFormatter.Equals(true)),
-                    Generator: new MessagePackFormatterResolverGenerator(),
-                    EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(context, x)
+                    Generator: new MessagePackFormatterRegistrationGenerator()
                 ),
                 _ => throw new NotImplementedException(),
             };
@@ -72,11 +70,6 @@ public partial class MagicOnionClientSourceGenerator
 
             outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName), MagicOnionInitializerGenerator.Build(context, serviceCollection)));
             outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + serializerHintNameSuffix), serializationSource));
-
-            if (serializationInfoCollection.Enums.Any())
-            {
-                outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".EnumFormatters"), serialization.EnumFormatterGenerator(serializationInfoCollection.Enums)));
-            }
 
             foreach (var service in serviceCollection.Services)
             {

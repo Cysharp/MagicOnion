@@ -13,9 +13,9 @@ internal ref struct StreamingHubServerMessageReader
         this.position = 0;
     }
 
-    void VerifyResultAndAdvance(MessagePackPrimitives.DecodeResult result, int readLen)
+    void VerifyResultAndAdvance(DecodeResult result, int readLen)
     {
-        if (result != MessagePackPrimitives.DecodeResult.Success)
+        if (result != DecodeResult.Success)
         {
             throw new InvalidOperationException($"Invalid message format: {result}");
         }
@@ -68,10 +68,10 @@ internal ref struct StreamingHubServerMessageReader
     public (Guid ClientResultMessageId, int ClientMethodId, ReadOnlyMemory<byte> Body) ReadClientResultResponse()
     {
         // T: [0, clientResultMessageId, methodId, result]
-        var reader = new MessagePackReader(data.Slice(position));
-        var clientResultMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+        using var reader = new MessagePackReader(data.Slice(position));
+        var clientResultMessageId = reader.Deserialize<Guid>(MessagePackSerializerOptions.DefaultAot);
         var clientMethodId = reader.ReadInt32();
-        position += (int)reader.Consumed;
+        position += (int)reader.BytesConsumed;
 
         return (clientResultMessageId, clientMethodId, data.Slice(position));
     }
@@ -79,8 +79,8 @@ internal ref struct StreamingHubServerMessageReader
     public (Guid ClientResultMessageId, int ClientMethodId, int StatusCode, string Detail, string Message) ReadClientResultResponseForError()
     {
         // T: [1, clientResultMessageId, methodId, [statusCode, detail, message]]
-        var reader = new MessagePackReader(data.Slice(position));
-        var clientResultMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+        using var reader = new MessagePackReader(data.Slice(position));
+        var clientResultMessageId = reader.Deserialize<Guid>(MessagePackSerializerOptions.DefaultAot);
         var clientMethodId = reader.ReadInt32();
         var bodyArray = reader.ReadArrayHeader();
         if (bodyArray != 3) throw new InvalidOperationException($"Invalid ClientResponse: The BodyArray length is {bodyArray}");
@@ -89,7 +89,7 @@ internal ref struct StreamingHubServerMessageReader
         var detail = reader.ReadString() ?? string.Empty;
         var message = reader.ReadString() ?? string.Empty;
 
-        position += (int)reader.Consumed;
+        position += (int)reader.BytesConsumed;
 
         return (clientResultMessageId, clientMethodId, statusCode, detail, message);
     }

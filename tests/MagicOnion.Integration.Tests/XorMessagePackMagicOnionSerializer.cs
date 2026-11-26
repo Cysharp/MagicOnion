@@ -10,7 +10,7 @@ public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerP
 
     readonly MessagePackSerializerOptions serializerOptions;
 
-    public static IMagicOnionSerializerProvider Instance { get; } = new XorMessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions);
+    public static IMagicOnionSerializerProvider Instance { get; } = new XorMessagePackMagicOnionSerializerProvider(MessagePackSerializerOptions.Default);
 
     XorMessagePackMagicOnionSerializerProvider(MessagePackSerializerOptions serializerOptions)
     {
@@ -36,7 +36,7 @@ public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerP
                 {
                     array[i] ^= MagicNumber;
                 }
-                return MessagePackSerializer.Deserialize<T>(array.AsMemory(0, (int)bytes.Length), serializerOptions);
+                return MessagePackSerializer.Deserialize<T>(array.AsSpan(0, (int)bytes.Length), serializerOptions);
             }
             finally
             {

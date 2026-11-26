@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Grpc.Net.Client;
 using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server.Hubs;
@@ -329,8 +329,8 @@ public class StreamingHubClientResultTest : IClassFixture<MagicOnionApplicationF
         var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
 
         // Act
-        var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: false);
-        await Task.Delay(150, TestContext.Current.CancellationToken); // Give some time to process the request.
+        _ = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: false);
+        await receiver.NeverInvoked.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         await client.DisposeAsync(); // Disconnect from the server.
         await Task.Delay(1500, TestContext.Current.CancellationToken); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
 
@@ -352,8 +352,8 @@ public class StreamingHubClientResultTest : IClassFixture<MagicOnionApplicationF
         var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
 
         // Act
-        var task = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: true);
-        await Task.Delay(150, TestContext.Current.CancellationToken); // Give some time to process the request.
+        _ = client.Invoke_CancelPendingTasksOnDisconnect(useGroup: true);
+        await receiver.NeverInvoked.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         await client.DisposeAsync(); // Disconnect from the server.
         await Task.Delay(1500, TestContext.Current.CancellationToken); // Wait for the timeout of the hub method queue processing. (see: StreamingHub.RequestQueueShutdownTimeout)
 
@@ -417,6 +417,8 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
     public List<(string Method, object Arguments)> Received { get; } = new();
 
     public static readonly object ArgumentEmpty = new();
+
+    public TaskCompletionSource NeverInvoked { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public async Task Parameter_Zero_NoResultValue()
     {
@@ -502,6 +504,7 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
     public async Task Never(CancellationToken cancellationToken = default)
     {
         Received.Add((nameof(Never), (ArgumentEmpty)));
+        NeverInvoked.TrySetResult();
         await Task.Delay(Timeout.Infinite);
     }
 }

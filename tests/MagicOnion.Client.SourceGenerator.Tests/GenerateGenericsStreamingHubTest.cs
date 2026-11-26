@@ -37,13 +37,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -84,13 +83,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T1, T2> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T1, T2>>
+            public class MyGenericObjectFormatterFactory<T1, T2> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T1, T2> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T1, T2> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -132,13 +130,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -178,13 +175,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -222,13 +218,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -387,13 +382,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -435,13 +429,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -482,13 +475,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T1, T2> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T1, T2>>
+            public class MyGenericObjectFormatterFactory<T1, T2> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T1, T2> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T1, T2> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -528,13 +520,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -574,13 +565,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -618,13 +608,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -785,13 +774,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -835,13 +823,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -884,13 +871,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T1, T2> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T1, T2>>
+            public class MyGenericObjectFormatterFactory<T1, T2> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T1, T2> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T1, T2> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -932,13 +918,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -980,13 +965,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;
@@ -1026,13 +1010,12 @@ public class GenerateGenericsStreamingHubTest
             partial class MagicOnionInitializer {}
         }
         
-        // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
+        // A custom MessagePack formatter factory.
         namespace MessagePack.Formatters.TempProject
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         """;

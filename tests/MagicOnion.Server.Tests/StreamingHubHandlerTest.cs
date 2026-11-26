@@ -31,7 +31,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -40,12 +40,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -69,7 +69,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -78,12 +78,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, {Int32:12345}]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
-            MessagePackSerializer.Serialize(ref writer, 12345);
-            writer.Flush();
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
+            writer.Serialize(12345);
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -106,7 +106,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -115,12 +115,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -144,7 +144,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -153,12 +153,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, {Int32:12345}]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
-            MessagePackSerializer.Serialize(ref writer, 12345);
-            writer.Flush();
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
+            writer.Serialize(12345);
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -182,7 +182,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -191,12 +191,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -220,7 +220,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -229,12 +229,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
             return buffer.WrittenMemory.ToArray();
         }
         Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
@@ -257,7 +257,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -266,12 +266,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, {Int32:12345}]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
-            MessagePackSerializer.Serialize(ref writer, 12345);
-            writer.Flush();
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
+            writer.Serialize(12345);
+            writer.WriteTo(buffer);
             return buffer.WrittenMemory.ToArray();
         }
         Assert.Equal(BuildMessage(), fakeStreamingHubContext.Responses[0].Memory.ToArray());
@@ -296,7 +296,7 @@ public class StreamingHubHandlerTest
         for (var i = 0; i < 3; i++)
         {
             var ctx = new StreamingHubContext();
-            ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(i, $"テスト{i}", i % 2 == 0), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, i * 1000);
+            ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(i, $"テスト{i}", i % 2 == 0)), DateTime.Now, i * 1000);
             await handler.MethodBody.Invoke(ctx);
         }
 
@@ -309,12 +309,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, {Int32:RetVal}]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(messageId);
-            writer.Write(FNV1A32.GetHashCode(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32)) /* MethodId */);
-            MessagePackSerializer.Serialize(ref writer, retVal);
-            writer.Flush();
+            writer.WriteInt32(messageId);
+            writer.WriteInt32(FNV1A32.GetHashCode(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32)) /* MethodId */);
+            writer.Serialize(retVal);
+            writer.WriteTo(buffer);
             return buffer.WrittenMemory.ToArray();
         }
         Assert.Equal(BuildMessage(0, 0), fakeStreamingHubContext.Responses[0].Memory.ToArray());
@@ -339,7 +339,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(Nil.Default), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -348,12 +348,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -377,7 +377,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345, cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(12345), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -386,12 +386,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -415,7 +415,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, 0);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, 0);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -424,12 +424,12 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, Nil]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
             writer.WriteNil();
-            writer.Flush();
+            writer.WriteTo(buffer);
 
             return buffer.WrittenMemory.ToArray();
         }
@@ -453,7 +453,7 @@ public class StreamingHubHandlerTest
         // Act
         var handler = new StreamingHubHandler(hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
         var ctx = new StreamingHubContext();
-        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true), cancellationToken: TestContext.Current.CancellationToken), DateTime.Now, -1 /* The client requires no response */);
+        ctx.Initialize(handler, fakeStreamingHubContext, hubInstance, MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)), DateTime.Now, -1 /* The client requires no response */);
         await handler.MethodBody.Invoke(ctx);
 
         // Assert
@@ -493,11 +493,11 @@ public class StreamingHubHandlerTest
         {
             // [MessageId, MethodId, {Xor:Int32:12345}]
             var buffer = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(buffer);
+            using var writer = new MessagePackWriter();
             writer.WriteArrayHeader(3);
-            writer.Write(ctx.MessageId);
-            writer.Write(ctx.MethodId);
-            writer.Flush();
+            writer.WriteInt32(ctx.MessageId);
+            writer.WriteInt32(ctx.MethodId);
+            writer.WriteTo(buffer);
             serializer.Serialize(buffer, 12345);
             return buffer.WrittenMemory.ToArray();
         }

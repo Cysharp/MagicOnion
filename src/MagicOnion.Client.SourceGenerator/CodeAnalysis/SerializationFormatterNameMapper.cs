@@ -44,9 +44,8 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         if (type is { Namespace: "MagicOnion", Name: "DynamicArgumentTuple" })
         {
             // MagicOnion.DynamicArgumentTuple
-            var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
             formatterName = $"global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<{genericTypeArgs}>";
-            formatterConstructorArgs = $"({ctorArguments})";
+            formatterConstructorArgs = "()";
         }
         else if (MessagePackWellKnownSerializationTypes.Instance.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))
         {
@@ -57,7 +56,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         else if (allowToMapUserDefinedFormatter)
         {
             // User-defined generic types
-            formatterName = $"{userDefinedFormatterNamespace}{(string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>";
+            formatterName = $"{userDefinedFormatterNamespace}{(string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}FormatterFactory<{genericTypeArgs}>";
             formatterConstructorArgs = "()";
         }
 
@@ -69,10 +68,10 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         Debug.Assert(type.ElementType is not null);
         return type.ArrayRank switch
         {
-            1 => ($"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType!.FullName}>", "()"),
-            2 => ($"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
-            3 => ($"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
-            4 => ($"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            1 => ($"global::MessagePack.Formatters.ArrayFormatterFactory<{type.ElementType!.FullName}>", "()"),
+            2 => ($"global::MessagePack.Formatters.TwoDimensionalArrayFormatterFactory<{type.ElementType!.FullName}>", "()"),
+            3 => ($"global::MessagePack.Formatters.ThreeDimensionalArrayFormatterFactory<{type.ElementType!.FullName}>", "()"),
+            4 => ($"global::MessagePack.Formatters.FourDimensionalArrayFormatterFactory<{type.ElementType!.FullName}>", "()"),
             _ => throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})"),
         };
     }
@@ -84,47 +83,47 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
 
         public IReadOnlyDictionary<string, string> GenericFormattersMap { get; } = new Dictionary<string, string>
         {
-            {"global::System.Nullable<>", "global::MessagePack.Formatters.NullableFormatter" },
+            {"global::System.Nullable<>", "global::MessagePack.Formatters.NullableFormatterFactory" },
             // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/v3.0.300/src/MessagePack/Resolvers/DynamicGenericResolver.cs#L52
-            {"global::System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatter" },
-            {"global::System.Collections.Generic.LinkedList<>", "global::MessagePack.Formatters.LinkedListFormatter" },
-            {"global::System.Collections.Generic.Queue<>", "global::MessagePack.Formatters.QueueFormatter" },
-            //{"global::System.Collections.Generic.PriorityQueue<,>", "global::MessagePack.Formatters.PriorityQueueFormatter" },
-            {"global::System.Collections.Generic.Stack<>", "global::MessagePack.Formatters.StackFormatter" },
-            {"global::System.Collections.Generic.HashSet<>", "global::MessagePack.Formatters.HashSetFormatter" },
-            {"global::System.Collections.ObjectModel.ReadOnlyCollection<>", "global::MessagePack.Formatters.ReadOnlyCollectionFormatter" },
-            {"global::System.Collections.Generic.IList<>", "global::MessagePack.Formatters.InterfaceListFormatter2" },
-            {"global::System.Collections.Generic.ICollection<>", "global::MessagePack.Formatters.InterfaceCollectionFormatter2" },
-            {"global::System.Collections.Generic.IEnumerable<>", "global::MessagePack.Formatters.InterfaceEnumerableFormatter" },
-            {"global::System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter"},
-            {"global::System.Collections.Generic.IDictionary<,>", "global::MessagePack.Formatters.InterfaceDictionaryFormatter"},
-            {"global::System.Collections.Generic.SortedDictionary<,>", "global::MessagePack.Formatters.SortedDictionaryFormatter"},
-            {"global::System.Collections.Generic.SortedList<,>", "global::MessagePack.Formatters.SortedListFormatter"},
-            {"global::System.Linq.ILookup<,>", "global::MessagePack.Formatters.InterfaceLookupFormatter" },
-            {"global::System.Linq.IGrouping<,>", "global::MessagePack.Formatters.InterfaceGroupingFormatter" },
-            {"global::System.Collections.Generic.IReadOnlyList<>", "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter" },
-            {"global::System.Collections.Generic.IReadOnlyCollection<>", "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter" },
-            {"global::System.Collections.Generic.ISet<>", "global::MessagePack.Formatters.InterfaceSetFormatter" },
-            {"global::System.Collections.Generic.IReadOnlySet<>", "global::MessagePack.Formatters.InterfaceReadOnlySetFormatter" },
-            {"global::System.Collections.ObjectModel.ReadOnlyDictionary<,>", "global::MessagePack.Formatters.ReadOnlyDictionaryFormatter"},
-            {"global::System.Collections.Generic.IReadOnlyDictionary<,>", "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter"},
-            {"global::System.Collections.Generic.KeyValuePair<,>", "global::MessagePack.Formatters.KeyValuePairFormatter" },
-            {"global::System.Tuple<>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.Tuple<,,,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
-            {"global::System.ValueTuple<>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
-            {"global::System.ValueTuple<,,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+            {"global::System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatterFactory" },
+            {"global::System.Collections.Generic.LinkedList<>", "global::MessagePack.Formatters.LinkedListFormatterFactory" },
+            {"global::System.Collections.Generic.Queue<>", "global::MessagePack.Formatters.QueueFormatterFactory" },
+            //{"global::System.Collections.Generic.PriorityQueue<,>", "global::MessagePack.Formatters.PriorityQueueFormatterFactory" },
+            {"global::System.Collections.Generic.Stack<>", "global::MessagePack.Formatters.StackFormatterFactory" },
+            {"global::System.Collections.Generic.HashSet<>", "global::MessagePack.Formatters.HashSetFormatterFactory" },
+            {"global::System.Collections.ObjectModel.ReadOnlyCollection<>", "global::MessagePack.Formatters.ReadOnlyCollectionFormatterFactory" },
+            {"global::System.Collections.Generic.IList<>", "global::MessagePack.Formatters.InterfaceListFormatterFactory" },
+            {"global::System.Collections.Generic.ICollection<>", "global::MessagePack.Formatters.InterfaceCollectionFormatterFactory" },
+            {"global::System.Collections.Generic.IEnumerable<>", "global::MessagePack.Formatters.InterfaceEnumerableFormatterFactory" },
+            {"global::System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatterFactory"},
+            {"global::System.Collections.Generic.IDictionary<,>", "global::MessagePack.Formatters.InterfaceDictionaryFormatterFactory"},
+            {"global::System.Collections.Generic.SortedDictionary<,>", "global::MessagePack.Formatters.SortedDictionaryFormatterFactory"},
+            {"global::System.Collections.Generic.SortedList<,>", "global::MessagePack.Formatters.SortedListFormatterFactory"},
+            {"global::System.Linq.ILookup<,>", "global::MessagePack.Formatters.InterfaceLookupFormatterFactory" },
+            {"global::System.Linq.IGrouping<,>", "global::MessagePack.Formatters.InterfaceGroupingFormatterFactory" },
+            {"global::System.Collections.Generic.IReadOnlyList<>", "global::MessagePack.Formatters.InterfaceReadOnlyListFormatterFactory" },
+            {"global::System.Collections.Generic.IReadOnlyCollection<>", "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatterFactory" },
+            {"global::System.Collections.Generic.ISet<>", "global::MessagePack.Formatters.InterfaceSetFormatterFactory" },
+            {"global::System.Collections.Generic.IReadOnlySet<>", "global::MessagePack.Formatters.InterfaceReadOnlySetFormatterFactory" },
+            {"global::System.Collections.ObjectModel.ReadOnlyDictionary<,>", "global::MessagePack.Formatters.ReadOnlyDictionaryFormatterFactory"},
+            {"global::System.Collections.Generic.IReadOnlyDictionary<,>", "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatterFactory"},
+            {"global::System.Collections.Generic.KeyValuePair<,>", "global::MessagePack.Formatters.KeyValuePairFormatterFactory" },
+            {"global::System.Tuple<>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,,,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,,,,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.Tuple<,,,,,,,>", "global::MessagePack.Formatters.TupleFormatterFactory" },
+            {"global::System.ValueTuple<>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
+            {"global::System.ValueTuple<,,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatterFactory" },
         };
 
         public HashSet<string> BuiltInTypes { get; } = new HashSet<string>(new string[]

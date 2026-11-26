@@ -1,4 +1,4 @@
-﻿using MagicOnion.Client.DynamicClient;
+using MagicOnion.Client.DynamicClient;
 using Microsoft.Extensions.Time.Testing;
 using System.Buffers;
 using System.Collections.Concurrent;
@@ -474,9 +474,9 @@ public class StreamingHubTest
             var ms = (long)ts.TotalMilliseconds;
 
             var arrayBufferWriter = new ArrayBufferWriter<byte>();
-            var writer = new MessagePackWriter(arrayBufferWriter);
-            writer.Write(ms);
-            writer.Flush();
+            using var writer = new MessagePackWriter();
+            writer.WriteInt64(ms);
+            writer.WriteTo(arrayBufferWriter);
             return arrayBufferWriter.WrittenMemory.ToArray();
         }
     }

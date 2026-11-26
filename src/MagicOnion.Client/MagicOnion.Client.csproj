@@ -13,6 +13,10 @@
     <Description>MagicOnion client-side runtime library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Reflection.Emit" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**;**\obj\**" LinkBase="Internal.Shared" />
   </ItemGroup>
