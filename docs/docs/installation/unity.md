@@ -1,5 +1,5 @@
 # Works with Unity
-MagicOnion client supports Unity versions 2022.3.0f1 (LTS) and later.
+MagicOnion client supports Unity versions 2022.3.12f1 (LTS) and later.
 
 It supports `.NET Standard 2.1` profile, IL2CPP build, and platforms such as Windows, Android, iOS, and macOS. At the moment, it does not support environments such as WebGL and consoles.
 
@@ -58,7 +58,7 @@ For Unity, we also provide extensions that wrap GrpcChannel and provide more use
 ## Using Unity-specific types such as UnityEngine.Vector3
 If you want to use Unity-specific types such as `UnityEngine.Vector2` and `UnityEngine.Vector3`, you need to install additional packages.
 
-To use Unity-specific types in a Unity project, you need to install the Unity-specific package of MessagePack-CSharp, and in the server or shared library, you need to install an extension NuGet package. For more information, see the [Unity support](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#unity-support) and [Extensions](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#extensions) sections of MessagePack-CSharp.
+Install the MessagePack v4 Unity package in the Unity project and the `MessagePack.UnityShims` NuGet package on the server. Configure both sides with MessagePack options that include the Unity formatter factory through `WithUnity()`. [MessagePack v4 Unity setup](https://github.com/MessagePack-CSharp/MessagePack-CSharp/tree/v4.0.0-rc.1#unity)
 
 ## Works with IL2CPP
 

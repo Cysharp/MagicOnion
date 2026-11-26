@@ -9,7 +9,7 @@ This guide assumes the following environment to create a server and client:
 
 - Windows or macOS
 - .NET 8 SDK or later
-- Unity 2022.3 or later or Unity 6 (6000.0.34f1) or later
+- Unity 2022.3.12f1 or later or Unity 6 (6000.0.34f1) or later
 
 :::note
 Some versions of Unity 6 have issues with Source Generator, so use 6000.0.34f1 or later.

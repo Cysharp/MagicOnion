@@ -1,5 +1,5 @@
 # Unity 환경에서 사용하기
-MagicOnion 클라이언트는 Unity 버전 2022.3.0f1(LTS) 이상을 지원합니다.
+MagicOnion 클라이언트는 Unity 버전 2022.3.12f1(LTS) 이상을 지원합니다.
 
 `.NET Standard 2.1` 프로파일과 IL2CPP에 의한 빌드, 플랫폼으로 Windows, Android, iOS, macOS를 지원합니다. 현 시점에서 그 외의 WebGL이나 콘솔과 같은 환경에서의 동작은 지원하지 않습니다.
 
