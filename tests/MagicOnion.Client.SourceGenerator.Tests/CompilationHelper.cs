@@ -25,7 +25,7 @@ public static class CompilationHelper
             MetadataReference.CreateFromFile(typeof(Grpc.Core.AsyncUnaryCall<>).Assembly.Location), // Grpc.Core.Api
             MetadataReference.CreateFromFile(typeof(Grpc.Net.Client.GrpcChannel).Assembly.Location), // Grpc.Net.Client
             MetadataReference.CreateFromFile(typeof(MessagePack.MessagePackSerializer).Assembly.Location), // MessagePack
-            MetadataReference.CreateFromFile(typeof(MessagePack.MessagePackObjectAttribute).Assembly.Location), // MessagePack.Annotations
+            MetadataReference.CreateFromFile(typeof(SerializerFoundation.IReadBuffer).Assembly.Location), // SerializerFoundation
             MetadataReference.CreateFromFile(typeof(MagicOnion.IService<>).Assembly.Location), // MagicOnion.Abstractions
             MetadataReference.CreateFromFile(typeof(MagicOnion.Client.MagicOnionClient).Assembly.Location), // MagicOnion.Client
             MetadataReference.CreateFromFile(typeof(MagicOnion.Serialization.MagicOnionSerializerProvider).Assembly.Location), // MagicOnion.Shared

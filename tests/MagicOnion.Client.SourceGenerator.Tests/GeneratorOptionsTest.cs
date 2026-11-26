@@ -66,10 +66,9 @@ public class GeneratorOptionsTest
 
         namespace __UserDefined__.MessagePack.Formatters.MyApplication1
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::MyApplication1.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::MyApplication1.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::MyApplication1.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         
@@ -102,10 +101,9 @@ public class GeneratorOptionsTest
 
         namespace __UserDefined__.MessagePack.Formatters.MyApplication1
         {
-            public class MyGenericObjectFormatter<T> : global::MessagePack.Formatters.IMessagePackFormatter<global::MyApplication1.MyGenericObject<T>>
+            public class MyGenericObjectFormatterFactory<T> : global::MessagePack.MessagePackFormatterFactory
             {
-                public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::MyApplication1.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
-                public global::MyApplication1.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
+                public override object CreateFormatter(Type writeBufferType, Type readBufferType, Type valueType) => throw new NotImplementedException();
             }
         }
         

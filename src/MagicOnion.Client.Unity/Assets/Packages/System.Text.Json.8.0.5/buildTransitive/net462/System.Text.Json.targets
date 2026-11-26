@@ -1,0 +1,31 @@
+<Project>
+  <Target Name="_System_Text_JsonGatherAnalyzers">
+
+    <ItemGroup>
+      <_System_Text_JsonAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'System.Text.Json'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_System_Text_JsonAnalyzerMultiTargeting" 
+          Condition="'$(SupportsRoslynComponentVersioning)' != 'true'" 
+          AfterTargets="ResolvePackageDependenciesForBuild;ResolveNuGetPackageAssets"
+          DependsOnTargets="_System_Text_JsonGatherAnalyzers">
+
+    <ItemGroup>
+      <!-- Remove our analyzers targeting roslyn4.x -->
+      <Analyzer Remove="@(_System_Text_JsonAnalyzer)"
+                Condition="$([System.String]::Copy('%(_System_Text_JsonAnalyzer.Identity)').IndexOf('roslyn4')) &gt;= 0"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_System_Text_JsonRemoveAnalyzers" 
+          Condition="'$(DisableSystemTextJsonSourceGenerator)' == 'true'"
+          AfterTargets="ResolvePackageDependenciesForBuild;ResolveNuGetPackageAssets"
+          DependsOnTargets="_System_Text_JsonGatherAnalyzers">
+
+    <!-- Remove all our analyzers -->
+    <ItemGroup>
+      <Analyzer Remove="@(_System_Text_JsonAnalyzer)" />
+    </ItemGroup>
+  </Target>
+</Project>

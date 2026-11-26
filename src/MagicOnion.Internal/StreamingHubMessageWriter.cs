@@ -74,7 +74,7 @@ internal static class StreamingHubMessageWriter
         var written = 0;
         Span<byte> header = bufferWriter.GetSpan(16);
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 2, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
         bufferWriter.Advance(bytesWritten);
 
         messageSerializer.Serialize(bufferWriter, value);
@@ -89,7 +89,7 @@ internal static class StreamingHubMessageWriter
         var written = 0;
         Span<byte> header = bufferWriter.GetSpan(16);
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 2, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
         bufferWriter.Advance(bytesWritten);
 
         messageSerializer.Serialize(bufferWriter, value);
@@ -104,8 +104,8 @@ internal static class StreamingHubMessageWriter
         var written = 0;
         Span<byte> header = bufferWriter.GetSpan(16);
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
         bufferWriter.Advance(bytesWritten);
 
         messageSerializer.Serialize(bufferWriter, value);
@@ -122,8 +122,8 @@ internal static class StreamingHubMessageWriter
         Span<byte> header = bufferWriter.GetSpan(16);
 
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(header.Slice(bytesWritten), out written), written, ref bytesWritten);
         bufferWriter.Advance(bytesWritten);
     }
@@ -138,8 +138,8 @@ internal static class StreamingHubMessageWriter
         var written = 0;
         Span<byte> header = bufferWriter.GetSpan(16);
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(header.Slice(bytesWritten), 3, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), messageId, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(header.Slice(bytesWritten), methodId, out written), written, ref bytesWritten);
         bufferWriter.Advance(bytesWritten);
 
         messageSerializer.Serialize(bufferWriter, v);
@@ -151,30 +151,30 @@ internal static class StreamingHubMessageWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteResponseMessageForError(IBufferWriter<byte> bufferWriter, int messageId, int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
     {
-        var writer = new MessagePackWriter(bufferWriter);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(4);
-        writer.Write(messageId);
-        writer.Write(statusCode);
-        writer.Write(detail);
+        writer.WriteInt32(messageId);
+        writer.WriteInt32(statusCode);
+        writer.WriteString(detail);
 
         var msg = (isReturnExceptionStackTraceInErrorDetail && ex != null)
             ? ex.ToString()
             : null;
 
-        writer.Write(msg);
-        writer.Flush();
+        writer.WriteString(msg);
+        writer.WriteTo(bufferWriter);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteClientResultRequestMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, T request, IMagicOnionSerializer messageSerializer)
     {
-        var writer = new MessagePackWriter(bufferWriter);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(5);
-        writer.Write(0); // Type = ClientResultRequest (0)
+        writer.WriteByte(0); // Type = ClientResultRequest (0)
         writer.WriteNil(); // Dummy
-        MessagePackSerializer.Serialize(ref writer, messageId);
-        writer.Write(methodId);
-        writer.Flush();
+        writer.Serialize(messageId, MessagePackSerializerOptions.DefaultAot);
+        writer.WriteInt32(methodId);
+        writer.WriteTo(bufferWriter);
         messageSerializer.Serialize(bufferWriter, request);
     }
 
@@ -184,12 +184,12 @@ internal static class StreamingHubMessageWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteClientResultResponseMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, T response, IMagicOnionSerializer messageSerializer)
     {
-        var writer = new MessagePackWriter(bufferWriter);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(4);
-        writer.Write(0); // Result = 0 (success)
-        MessagePackSerializer.Serialize(ref writer, messageId);
-        writer.Write(methodId);
-        writer.Flush();
+        writer.WriteByte(0); // Result = 0 (success)
+        writer.Serialize(messageId, MessagePackSerializerOptions.DefaultAot);
+        writer.WriteInt32(methodId);
+        writer.WriteTo(bufferWriter);
         messageSerializer.Serialize(bufferWriter, response);
     }
 
@@ -199,19 +199,19 @@ internal static class StreamingHubMessageWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteClientResultResponseMessageForError(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, int statusCode, string detail, Exception? ex, IMagicOnionSerializer messageSerializer)
     {
-        var writer = new MessagePackWriter(bufferWriter);
+        using var writer = new MessagePackWriter();
         writer.WriteArrayHeader(4);
-        writer.Write(1); // Result = 1 (failed)
-        MessagePackSerializer.Serialize(ref writer, messageId);
-        writer.Write(methodId);
+        writer.WriteByte(1); // Result = 1 (failed)
+        writer.Serialize(messageId, MessagePackSerializerOptions.DefaultAot);
+        writer.WriteInt32(methodId);
 
         writer.WriteArrayHeader(3);
         {
-            writer.Write(statusCode);
-            writer.Write(detail);
-            writer.Write(ex?.ToString());
+            writer.WriteInt32(statusCode);
+            writer.WriteString(detail);
+            writer.WriteString(ex?.ToString());
         }
-        writer.Flush();
+        writer.WriteTo(bufferWriter);
     }
 
     /// <summary>
@@ -227,11 +227,11 @@ internal static class StreamingHubMessageWriter
         // Array(5)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil, <Metadata>]
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 5, out written), written, ref bytesWritten);
         // Type = 0x7f / 127 (Heartbeat)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteByte(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
         // 1:Sequence
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
         // 2:ServerSentAt
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), serverSentAt.ToUnixTimeMilliseconds(), out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt64(buffer.Slice(bytesWritten), serverSentAt.ToUnixTimeMilliseconds(), out written), written, ref bytesWritten);
         // 3:Reserved (Nil)
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
 
@@ -250,11 +250,11 @@ internal static class StreamingHubMessageWriter
         // Array(4)[127, Sequence(int8), ServerSentAt(long; UnixTimeMs), Nil]
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 4, out written), written, ref bytesWritten);
         // Type = 0x7f / 127 (Heartbeat)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteByte(buffer.Slice(bytesWritten), 0x7f, out written), written, ref bytesWritten);
         // 1:Sequence
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
         // 2:ServerSentAt
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), serverSentAt, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt64(buffer.Slice(bytesWritten), serverSentAt, out written), written, ref bytesWritten);
         // 3:Reserved (Nil)
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
     }
@@ -271,11 +271,11 @@ internal static class StreamingHubMessageWriter
         // Array(4)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), <Extra>]
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 4, out written), written, ref bytesWritten);
         // 0:Type = 0x7e / 126 (ClientHeartbeat)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteByte(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
         // 1:Sequence
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
         // 2:ClientSentAtElapsedFromOrigin
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), clientSentAtElapsedFromOriginMs, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt64(buffer.Slice(bytesWritten), clientSentAtElapsedFromOriginMs, out written), written, ref bytesWritten);
         // 3:Reserved (Nil)
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
     }
@@ -293,11 +293,11 @@ internal static class StreamingHubMessageWriter
         // Array(5)[0x7e(126), Sequence(int8), ClientSentAtElapsedFromOrigin(long; Ms), Nil, <Extra>]
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteArrayHeader(buffer.Slice(bytesWritten), 5, out written), written, ref bytesWritten);
         // 0:Type = 0x7e / 126 (Heartbeat)
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteByte(buffer.Slice(bytesWritten), 0x7e, out written), written, ref bytesWritten);
         // 1:Sequence
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt32(buffer.Slice(bytesWritten), sequence, out written), written, ref bytesWritten);
         // 2:ClientSentAtElapsedFromOrigin
-        VerifyResultAndAdvance(MessagePackPrimitives.TryWrite(buffer.Slice(bytesWritten), clientSentAt, out written), written, ref bytesWritten);
+        VerifyResultAndAdvance(MessagePackPrimitives.TryWriteInt64(buffer.Slice(bytesWritten), clientSentAt, out written), written, ref bytesWritten);
         // 3:Reserved (Nil)
         VerifyResultAndAdvance(MessagePackPrimitives.TryWriteNil(buffer.Slice(bytesWritten), out written), written, ref bytesWritten);
         // 4:Reserved (Nil)

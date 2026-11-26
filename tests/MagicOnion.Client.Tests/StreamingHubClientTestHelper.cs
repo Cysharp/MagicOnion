@@ -123,33 +123,33 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     static StreamingHubPayload BuildResponsePayload<T>(int messageId, int methodId, T response)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var messagePackWriter = new MessagePackWriter(bufferWriter);
+        using var messagePackWriter = new MessagePackWriter();
         messagePackWriter.WriteArrayHeader(3);
-        messagePackWriter.Write(messageId);
-        messagePackWriter.Write(methodId);
-        MessagePackSerializer.Serialize(ref messagePackWriter, response);
-        messagePackWriter.Flush();
+        messagePackWriter.WriteInt32(messageId);
+        messagePackWriter.WriteInt32(methodId);
+        messagePackWriter.Serialize(response);
+        messagePackWriter.WriteTo(bufferWriter);
         return StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan);
     }
 
     static (int MessageId, int MethodId, T Body) ReadRequestPayload<T>(ReadOnlyMemory<byte> payload)
     {
         // Array[3][messageId (int), methodId (int), request body...]
-        var messagePackReader = new MessagePackReader(payload);
+        using var messagePackReader = new MessagePackReader(payload);
         var arraySize = messagePackReader.ReadArrayHeader();
         Debug.Assert(arraySize == 3);
         var messageId = messagePackReader.ReadInt32();
         var methodId = messagePackReader.ReadInt32();
-        return (messageId, methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
+        return (messageId, methodId, messagePackReader.Deserialize<T>());
     }
 
     static (int MethodId, T Body) ReadFireAndForgetRequestPayload<T>(ReadOnlyMemory<byte> payload)
     {
         // Array[2][methodId (int), request body...]
-        var messagePackReader = new MessagePackReader(payload);
+        using var messagePackReader = new MessagePackReader(payload);
         var arraySize = messagePackReader.ReadArrayHeader();
         Debug.Assert(arraySize == 2);
         var methodId = messagePackReader.ReadInt32();
-        return (methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
+        return (methodId, messagePackReader.Deserialize<T>());
     }
 }

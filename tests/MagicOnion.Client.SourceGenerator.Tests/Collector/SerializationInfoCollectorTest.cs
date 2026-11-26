@@ -51,8 +51,8 @@ public class SerializationInfoCollectorTest
         Assert.NotNull(serializationInfoCollection);
         Assert.Empty(serializationInfoCollection.Enums);
         Assert.Equal(2, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.YetAnotherGenericObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.NullableFormatterFactory<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.NullableFormatterFactory<global::MyNamespace.YetAnotherGenericObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
         Assert.Equal(4, serializationInfoCollection.TypeHints.Count()); // Non-nullable + Nullable
     }
 
@@ -73,8 +73,8 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(2, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String, global::System.Int32>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatterFactory<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatterFactory<global::System.String, global::System.Int32>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
         Assert.Equal(5, serializationInfoCollection.TypeHints.Count()); // string, int, long, MyGenericObject<string, long>, MyGenericObject<string, int>
     }
 
@@ -191,10 +191,10 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(4, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.ArrayFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TwoDimensionalArrayFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.FourDimensionalArrayFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ArrayFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TwoDimensionalArrayFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ThreeDimensionalArrayFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.FourDimensionalArrayFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
         Assert.Equal(5, serializationInfoCollection.TypeHints.Count()); // MyObject, MyObject[], MyObject[,], MyObject[,,], MyObject[,,,]
     }
 
@@ -225,18 +225,18 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(12, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.ListFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceListFormatter2<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.DictionaryFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceDictionaryFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[8].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.KeyValuePairFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[9].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[10].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[11].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ListFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceListFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyListFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.DictionaryFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceDictionaryFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceCollectionFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceEnumerableFormatterFactory<global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[8].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.KeyValuePairFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[9].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceLookupFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[10].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.InterfaceGroupingFormatterFactory<global::System.String, global::MyNamespace.MyObject>()", serializationInfoCollection.Generics[11].GetFormatterNameWithConstructorArgs());
         Assert.Equal(14, serializationInfoCollection.TypeHints.Count());
     }
     
@@ -295,14 +295,14 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(8, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.ValueTupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
         Assert.Equal(8 + 8, serializationInfoCollection.TypeHints.Count());
     }
 
@@ -329,14 +329,14 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(8, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()", serializationInfoCollection.Generics[3].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()", serializationInfoCollection.Generics[4].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()", serializationInfoCollection.Generics[5].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()", serializationInfoCollection.Generics[6].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.TupleFormatterFactory<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()", serializationInfoCollection.Generics[7].GetFormatterNameWithConstructorArgs());
     }
 
     [Fact]
@@ -356,8 +356,8 @@ public class SerializationInfoCollectorTest
         // Assert
         Assert.NotNull(serializationInfoCollection);
         Assert.Equal(2, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32))", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
         Assert.Equal(5, serializationInfoCollection.TypeHints.Count()); // string, long, int, DynamicArgumentTuple<string, long>, DynamicArgumentTuple<string, int>
     }
 
@@ -381,9 +381,9 @@ public class SerializationInfoCollectorTest
         Assert.NotNull(serializationInfoCollection);
         Assert.Empty(serializationInfoCollection.Enums);
         Assert.Equal(3, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MyFormatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.NullableFormatterFactory<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MyFormatters.MyNamespace.MyGenericObjectFormatterFactory<global::System.String>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
     }
 
     [Fact]
@@ -405,9 +405,9 @@ public class SerializationInfoCollectorTest
         Assert.NotNull(serializationInfoCollection);
         Assert.Empty(serializationInfoCollection.Enums);
         Assert.Equal(3, serializationInfoCollection.Generics.Count());
-        Assert.Equal("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
-        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.NullableFormatterFactory<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatterFactory<global::System.String>()", serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs());
     }
 
     [Fact]
@@ -434,11 +434,11 @@ public class SerializationInfoCollectorTest
         // Enum
         Assert.Equal("MyEnumFormatter()", serializationInfoCollection.Enums[0].GetFormatterNameWithConstructorArgs());
         // Built-in
-        Assert.Equal("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MessagePack.Formatters.NullableFormatterFactory<global::MyNamespace.MyGenericObject>()", serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs());
         // MagicOnion
-        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
+        Assert.Equal("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>()", serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs());
 
-        Assert.DoesNotContain(serializationInfoCollection.Generics, x => x.FormatterName == "global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String>");
+        Assert.DoesNotContain(serializationInfoCollection.Generics, x => x.FormatterName == "global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatterFactory<global::System.String>");
     }
 
 }

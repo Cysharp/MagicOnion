@@ -295,9 +295,9 @@ public class StreamingHubClientHeartbeatManagerTest
         var ms = dt.ToUnixTimeMilliseconds();
 
         var arrayBufferWriter = new ArrayBufferWriter<byte>();
-        var writer = new MessagePackWriter(arrayBufferWriter);
-        writer.Write(ms);
-        writer.Flush();
+        using var writer = new MessagePackWriter();
+        writer.WriteInt64(ms);
+        writer.WriteTo(arrayBufferWriter);
         return arrayBufferWriter.WrittenMemory.ToArray();
     }
 
@@ -306,9 +306,9 @@ public class StreamingHubClientHeartbeatManagerTest
         var ms = (long)ts.TotalMilliseconds;
 
         var arrayBufferWriter = new ArrayBufferWriter<byte>();
-        var writer = new MessagePackWriter(arrayBufferWriter);
-        writer.Write(ms);
-        writer.Flush();
+        using var writer = new MessagePackWriter();
+        writer.WriteInt64(ms);
+        writer.WriteTo(arrayBufferWriter);
         return arrayBufferWriter.WrittenMemory.ToArray();
     }
 }

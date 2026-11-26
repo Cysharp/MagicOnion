@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 - Windows または macOS
 - .NET 8 SDK またはそれ以降
-- Unity 2022.3 以降または Unity 6 (6000.0.34f1) 以降
+- Unity 2022.3.12f1 以降または Unity 6 (6000.0.34f1) 以降
 
 :::note
 Unity 6 の一部バージョンでは Source Generator に関する不具合があるため 6000.0.34f1 以降を使用してください

@@ -10,14 +10,14 @@
     <PackageVersion Include="Grpc.Core.Api" Version="2.57.0" />
     <PackageVersion Include="Grpc.Net.Client" Version="2.57.0" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
-    <PackageVersion Include="MessagePack" Version="3.1.12" />
+    <PackageVersion Include="MessagePack" Version="4.0.0-rc.1" />
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="8.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.3.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
-    <PackageVersion Include="Multicaster" Version="2.1.1" />
-    <PackageVersion Include="Multicaster.Distributed.Redis" Version="2.1.1" />
-    <PackageVersion Include="Multicaster.Distributed.Nats" Version="2.1.1" />
+    <PackageVersion Include="Multicaster" Version="3.0.0-preview.1" />
+    <PackageVersion Include="Multicaster.Distributed.Nats" Version="3.0.0-preview.1" />
+    <PackageVersion Include="Multicaster.Distributed.Redis" Version="3.0.0-preview.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageVersion Include="PolySharp" Version="1.15.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.0" />
@@ -48,6 +48,7 @@
   </ItemGroup>
   <!-- for transitive dependencies (legacy) -->
   <ItemGroup>
+    <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageVersion Include="System.Formats.Asn1" Version="9.0.0" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />

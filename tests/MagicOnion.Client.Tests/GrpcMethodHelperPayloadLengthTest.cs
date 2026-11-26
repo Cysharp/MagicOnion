@@ -95,7 +95,7 @@ public class GrpcMethodHelperPayloadLengthTest
 
             // Assert
             Assert.Equal(context.Written.Length, context.PayloadLength);
-            Assert.Equal(value, MessagePackSerializer.Deserialize<string>(context.Written));
+            Assert.Equal(value, MessagePackSerializer.Deserialize<string>(context.Written.Span));
         }
     }
 

@@ -1,0 +1,714 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SerializerFoundation</name>
+    </assembly>
+    <members>
+        <member name="T:SerializerFoundation.PooledSegment">
+            <summary>One rented array of a pooled-list write buffer and its finished length (meaningful for every segment but the live last one).</summary>
+        </member>
+        <member name="M:SerializerFoundation.PooledSegments.Return(SerializerFoundation.PooledSegment[],System.Int32)">
+            <summary>Returns every rented array in <paramref name="segments"/> and the table itself to their pools.</summary>
+        </member>
+        <member name="T:SerializerFoundation.BufferSegments">
+            <summary>
+            A borrowed, forward-only view of a written message, exposed as zero-copy segments.
+            Valid only while the source buffer is alive and unmodified.
+            Every segment is non-empty, and <see cref="P:SerializerFoundation.BufferSegments.SegmentCount"/> tells how many there are up front.
+            Instead of foreach, you can loop with `while (segments.TryGetNext(out var segment))`.
+            </summary>
+        </member>
+        <member name="P:SerializerFoundation.BufferSegments.Length">
+            <summary>Total message length in bytes.</summary>
+        </member>
+        <member name="P:SerializerFoundation.BufferSegments.SegmentCount">
+            <summary>
+            Number of segments <see cref="M:SerializerFoundation.BufferSegments.TryGetNext(System.ReadOnlySpan{System.Byte}@)"/> yields over a full pass (none of them empty).
+            Lets a header that depends on the segment count be written without a counting pass.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.BufferSegments.TryGetNext(System.ReadOnlySpan{System.Byte}@)">
+            <summary>Retrieves the next segment. Returns false when no segments remain.</summary>
+        </member>
+        <member name="M:SerializerFoundation.BufferSegments.Reset">
+            <summary>Restarts iteration from the first segment.</summary>
+        </member>
+        <member name="T:SerializerFoundation.CodeAnalysis.NonCopyableAttribute">
+            <summary>
+            Marks a struct as single-owner mutable state that must not be copied, which the bundled analyzer enforces as SF002.
+            Buffer structs need no marker: implementing <see cref="T:SerializerFoundation.IWriteBuffer"/> or <see cref="T:SerializerFoundation.IReadBuffer"/> already opts them in.
+            Apply it to a struct that is not a buffer itself but holds one by value, such as a serializer's reader or writer,
+            where a copy duplicates the inner buffer just as copying the buffer would.
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.CodeAnalysis.RequireOverrideAttribute">
+            <summary>
+            Marks a virtual member that is conceptually abstract.
+            Every non-abstract derived type that can see the member must override it, which the bundled analyzer enforces as SF003.
+            Used where a true abstract member would break binary compatibility across target frameworks.
+            The attribute is not inherited: an override satisfies the requirement for everything below it,
+            and an intermediate override that should itself be overridden again applies the attribute anew.
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.IReadBuffer">
+            <summary>
+            Source that serializers read from.
+            Inspect bytes through <see cref="M:SerializerFoundation.IReadBuffer.GetUnreadSpan"/> or <see cref="M:SerializerFoundation.IReadBuffer.TryGetSpan(System.Int32,System.ReadOnlySpan{System.Byte}@)"/>, then consume them with <see cref="M:SerializerFoundation.IReadBuffer.Advance(System.Int32)"/>.
+            A span obtained from either stays valid until the next call to <see cref="M:SerializerFoundation.IReadBuffer.GetUnreadSpan"/> or <see cref="M:SerializerFoundation.IReadBuffer.TryGetSpan(System.Int32,System.ReadOnlySpan{System.Byte}@)"/>,
+            or until <see cref="M:System.IDisposable.Dispose"/>: a later window may be served from temporary storage that the next request
+            overwrites or returns to a pool. Anything that may read from the buffer, such as a nested formatter, can request a window,
+            so re-request the span after such calls instead of holding on to it.
+            <see cref="M:SerializerFoundation.IReadBuffer.Advance(System.Int32)"/> and <see cref="M:SerializerFoundation.IReadBuffer.CopyTo(System.Span{System.Byte})"/> do not invalidate a held span, although the bytes that Advance consumed are no longer unread data.
+            </summary>
+        </member>
+        <member name="P:SerializerFoundation.IReadBuffer.BytesConsumed">
+            <summary>Total number of bytes consumed so far.</summary>
+        </member>
+        <member name="P:SerializerFoundation.IReadBuffer.BytesRemaining">
+            <summary>Number of unread bytes left in the data.</summary>
+        </member>
+        <member name="M:SerializerFoundation.IReadBuffer.GetUnreadSpan">
+            <summary>
+            Returns the unread portion of the current contiguous window, with no size requirement.
+            Empty only when the data is exhausted: while <see cref="P:SerializerFoundation.IReadBuffer.BytesRemaining"/> is positive the span holds at least one byte,
+            so a segmented implementation repositions onto the next non-empty segment instead of returning an empty window.
+            Never throws.
+            The span is valid until the next <see cref="M:SerializerFoundation.IReadBuffer.GetUnreadSpan"/> or <see cref="M:SerializerFoundation.IReadBuffer.TryGetSpan(System.Int32,System.ReadOnlySpan{System.Byte}@)"/> call, or Dispose.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.IReadBuffer.TryGetSpan(System.Int32,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Returns a contiguous window of at least <paramref name="sizeHint"/> bytes, copying across segment seams as needed,
+            or false when fewer bytes remain in the data.
+            A <paramref name="sizeHint"/> of 0 always succeeds and may return an empty span.
+            A negative <paramref name="sizeHint"/> throws <see cref="T:System.ArgumentOutOfRangeException"/>.
+            The span is valid until the next <see cref="M:SerializerFoundation.IReadBuffer.GetUnreadSpan"/> or <see cref="M:SerializerFoundation.IReadBuffer.TryGetSpan(System.Int32,System.ReadOnlySpan{System.Byte}@)"/> call, or Dispose;
+            a window copied across a seam lives in temporary storage that the next request reuses.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.IReadBuffer.Advance(System.Int32)">
+            <summary>
+            Consumes <paramref name="bytesConsumed"/> bytes.
+            Throws <see cref="T:System.InvalidOperationException"/> when the value is negative or exceeds <see cref="P:SerializerFoundation.IReadBuffer.BytesRemaining"/>.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.IReadBuffer.CopyTo(System.Span{System.Byte})">
+            <summary>
+            Copies the next <paramref name="destination"/>.Length bytes into <paramref name="destination"/> without consuming them;
+            the caller advances afterwards.
+            Multi-segment implementations copy straight out of their segments without building a contiguous window first.
+            Throws <see cref="T:System.InvalidOperationException"/> when <paramref name="destination"/> is longer than <see cref="P:SerializerFoundation.IReadBuffer.BytesRemaining"/>.
+            <paramref name="destination"/> is <c>scoped</c>: implementations only copy into it and never retain it, so callers may pass stack memory.
+            A ref struct implementation must declare the parameter <c>scoped</c> as well (the compiler reports CS8987 otherwise).
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.IWriteBuffer">
+            <summary>
+            Destination that serializers write to.
+            Request a window with <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/>, write into it, then commit with <see cref="M:SerializerFoundation.IWriteBuffer.Advance(System.Int32)"/>.
+            The span stays valid until the next call to <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/>, <see cref="M:SerializerFoundation.IWriteBuffer.Flush"/>, or <see cref="M:System.IDisposable.Dispose"/>:
+            any of them may hand the window to the underlying destination, return it to a pool, or replace it with a larger one.
+            Anything that may write to the buffer, such as a nested formatter, can request a window, so re-request the span after
+            such calls instead of holding on to it.
+            <see cref="M:SerializerFoundation.IWriteBuffer.Advance(System.Int32)"/> commits the leading bytes and does not invalidate the rest of the span, which stays writable
+            until one of the calls above.
+            </summary>
+        </member>
+        <member name="P:SerializerFoundation.IWriteBuffer.BytesWritten">
+            <summary>Total number of bytes written so far.</summary>
+        </member>
+        <member name="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)">
+            <summary>
+            Returns a writable span of at least <paramref name="sizeHint"/> bytes.
+            When <paramref name="sizeHint"/> is 0, some non-empty span is returned.
+            A negative <paramref name="sizeHint"/> throws <see cref="T:System.ArgumentOutOfRangeException"/> instead of being clamped.
+            A size the buffer cannot provide throws as well: <see cref="T:System.InvalidOperationException"/> when the buffer is out of room
+            (a fixed span, or a destination that returns too little), while a buffer that grows by allocating lets the failed
+            allocation surface, which is <see cref="T:System.OutOfMemoryException"/> for a size past the largest possible array.
+            The span is valid until the next <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/>, <see cref="M:SerializerFoundation.IWriteBuffer.Flush"/>, or Dispose call.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.IWriteBuffer.Advance(System.Int32)">
+            <summary>
+            Commits <paramref name="bytesWritten"/> bytes written into the span obtained from <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/>.
+            Throws <see cref="T:System.InvalidOperationException"/> when the value is negative or exceeds the remaining span.
+            Always pass the number of bytes actually written, never an upfront reservation.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.IWriteBuffer.Flush">
+            <summary>Pushes buffered bytes through to the underlying destination, when one exists.</summary>
+        </member>
+        <member name="T:SerializerFoundation.WriteBufferExtensions">
+            <summary>Extension methods for <see cref="T:SerializerFoundation.IWriteBuffer"/> implementations.</summary>
+        </member>
+        <member name="M:SerializerFoundation.WriteBufferExtensions.GetReference``1(``0@,System.Int32)">
+            <inheritdoc cref="M:SerializerFoundation.WriteBufferExtensions.&lt;G&gt;$DF214563CFD238CF5E5CECF7133EEB2A`1.GetReference(System.Int32)"/>
+        </member>
+        <member name="M:SerializerFoundation.WriteBufferExtensions.&lt;G&gt;$DF214563CFD238CF5E5CECF7133EEB2A`1.GetReference(System.Int32)">
+            <summary>
+            Returns a reference to writable memory with at least <paramref name="sizeHint"/> bytes behind it.
+            A reference-typed shortcut for <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/> with the same contract,
+            including the lifetime: the reference is valid until the next <see cref="M:SerializerFoundation.IWriteBuffer.GetSpan(System.Int32)"/>,
+            <see cref="M:SerializerFoundation.IWriteBuffer.Flush"/>, or Dispose call.
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.ReadOnlySequenceReadBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.IReadBuffer"/> over a <see cref="T:System.Buffers.ReadOnlySequence`1"/>, such as one produced by PipeReader.
+            Reads operate on each contiguous segment,
+            and bytes that straddle a segment seam are copied into a temporary buffer to form a contiguous window.
+            It can also be constructed over a single <see cref="T:System.ReadOnlySpan`1"/>, so one reader type covers both inputs.
+            Dispose returns any rented buffer and must be called.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ReadOnlySequenceReadBuffer.#ctor(System.Buffers.ReadOnlySequence{System.Byte}@)">
+            <summary>Creates a read buffer over <paramref name="sequence"/>.</summary>
+        </member>
+        <member name="M:SerializerFoundation.ReadOnlySequenceReadBuffer.#ctor(System.Buffers.ReadOnlySequence{System.Byte}@,System.Span{System.Byte})">
+            <summary>
+            Creates a read buffer over <paramref name="sequence"/>.
+            Small windows that straddle a segment seam are copied into <paramref name="scratch"/> (typically stackalloc memory)
+            instead of renting from the pool.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ReadOnlySequenceReadBuffer.#ctor(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Creates a read buffer over a single contiguous <paramref name="span"/>,
+            so a reader that holds this type can take span input without a second buffer type.
+            The whole span is one window: nothing is stitched or rented.
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.CompatibleReadOnlySequenceReadBuffer">
+            <summary>
+            A <see cref="T:SerializerFoundation.ReadOnlySequenceReadBuffer"/> variant for target frameworks without <c>allows ref struct</c> support.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleReadOnlySequenceReadBuffer.#ctor(System.Buffers.ReadOnlySequence{System.Byte}@)">
+            <summary>Creates a read buffer over <paramref name="sequence"/>.</summary>
+        </member>
+        <member name="T:SerializerFoundation.ReadOnlySpanReadBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.IReadBuffer"/> over a single contiguous block of memory.
+            The standard entry point for reading from a byte array or span.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ReadOnlySpanReadBuffer.#ctor(System.ReadOnlySpan{System.Byte})">
+            <summary>Creates a read buffer over <paramref name="buffer"/>.</summary>
+        </member>
+        <member name="T:SerializerFoundation.CompatibleReadOnlySpanReadBuffer">
+            <summary>
+            A <see cref="T:SerializerFoundation.ReadOnlySpanReadBuffer"/> variant over pointer memory for target frameworks without <c>allows ref struct</c> support.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleReadOnlySpanReadBuffer.#ctor(System.Byte*,System.Int32)">
+            <summary>
+            Creates a read buffer over <paramref name="length"/> bytes starting at <paramref name="buffer"/>.
+            The memory must stay valid and pinned while in use.
+            </summary>
+        </member>
+        <member name="T:SerializerFoundation.ArrayPoolListWriteBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.IWriteBuffer"/> that stages the message in a caller-provided scratch span first,
+            then in a chain of arrays rented from <see cref="T:System.Buffers.ArrayPool`1"/>.
+            Dispose returns the rented arrays and must be called exactly once.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ArrayPoolListWriteBuffer.#ctor(System.Span{System.Byte})">
+            <summary>
+            Creates a write buffer that fills <paramref name="scratchBuffer"/> (typically stackalloc memory) before renting from the pool.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ArrayPoolListWriteBuffer.ToArray">
+            <summary>
+            Copies the written message into a new array.
+            Throws <see cref="T:System.InvalidOperationException"/> when the message is longer than the largest possible array;
+            <see cref="M:SerializerFoundation.ArrayPoolListWriteBuffer.GetWrittenSegments"/> still reaches all of it.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ArrayPoolListWriteBuffer.WriteTo(System.Span{System.Byte})">
+            <summary>
+            Copies the written message into <paramref name="destination"/>, which must be at least <see cref="P:SerializerFoundation.ArrayPoolListWriteBuffer.BytesWritten"/> bytes long.
+            <paramref name="destination"/> is not retained (it is <c>scoped</c>), so it may be stack memory.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.ArrayPoolListWriteBuffer.GetWrittenSegments">
+            <summary>Borrowed zero-copy view of the written message; valid until the next write or Dispose.</summary>
+        </member>
+        <member name="T:SerializerFoundation.CompatibleArrayPoolListWriteBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.ArrayPoolListWriteBuffer"/> variant for target frameworks without <c>allows ref struct</c> support.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleArrayPoolListWriteBuffer.ToArray">
+            <summary>
+            Copies the written message into a new array.
+            Throws <see cref="T:System.InvalidOperationException"/> when the message is longer than the largest possible array;
+            <see cref="M:SerializerFoundation.CompatibleArrayPoolListWriteBuffer.GetWrittenSegments"/> still reaches all of it.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleArrayPoolListWriteBuffer.WriteTo(System.Span{System.Byte})">
+            <summary>
+            Copies the written message into <paramref name="destination"/>, which must be at least <see cref="P:SerializerFoundation.CompatibleArrayPoolListWriteBuffer.BytesWritten"/> bytes long.
+            <paramref name="destination"/> is not retained (it is <c>scoped</c>), so it may be stack memory.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleArrayPoolListWriteBuffer.GetWrittenSegments">
+            <summary>Borrowed zero-copy view of the written message; valid until the next write or Dispose.</summary>
+        </member>
+        <member name="T:SerializerFoundation.BufferWriterWriteBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.IWriteBuffer"/> that writes into an <see cref="T:System.Buffers.IBufferWriter`1"/> such as PipeWriter or ArrayBufferWriter.
+            Writes are staged in the writer's current span and committed to the writer on <see cref="M:SerializerFoundation.BufferWriterWriteBuffer.Flush"/> or Dispose.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.BufferWriterWriteBuffer.#ctor(System.Buffers.IBufferWriter{System.Byte})">
+            <summary>Creates a write buffer over <paramref name="bufferWriter"/>.</summary>
+        </member>
+        <member name="T:SerializerFoundation.CompatibleBufferWriterWriteBuffer">
+            <summary>
+            A <see cref="T:SerializerFoundation.BufferWriterWriteBuffer"/> variant for target frameworks without <c>allows ref struct</c> support.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleBufferWriterWriteBuffer.#ctor(System.Buffers.IBufferWriter{System.Byte})">
+            <summary>Creates a write buffer over <paramref name="bufferWriter"/>.</summary>
+        </member>
+        <member name="T:SerializerFoundation.SpanWriteBuffer">
+            <summary>
+            An <see cref="T:SerializerFoundation.IWriteBuffer"/> over a caller-provided fixed span, such as stackalloc memory.
+            Suited to cases where the maximum message size is known up front.
+            It never grows; running out of space throws.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.SpanWriteBuffer.#ctor(System.Span{System.Byte})">
+            <summary>Creates a write buffer over <paramref name="buffer"/>.</summary>
+        </member>
+        <member name="T:SerializerFoundation.CompatibleSpanWriteBuffer">
+            <summary>
+            A <see cref="T:SerializerFoundation.SpanWriteBuffer"/> variant over pointer memory for target frameworks without <c>allows ref struct</c> support.
+            </summary>
+        </member>
+        <member name="M:SerializerFoundation.CompatibleSpanWriteBuffer.#ctor(System.Byte*,System.Int32)">
+            <summary>
+            Creates a write buffer over <paramref name="length"/> bytes starting at <paramref name="buffer"/>.
+            The memory must stay valid and pinned while in use.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.EmbeddedAttribute">
+            <summary>
+            A special attribute recognized by Roslyn, that marks a type as "embedded", meaning it won't ever be visible from other assemblies.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ParamCollectionAttribute">
+            <summary>
+            Indicates that a method will allow a variable number of arguments in its invocation.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.SkipLocalsInitAttribute">
+            <summary>
+            Used to indicate to the compiler that the <c>.locals init</c> flag should not be set in method headers.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>
+            Specifies that a type has required members or that a member is required.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
+            <summary>
+            An attribute that allows parameters to receive the expression of other parameters.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            </summary>
+            <param name="parameterName">The condition parameter value.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+            <summary>
+            Gets the parameter name the expression is retrieved from.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute"/> type.
+            </summary>
+            <param name="featureName">The name of the feature to indicate.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ExtensionMarkerAttribute">
+            <summary>
+            This attribute is used to mark extension members and associate them with a specific marker type (which provides detailed information about an extension block and its receiver parameter).
+            This attribute should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.ExtensionMarkerAttribute.#ctor(System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.ExtensionMarkerAttribute"/> class.</summary>
+            <param name="name">The name of the marker type this extension member is associated with.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.ExtensionMarkerAttribute.Name">
+            <summary>The name of the marker type this extension member is associated with.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiresLocationAttribute">
+            <summary>
+            Reserved for use by a compiler for tracking metadata.
+            This attribute should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Reserved to be used by the compiler for tracking metadata.
+            This class should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ModuleInitializerAttribute">
+             <summary>
+             Used to indicate to the compiler that a method should be called
+             in its containing module's initializer.
+             </summary>
+             <remarks>
+             When one or more valid methods
+             with this attribute are found in a compilation, the compiler will
+             emit a module initializer which calls each of the attributed methods.
+            
+             Certain requirements are imposed on any method targeted with this attribute:
+             - The method must be `static`.
+             - The method must be an ordinary member method, as opposed to a property accessor, constructor, local function, etc.
+             - The method must be parameterless.
+             - The method must return `void`.
+             - The method must not be generic or be contained in a generic type.
+             - The method's effective accessibility must be `internal` or `public`.
+            
+             The specification for module initializers in the .NET runtime can be found here:
+             https://github.com/dotnet/runtime/blob/main/docs/design/specs/Ecma-335-Augments.md#module-initializer
+             </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>
+            Indicates the attributed type is to be used as an interpolated string handler.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>
+            Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>
+            Gets the names of the arguments that should be passed to the handler.
+            </summary>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute">
+            <summary>
+            Specifies the priority of a member in overload resolution. When unspecified, the default priority is 0.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute"/> class.
+            </summary>
+            <param name="priority">The priority of the attributed member. Higher numbers are prioritized, lower numbers are deprioritized. 0 is the default if no attribute is present.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute.Priority">
+            <summary>
+            The priority of the member.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CollectionBuilderAttribute.#ctor(System.Type,System.String)">
+            <summary>
+            Initialize the attribute to refer to the <paramref name="methodName"/> method on the <paramref name="builderType"/> type.
+            </summary>
+            <param name="builderType">The type of the builder to use to construct the collection.</param>
+            <param name="methodName">The name of the method on the builder to use to construct the collection.</param>
+            <remarks>
+            <paramref name="methodName"/> must refer to a static method that accepts a single parameter of
+            type <see cref="T:System.ReadOnlySpan`1"/> and returns an instance of the collection being built containing
+            a copy of the data from that span.  In future releases of .NET, additional patterns may be supported.
+            </remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CollectionBuilderAttribute.BuilderType">
+            <summary>
+            Gets the type of the builder to use to construct the collection.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CollectionBuilderAttribute.MethodName">
+            <summary>
+            Gets the name of the method on the builder to use to construct the collection.
+            </summary>
+            <remarks>
+            This should match the metadata name of the target method.
+            For example, this might be ".ctor" if targeting the type's constructor.
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerLoweringPreserveAttribute">
+            <summary>
+            When applied to an attribute class, instructs the compiler to flow applications of that attribute,
+            from source code down to compiler-generated symbols. This can help IL-based analysis tools.
+            </summary>
+            <remarks>
+            One example where this attribute applies is in C# primary constructor parameters. If an attribute
+            marked with <see cref="T:System.Runtime.CompilerServices.CompilerLoweringPreserveAttribute"/> gets applied to a primary constructor
+            parameter, the attribute will also be applied to any compiler-generated fields storing that parameter.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerLoweringPreserveAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerLoweringPreserveAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class with the specified message.
+            </summary>
+            <param name="message">An optional message associated with this attribute instance.</param>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Message">
+            <summary>
+            Returns the optional message associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Url">
+            <summary>
+            Returns the optional URL associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute">
+            <summary>
+            Indicates that an API is experimental and it may change in the future.
+            </summary>
+            <remarks>
+            This attribute allows call sites to be flagged with a diagnostic that indicates that an experimental
+            feature is used. Authors can use this attribute to ship preview features in their assemblies.
+            </remarks>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute"/> class,
+            specifying the ID that the compiler will use when reporting a use of the API the attribute applies to.
+            </summary>
+            <param name="diagnosticId">The ID that the compiler will use when reporting a use of the API the attribute applies to.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.DiagnosticId">
+            <summary>
+            Gets the ID that the compiler will use when reporting a use of the API the attribute applies to.
+            </summary>
+            <value>The unique diagnostic ID.</value>
+            <remarks>
+            The diagnostic ID is shown in build output for warnings and errors.
+            <para>This property represents the unique ID that can be used to suppress the warnings or errors, if needed.</para>
+            </remarks>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ExperimentalAttribute.UrlFormat">
+            <summary>
+            Gets or sets the URL for corresponding documentation.
+            The API accepts a format string instead of an actual URL, creating a generic URL that includes the diagnostic ID.
+            </summary>
+            <value>The format string that represents a URL to corresponding documentation.</value>
+            <remarks>An example format string is <c>https://contoso.com/obsoletion-warnings/{0}</c>.</remarks>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.UnscopedRefAttribute">
+            <summary>
+            Used to indicate a byref escapes and is not scoped.
+            </summary>
+            <remarks>
+            <para>
+            There are several cases where the C# compiler treats a <see langword="ref"/> as implicitly
+            <see langword="scoped"/> - where the compiler does not allow the <see langword="ref"/> to escape the method.
+            </para>
+            <para>
+            For example:
+            <list type="number">
+                <item><see langword="this"/> for <see langword="struct"/> instance methods.</item>
+                <item><see langword="ref"/> parameters that refer to <see langword="ref"/> <see langword="struct"/> types.</item>
+                <item><see langword="out"/> parameters.</item>
+            </list>
+            </para>
+            <para>
+            This attribute is used in those instances where the <see langword="ref"/> should be allowed to escape.
+            </para>
+            <para>
+            Applying this attribute, in any form, has impact on consumers of the applicable API. It is necessary for
+            API authors to understand the lifetime implications of applying this attribute and how it may impact their users.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>
+            Specifies the syntax used in a string.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.
+            </summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property members have not-null values.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with a field or property member.
+            </summary>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes the attribute with the list of field and property members.
+            </summary>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type,
+            and callers do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property
+            members have not-null values when returning with the specified return value condition.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>
+            Initializes the attribute with the specified return value condition and a field or property member.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>
+            Initializes the attribute with the specified return value condition and list of field and property members.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute">
+            <summary>
+            Indicates that the specified method parameter expects a constant.
+            </summary>
+            <remarks>
+            This can be used to inform tooling that a constant should be used as an argument for the annotated parameter.
+            </remarks>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute.Min">
+            <summary>
+            Indicates the minimum bound of the expected constant, inclusive.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.ConstantExpectedAttribute.Max">
+            <summary>
+            Indicates the maximum bound of the expected constant, inclusive.
+            </summary>
+        </member>
+    </members>
+</doc>

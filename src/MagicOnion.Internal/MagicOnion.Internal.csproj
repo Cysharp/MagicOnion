@@ -13,6 +13,10 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Reflection.Emit" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" />
   </ItemGroup>

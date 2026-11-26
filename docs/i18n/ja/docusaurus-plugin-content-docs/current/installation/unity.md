@@ -1,5 +1,5 @@
 # Unity での利用
-MagicOnion のクライアントは Unity のバージョン 2022.3.0f1 (LTS) 以降をサポートしています。
+MagicOnion のクライアントは Unity のバージョン 2022.3.12f1 (LTS) 以降をサポートしています。
 
 `.NET Standard 2.1` プロファイルと IL2CPP によるビルド、プラットフォームとして Windows, Android, iOS, macOS をサポートします。現時点でそれ以外の WebGL やコンソールといった環境における動作は未サポートです。
 
@@ -56,7 +56,7 @@ Unity 向けに GrpcChannel をラップした、より開発に役立つ機能�
 ## UnityEngine.Vector3 などの Unity 固有型を使用する
 `UnityEngine.Vector2`, `UnityEngine.Vector3` などの Unity に固有な型を使用するには追加のパッケージのインストールが必要です。
 
-Unity プロジェクトには MessagePack-CSharp の Unity 向けパッケージの導入が必要となり、サーバーや共有ライブラリーでは Unity 固有の型をサポートするための NuGet パッケージをインストールする必要があります。詳しくは MessagePack-CSharp の [Unity support](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#unity-support) および [Extensions](https://github.com/MessagePack-CSharp/MessagePack-CSharp?tab=readme-ov-file#extensions) のセクションを参照してください。
+Unity プロジェクトに MessagePack v4 の Unity パッケージを、サーバーに NuGet パッケージの `MessagePack.UnityShims` をインストールします。両側で `WithUnity()` により Unity 用フォーマッターファクトリを追加した MessagePack オプションを使用します。[MessagePack v4 の Unity 設定](https://github.com/MessagePack-CSharp/MessagePack-CSharp/tree/v4.0.0-rc.1#unity)
 
 ## IL2CPP での動作
 

@@ -76,7 +76,7 @@ public class MyStreamingHub : StreamingHubBase<IMyStreamingHub, IMyStreamingHubR
 NATS support is currently in preview and is provided as a package for Multicaster. To use NATS, install the `Multicaster.Distributed.Nats` package.
 
 ```shell
-dotnet add package Multicaster.Distributed.Nats
+dotnet add package Multicaster.Distributed.Nats --version 3.0.0-preview.1
 ```
 
 Next, register `NatsGroupOptions` with the service.
